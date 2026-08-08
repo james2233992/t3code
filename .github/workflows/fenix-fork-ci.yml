@@ -45,6 +45,11 @@ jobs:
       - name: Check
         run: vp check
 
+      - name: Verify Fenix branding inventory
+        run: |
+          bash scripts/fenix/generate-branding-inventory.sh selftest
+          bash scripts/fenix/generate-branding-inventory.sh check
+
       - name: Typecheck
         run: vpr typecheck
 

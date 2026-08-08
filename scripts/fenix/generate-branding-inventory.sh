@@ -58,6 +58,7 @@ run_match_inventory() {
   local pattern="$1"
   local rg_output
   local rg_status=0
+  local jq_status=0
   rg_output="$(mktemp)"
   (
     cd "$repo_root"
@@ -76,8 +77,9 @@ run_match_inventory() {
     | .data as $data
     | $data.submatches[]
     | "\($data.path.text):\($data.line_number):\(.start + 1):\(.match.text)"
-  ' "$rg_output" | LC_ALL=C sort -u
+  ' "$rg_output" | LC_ALL=C sort -u || jq_status=$?
   find "$rg_output" -depth -delete
+  return "$jq_status"
 }
 
 generate_to() {
@@ -135,9 +137,11 @@ write_inventory() {
 run_selftest() {
   local selftest_dir
   local fake_rg
+  local fake_jq
   local no_clobber_dir
   selftest_dir="$(mktemp -d)"
   fake_rg="${selftest_dir}/rg"
+  fake_jq="${selftest_dir}/jq"
 
   cat > "$fake_rg" <<'SH'
 #!/usr/bin/env bash
@@ -169,6 +173,34 @@ SH
   if write_inventory "$no_clobber_dir" > "${selftest_dir}/write.out" \
     2> "${selftest_dir}/write.err"; then
     echo "expected failing generation to preserve existing inventory files" >&2
+    find "$selftest_dir" -depth -delete
+    return 1
+  fi
+  for inventory_file in "${inventory_files[@]}"; do
+    grep -qx "sentinel:${inventory_file}" "${no_clobber_dir}/${inventory_file}"
+  done
+
+  cat > "$fake_rg" <<'SH'
+#!/usr/bin/env bash
+exit 1
+SH
+  cat > "$fake_jq" <<'SH'
+#!/usr/bin/env bash
+echo "synthetic jq failure" >&2
+exit 3
+SH
+  chmod +x "$fake_rg" "$fake_jq"
+  export FENIX_BRANDING_INVENTORY_RG_BIN="$fake_rg"
+  export FENIX_BRANDING_INVENTORY_JQ_BIN="$fake_jq"
+  if run_match_inventory "jq-error" > "${selftest_dir}/jq.out" \
+    2> "${selftest_dir}/jq.err"; then
+    echo "expected jq failure to fail" >&2
+    find "$selftest_dir" -depth -delete
+    return 1
+  fi
+  if write_inventory "$no_clobber_dir" > "${selftest_dir}/jq-write.out" \
+    2> "${selftest_dir}/jq-write.err"; then
+    echo "expected jq failure to preserve existing inventory files" >&2
     find "$selftest_dir" -depth -delete
     return 1
   fi
