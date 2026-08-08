@@ -45,6 +45,9 @@ jobs:
       - name: Check
         run: vp check
 
+      - name: Install Fenix branding inventory tools
+        run: sudo apt-get update && sudo apt-get install -y ripgrep
+
       - name: Verify Fenix branding inventory
         run: |
           bash scripts/fenix/generate-branding-inventory.sh selftest
