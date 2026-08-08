@@ -115,6 +115,103 @@ describe("FenixAdapter", () => {
     }),
   );
 
+  it.effect("canonicalizes a persisted legacy featured model before posting a turn", () =>
+    Effect.gen(function* () {
+      const requests: Array<{ body: string }> = [];
+      const fetchImpl = (async (_url, init) => {
+        requests.push({ body: String(init?.body ?? "{}") });
+        return Response.json({ response: "respuesta fenix" });
+      }) as typeof fetch;
+      const adapter = yield* makeFenixAdapter(
+        fenixSettings({ featuredModel: "openai/gpt-oss-120b" }),
+        {
+          fetch: fetchImpl,
+          instanceId: ProviderInstanceId.make("fenix"),
+          pairingSession: { kind: "cookie", authToken: "fenix-session" },
+        },
+      );
+      const threadId = ThreadId.make("thread-fenix-legacy-featured-model");
+
+      yield* adapter.startSession({
+        threadId,
+        runtimeMode: "full-access",
+      });
+      yield* adapter.sendTurn({ threadId, input: "crea una funcion" });
+      const sessions = yield* adapter.listSessions();
+
+      expect(sessions[0]?.model).toBe("groq/openai/gpt-oss-120b");
+      expect(decodeUnknownJson(requests[0]?.body ?? "{}")).toMatchObject({
+        model: "groq/openai/gpt-oss-120b",
+      });
+    }),
+  );
+
+  it.effect("canonicalizes a legacy selected model before posting a turn", () =>
+    Effect.gen(function* () {
+      const requests: Array<{ body: string }> = [];
+      const fetchImpl = (async (_url, init) => {
+        requests.push({ body: String(init?.body ?? "{}") });
+        return Response.json({ response: "respuesta fenix" });
+      }) as typeof fetch;
+      const instanceId = ProviderInstanceId.make("fenix");
+      const adapter = yield* makeFenixAdapter(fenixSettings(), {
+        fetch: fetchImpl,
+        instanceId,
+        pairingSession: { kind: "cookie", authToken: "fenix-session" },
+      });
+      const threadId = ThreadId.make("thread-fenix-legacy-selected-model");
+
+      yield* adapter.startSession({
+        threadId,
+        runtimeMode: "full-access",
+      });
+      yield* adapter.sendTurn({
+        threadId,
+        input: "crea una funcion",
+        modelSelection: {
+          instanceId,
+          model: "openai/gpt-oss-120b",
+          options: [],
+        },
+      });
+      const sessions = yield* adapter.listSessions();
+
+      expect(sessions[0]?.model).toBe("groq/openai/gpt-oss-120b");
+      expect(decodeUnknownJson(requests[0]?.body ?? "{}")).toMatchObject({
+        model: "groq/openai/gpt-oss-120b",
+      });
+    }),
+  );
+
+  it.effect("keeps unknown custom model slugs intact", () =>
+    Effect.gen(function* () {
+      const requests: Array<{ body: string }> = [];
+      const fetchImpl = (async (_url, init) => {
+        requests.push({ body: String(init?.body ?? "{}") });
+        return Response.json({ response: "respuesta fenix" });
+      }) as typeof fetch;
+      const adapter = yield* makeFenixAdapter(
+        fenixSettings({ featuredModel: "custom/fenix-dev" }),
+        {
+          fetch: fetchImpl,
+          instanceId: ProviderInstanceId.make("fenix"),
+          pairingSession: { kind: "cookie", authToken: "fenix-session" },
+        },
+      );
+      const threadId = ThreadId.make("thread-fenix-custom-model");
+
+      yield* adapter.startSession({
+        threadId,
+        runtimeMode: "full-access",
+      });
+      yield* adapter.sendTurn({ threadId, input: "crea una funcion" });
+
+      expect(decodeUnknownJson(requests[0]?.body ?? "{}")).toMatchObject({
+        model: "custom/fenix-dev",
+      });
+    }),
+  );
+
   it.effect("does not resolve pairing credentials when starting a session", () =>
     Effect.gen(function* () {
       let resolveCount = 0;

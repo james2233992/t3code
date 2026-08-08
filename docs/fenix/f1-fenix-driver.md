@@ -16,7 +16,9 @@ Repository: `james2233992/t3code` fork.
 
 ## Featured Programming Agent
 
-The featured model is `openai/gpt-oss-120b` for `Agente Groq de Programacion`.
+The featured model is `groq/openai/gpt-oss-120b` for `Agente Groq de Programacion`.
+Legacy stored selections using `openai/gpt-oss-120b` are accepted as input and
+canonicalized before any server payload is built.
 
 Fable review notes this is already present in the production Fenix catalog as run_on `14`, used by QA agent `234`. F1 therefore does not require a new `run_on_models` row or DML. The documented catalog economics for this driver are `$0.15` input / `$0.60` output per 1M tokens with `131k` context.
 

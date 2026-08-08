@@ -16,6 +16,7 @@ import * as Effect from "effect/Effect";
 import * as PubSub from "effect/PubSub";
 import * as Schema from "effect/Schema";
 import * as Stream from "effect/Stream";
+import { normalizeModelSlug } from "@t3tools/shared/model";
 
 import {
   ProviderAdapterRequestError,
@@ -26,9 +27,14 @@ import type { FenixAdapterShape } from "../Services/FenixAdapter.ts";
 
 const PROVIDER = ProviderDriverKind.make("fenix");
 const FENIX_TRUSTED_ORIGIN = "https://iaonline.io";
+const DEFAULT_FENIX_MODEL = "groq/openai/gpt-oss-120b";
 const INVALID_HEADER_VALUE = /[\u0000-\u001f\u007f\s]/;
 const INVALID_COOKIE_VALUE = /[\u0000-\u001f\u007f\s;,]/;
 const encodeUnknownJsonString = Schema.encodeUnknownSync(Schema.fromJsonString(Schema.Unknown));
+
+function normalizeFenixModel(model: string | null | undefined): string {
+  return normalizeModelSlug(model, PROVIDER) ?? DEFAULT_FENIX_MODEL;
+}
 
 interface FenixSessionContext {
   session: ProviderSession;
@@ -208,8 +214,8 @@ export function makeFenixAdapter(settings: FenixSettings, options?: FenixAdapter
         const createdAt = yield* nowIso;
         const selectedModel =
           input.modelSelection?.instanceId === boundInstanceId
-            ? input.modelSelection.model
-            : settings.featuredModel;
+            ? normalizeFenixModel(input.modelSelection.model)
+            : normalizeFenixModel(settings.featuredModel);
         const session: ProviderSession = {
           provider: PROVIDER,
           providerInstanceId: boundInstanceId,
@@ -305,8 +311,8 @@ export function makeFenixAdapter(settings: FenixSettings, options?: FenixAdapter
         activeContext = ctx;
         const model =
           input.modelSelection?.instanceId === boundInstanceId
-            ? input.modelSelection.model
-            : (ctx.session.model ?? settings.featuredModel);
+            ? normalizeFenixModel(input.modelSelection.model)
+            : normalizeFenixModel(ctx.session.model ?? settings.featuredModel);
         const updatedAt = yield* nowIso;
         const { lastError: _lastError, ...runningSession } = ctx.session;
         ctx.session = {
