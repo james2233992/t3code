@@ -1,4 +1,5 @@
 import { FenixSettings, ProviderDriverKind, type ServerProvider } from "@t3tools/contracts";
+import * as Clock from "effect/Clock";
 import * as Effect from "effect/Effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
@@ -92,7 +93,14 @@ export const FenixDriver: ProviderDriver<FenixSettings, FenixDriverEnv> = {
 
       const adapter = yield* makeFenixAdapter(effectiveConfig, {
         instanceId,
-        pairingSession: () => pairingSessionBridge.resolvePairingSession({ instanceId }),
+        pairingSession: () =>
+          Effect.gen(function* () {
+            const nowEpochMs = yield* Clock.currentTimeMillis;
+            return FenixPairingSessionBridge.activePairingSessionFromSnapshot(
+              pairingSessionBridge.resolvePairingSessionSnapshot({ instanceId }),
+              nowEpochMs,
+            );
+          }),
       });
       const textGeneration = yield* makeFenixTextGeneration;
 

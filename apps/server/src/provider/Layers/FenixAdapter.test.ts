@@ -113,14 +113,18 @@ describe("FenixAdapter", () => {
     }),
   );
 
-  it.effect("announces credential presence without claiming the session is paired", () =>
+  it.effect("does not resolve pairing credentials when starting a session", () =>
     Effect.gen(function* () {
+      let resolveCount = 0;
       const adapter = yield* makeFenixAdapter(fenixSettings(), {
         fetch: throwingFetch,
         instanceId: ProviderInstanceId.make("fenix"),
-        pairingSession: { kind: "cookie", authToken: "fenix-session" },
+        pairingSession: () => {
+          resolveCount += 1;
+          return Effect.succeed({ kind: "cookie", authToken: "fenix-session" });
+        },
       });
-      const threadId = ThreadId.make("thread-fenix-credential-present");
+      const threadId = ThreadId.make("thread-fenix-start-neutral");
       const eventsFiber = yield* adapter.streamEvents.pipe(
         Stream.take(3),
         Stream.runCollect,
@@ -135,9 +139,10 @@ describe("FenixAdapter", () => {
       const events = Array.from(yield* Fiber.join(eventsFiber));
 
       const stateChanged = events.find((event) => event.type === "session.state.changed");
+      expect(resolveCount).toBe(0);
       expect(stateChanged?.payload).toMatchObject({
         state: "ready",
-        reason: "Fenix pairing credential present",
+        reason: "Fenix pairing checked on turn",
       });
     }),
   );
@@ -173,7 +178,7 @@ describe("FenixAdapter", () => {
       const stateChanged = events.find((event) => event.type === "session.state.changed");
       expect(stateChanged?.payload).toMatchObject({
         state: "ready",
-        reason: "Fenix pairing required",
+        reason: "Fenix pairing checked on turn",
       });
     }),
   );

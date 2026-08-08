@@ -29,21 +29,30 @@ Fenix Code now fails closed unless the Fenix adapter receives an active paired F
 
 Pairing credentials are only attached to requests whose resolved origin is exactly `https://iaonline.io`. The adapter rejects malformed cookie and bearer values before fetch, including control characters or multi-cookie input.
 
-The Fenix driver now resolves its credential through the runtime
-`FenixPairingSessionBridge` service and injects the active session into the
-adapter on each turn. The production default bridge is deliberately unpaired,
-so an enabled Fenix provider cannot reach `iaonline.io` until the Code Lab
-pairing bridge supplies an active Fenix identity. Expired or unavailable
-sessions must resolve to `null`, which keeps the existing adapter fail-closed
-path: no backend request is made without a valid pairing session.
+The Fenix driver now resolves a short-lived credential snapshot through the
+runtime `FenixPairingSessionBridge` service and injects the active session into
+the adapter on each turn. The bridge contract returns an envelope with an
+explicit `expiresAtEpochMs`; Fenix Code validates that expiry in one central
+helper before exposing any cookie or bearer value to the adapter. Missing,
+non-finite, unsafe, expired, or near-expiry metadata is treated as unpaired.
+
+The production default bridge is deliberately unpaired, so an enabled Fenix
+provider cannot reach `iaonline.io` until the Code Lab pairing bridge supplies
+an active Fenix identity envelope. `startSession` never resolves or consumes the
+credential; pairing is checked only when an accepted turn is sent. Expired or
+unavailable sessions keep the existing adapter fail-closed path: no backend
+request is made without a valid pairing session.
 
 The current Fenix monorepo surface inspected for F1.2 is `ChatWorkspaceController` plus `InMemoryChatWorkspacePairingService`. That pairing is currently a boolean per `(companyId, userId)` and does not yet issue a cookie/token envelope consumable by Fenix Code. If production pairing requires changes there, it must be a separate monorepo PR.
 
 ## F1.2 Guardrails
 
 - No pairing session: `sendTurn` fails before `fetch`, so the Fenix backend is not reached.
+- Invalid/expired pairing envelope: `sendTurn` fails before `fetch`.
 - Paired cookie session: `sendTurn` calls the Fenix generic chat lane with `Cookie: AuthToken=<value>` and the standard request body.
 - Local driver E2E: a simulated bridge session reaches a mocked
   `ChatModels/SendMessageWithOptions` endpoint, records the turn, and rolls the
   thread back through the standard adapter cycle.
+- Resolver discipline: `startSession` resolves zero credentials; each accepted
+  `sendTurn` resolves the bridge exactly once.
 - Existing upstream drivers remain untouched.

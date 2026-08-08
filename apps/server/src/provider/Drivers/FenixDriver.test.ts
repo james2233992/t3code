@@ -22,6 +22,7 @@ const decodeUnknownJsonString = Schema.decodeUnknownSync(Schema.fromJsonString(S
 const DRIVER_KIND = ProviderDriverKind.make("fenix");
 const INSTANCE_ID = ProviderInstanceId.make("fenix");
 const TEST_EPOCH = DateTime.makeUnsafe("1970-01-01T00:00:00.000Z");
+const ACTIVE_EXPIRES_AT_EPOCH_MS = 4_102_444_800_000;
 
 const makeFenixConfig = (overrides: Partial<FenixSettings> = {}) =>
   decodeFenixSettings({
@@ -92,6 +93,28 @@ describe("FenixDriver", () => {
     vi.unstubAllGlobals();
   });
 
+  it("keeps pairing snapshots inactive for invalid metadata and expiry boundaries", () => {
+    const session = { kind: "cookie" as const, authToken: "fenix-session-token" };
+    const active = FenixPairingSessionBridge.unsafePairingSessionSnapshotForTest(session, 20_001);
+
+    expect(
+      FenixPairingSessionBridge.activePairingSessionFromSnapshot(active, Number.NaN),
+    ).toBeNull();
+    expect(
+      FenixPairingSessionBridge.activePairingSessionFromSnapshot(
+        FenixPairingSessionBridge.unsafePairingSessionSnapshotForTest(
+          session,
+          Number.POSITIVE_INFINITY,
+        ),
+        1,
+      ),
+    ).toBeNull();
+    expect(FenixPairingSessionBridge.activePairingSessionFromSnapshot(active, 15_001)).toBeNull();
+    expect(FenixPairingSessionBridge.activePairingSessionFromSnapshot(active, 14_999)).toEqual(
+      session,
+    );
+  });
+
   it.effect("keeps the provider fail-closed when no Code Lab pairing is available", () =>
     Effect.gen(function* () {
       const fetchMock = vi.fn(async () => Response.json({ response: "unexpected" }));
@@ -113,13 +136,10 @@ describe("FenixDriver", () => {
       const fetchMock = vi.fn(async () => Response.json({ response: "unexpected" }));
       vi.stubGlobal("fetch", fetchMock);
       const instance = yield* createFenixInstance(
-        FenixPairingSessionBridge.layerFromResolver(() =>
-          FenixPairingSessionBridge.activePairingSessionFromSnapshot(
-            {
-              session: { kind: "cookie", authToken: "expired-fenix-session" },
-              expiresAtEpochMs: 1,
-            },
-            2,
+        FenixPairingSessionBridge.layerFromSnapshotResolver(() =>
+          FenixPairingSessionBridge.unsafePairingSessionSnapshotForTest(
+            { kind: "cookie", authToken: "expired-fenix-session" },
+            1,
           ),
         ),
       );
@@ -134,6 +154,38 @@ describe("FenixDriver", () => {
     }),
   );
 
+  it.effect("rejects malformed pairing snapshot metadata before fetch", () =>
+    Effect.gen(function* () {
+      const fetchMock = vi.fn(async () => Response.json({ response: "unexpected" }));
+      vi.stubGlobal("fetch", fetchMock);
+
+      for (const [index, expiresAtEpochMs] of [
+        undefined,
+        Number.NaN,
+        Number.POSITIVE_INFINITY,
+        Number.MAX_SAFE_INTEGER + 1,
+      ].entries()) {
+        const instance = yield* createFenixInstance(
+          FenixPairingSessionBridge.layerFromSnapshotResolver(() => ({
+            session: { kind: "cookie", authToken: `bad-expiry-${index}` },
+            expiresAtEpochMs: expiresAtEpochMs as number,
+          })),
+        );
+        const threadId = ThreadId.make(`thread-fenix-driver-bad-expiry-${index}`);
+
+        yield* instance.adapter.startSession({ threadId, runtimeMode: "full-access" });
+        const error = yield* instance.adapter
+          .sendTurn({ threadId, input: "hola" })
+          .pipe(Effect.flip);
+
+        expect(error._tag).toBe("ProviderAdapterValidationError");
+        expect(error.message).toContain("active Code Lab pairing session");
+      }
+
+      expect(fetchMock).not.toHaveBeenCalled();
+    }),
+  );
+
   it.effect("injects a paired Fenix session into a complete local driver turn", () =>
     Effect.gen(function* () {
       const requests: Array<{ readonly url: string; readonly init: RequestInit | undefined }> = [];
@@ -143,8 +195,13 @@ describe("FenixDriver", () => {
       });
       vi.stubGlobal("fetch", fetchMock);
       const instance = yield* createFenixInstance(
-        FenixPairingSessionBridge.layerFromResolver(({ instanceId }) =>
-          instanceId === INSTANCE_ID ? { kind: "cookie", authToken: "fenix-session-token" } : null,
+        FenixPairingSessionBridge.layerFromSnapshotResolver(({ instanceId }) =>
+          instanceId === INSTANCE_ID
+            ? FenixPairingSessionBridge.unsafePairingSessionSnapshotForTest(
+                { kind: "cookie", authToken: "fenix-session-token" },
+                ACTIVE_EXPIRES_AT_EPOCH_MS,
+              )
+            : null,
         ),
       );
       const threadId = ThreadId.make("thread-fenix-driver-paired");
@@ -174,6 +231,38 @@ describe("FenixDriver", () => {
       });
       expect(thread.turns).toHaveLength(1);
       expect(rolledBack.turns).toHaveLength(0);
+    }),
+  );
+
+  it.effect("resolves the pairing bridge once per accepted turn and never on start", () =>
+    Effect.gen(function* () {
+      const requests: Array<string> = [];
+      const fetchMock = vi.fn(async () => {
+        requests.push("fetch");
+        return Response.json({ response: "ok" });
+      });
+      vi.stubGlobal("fetch", fetchMock);
+      let resolveCount = 0;
+      const instance = yield* createFenixInstance(
+        FenixPairingSessionBridge.layerFromSnapshotResolver(() => {
+          resolveCount += 1;
+          return FenixPairingSessionBridge.unsafePairingSessionSnapshotForTest(
+            { kind: "cookie", authToken: "fenix-session-token" },
+            ACTIVE_EXPIRES_AT_EPOCH_MS,
+          );
+        }),
+      );
+      const threadId = ThreadId.make("thread-fenix-driver-resolver-count");
+
+      yield* instance.adapter.startSession({ threadId, runtimeMode: "full-access" });
+      expect(resolveCount).toBe(0);
+
+      yield* instance.adapter.sendTurn({ threadId, input: "primer turno" });
+      expect(resolveCount).toBe(1);
+
+      yield* instance.adapter.sendTurn({ threadId, input: "segundo turno" });
+      expect(resolveCount).toBe(2);
+      expect(requests).toHaveLength(2);
     }),
   );
 });

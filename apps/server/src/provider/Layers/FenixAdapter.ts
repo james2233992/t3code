@@ -52,7 +52,9 @@ export type FenixPairingSession =
       readonly token: string;
     };
 
-export type FenixPairingSessionResolver = () => FenixPairingSession | null | undefined;
+export type FenixPairingSessionResolver = () => Effect.Effect<
+  FenixPairingSession | null | undefined
+>;
 
 function resolveUrl(baseUrl: string, path: string): string {
   const base = baseUrl.trim() || "https://iaonline.io";
@@ -90,8 +92,10 @@ function validatePairingSession(
 
 function readPairingSession(
   input: FenixPairingSession | FenixPairingSessionResolver | undefined,
-): FenixPairingSession | null {
-  return validatePairingSession(typeof input === "function" ? input() : input);
+): Effect.Effect<FenixPairingSession | null> {
+  return (typeof input === "function" ? input() : Effect.succeed(input)).pipe(
+    Effect.map(validatePairingSession),
+  );
 }
 
 function applyPairingSessionHeaders(
@@ -165,7 +169,7 @@ export function makeFenixAdapter(settings: FenixSettings, options?: FenixAdapter
           }),
       });
     const readRequiredPairingSession = () =>
-      Effect.sync(() => readPairingSession(options?.pairingSession)).pipe(
+      readPairingSession(options?.pairingSession).pipe(
         Effect.flatMap((pairingSession) =>
           pairingSession
             ? Effect.succeed(pairingSession)
@@ -235,9 +239,7 @@ export function makeFenixAdapter(settings: FenixSettings, options?: FenixAdapter
           threadId: input.threadId,
           payload: {
             state: "ready",
-            reason: readPairingSession(options?.pairingSession)
-              ? "Fenix pairing credential present"
-              : "Fenix pairing required",
+            reason: "Fenix pairing checked on turn",
           },
         });
         yield* offerRuntimeEvent({
