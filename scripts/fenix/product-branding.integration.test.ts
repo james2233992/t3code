@@ -36,10 +36,7 @@ describe("Fenix product branding integration", () => {
     const scripts = mobilePackageJson.scripts as Record<string, string>;
 
     assert.include(scripts["dev:client"], `--scheme ${PRODUCT_MOBILE_DEVELOPMENT_SCHEME}`);
-    assert.include(
-      scripts["dev:client:preview"],
-      `--scheme ${PRODUCT_MOBILE_PREVIEW_SCHEME}`,
-    );
+    assert.include(scripts["dev:client:preview"], `--scheme ${PRODUCT_MOBILE_PREVIEW_SCHEME}`);
     assert.include(scripts.showcase, `--scheme ${PRODUCT_MOBILE_PRODUCTION_SCHEME}`);
     assert.notInclude(JSON.stringify(scripts), "--scheme t3code");
   });

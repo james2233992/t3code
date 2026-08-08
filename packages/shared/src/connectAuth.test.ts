@@ -52,9 +52,7 @@ describe("connectAuth", () => {
     expect(url.origin).toBe("https://clerk.t3.codes");
     expect(url.pathname).toBe("/oauth/authorize");
     expect(url.searchParams.get("client_id")).toBe("oauthapp_123");
-    expect(url.searchParams.get("redirect_uri")).toBe(
-      "https://code.iaonline.io/connect/callback",
-    );
+    expect(url.searchParams.get("redirect_uri")).toBe("https://code.iaonline.io/connect/callback");
     expect(url.searchParams.get("response_type")).toBe("code");
     expect(url.searchParams.get("scope")).toBe("openid profile email");
     expect(url.searchParams.get("state")).toBe("state-1");

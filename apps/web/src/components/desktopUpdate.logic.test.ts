@@ -161,9 +161,7 @@ describe("getDesktopUpdateActionError", () => {
 
 describe("desktop update UI helpers", () => {
   it("builds the stable release URL for a downloaded version", () => {
-    expect(getDesktopUpdateReleaseUrl("0.0.30")).toBe(
-      `${DESKTOP_RELEASE_TAG_URL}/v0.0.30`,
-    );
+    expect(getDesktopUpdateReleaseUrl("0.0.30")).toBe(`${DESKTOP_RELEASE_TAG_URL}/v0.0.30`);
   });
 
   it("builds the nightly release URL without dropping its version suffix", () => {

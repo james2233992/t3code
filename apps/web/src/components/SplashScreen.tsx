@@ -7,7 +7,11 @@ export function SplashScreen() {
         className="flex size-24 items-center justify-center"
         aria-label={`${PRODUCT_BASE_NAME} splash screen`}
       >
-        <img alt={PRODUCT_BASE_NAME} className="size-16 object-contain" src="/apple-touch-icon.png" />
+        <img
+          alt={PRODUCT_BASE_NAME}
+          className="size-16 object-contain"
+          src="/apple-touch-icon.png"
+        />
       </div>
     </div>
   );

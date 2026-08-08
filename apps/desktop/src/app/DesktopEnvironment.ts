@@ -10,6 +10,7 @@ import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
 import * as Option from "effect/Option";
 import * as Path from "effect/Path";
+
 import {
   PRODUCT_BASE_NAME,
   PRODUCT_DESKTOP_APP_USER_MODEL_ID,
@@ -180,7 +181,9 @@ const make = Effect.fn("desktop.environment.make")(function* (
     joinPath: path.join,
     t3Home: config.t3Home,
   });
-  const userDataDirName = isDevelopment ? PRODUCT_DESKTOP_DEV_USER_DATA_DIR : PRODUCT_DESKTOP_USER_DATA_DIR;
+  const userDataDirName = isDevelopment
+    ? PRODUCT_DESKTOP_DEV_USER_DATA_DIR
+    : PRODUCT_DESKTOP_USER_DATA_DIR;
   const legacyUserDataDirName = isDevelopment
     ? `${PRODUCT_LEGACY_BASE_NAME} (Dev)`
     : `${PRODUCT_LEGACY_BASE_NAME} (Alpha)`;
@@ -229,7 +232,9 @@ const make = Effect.fn("desktop.environment.make")(function* (
     appUserModelId: Option.getOrElse(config.appUserModelIdOverride, () =>
       isDevelopment ? PRODUCT_DESKTOP_DEV_APP_USER_MODEL_ID : PRODUCT_DESKTOP_APP_USER_MODEL_ID,
     ),
-    linuxDesktopEntryName: isDevelopment ? PRODUCT_DESKTOP_DEV_ENTRY_NAME : PRODUCT_DESKTOP_ENTRY_NAME,
+    linuxDesktopEntryName: isDevelopment
+      ? PRODUCT_DESKTOP_DEV_ENTRY_NAME
+      : PRODUCT_DESKTOP_ENTRY_NAME,
     linuxWmClass: isDevelopment ? PRODUCT_DESKTOP_DEV_WM_CLASS : PRODUCT_DESKTOP_WM_CLASS,
     linuxApplicationsDir,
     appImagePath: config.appImagePath,

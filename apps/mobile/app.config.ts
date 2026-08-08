@@ -1,4 +1,5 @@
 import type { ExpoConfig } from "expo/config";
+
 import {
   PRODUCT_BASE_NAME,
   PRODUCT_MOBILE_ANDROID_DEV_PACKAGE,
@@ -211,8 +212,7 @@ const config: ExpoConfig = {
       NSAppTransportSecurity: {
         NSAllowsArbitraryLoads: true,
       },
-      NSLocalNetworkUsageDescription:
-        `Allow ${PRODUCT_BASE_NAME} to connect to ${PRODUCT_BASE_NAME} servers on your local network or tailnet.`,
+      NSLocalNetworkUsageDescription: `Allow ${PRODUCT_BASE_NAME} to connect to ${PRODUCT_BASE_NAME} servers on your local network or tailnet.`,
       ITSAppUsesNonExemptEncryption: false,
       // The App Store screenshot harness rotates the iPad interface from
       // inside the app (CI denies osascript the Accessibility access that
