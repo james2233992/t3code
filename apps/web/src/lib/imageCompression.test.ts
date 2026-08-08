@@ -17,6 +17,8 @@ import {
 
 const originalCreateImageBitmap = globalThis.createImageBitmap;
 const originalOffscreenCanvas = globalThis.OffscreenCanvas;
+const TOO_LARGE_STASH_ENCODING_BYTES = 1_000_000;
+const TOO_LARGE_BYTE_LIMIT_ENCODING_BYTES = 1_100_000;
 
 function makeFile(sizeBytes: number, type = "image/png"): File {
   return new File([new Uint8Array(sizeBytes).fill(7)], "shot.png", { type });
@@ -123,7 +125,7 @@ describe("compressImageForStash", () => {
   });
 
   it("reports too-large when even the smallest encoding overflows the budget", async () => {
-    const { close } = stubCanvasPipeline(() => 8_000_000);
+    const { close } = stubCanvasPipeline(() => TOO_LARGE_STASH_ENCODING_BYTES);
 
     const result = await compressImageForStash(makeFile(9_000_000));
 
@@ -206,7 +208,7 @@ describe("compressImageForStash", () => {
   });
 
   it("compressImageToByteLimit reports too-large when no encoding fits", async () => {
-    const { close } = stubCanvasPipeline(() => 3_000_000);
+    const { close } = stubCanvasPipeline(() => TOO_LARGE_BYTE_LIMIT_ENCODING_BYTES);
 
     const result = await compressImageToByteLimit(makeFile(2_000_000), 1_000_000);
 
