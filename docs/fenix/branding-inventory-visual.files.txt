@@ -56,8 +56,6 @@ apps/mobile/src/lib/markdownLinks.test.ts
 apps/mobile/src/lib/nativeMarkdownText.test.ts
 apps/mobile/src/native/SelectableMarkdownText.ios.tsx
 apps/mobile/src/native/SelectableMarkdownText.tsx
-apps/server/src/project/ProjectFaviconResolver.test.ts
-apps/server/src/project/ProjectFaviconResolver.ts
 apps/web/public/apple-touch-icon.png
 apps/web/public/favicon-16x16.png
 apps/web/public/favicon-32x32.png
@@ -83,17 +81,12 @@ assets/dev/app-icon.icon/icon.json
 assets/dev/blueprint-web-favicon-16x16.png
 assets/dev/blueprint-web-favicon-32x32.png
 assets/dev/blueprint-web-favicon.ico
-assets/dev/blueprint-windows.ico
 assets/nightly/app-icon.icon/icon.json
 assets/nightly/nightly-web-favicon-16x16.png
 assets/nightly/nightly-web-favicon-32x32.png
 assets/nightly/nightly-web-favicon.ico
-assets/nightly/nightly-windows.ico
 assets/prod/app-icon.icon/icon.json
 assets/prod/logo.svg
 assets/prod/t3-black-web-favicon-16x16.png
 assets/prod/t3-black-web-favicon-32x32.png
 assets/prod/t3-black-web-favicon.ico
-assets/prod/t3-black-windows.ico
-packages/shared/src/projectFavicon.test.ts
-packages/shared/src/projectFavicon.ts

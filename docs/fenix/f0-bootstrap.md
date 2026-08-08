@@ -6,7 +6,8 @@ Date: 2026-08-08
 
 - Fork remote exists: `https://github.com/james2233992/t3code`.
 - Upstream remote configured locally: `https://github.com/pingdotgg/t3code.git`.
-- Local working directory: `/Users/juancarlosalonsonolasco-macmini2/Proyectos/Fenix-Code`.
+- Local working directory: `$FENIX_CODE_ROOT` (standalone `Fenix-Code`
+  checkout, separate from the Fenix monorepo).
 - Base upstream commit: `8101cd044911c7dc2a2adf7c7a9ba7962abf57b6`.
 - Upstream license: MIT.
 - Runtime rebrand is in progress in the F0.3 branding-layer candidate. See

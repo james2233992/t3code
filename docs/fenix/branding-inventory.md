@@ -10,15 +10,27 @@ docs, generated references, and vendored code.
 
 ## Scope And Evidence
 
-The exact generated evidence is stored next to this file:
+The exact generated evidence is stored next to this file and is reproducible
+with `bash scripts/fenix/generate-branding-inventory.sh generate`. Review can
+verify it with `bash scripts/fenix/generate-branding-inventory.sh check`.
+The generator uses `rg --json -I -o` plus `jq` formatting, so binary-file
+warnings are excluded, filenames are always present, multiple occurrences on one
+line remain distinguishable by column, and output order is deterministic.
 
-- `branding-inventory-textual.matches.txt`: 4,371 `file:line:match` rows for visible/product text and package strings.
-- `branding-inventory-platform.matches.txt`: 3,578 `file:line:match` rows for package names, schemes, bundle IDs, CLI names, and T3CODE env vars.
-- `branding-inventory-endpoints-links.matches.txt`: 248 `file:line:match` rows for T3-hosted URLs, store links, GitHub links, Clerk relying parties, and support links.
-- `branding-inventory-visual.files.txt`: 99 asset/component paths for icons, favicons, marks, splash, wordmark, and adjacent visual files.
+- `branding-inventory-textual.matches.txt`: generated `file:line:column:match`
+  rows for visible/product text and package strings.
+- `branding-inventory-platform.matches.txt`: generated
+  `file:line:column:match` rows for package names, schemes, bundle IDs, CLI
+  names, and T3CODE env vars.
+- `branding-inventory-endpoints-links.matches.txt`: generated
+  `file:line:column:match` rows for T3-hosted URLs, store links, GitHub links,
+  Clerk relying parties, and support links.
+- `branding-inventory-visual.files.txt`: generated asset/component paths for
+  icons, favicons, marks, splash, wordmark, and adjacent visual files.
 
-The scans intentionally exclude lockfiles and build outputs. They include tests and
-docs because rebrand regressions will otherwise keep old strings alive in assertions.
+The scans intentionally exclude lockfiles, build outputs, binary files, and
+vendored references. They include tests and docs because rebrand regressions will
+otherwise keep old strings alive in assertions.
 The `.repos/` reference trees are excluded from the generated evidence: they are
 vendored read-only references and must not be rebranded unless a later reviewed
 dependency-sync policy says otherwise.
