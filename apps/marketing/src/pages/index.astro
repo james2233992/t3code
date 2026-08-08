@@ -21,6 +21,7 @@ const mobileEndorsementRows = [
   tweets.filter((_, index) => index % 3 === 2),
 ];
 const githubRepositoryPath = new URL(GITHUB_REPOSITORY_URL).pathname.replace(/^\/+/, "");
+const hasEndorsements = tweets.length > 0;
 ---
 
 <Layout>
@@ -101,91 +102,94 @@ const githubRepositoryPath = new URL(GITHUB_REPOSITORY_URL).pathname.replace(/^\
     </div>
   </section>
 
-  <!-- ── Endorsements ─────────────────────────────────────────── -->
-  <section id="endorsements" class="sec-endorsements" aria-labelledby="endorsements-title">
-    <div class="container">
-      <div class="endorsements-head">
-        <h2 id="endorsements-title">Tolerated by over <span class="endorsements-count">{MARKETING_STATS.users}</span> devs</h2>
-        <p>Some of them even tweeted about it.</p>
-      </div>
-    </div>
+  {
+    hasEndorsements ? (
+      <section id="endorsements" class="sec-endorsements" aria-labelledby="endorsements-title">
+        <div class="container">
+          <div class="endorsements-head">
+            <h2 id="endorsements-title">Tolerated by over <span class="endorsements-count">{MARKETING_STATS.users}</span> devs</h2>
+            <p>Some of them even tweeted about it.</p>
+          </div>
+        </div>
 
-    <div class="endorsement-carousel endorsement-carousel--desktop" aria-label="Developer endorsements">
-        {
-          desktopEndorsementRows.map((row, rowIndex) => (
-            <div class:list={["endorsement-row", rowIndex === 1 && "is-reverse"]}>
-              <div class="endorsement-track">
-                {[0, 1].map((groupIndex) => (
-                  <div class="endorsement-track-group" aria-hidden={groupIndex === 1 ? "true" : undefined}>
-                    {row.map((tweet) => (
-                      <a
-                        class="endorsement-card"
-                        href={tweet.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`Read ${tweet.handle}'s post on X`}
-                        tabindex={groupIndex === 1 ? "-1" : undefined}
-                      >
-                        <div class="endorsement-author">
-                          <img
-                            src={`/pfps/${tweet.handle}.webp`}
-                            alt=""
-                            width="28"
-                            height="28"
-                            loading="lazy"
-                            decoding="async"
-                          />
-                          <div class="endorsement-handle">@{tweet.handle}</div>
-                        </div>
-                        <p>{tweet.excerpt ?? tweet.content}</p>
-                      </a>
+        <div class="endorsement-carousel endorsement-carousel--desktop" aria-label="Developer endorsements">
+            {
+              desktopEndorsementRows.map((row, rowIndex) => (
+                <div class:list={["endorsement-row", rowIndex === 1 && "is-reverse"]}>
+                  <div class="endorsement-track">
+                    {[0, 1].map((groupIndex) => (
+                      <div class="endorsement-track-group" aria-hidden={groupIndex === 1 ? "true" : undefined}>
+                        {row.map((tweet) => (
+                          <a
+                            class="endorsement-card"
+                            href={tweet.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Read ${tweet.handle}'s post on X`}
+                            tabindex={groupIndex === 1 ? "-1" : undefined}
+                          >
+                            <div class="endorsement-author">
+                              <img
+                                src={`/pfps/${tweet.handle}.webp`}
+                                alt=""
+                                width="28"
+                                height="28"
+                                loading="lazy"
+                                decoding="async"
+                              />
+                              <div class="endorsement-handle">@{tweet.handle}</div>
+                            </div>
+                            <p>{tweet.excerpt ?? tweet.content}</p>
+                          </a>
+                        ))}
+                      </div>
                     ))}
                   </div>
-                ))}
-              </div>
-            </div>
-          ))
-        }
-    </div>
+                </div>
+              ))
+            }
+        </div>
 
-    <div class="endorsement-carousel endorsement-carousel--mobile" aria-label="Developer endorsements">
-        {
-          mobileEndorsementRows.map((row, rowIndex) => (
-            <div class:list={["endorsement-row", rowIndex === 1 && "is-reverse"]}>
-              <div class="endorsement-track">
-                {[0, 1].map((groupIndex) => (
-                  <div class="endorsement-track-group" aria-hidden={groupIndex === 1 ? "true" : undefined}>
-                    {row.map((tweet) => (
-                      <a
-                        class="endorsement-card"
-                        href={tweet.link}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label={`Read ${tweet.handle}'s post on X`}
-                        tabindex={groupIndex === 1 ? "-1" : undefined}
-                      >
-                        <div class="endorsement-author">
-                          <img
-                            src={`/pfps/${tweet.handle}.webp`}
-                            alt=""
-                            width="28"
-                            height="28"
-                            loading="lazy"
-                            decoding="async"
-                          />
-                          <div class="endorsement-handle">@{tweet.handle}</div>
-                        </div>
-                        <p>{tweet.excerpt ?? tweet.content}</p>
-                      </a>
+        <div class="endorsement-carousel endorsement-carousel--mobile" aria-label="Developer endorsements">
+            {
+              mobileEndorsementRows.map((row, rowIndex) => (
+                <div class:list={["endorsement-row", rowIndex === 1 && "is-reverse"]}>
+                  <div class="endorsement-track">
+                    {[0, 1].map((groupIndex) => (
+                      <div class="endorsement-track-group" aria-hidden={groupIndex === 1 ? "true" : undefined}>
+                        {row.map((tweet) => (
+                          <a
+                            class="endorsement-card"
+                            href={tweet.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            aria-label={`Read ${tweet.handle}'s post on X`}
+                            tabindex={groupIndex === 1 ? "-1" : undefined}
+                          >
+                            <div class="endorsement-author">
+                              <img
+                                src={`/pfps/${tweet.handle}.webp`}
+                                alt=""
+                                width="28"
+                                height="28"
+                                loading="lazy"
+                                decoding="async"
+                              />
+                              <div class="endorsement-handle">@{tweet.handle}</div>
+                            </div>
+                            <p>{tweet.excerpt ?? tweet.content}</p>
+                          </a>
+                        ))}
+                      </div>
                     ))}
                   </div>
-                ))}
-              </div>
-            </div>
-          ))
-        }
-    </div>
-  </section>
+                </div>
+              ))
+            }
+        </div>
+      </section>
+    ) : null
+  }
 
   <!-- ── Harnesses ─────────────────────────────────────────────── -->
   <section id="harnesses" class="sec-harness">

@@ -149,6 +149,20 @@ Centralize first, then replace:
 4. Replace assets from the central export path, not by scattering imports.
 5. Re-run these generated inventories after the rebrand. Required F0.3 exit: no unclassified T3 runtime hits outside attribution, license, upstream-history docs, fixture-only tests, and vendored references.
 
+## F0-Final Visible Rebrand Decision
+
+F0-final closes the user-visible rebrand and hosted-domain boundary without
+renaming upstream-compatible internal identifiers. User-facing strings and
+external T3-hosted domains in live source are replaced with Fenix-owned naming
+or Fenix-owned URLs, and `scripts/fenix/check-visible-branding.sh` guards that
+boundary in Fork Check.
+
+Internal identifiers remain intentionally stable for upstream rebase
+compatibility. Examples include `T3ProjectFile`, `T3_PROJECT_FILE_NAME`,
+`t3ProjectFile.ts`, package/import scope `@t3tools/*`, and the checked-in
+configuration filename `t3.json`. The `t3.json` filename is revisited in the
+client-facing phase, not in F0.
+
 ## F1 Bridge Notes
 
 The Fenix monorepo already has local runner and pairing surfaces that look relevant

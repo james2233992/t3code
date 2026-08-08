@@ -40,7 +40,7 @@ describe("connectAuth", () => {
   it("builds a PKCE authorize URL against the Clerk endpoint", () => {
     const url = new URL(
       buildConnectClerkAuthorizeUrl({
-        authorizationEndpoint: "https://clerk.t3.codes/oauth/authorize",
+        authorizationEndpoint: "https://clerk.code.iaonline.io/oauth/authorize",
         clientId: "oauthapp_123",
         redirectUri: connectCallbackUrl("https://code.iaonline.io"),
         scopes: ["openid", "profile", "email"],
@@ -49,7 +49,7 @@ describe("connectAuth", () => {
       }),
     );
 
-    expect(url.origin).toBe("https://clerk.t3.codes");
+    expect(url.origin).toBe("https://clerk.code.iaonline.io");
     expect(url.pathname).toBe("/oauth/authorize");
     expect(url.searchParams.get("client_id")).toBe("oauthapp_123");
     expect(url.searchParams.get("redirect_uri")).toBe("https://code.iaonline.io/connect/callback");

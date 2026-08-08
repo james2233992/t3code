@@ -52,6 +52,8 @@ jobs:
         run: |
           bash scripts/fenix/generate-branding-inventory.sh selftest
           bash scripts/fenix/generate-branding-inventory.sh check
+          bash scripts/fenix/check-visible-branding.sh selftest
+          bash scripts/fenix/check-visible-branding.sh
 
       - name: Typecheck
         run: vpr typecheck
