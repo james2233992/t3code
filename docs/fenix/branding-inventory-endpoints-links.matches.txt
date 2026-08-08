@@ -93,11 +93,6 @@
 ./apps/server/src/vcs/GitVcsDriverCore.test.ts:1394:23:github.com/pingdotgg/t3code
 ./apps/server/src/vcs/VcsStatusBroadcaster.test.ts:58:19:github.com/pingdotgg/t3code
 ./apps/web/src/components/ThreadStatusIndicators.test.ts:24:21:github.com/pingdotgg/t3code
-./apps/web/src/components/desktopUpdate.logic.test.ts:164:16:github.com/pingdotgg/t3code
-./apps/web/src/components/desktopUpdate.logic.test.ts:170:16:github.com/pingdotgg/t3code
-./apps/web/src/components/desktopUpdate.logic.ts:6:42:github.com/pingdotgg/t3code
-./apps/web/src/components/desktopUpdate.toast.test.tsx:75:18:github.com/pingdotgg/t3code
-./apps/web/src/components/desktopUpdate.toast.test.tsx:93:18:github.com/pingdotgg/t3code
 ./apps/web/src/components/settings/pairingUrls.test.ts:18:56:t3.codes
 ./apps/web/src/components/settings/pairingUrls.test.ts:21:24:t3.codes
 ./apps/web/src/lib/openPullRequestLink.test.ts:17:32:github.com/pingdotgg/t3code
@@ -156,9 +151,9 @@
 ./packages/shared/src/remote.test.ts:40:20:app.t3.codes
 ./packages/shared/src/remote.test.ts:91:30:app.t3.codes
 ./packages/shared/src/t3ProjectFile.test.ts:13:38:t3.codes
-./scripts/fenix/product-branding.integration.test.ts:23:42:app.t3.codes
-./scripts/fenix/product-branding.integration.test.ts:24:49:app.t3.codes
-./scripts/fenix/product-branding.integration.test.ts:25:50:app.t3.codes
+./scripts/fenix/product-branding.integration.test.ts:30:42:app.t3.codes
+./scripts/fenix/product-branding.integration.test.ts:31:49:app.t3.codes
+./scripts/fenix/product-branding.integration.test.ts:32:50:app.t3.codes
 ./scripts/mobile-showcase-environment.ts:120:29:github.com/pingdotgg/t3code
 ./scripts/mobile-showcase-environment.ts:296:29:github.com/pingdotgg/t3code
 ./t3.json:2:23:t3.codes

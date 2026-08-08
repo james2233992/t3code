@@ -2875,22 +2875,10 @@
 ./apps/web/src/components/composerInlineTokenPaste.ts:1:46:@t3tools
 ./apps/web/src/components/desktop/SshPasswordPromptDialog.tsx:164:86:T3 Code
 ./apps/web/src/components/desktop/SshPasswordPromptDialog.tsx:1:55:@t3tools
-./apps/web/src/components/desktopUpdate.logic.test.ts:164:37:t3code
-./apps/web/src/components/desktopUpdate.logic.test.ts:170:37:t3code
-./apps/web/src/components/desktopUpdate.logic.test.ts:235:51:T3 Code
-./apps/web/src/components/desktopUpdate.logic.test.ts:244:45:T3 Code
 ./apps/web/src/components/desktopUpdate.logic.test.ts:2:69:@t3tools
-./apps/web/src/components/desktopUpdate.logic.ts:104:133:T3 Code
-./apps/web/src/components/desktopUpdate.logic.ts:104:24:T3 Code
-./apps/web/src/components/desktopUpdate.logic.ts:106:69:T3 Code
 ./apps/web/src/components/desktopUpdate.logic.ts:1:69:@t3tools
-./apps/web/src/components/desktopUpdate.logic.ts:66:45:T3 Code
-./apps/web/src/components/desktopUpdate.logic.ts:69:45:T3 Code
-./apps/web/src/components/desktopUpdate.logic.ts:6:63:t3code
-./apps/web/src/components/desktopUpdate.logic.ts:71:43:T3 Code
+./apps/web/src/components/desktopUpdate.logic.ts:2:60:@t3tools
 ./apps/web/src/components/desktopUpdate.toast.test.tsx:3:42:@t3tools
-./apps/web/src/components/desktopUpdate.toast.test.tsx:75:39:t3code
-./apps/web/src/components/desktopUpdate.toast.test.tsx:93:39:t3code
 ./apps/web/src/components/desktopUpdate.toast.tsx:1:57:@t3tools
 ./apps/web/src/components/diffs/AnnotatableCodeView.tsx:10:39:@t3tools
 ./apps/web/src/components/files/FileBrowserPanel.tsx:5:51:@t3tools
@@ -4578,8 +4566,10 @@
 ./scripts/fenix/generate-branding-inventory.sh:49:114:t3-code
 ./scripts/fenix/generate-branding-inventory.sh:49:177:t3code
 ./scripts/fenix/generate-branding-inventory.sh:49:41:t3code
-./scripts/fenix/product-branding.integration.test.ts:13:9:@t3tools
-./scripts/fenix/product-branding.integration.test.ts:37:58:t3code
+./scripts/fenix/product-branding.integration.test.ts:20:9:@t3tools
+./scripts/fenix/product-branding.integration.test.ts:44:58:t3code
+./scripts/fenix/product-branding.integration.test.ts:80:57:t3code
+./scripts/fenix/product-branding.integration.test.ts:81:47:T3 Code
 ./scripts/lib/build-target-arch.test.ts:5:63:@t3tools
 ./scripts/lib/build-target-arch.ts:1:63:@t3tools
 ./scripts/lib/dev-share.ts:23:9:@t3tools

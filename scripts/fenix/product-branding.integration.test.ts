@@ -1,14 +1,21 @@
 import { assert, describe, it } from "@effect/vitest";
 
 import mobilePackageJson from "../../apps/mobile/package.json" with { type: "json" };
+import {
+  DESKTOP_RELEASE_TAG_URL,
+  getArm64IntelBuildWarningDescription,
+  getDesktopUpdateInstallConfirmationMessage,
+} from "../../apps/web/src/components/desktopUpdate.logic.ts";
 import { config as vercelConfig } from "../../apps/web/vercel.ts";
 import {
+  PRODUCT_BASE_NAME,
   PRODUCT_HOSTED_APP_DOMAIN,
   PRODUCT_LATEST_HOSTED_APP_DOMAIN,
   PRODUCT_MOBILE_DEVELOPMENT_SCHEME,
   PRODUCT_MOBILE_PREVIEW_SCHEME,
   PRODUCT_MOBILE_PRODUCTION_SCHEME,
   PRODUCT_NIGHTLY_HOSTED_APP_DOMAIN,
+  PRODUCT_REPOSITORY_URL,
   PRODUCT_WEB_CHANNEL_PATH,
 } from "@t3tools/shared/productBranding";
 
@@ -37,4 +44,40 @@ describe("Fenix product branding integration", () => {
     assert.notInclude(JSON.stringify(scripts), "--scheme t3code");
   });
 
+  it("keeps desktop updater release links and visible copy on Fenix branding", () => {
+    const warning = getArm64IntelBuildWarningDescription({
+      enabled: true,
+      status: "available",
+      channel: "latest",
+      currentVersion: "1.0.0",
+      hostArch: "arm64",
+      appArch: "x64",
+      runningUnderArm64Translation: true,
+      availableVersion: "1.1.0",
+      downloadedVersion: null,
+      releaseNotes: [],
+      downloadPercent: null,
+      checkedAt: null,
+      message: null,
+      errorContext: null,
+      canRetry: false,
+    });
+    const installConfirmation = getDesktopUpdateInstallConfirmationMessage(
+      {
+        availableVersion: "1.1.0",
+        downloadedVersion: "1.1.0",
+      },
+      "Win32",
+    );
+    const serializedUpdaterCopy = JSON.stringify({
+      releaseTagUrl: DESKTOP_RELEASE_TAG_URL,
+      warning,
+      installConfirmation,
+    });
+
+    assert.strictEqual(DESKTOP_RELEASE_TAG_URL, `${PRODUCT_REPOSITORY_URL}/releases/tag`);
+    assert.include(serializedUpdaterCopy, PRODUCT_BASE_NAME);
+    assert.notInclude(serializedUpdaterCopy, "pingdotgg/t3code/releases");
+    assert.notInclude(serializedUpdaterCopy, "T3 Code");
+  });
 });
