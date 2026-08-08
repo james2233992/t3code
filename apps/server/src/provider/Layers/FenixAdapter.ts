@@ -1,4 +1,4 @@
-import { randomUUID } from "node:crypto";
+import * as NodeCrypto from "node:crypto";
 
 import {
   EventId,
@@ -97,7 +97,7 @@ export function makeFenixAdapter(settings: FenixSettings, options?: FenixAdapter
     const fetchImpl = options?.fetch ?? fetch;
 
     const nowIso = Effect.map(DateTime.now, DateTime.formatIso);
-    const nextEventId = Effect.sync(() => EventId.make(randomUUID()));
+    const nextEventId = Effect.sync(() => EventId.make(NodeCrypto.randomUUID()));
     const makeEventStamp = () => Effect.all({ eventId: nextEventId, createdAt: nowIso });
 
     const offerRuntimeEvent = (event: ProviderRuntimeEvent) =>
@@ -174,7 +174,7 @@ export function makeFenixAdapter(settings: FenixSettings, options?: FenixAdapter
           });
         }
 
-        const turnId = TurnId.make(randomUUID());
+        const turnId = TurnId.make(NodeCrypto.randomUUID());
         const model =
           input.modelSelection?.instanceId === boundInstanceId
             ? input.modelSelection.model
