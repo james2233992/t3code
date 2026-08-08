@@ -7,6 +7,11 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { createStaticNavigation, DarkTheme, DefaultTheme } from "@react-navigation/native";
+import {
+  PRODUCT_MOBILE_DEVELOPMENT_SCHEME,
+  PRODUCT_MOBILE_PREVIEW_SCHEME,
+  PRODUCT_MOBILE_PRODUCTION_SCHEME,
+} from "@t3tools/shared/productBranding";
 
 import { RegistryContext } from "@effect/atom-react";
 import { ConfirmDialogHost } from "./components/ConfirmDialogHost";
@@ -34,7 +39,12 @@ void SplashScreen.preventAutoHideAsync().catch(() => {
 });
 
 const appLinking = {
-  prefixes: [Linking.createURL("/"), "t3code://", "t3code-dev://", "t3code-preview://"],
+  prefixes: [
+    Linking.createURL("/"),
+    `${PRODUCT_MOBILE_PRODUCTION_SCHEME}://`,
+    `${PRODUCT_MOBILE_DEVELOPMENT_SCHEME}://`,
+    `${PRODUCT_MOBILE_PREVIEW_SCHEME}://`,
+  ],
   // The Expo dev client launches the app via
   // <scheme>://expo-development-client/?url=<packager> — that URL addresses
   // the launcher, not app navigation. Without this filter it falls through

@@ -6,6 +6,13 @@ import { EnvironmentId } from "@t3tools/contracts";
 import { RelayMobileClientId } from "@t3tools/contracts/relay";
 import { ManagedRelay } from "@t3tools/client-runtime/relay";
 import { remoteHttpClientLayer } from "@t3tools/client-runtime/rpc";
+import {
+  PRODUCT_BASE_NAME,
+  PRODUCT_MOBILE_DEVELOPMENT_SCHEME,
+  PRODUCT_MOBILE_PREVIEW_SCHEME,
+  PRODUCT_MOBILE_PRODUCTION_SCHEME,
+} from "@t3tools/shared/productBranding";
+import mobilePackageJson from "../../../package.json" with { type: "json" };
 import { HttpClient } from "effect/unstable/http";
 import { MobilePreferencesStore } from "../../persistence/mobile-preferences";
 import { MobileStorage } from "../../persistence/mobile-storage";
@@ -116,6 +123,17 @@ const withCloudServices = <A, E>(
     | MobileStorage
   >,
 ) => effect.pipe(Effect.provide(cloudClientLayer()));
+
+describe("mobile branding", () => {
+  it("keeps mobile scripts aligned with Expo schemes", () => {
+    const scripts = mobilePackageJson.scripts as Record<string, string>;
+
+    expect(scripts["dev:client"]).toContain(`--scheme ${PRODUCT_MOBILE_DEVELOPMENT_SCHEME}`);
+    expect(scripts["dev:client:preview"]).toContain(`--scheme ${PRODUCT_MOBILE_PREVIEW_SCHEME}`);
+    expect(scripts.showcase).toContain(`--scheme ${PRODUCT_MOBILE_PRODUCTION_SCHEME}`);
+    expect(JSON.stringify(scripts)).not.toContain("--scheme t3code");
+  });
+});
 
 function validLinkProof() {
   return "signed-environment-link-jwt";
@@ -486,7 +504,7 @@ describe("mobile cloud link environment client", () => {
       const environmentTokenBody = new URLSearchParams(
         requestBodyText(environmentTokenRequest?.body),
       );
-      expect(environmentTokenBody.get("client_label")).toBe("T3 Code Mobile");
+      expect(environmentTokenBody.get("client_label")).toBe(`${PRODUCT_BASE_NAME} Mobile`);
       expect(environmentTokenBody.get("client_device_type")).toBe("mobile");
       expect(environmentTokenBody.get("client_os")).toBe("iOS");
     }),

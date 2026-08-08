@@ -1,8 +1,10 @@
 import { describe, expect, it } from "vite-plus/test";
 import type { DesktopUpdateActionResult, DesktopUpdateState } from "@t3tools/contracts";
+import { PRODUCT_BASE_NAME, PRODUCT_REPOSITORY_URL } from "@t3tools/shared/productBranding";
 
 import {
   canCheckForUpdate,
+  DESKTOP_RELEASE_TAG_URL,
   getArm64IntelBuildWarningDescription,
   getDesktopUpdateActionError,
   getDesktopUpdateButtonTooltip,
@@ -160,15 +162,41 @@ describe("getDesktopUpdateActionError", () => {
 
 describe("desktop update UI helpers", () => {
   it("builds the stable release URL for a downloaded version", () => {
-    expect(getDesktopUpdateReleaseUrl("0.0.30")).toBe(
-      "https://github.com/pingdotgg/t3code/releases/tag/v0.0.30",
-    );
+    expect(getDesktopUpdateReleaseUrl("0.0.30")).toBe(`${DESKTOP_RELEASE_TAG_URL}/v0.0.30`);
   });
 
   it("builds the nightly release URL without dropping its version suffix", () => {
     expect(getDesktopUpdateReleaseUrl("0.0.30-nightly.20260728.931")).toBe(
-      "https://github.com/pingdotgg/t3code/releases/tag/v0.0.30-nightly.20260728.931",
+      `${DESKTOP_RELEASE_TAG_URL}/v0.0.30-nightly.20260728.931`,
     );
+  });
+
+  it("keeps release links and visible copy on Fenix branding", () => {
+    const warning = getArm64IntelBuildWarningDescription({
+      ...baseState,
+      status: "available",
+      hostArch: "arm64",
+      appArch: "x64",
+      runningUnderArm64Translation: true,
+      availableVersion: "1.1.0",
+    });
+    const installConfirmation = getDesktopUpdateInstallConfirmationMessage(
+      {
+        availableVersion: "1.1.0",
+        downloadedVersion: "1.1.0",
+      },
+      "Win32",
+    );
+    const serializedUpdaterCopy = JSON.stringify({
+      releaseTagUrl: DESKTOP_RELEASE_TAG_URL,
+      warning,
+      installConfirmation,
+    });
+
+    expect(DESKTOP_RELEASE_TAG_URL).toBe(`${PRODUCT_REPOSITORY_URL}/releases/tag`);
+    expect(serializedUpdaterCopy).toContain(PRODUCT_BASE_NAME);
+    expect(serializedUpdaterCopy).not.toContain("pingdotgg/t3code/releases");
+    expect(serializedUpdaterCopy).not.toContain("T3 Code");
   });
 
   it("omits the release URL when the updater does not report a version", () => {
@@ -232,7 +260,7 @@ describe("desktop update UI helpers", () => {
         availableVersion: "1.1.0",
         downloadedVersion: "1.1.1",
       }),
-    ).toContain("Install update 1.1.1 and restart T3 Code?");
+    ).toContain("Install update 1.1.1 and restart Fenix Code?");
   });
 
   it("falls back to generic install confirmation copy when no version is available", () => {
@@ -241,7 +269,7 @@ describe("desktop update UI helpers", () => {
         availableVersion: null,
         downloadedVersion: null,
       }),
-    ).toContain("Install update and restart T3 Code?");
+    ).toContain("Install update and restart Fenix Code?");
   });
 
   it("warns Windows users that a silent installation can take several minutes", () => {

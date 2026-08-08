@@ -1,5 +1,12 @@
 import { afterEach, describe, expect, it, vi } from "vite-plus/test";
 import {
+  PRODUCT_HOSTED_APP_DOMAIN,
+  PRODUCT_LATEST_HOSTED_APP_DOMAIN,
+  PRODUCT_NIGHTLY_HOSTED_APP_DOMAIN,
+  PRODUCT_WEB_CHANNEL_PATH,
+} from "@t3tools/shared/productBranding";
+import { config as vercelConfig } from "../vercel";
+import {
   resolveServerBackedAppDisplayName,
   resolveServerBackedAppStageLabel,
 } from "./branding.logic";
@@ -47,7 +54,7 @@ describe("branding", () => {
     expect(branding.HOSTED_APP_CHANNEL).toBe("nightly");
     expect(branding.HOSTED_APP_CHANNEL_LABEL).toBe("Nightly");
     expect(branding.APP_STAGE_LABEL).toBe("Nightly");
-    expect(branding.APP_DISPLAY_NAME).toBe("T3 Code (Nightly)");
+    expect(branding.APP_DISPLAY_NAME).toBe("Fenix Code (Nightly)");
   });
 
   it("does not label the latest hosted app channel", async () => {
@@ -58,7 +65,7 @@ describe("branding", () => {
     expect(branding.HOSTED_APP_CHANNEL).toBe("latest");
     expect(branding.HOSTED_APP_CHANNEL_LABEL).toBe("Latest");
     expect(branding.APP_STAGE_LABEL).toBe("Latest");
-    expect(branding.APP_DISPLAY_NAME).toBe("T3 Code");
+    expect(branding.APP_DISPLAY_NAME).toBe("Fenix Code");
   });
 
   it("ignores unknown hosted app channels", async () => {
@@ -112,5 +119,19 @@ describe("branding logic", () => {
         primaryServerVersion: "0.0.28-nightly.20260616",
       }),
     ).toBe("T3 Code (Alpha)");
+  });
+});
+
+describe("hosted branding", () => {
+  it("keeps hosted routing on Fenix-owned domains", () => {
+    const serializedConfig = JSON.stringify(vercelConfig);
+
+    expect(serializedConfig).toContain(PRODUCT_HOSTED_APP_DOMAIN);
+    expect(serializedConfig).toContain(PRODUCT_LATEST_HOSTED_APP_DOMAIN);
+    expect(serializedConfig).toContain(PRODUCT_NIGHTLY_HOSTED_APP_DOMAIN);
+    expect(serializedConfig).toContain(PRODUCT_WEB_CHANNEL_PATH);
+    expect(serializedConfig).not.toContain("app.t3.codes");
+    expect(serializedConfig).not.toContain("latest.app.t3.codes");
+    expect(serializedConfig).not.toContain("nightly.app.t3.codes");
   });
 });

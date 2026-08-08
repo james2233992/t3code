@@ -1,9 +1,16 @@
 import { matchers, routes, type Transform, type VercelConfig } from "@vercel/config/v1";
+import {
+  PRODUCT_HOSTED_APP_DOMAIN,
+  PRODUCT_LATEST_HOSTED_APP_DOMAIN,
+  PRODUCT_NIGHTLY_HOSTED_APP_DOMAIN,
+  PRODUCT_WEB_CHANNEL_COOKIE,
+  PRODUCT_WEB_CHANNEL_PATH,
+} from "@t3tools/shared/productBranding";
 
-const ROUTER_HOST = "app.t3.codes";
-const HOSTED_WEB_CHANNEL_COOKIE = "t3code_web_channel";
-const LATEST_ORIGIN = "https://latest.app.t3.codes";
-const NIGHTLY_ORIGIN = "https://nightly.app.t3.codes";
+const ROUTER_HOST = PRODUCT_HOSTED_APP_DOMAIN;
+const HOSTED_WEB_CHANNEL_COOKIE = PRODUCT_WEB_CHANNEL_COOKIE;
+const LATEST_ORIGIN = `https://${PRODUCT_LATEST_HOSTED_APP_DOMAIN}`;
+const NIGHTLY_ORIGIN = `https://${PRODUCT_NIGHTLY_HOSTED_APP_DOMAIN}`;
 const CLEAN_CHANNEL_QUERY_TRANSFORMS = [
   {
     type: "request.query",
@@ -33,7 +40,7 @@ export const config: VercelConfig = {
     "npm install -g vite-plus && vp install --ignore-scripts --filter '@t3tools/scripts...' --filter '@t3tools/web...'",
   routes: [
     {
-      src: "/__t3code/channel",
+      src: PRODUCT_WEB_CHANNEL_PATH,
       has: [matchers.query("channel", "nightly")],
       transforms: CLEAN_CHANNEL_QUERY_TRANSFORMS,
       headers: {
@@ -43,7 +50,7 @@ export const config: VercelConfig = {
       status: 302,
     },
     {
-      src: "/__t3code/channel",
+      src: PRODUCT_WEB_CHANNEL_PATH,
       transforms: CLEAN_CHANNEL_QUERY_TRANSFORMS,
       headers: {
         Location: "/",

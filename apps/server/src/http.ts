@@ -6,6 +6,12 @@ import {
 } from "@t3tools/contracts";
 import { isDevProxiedPath } from "@t3tools/shared/devProxy";
 import { decodeOtlpTraceRecords } from "@t3tools/shared/observability";
+import {
+  PRODUCT_DESKTOP_DEVELOPMENT_SCHEME,
+  PRODUCT_DESKTOP_PRODUCTION_SCHEME,
+  PRODUCT_LEGACY_DESKTOP_DEVELOPMENT_SCHEME,
+  PRODUCT_LEGACY_DESKTOP_PRODUCTION_SCHEME,
+} from "@t3tools/shared/productBranding";
 import * as Data from "effect/Data";
 import * as Effect from "effect/Effect";
 import * as FileSystem from "effect/FileSystem";
@@ -42,7 +48,12 @@ import { browserApiCorsAllowedHeaders, browserApiCorsAllowedMethods } from "./ht
 
 const OTLP_TRACES_PROXY_PATH = "/api/observability/v1/traces";
 const LOOPBACK_HOSTNAMES = new Set(["127.0.0.1", "::1", "localhost"]);
-const DESKTOP_RENDERER_ORIGINS = ["t3code://app", "t3code-dev://app"];
+export const DESKTOP_RENDERER_ORIGINS = [
+  `${PRODUCT_DESKTOP_PRODUCTION_SCHEME}://app`,
+  `${PRODUCT_DESKTOP_DEVELOPMENT_SCHEME}://app`,
+  `${PRODUCT_LEGACY_DESKTOP_PRODUCTION_SCHEME}://app`,
+  `${PRODUCT_LEGACY_DESKTOP_DEVELOPMENT_SCHEME}://app`,
+];
 export const httpCompressionLayer = HttpRouter.middleware(HttpMiddleware.compression(), {
   global: true,
 });
