@@ -15,7 +15,7 @@ const fenixSettings = (overrides: Partial<FenixSettings> = {}) =>
     enabled: true,
     baseUrl: "https://iaonline.io",
     sendMessagePath: "/api/v1/ChatModels/SendMessageWithOptions",
-    featuredModel: "openai/gpt-oss-120b",
+    featuredModel: "groq/openai/gpt-oss-120b",
     ...overrides,
   });
 
@@ -66,10 +66,12 @@ describe("FenixAdapter", () => {
       });
       expect(requestBody).toMatchObject({
         message: "crea una funcion",
-        model: "openai/gpt-oss-120b",
+        model: "groq/openai/gpt-oss-120b",
         isGenericChatLane: true,
         source: "fenix-code",
         threadId,
+        turnId: result.turnId,
+        requestId: result.turnId,
       });
       expect(events.map((event) => event.type)).toEqual([
         "session.started",

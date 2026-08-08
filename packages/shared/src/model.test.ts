@@ -158,6 +158,7 @@ describe("model slug normalization", () => {
   it("maps the Fenix programming agent alias to the approved Groq coding model", () => {
     const fenix = ProviderDriverKind.make("fenix");
 
-    expect(normalizeModelSlug("agente-groq-programacion", fenix)).toBe("openai/gpt-oss-120b");
+    expect(normalizeModelSlug("agente-groq-programacion", fenix)).toBe("groq/openai/gpt-oss-120b");
+    expect(normalizeModelSlug("openai/gpt-oss-120b", fenix)).toBe("groq/openai/gpt-oss-120b");
   });
 });

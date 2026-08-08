@@ -153,7 +153,7 @@ export const DEFAULT_MODEL_BY_PROVIDER: Partial<Record<ProviderDriverKind, strin
   [CLAUDE_DRIVER_KIND]: "claude-sonnet-5",
   [CURSOR_DRIVER_KIND]: "auto",
   [GROK_DRIVER_KIND]: "grok-build",
-  [FENIX_DRIVER_KIND]: "openai/gpt-oss-120b",
+  [FENIX_DRIVER_KIND]: "groq/openai/gpt-oss-120b",
   [OPENCODE_DRIVER_KIND]: "openai/gpt-5",
 };
 
@@ -164,7 +164,7 @@ export const DEFAULT_TEXT_GENERATION_MODEL_BY_PROVIDER: Partial<
   [CODEX_DRIVER_KIND]: DEFAULT_TEXT_GENERATION_MODEL,
   [CLAUDE_DRIVER_KIND]: "claude-haiku-4-5",
   [CURSOR_DRIVER_KIND]: "composer-2",
-  [FENIX_DRIVER_KIND]: "openai/gpt-oss-120b",
+  [FENIX_DRIVER_KIND]: "groq/openai/gpt-oss-120b",
   [OPENCODE_DRIVER_KIND]: "openai/gpt-5",
 };
 
@@ -215,10 +215,11 @@ export const MODEL_SLUG_ALIASES_BY_PROVIDER: Partial<
     "opus-4.5": "claude-opus-4-5",
   },
   [FENIX_DRIVER_KIND]: {
-    "agente-groq-programacion": "openai/gpt-oss-120b",
-    "agente groq de programacion": "openai/gpt-oss-120b",
-    "agente groq de programación": "openai/gpt-oss-120b",
-    "gpt-oss-120b": "openai/gpt-oss-120b",
+    "agente-groq-programacion": "groq/openai/gpt-oss-120b",
+    "agente groq de programacion": "groq/openai/gpt-oss-120b",
+    "agente groq de programación": "groq/openai/gpt-oss-120b",
+    "gpt-oss-120b": "groq/openai/gpt-oss-120b",
+    "openai/gpt-oss-120b": "groq/openai/gpt-oss-120b",
   },
   [OPENCODE_DRIVER_KIND]: {},
 };

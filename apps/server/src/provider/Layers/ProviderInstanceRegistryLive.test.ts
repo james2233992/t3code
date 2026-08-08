@@ -134,7 +134,7 @@ const makeFenixConfig = (overrides: Partial<FenixSettings>): FenixSettings => ({
   baseUrl: "https://iaonline.io",
   chatModelsPath: "/api/v1/ChatModels",
   sendMessagePath: "/api/v1/ChatModels/SendMessageWithOptions",
-  featuredModel: "openai/gpt-oss-120b",
+  featuredModel: "groq/openai/gpt-oss-120b",
   customModels: [],
   ...overrides,
 });

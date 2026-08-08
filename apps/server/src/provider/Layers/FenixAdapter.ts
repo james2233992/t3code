@@ -344,6 +344,8 @@ export function makeFenixAdapter(settings: FenixSettings, options?: FenixAdapter
                 isGenericChatLane: true,
                 source: "fenix-code",
                 threadId: input.threadId,
+                turnId,
+                requestId: turnId,
               }),
             });
             const contentType = response.headers.get("content-type") ?? "";

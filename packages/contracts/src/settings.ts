@@ -445,12 +445,12 @@ export const FenixSettings = makeProviderSettingsSchema(
       Schema.annotateKey({ providerSettingsForm: { hidden: true } }),
     ),
     featuredModel: TrimmedString.pipe(
-      Schema.withDecodingDefault(Effect.succeed("openai/gpt-oss-120b")),
+      Schema.withDecodingDefault(Effect.succeed("groq/openai/gpt-oss-120b")),
       Schema.annotateKey({
         title: "Featured coding model",
         description: "Default model advertised for the Fenix programming agent.",
         providerSettingsForm: {
-          placeholder: "openai/gpt-oss-120b",
+          placeholder: "groq/openai/gpt-oss-120b",
           clearWhenEmpty: "omit",
         },
       }),

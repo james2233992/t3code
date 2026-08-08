@@ -23,7 +23,7 @@ const EMPTY_CAPABILITIES: ModelCapabilities = createModelCapabilities({
   optionDescriptors: [],
 });
 
-export const FENIX_FEATURED_CODING_MODEL = "openai/gpt-oss-120b";
+export const FENIX_FEATURED_CODING_MODEL = "groq/openai/gpt-oss-120b";
 
 export const FENIX_BUILT_IN_MODELS: ReadonlyArray<ServerProviderModel> = [
   {

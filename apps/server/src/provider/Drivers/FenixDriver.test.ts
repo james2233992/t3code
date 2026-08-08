@@ -30,7 +30,7 @@ const makeFenixConfig = (overrides: Partial<FenixSettings> = {}) =>
     baseUrl: "https://iaonline.io",
     chatModelsPath: "/api/v1/ChatModels",
     sendMessagePath: "/api/v1/ChatModels/SendMessageWithOptions",
-    featuredModel: "openai/gpt-oss-120b",
+    featuredModel: "groq/openai/gpt-oss-120b",
     customModels: [],
     ...overrides,
   });
@@ -224,10 +224,12 @@ describe("FenixDriver", () => {
       });
       expect(decodeUnknownJsonString(String(requests[0]?.init?.body))).toMatchObject({
         message: "construye una oferta",
-        model: "openai/gpt-oss-120b",
+        model: "groq/openai/gpt-oss-120b",
         isGenericChatLane: true,
         source: "fenix-code",
         threadId,
+        turnId: result.turnId,
+        requestId: result.turnId,
       });
       expect(thread.turns).toHaveLength(1);
       expect(rolledBack.turns).toHaveLength(0);
