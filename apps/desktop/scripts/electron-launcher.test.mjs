@@ -1,12 +1,21 @@
 import { assert, describe, it } from "vite-plus/test";
 
 import {
+  APP_BUNDLE_ID,
+  APP_DISPLAY_NAME,
+  APP_PROTOCOL_SCHEMES,
   makeDevelopmentLauncherScript,
   resolveElectronBinaryPath,
   resolveMacLauncherPaths,
 } from "./electron-launcher.mjs";
 
 describe("electron development launcher", () => {
+  it("uses the Fenix packaged identity by default", () => {
+    assert.equal(APP_DISPLAY_NAME, "Fenix Code (Alpha)");
+    assert.equal(APP_BUNDLE_ID, "com.aiworks.fenixcode");
+    assert.deepEqual(APP_PROTOCOL_SCHEMES, ["fenixcode"]);
+  });
+
   it("uses captured values only as fallbacks for a live runner environment", () => {
     const script = makeDevelopmentLauncherScript({
       electronBinaryPath: "/repo/node_modules/electron/Electron",
@@ -52,18 +61,18 @@ describe("electron development launcher", () => {
 
   it("keeps the native Electron executable name inside the branded macOS bundle", () => {
     const paths = resolveMacLauncherPaths(
-      "/repo/apps/desktop/.electron-runtime/T3 Code (Dev).app",
-      "T3 Code (Dev)",
+      "/repo/apps/desktop/.electron-runtime/Fenix Code (Dev).app",
+      "Fenix Code (Dev)",
     );
 
-    assert.equal(paths.launcherExecutableName, "T3 Code (Dev) Launcher");
+    assert.equal(paths.launcherExecutableName, "Fenix Code (Dev) Launcher");
     assert.equal(
       paths.launcherBinaryPath,
-      "/repo/apps/desktop/.electron-runtime/T3 Code (Dev).app/Contents/MacOS/T3 Code (Dev) Launcher",
+      "/repo/apps/desktop/.electron-runtime/Fenix Code (Dev).app/Contents/MacOS/Fenix Code (Dev) Launcher",
     );
     assert.equal(
       paths.runtimeElectronBinaryPath,
-      "/repo/apps/desktop/.electron-runtime/T3 Code (Dev).app/Contents/MacOS/Electron",
+      "/repo/apps/desktop/.electron-runtime/Fenix Code (Dev).app/Contents/MacOS/Electron",
     );
 
     const script = makeDevelopmentLauncherScript({
@@ -74,7 +83,7 @@ describe("electron development launcher", () => {
     });
     assert.include(
       script,
-      "exec '/repo/apps/desktop/.electron-runtime/T3 Code (Dev).app/Contents/MacOS/Electron'",
+      "exec '/repo/apps/desktop/.electron-runtime/Fenix Code (Dev).app/Contents/MacOS/Electron'",
     );
     assert.notInclude(script, "node_modules/electron");
   });

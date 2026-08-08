@@ -1,4 +1,5 @@
 import { DEFAULT_HOSTED_APP_URL } from "@t3tools/shared/connectAuth";
+import { PRODUCT_WEB_CHANNEL_PATH } from "@t3tools/shared/productBranding";
 
 import { getPairingTokenFromUrl, setPairingTokenOnUrl } from "./pairingUrl";
 
@@ -83,7 +84,7 @@ export function buildHostedPairingUrl(input: {
 export function buildHostedChannelSelectionUrl(input: {
   readonly channel: HostedAppChannel;
 }): string {
-  const url = new URL("/__t3code/channel", configuredHostedAppUrl());
+  const url = new URL(PRODUCT_WEB_CHANNEL_PATH, configuredHostedAppUrl());
   url.searchParams.set("channel", input.channel);
   return url.toString();
 }

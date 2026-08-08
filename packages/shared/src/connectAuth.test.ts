@@ -28,12 +28,12 @@ describe("connectAuth", () => {
   });
 
   it("rejects authorize requests missing state or challenge", () => {
-    expect(readConnectAuthorizeRequest(new URL("https://app.t3.codes/connect"))).toBeNull();
+    expect(readConnectAuthorizeRequest(new URL("https://code.iaonline.io/connect"))).toBeNull();
     expect(
-      readConnectAuthorizeRequest(new URL("https://app.t3.codes/connect#state=abc")),
+      readConnectAuthorizeRequest(new URL("https://code.iaonline.io/connect#state=abc")),
     ).toBeNull();
     expect(
-      readConnectAuthorizeRequest(new URL("https://app.t3.codes/connect#challenge=abc")),
+      readConnectAuthorizeRequest(new URL("https://code.iaonline.io/connect#challenge=abc")),
     ).toBeNull();
   });
 

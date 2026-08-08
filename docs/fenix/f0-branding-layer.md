@@ -22,6 +22,10 @@ asset replacement, package-scope migration, or production release.
 - Mobile schemes: `fenixcode`, `fenixcode-dev`, `fenixcode-preview`.
 - Mobile bundle/package identifiers: `com.aiworks.fenixcode*`.
 - Mobile relying party: `code.iaonline.io`.
+- Vercel hosted domains: `code.iaonline.io`, `latest.code.iaonline.io`,
+  `nightly.code.iaonline.io`.
+- Hosted channel path/cookie: `/__fenixcode/channel`,
+  `fenixcode_web_channel`.
 
 ## Touched Surfaces
 
@@ -29,9 +33,13 @@ asset replacement, package-scope migration, or production release.
 - Desktop runtime environment, Electron custom protocol, Linux URL handler, early
   Linux WM class, product name, and fatal-startup title.
 - Mobile Expo app config, navigation schemes, widget deep links, branded title,
-  and authorized-client label.
-- Marketing release/source links and default layout brand.
+  package scripts, showcase harness, branded title, and authorized-client label.
+- Marketing release/source links, default layout brand, and release API target.
 - Shared connect authorization default hosted URL.
+- Server CORS desktop renderer origins, with legacy T3 origins retained
+  deliberately for migration compatibility.
+- Desktop packaging config and development launcher identity.
+- GitHub release workflow hosted-domain defaults.
 
 ## Intentional Non-Changes
 
@@ -50,6 +58,8 @@ asset replacement, package-scope migration, or production release.
 ## Verification Notes
 
 - `git diff --check` passed.
+- `bash scripts/fenix/generate-branding-inventory.sh check` passed.
+- Branding inventory duplicate checks report zero exact duplicates.
 - Full dependency/test execution is deferred because this checkout has no
   `node_modules`, upstream requires Node `^24.13.1`, and the host should preserve
   disk before any `vp i` install.
