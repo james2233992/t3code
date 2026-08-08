@@ -122,6 +122,8 @@ describe("ServerSettings.providerInstances (slice-2 invariant)", () => {
     // Legacy `providers` struct is still hydrated with its per-driver defaults
     // so existing call sites keep working through the migration.
     expect(decoded.providers.codex.enabled).toBe(true);
+    expect(decoded.providers.fenix.enabled).toBe(false);
+    expect(decoded.providers.fenix.baseUrl).toBe("https://iaonline.io");
   });
 
   it("decodes a multi-instance map mixing first-party and fork drivers", () => {

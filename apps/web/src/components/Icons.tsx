@@ -211,6 +211,18 @@ export const GrokIcon: Icon = ({ className, ...props }) => (
   </svg>
 );
 
+export const FenixIcon: Icon = ({ className, ...props }) => (
+  <svg
+    {...props}
+    viewBox="0 0 24 24"
+    fill="none"
+    className={cn("text-[#126A68] dark:text-[#7CE0D7]", className)}
+  >
+    <path d="M4.5 20V4h11.75v3H7.9v3.2h7.05v3H7.9V20H4.5Z" fill="currentColor" />
+    <path d="M13.25 20 19.5 4h-3.45l-6.25 16h3.45Z" fill="currentColor" opacity="0.72" />
+  </svg>
+);
+
 export const TraeIcon: Icon = (props) => (
   <svg {...props} viewBox="0 0 24 24" fill="currentColor">
     {/* Back rectangle: left strip + bottom strip drawn separately — empty bottom-left corner is the gap between them */}
