@@ -528,7 +528,6 @@
 ./apps/marketing/src/lib/tweets.ts:85:16:T3 Code
 ./apps/marketing/src/lib/tweets.ts:90:15:T3 Code
 ./apps/marketing/src/lib/tweets.ts:96:8:T3 Code
-./apps/marketing/src/pages/index.astro:323:75:t3code
 ./apps/marketing/src/pages/legal.astro:14:53:T3 Code
 ./apps/marketing/src/pages/legal.astro:14:65:T3 Tools
 ./apps/marketing/src/pages/legal.astro:27:20:T3 Code
@@ -4549,21 +4548,21 @@
 ./scripts/dev-runner.ts:90:62:T3CODE
 ./scripts/dev-runner.ts:9:70:@t3tools
 ./scripts/export-brand-icons.ts:5:41:@t3tools
-./scripts/fenix/generate-branding-inventory.sh:47:18:T3 Code
-./scripts/fenix/generate-branding-inventory.sh:47:26:T3Code
-./scripts/fenix/generate-branding-inventory.sh:47:33:T3 Tools
-./scripts/fenix/generate-branding-inventory.sh:47:42:T3 Connect
-./scripts/fenix/generate-branding-inventory.sh:47:53:t3code
-./scripts/fenix/generate-branding-inventory.sh:47:60:t3-code
-./scripts/fenix/generate-branding-inventory.sh:47:68:@t3tools
-./scripts/fenix/generate-branding-inventory.sh:47:77:T3CODE
-./scripts/fenix/generate-branding-inventory.sh:48:19:t3code
-./scripts/fenix/generate-branding-inventory.sh:48:26:t3-code
-./scripts/fenix/generate-branding-inventory.sh:48:34:T3CODE
-./scripts/fenix/generate-branding-inventory.sh:48:54:@t3tools
-./scripts/fenix/generate-branding-inventory.sh:49:114:t3-code
-./scripts/fenix/generate-branding-inventory.sh:49:177:t3code
-./scripts/fenix/generate-branding-inventory.sh:49:41:t3code
+./scripts/fenix/generate-branding-inventory.sh:53:18:T3 Code
+./scripts/fenix/generate-branding-inventory.sh:53:26:T3Code
+./scripts/fenix/generate-branding-inventory.sh:53:33:T3 Tools
+./scripts/fenix/generate-branding-inventory.sh:53:42:T3 Connect
+./scripts/fenix/generate-branding-inventory.sh:53:53:t3code
+./scripts/fenix/generate-branding-inventory.sh:53:60:t3-code
+./scripts/fenix/generate-branding-inventory.sh:53:68:@t3tools
+./scripts/fenix/generate-branding-inventory.sh:53:77:T3CODE
+./scripts/fenix/generate-branding-inventory.sh:54:19:t3code
+./scripts/fenix/generate-branding-inventory.sh:54:26:t3-code
+./scripts/fenix/generate-branding-inventory.sh:54:34:T3CODE
+./scripts/fenix/generate-branding-inventory.sh:54:54:@t3tools
+./scripts/fenix/generate-branding-inventory.sh:55:114:t3-code
+./scripts/fenix/generate-branding-inventory.sh:55:177:t3code
+./scripts/fenix/generate-branding-inventory.sh:55:41:t3code
 ./scripts/lib/build-target-arch.test.ts:5:63:@t3tools
 ./scripts/lib/build-target-arch.ts:1:63:@t3tools
 ./scripts/lib/dev-share.ts:23:9:@t3tools

@@ -14,7 +14,6 @@ apps/marketing/public/icon.webp
 apps/mobile/assets/android-icon-mark.png
 apps/mobile/assets/android-notification-icon.png
 apps/mobile/assets/widget/T3Mark.svg
-apps/mobile/deps/react-native-nitro-markdown-0.5.0.tgz
 apps/mobile/modules/t3-markdown-text/T3MarkdownText.podspec
 apps/mobile/modules/t3-markdown-text/assets/file-icons/pierre_markdown.png
 apps/mobile/modules/t3-markdown-text/ios/T3MarkdownText.h

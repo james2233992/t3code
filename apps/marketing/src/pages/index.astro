@@ -20,6 +20,7 @@ const mobileEndorsementRows = [
   tweets.filter((_, index) => index % 3 === 1),
   tweets.filter((_, index) => index % 3 === 2),
 ];
+const githubRepositoryPath = new URL(GITHUB_REPOSITORY_URL).pathname.replace(/^\/+/, "");
 ---
 
 <Layout>
@@ -320,7 +321,7 @@ const mobileEndorsementRows = [
             <span class="open-term-title">~/code</span>
           </div>
           <div class="open-term-body">
-            <div><span class="prompt">$</span> gh repo clone james2233992/t3code Fenix-Code</div>
+            <div><span class="prompt">$</span> gh repo clone {githubRepositoryPath} Fenix-Code</div>
             <div class="dim">✓ Cloned Fenix Code into ./Fenix-Code</div>
             <div><span class="prompt">$</span> cd Fenix-Code &amp;&amp; vp install</div>
             <div class="dim">✓ 1 284 packages installed in 4.2s</div>
