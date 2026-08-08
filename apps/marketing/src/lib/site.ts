@@ -1,10 +1,12 @@
-export const GITHUB_REPOSITORY_URL = "https://github.com/pingdotgg/t3code";
+import { PRODUCT_BASE_NAME, PRODUCT_REPOSITORY_URL } from "@t3tools/shared/productBranding";
 
-export const IOS_APP_STORE_URL =
-  "https://apps.apple.com/us/app/t3-code-remote-claude-more/id6787819824";
+export const PRODUCT_NAME = PRODUCT_BASE_NAME;
+export const GITHUB_REPOSITORY_URL = PRODUCT_REPOSITORY_URL;
+export const GITHUB_RELEASES_URL = `${PRODUCT_REPOSITORY_URL}/releases`;
 
-export const ANDROID_PLAY_STORE_URL =
-  "https://play.google.com/store/apps/details?id=com.t3tools.t3code";
+export const IOS_APP_STORE_URL: string | null = null;
+
+export const ANDROID_PLAY_STORE_URL: string | null = null;
 
 export const MARKETING_STATS = {
   githubStars: "14k+",

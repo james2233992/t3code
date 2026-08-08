@@ -10,6 +10,18 @@ import * as Effect from "effect/Effect";
 import * as Layer from "effect/Layer";
 import * as Option from "effect/Option";
 import * as Path from "effect/Path";
+import {
+  PRODUCT_BASE_NAME,
+  PRODUCT_DESKTOP_APP_USER_MODEL_ID,
+  PRODUCT_DESKTOP_DEV_APP_USER_MODEL_ID,
+  PRODUCT_DESKTOP_DEV_ENTRY_NAME,
+  PRODUCT_DESKTOP_DEV_USER_DATA_DIR,
+  PRODUCT_DESKTOP_DEV_WM_CLASS,
+  PRODUCT_DESKTOP_ENTRY_NAME,
+  PRODUCT_DESKTOP_USER_DATA_DIR,
+  PRODUCT_DESKTOP_WM_CLASS,
+  PRODUCT_LEGACY_BASE_NAME,
+} from "@t3tools/shared/productBranding";
 
 import * as DesktopAppSettings from "../settings/DesktopAppSettings.ts";
 import * as DesktopConfig from "./DesktopConfig.ts";
@@ -79,7 +91,7 @@ export class DesktopEnvironment extends Context.Service<
   }
 >()("@t3tools/desktop/app/DesktopEnvironment") {}
 
-const APP_BASE_NAME = "T3 Code";
+const APP_BASE_NAME = PRODUCT_BASE_NAME;
 
 function resolveDesktopAppStageLabel(input: {
   readonly isDevelopment: boolean;
@@ -168,8 +180,10 @@ const make = Effect.fn("desktop.environment.make")(function* (
     joinPath: path.join,
     t3Home: config.t3Home,
   });
-  const userDataDirName = isDevelopment ? "t3code-dev" : "t3code";
-  const legacyUserDataDirName = isDevelopment ? "T3 Code (Dev)" : "T3 Code (Alpha)";
+  const userDataDirName = isDevelopment ? PRODUCT_DESKTOP_DEV_USER_DATA_DIR : PRODUCT_DESKTOP_USER_DATA_DIR;
+  const legacyUserDataDirName = isDevelopment
+    ? `${PRODUCT_LEGACY_BASE_NAME} (Dev)`
+    : `${PRODUCT_LEGACY_BASE_NAME} (Alpha)`;
   const linuxApplicationsDir = path.join(
     Option.getOrElse(config.xdgDataHome, () => path.join(homeDirectory, ".local", "share")),
     "applications",
@@ -213,10 +227,10 @@ const make = Effect.fn("desktop.environment.make")(function* (
     branding,
     displayName,
     appUserModelId: Option.getOrElse(config.appUserModelIdOverride, () =>
-      isDevelopment ? "com.t3tools.t3code.dev" : "com.t3tools.t3code",
+      isDevelopment ? PRODUCT_DESKTOP_DEV_APP_USER_MODEL_ID : PRODUCT_DESKTOP_APP_USER_MODEL_ID,
     ),
-    linuxDesktopEntryName: isDevelopment ? "t3code-dev.desktop" : "t3code.desktop",
-    linuxWmClass: isDevelopment ? "t3code-dev" : "t3code",
+    linuxDesktopEntryName: isDevelopment ? PRODUCT_DESKTOP_DEV_ENTRY_NAME : PRODUCT_DESKTOP_ENTRY_NAME,
+    linuxWmClass: isDevelopment ? PRODUCT_DESKTOP_DEV_WM_CLASS : PRODUCT_DESKTOP_WM_CLASS,
     linuxApplicationsDir,
     appImagePath: config.appImagePath,
     userDataDirName,

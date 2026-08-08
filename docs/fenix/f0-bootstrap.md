@@ -9,7 +9,9 @@ Date: 2026-08-08
 - Local working directory: `/Users/juancarlosalonsonolasco-macmini2/Proyectos/Fenix-Code`.
 - Base upstream commit: `8101cd044911c7dc2a2adf7c7a9ba7962abf57b6`.
 - Upstream license: MIT.
-- No runtime rebrand has been applied yet.
+- Runtime rebrand is in progress in the F0.3 branding-layer candidate. See
+  `docs/fenix/f0-branding-layer.md` for the scoped defaults already moved to
+  Fenix-owned constants and the surfaces intentionally left as follow-up.
 
 ## F0 Order
 

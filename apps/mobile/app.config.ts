@@ -1,4 +1,18 @@
 import type { ExpoConfig } from "expo/config";
+import {
+  PRODUCT_BASE_NAME,
+  PRODUCT_MOBILE_ANDROID_DEV_PACKAGE,
+  PRODUCT_MOBILE_ANDROID_PACKAGE,
+  PRODUCT_MOBILE_ANDROID_PREVIEW_PACKAGE,
+  PRODUCT_MOBILE_DEVELOPMENT_SCHEME,
+  PRODUCT_MOBILE_IOS_BUNDLE_IDENTIFIER,
+  PRODUCT_MOBILE_IOS_DEV_BUNDLE_IDENTIFIER,
+  PRODUCT_MOBILE_IOS_PREVIEW_BUNDLE_IDENTIFIER,
+  PRODUCT_MOBILE_PREVIEW_SCHEME,
+  PRODUCT_MOBILE_PRODUCTION_SCHEME,
+  PRODUCT_MOBILE_RELYING_PARTY,
+  PRODUCT_MOBILE_SLUG,
+} from "@t3tools/shared/productBranding";
 
 import { BRAND_ASSET_PATHS } from "../../scripts/lib/brand-assets.ts";
 import { loadRepoEnv } from "../../scripts/lib/public-config.ts";
@@ -22,7 +36,7 @@ if (
     !IOS_BUNDLE_IDENTIFIER_PATTERN.test(personalTeamBundleIdentifier))
 ) {
   throw new Error(
-    "T3CODE_IOS_PERSONAL_TEAM_BUNDLE_ID must be a reverse-DNS identifier such as com.example.t3code when T3CODE_IOS_PERSONAL_TEAM=1.",
+    "T3CODE_IOS_PERSONAL_TEAM_BUNDLE_ID must be a reverse-DNS identifier such as com.example.fenixcode when T3CODE_IOS_PERSONAL_TEAM=1.",
   );
 }
 
@@ -61,27 +75,27 @@ const RELEASE_ASSETS = {
 
 const VARIANT_CONFIG = {
   development: {
-    appName: "T3 Code Dev",
-    scheme: "t3code-dev",
-    iosBundleIdentifier: "com.t3tools.t3code.dev",
-    androidPackage: "com.t3tools.t3code.dev",
-    relyingParty: "clerk.t3.codes",
+    appName: `${PRODUCT_BASE_NAME} Dev`,
+    scheme: PRODUCT_MOBILE_DEVELOPMENT_SCHEME,
+    iosBundleIdentifier: PRODUCT_MOBILE_IOS_DEV_BUNDLE_IDENTIFIER,
+    androidPackage: PRODUCT_MOBILE_ANDROID_DEV_PACKAGE,
+    relyingParty: PRODUCT_MOBILE_RELYING_PARTY,
     assets: DEVELOPMENT_ASSETS,
   },
   preview: {
-    appName: "T3 Code Preview",
-    scheme: "t3code-preview",
-    iosBundleIdentifier: "com.t3tools.t3code.preview",
-    androidPackage: "com.t3tools.t3code.preview",
-    relyingParty: "clerk.t3.codes",
+    appName: `${PRODUCT_BASE_NAME} Preview`,
+    scheme: PRODUCT_MOBILE_PREVIEW_SCHEME,
+    iosBundleIdentifier: PRODUCT_MOBILE_IOS_PREVIEW_BUNDLE_IDENTIFIER,
+    androidPackage: PRODUCT_MOBILE_ANDROID_PREVIEW_PACKAGE,
+    relyingParty: PRODUCT_MOBILE_RELYING_PARTY,
     assets: PREVIEW_ASSETS,
   },
   production: {
-    appName: "T3 Code",
-    scheme: "t3code",
-    iosBundleIdentifier: "com.t3tools.t3code",
-    androidPackage: "com.t3tools.t3code",
-    relyingParty: "clerk.t3.codes",
+    appName: PRODUCT_BASE_NAME,
+    scheme: PRODUCT_MOBILE_PRODUCTION_SCHEME,
+    iosBundleIdentifier: PRODUCT_MOBILE_IOS_BUNDLE_IDENTIFIER,
+    androidPackage: PRODUCT_MOBILE_ANDROID_PACKAGE,
+    relyingParty: PRODUCT_MOBILE_RELYING_PARTY,
     assets: RELEASE_ASSETS,
   },
 } as const;
@@ -121,7 +135,7 @@ const widgetsPlugin: NonNullable<ExpoConfig["plugins"]>[number] = [
       {
         name: "AgentActivity",
         displayName: "Agent Activity",
-        description: "Shows the current state of active T3 Code agents.",
+        description: `Shows the current state of active ${PRODUCT_BASE_NAME} agents.`,
         supportedFamilies: ["systemSmall", "systemMedium", "accessoryRectangular"],
       },
     ],
@@ -158,7 +172,7 @@ const sharingPlugin: NonNullable<ExpoConfig["plugins"]>[number] = [
 
 const config: ExpoConfig = {
   name: variant.appName,
-  slug: "t3-code",
+  slug: PRODUCT_MOBILE_SLUG,
   platforms: ["ios", "android"],
   scheme: variant.scheme,
   version: "1.0.2",
@@ -198,7 +212,7 @@ const config: ExpoConfig = {
         NSAllowsArbitraryLoads: true,
       },
       NSLocalNetworkUsageDescription:
-        "Allow T3 Code to connect to T3 Code servers on your local network or tailnet.",
+        `Allow ${PRODUCT_BASE_NAME} to connect to ${PRODUCT_BASE_NAME} servers on your local network or tailnet.`,
       ITSAppUsesNonExemptEncryption: false,
       // The App Store screenshot harness rotates the iPad interface from
       // inside the app (CI denies osascript the Accessibility access that
@@ -292,7 +306,7 @@ const config: ExpoConfig = {
     [
       "expo-camera",
       {
-        cameraPermission: "Allow T3 Code to access your camera so you can scan pairing QR codes.",
+        cameraPermission: `Allow ${PRODUCT_BASE_NAME} to access your camera so you can scan pairing QR codes.`,
         microphonePermission: false,
         barcodeScannerEnabled: true,
         recordAudioAndroid: false,

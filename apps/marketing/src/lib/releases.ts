@@ -1,9 +1,11 @@
-const REPO = "pingdotgg/t3code";
+import { PRODUCT_REPOSITORY_URL } from "@t3tools/shared/productBranding";
 
-export const RELEASES_URL = `https://github.com/${REPO}/releases`;
+const repositoryPath = new URL(PRODUCT_REPOSITORY_URL).pathname.replace(/^\/+/, "");
 
-const API_URL = `https://api.github.com/repos/${REPO}/releases/latest`;
-const CACHE_KEY = "t3code-latest-release";
+export const RELEASES_URL = `${PRODUCT_REPOSITORY_URL}/releases`;
+
+const API_URL = `https://api.github.com/repos/${repositoryPath}/releases/latest`;
+const CACHE_KEY = "fenixcode-latest-release";
 
 export interface ReleaseAsset {
   name: string;

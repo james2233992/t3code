@@ -1,4 +1,5 @@
 import { readHashParams } from "./remote.ts";
+import { PRODUCT_HOSTED_APP_URL } from "./productBranding.ts";
 
 const CONNECT_AUTH_STATE_PARAM = "state";
 const CONNECT_AUTH_CHALLENGE_PARAM = "challenge";
@@ -12,7 +13,7 @@ const CONNECT_CALLBACK_PATH = "/connect/callback";
  * decide whether it is the hosted deployment — the two must agree, so the
  * default lives here.
  */
-export const DEFAULT_HOSTED_APP_URL = "https://app.t3.codes";
+export const DEFAULT_HOSTED_APP_URL = PRODUCT_HOSTED_APP_URL;
 
 /**
  * Requested at authorize time by the hosted page and honored by the CLI's

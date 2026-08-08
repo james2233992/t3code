@@ -1,4 +1,8 @@
 import { fromLenientJson } from "@t3tools/shared/schemaJson";
+import {
+  PRODUCT_DESKTOP_DEV_WM_CLASS,
+  PRODUCT_DESKTOP_WM_CLASS,
+} from "@t3tools/shared/productBranding";
 import * as Option from "effect/Option";
 import * as Schema from "effect/Schema";
 
@@ -81,7 +85,9 @@ export function resolveEarlyLinuxElectronOptions(
 ): EarlyLinuxElectronOptions {
   const preference = resolveEarlyLinuxPasswordStorePreference(input);
   return {
-    linuxWmClass: isDevelopmentEnvironment(input.env) ? "t3code-dev" : "t3code",
+    linuxWmClass: isDevelopmentEnvironment(input.env)
+      ? PRODUCT_DESKTOP_DEV_WM_CLASS
+      : PRODUCT_DESKTOP_WM_CLASS,
     passwordStore: resolveLinuxPasswordStoreSwitch({
       preference,
       env: input.env,
