@@ -419,6 +419,53 @@ export const GrokSettings = makeProviderSettingsSchema(
 );
 export type GrokSettings = typeof GrokSettings.Type;
 
+export const FenixSettings = makeProviderSettingsSchema(
+  {
+    enabled: Schema.Boolean.pipe(
+      Schema.withDecodingDefault(Effect.succeed(false)),
+      Schema.annotateKey({ providerSettingsForm: { hidden: true } }),
+    ),
+    baseUrl: TrimmedString.pipe(
+      Schema.withDecodingDefault(Effect.succeed("https://iaonline.io")),
+      Schema.annotateKey({
+        title: "Fenix API URL",
+        description: "Base URL for the paired Fenix backend session.",
+        providerSettingsForm: {
+          placeholder: "https://iaonline.io",
+          clearWhenEmpty: "omit",
+        },
+      }),
+    ),
+    chatModelsPath: TrimmedString.pipe(
+      Schema.withDecodingDefault(Effect.succeed("/api/v1/ChatModels")),
+      Schema.annotateKey({ providerSettingsForm: { hidden: true } }),
+    ),
+    sendMessagePath: TrimmedString.pipe(
+      Schema.withDecodingDefault(Effect.succeed("/api/v1/ChatModels/SendMessageWithOptions")),
+      Schema.annotateKey({ providerSettingsForm: { hidden: true } }),
+    ),
+    featuredModel: TrimmedString.pipe(
+      Schema.withDecodingDefault(Effect.succeed("openai/gpt-oss-120b")),
+      Schema.annotateKey({
+        title: "Featured coding model",
+        description: "Default model advertised for the Fenix programming agent.",
+        providerSettingsForm: {
+          placeholder: "openai/gpt-oss-120b",
+          clearWhenEmpty: "omit",
+        },
+      }),
+    ),
+    customModels: Schema.Array(Schema.String).pipe(
+      Schema.withDecodingDefault(Effect.succeed([])),
+      Schema.annotateKey({ providerSettingsForm: { hidden: true } }),
+    ),
+  },
+  {
+    order: ["baseUrl", "featuredModel"],
+  },
+);
+export type FenixSettings = typeof FenixSettings.Type;
+
 export const OpenCodeSettings = makeProviderSettingsSchema(
   {
     enabled: Schema.Boolean.pipe(
@@ -598,6 +645,7 @@ export const ServerSettings = Schema.Struct({
     claudeAgent: ClaudeSettings.pipe(Schema.withDecodingDefault(Effect.succeed({}))),
     cursor: CursorSettings.pipe(Schema.withDecodingDefault(Effect.succeed({}))),
     grok: GrokSettings.pipe(Schema.withDecodingDefault(Effect.succeed({}))),
+    fenix: FenixSettings.pipe(Schema.withDecodingDefault(Effect.succeed({}))),
     opencode: OpenCodeSettings.pipe(Schema.withDecodingDefault(Effect.succeed({}))),
   }).pipe(Schema.withDecodingDefault(Effect.succeed({}))),
   // New driver-agnostic instance map. Keyed by `ProviderInstanceId`; values
@@ -694,6 +742,15 @@ const GrokSettingsPatch = Schema.Struct({
   customModels: Schema.optionalKey(Schema.Array(Schema.String)),
 });
 
+const FenixSettingsPatch = Schema.Struct({
+  enabled: Schema.optionalKey(Schema.Boolean),
+  baseUrl: Schema.optionalKey(TrimmedString),
+  chatModelsPath: Schema.optionalKey(TrimmedString),
+  sendMessagePath: Schema.optionalKey(TrimmedString),
+  featuredModel: Schema.optionalKey(TrimmedString),
+  customModels: Schema.optionalKey(Schema.Array(Schema.String)),
+});
+
 const OpenCodeSettingsPatch = Schema.Struct({
   enabled: Schema.optionalKey(Schema.Boolean),
   binaryPath: Schema.optionalKey(TrimmedString),
@@ -741,6 +798,7 @@ export const ServerSettingsPatch = Schema.Struct({
       claudeAgent: Schema.optionalKey(ClaudeSettingsPatch),
       cursor: Schema.optionalKey(CursorSettingsPatch),
       grok: Schema.optionalKey(GrokSettingsPatch),
+      fenix: Schema.optionalKey(FenixSettingsPatch),
       opencode: Schema.optionalKey(OpenCodeSettingsPatch),
     }),
   ),

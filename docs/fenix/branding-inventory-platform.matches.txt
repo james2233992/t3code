@@ -1552,6 +1552,7 @@
 ./apps/server/src/provider/Drivers/CodexHomeLayout.test.ts:9:32:@t3tools
 ./apps/server/src/provider/Drivers/CodexHomeLayout.ts:3:57:@t3tools
 ./apps/server/src/provider/Drivers/CursorDriver.ts:14:74:@t3tools
+./apps/server/src/provider/Drivers/FenixDriver.ts:1:73:@t3tools
 ./apps/server/src/provider/Drivers/GrokDriver.ts:1:72:@t3tools
 ./apps/server/src/provider/Drivers/OpenCodeDriver.ts:15:76:@t3tools
 ./apps/server/src/provider/Layers/ClaudeAdapter.test.ts:2114:46:t3code
@@ -1614,6 +1615,11 @@
 ./apps/server/src/provider/Layers/EventNdjsonLogger.ts:11:32:@t3tools
 ./apps/server/src/provider/Layers/EventNdjsonLogger.ts:12:35:@t3tools
 ./apps/server/src/provider/Layers/EventNdjsonLogger.ts:13:27:@t3tools
+./apps/server/src/provider/Layers/FenixAdapter.test.ts:2:62:@t3tools
+./apps/server/src/provider/Layers/FenixAdapter.ts:13:9:@t3tools
+./apps/server/src/provider/Layers/FenixProvider.test.ts:2:32:@t3tools
+./apps/server/src/provider/Layers/FenixProvider.ts:5:9:@t3tools
+./apps/server/src/provider/Layers/FenixProvider.ts:8:42:@t3tools
 ./apps/server/src/provider/Layers/GrokAdapter.test.ts:26:9:@t3tools
 ./apps/server/src/provider/Layers/GrokAdapter.test.ts:86:12:t3code
 ./apps/server/src/provider/Layers/GrokAdapter.ts:14:9:@t3tools
@@ -1639,12 +1645,12 @@
 ./apps/server/src/provider/Layers/ProviderAdapterRegistry.test.ts:5:9:@t3tools
 ./apps/server/src/provider/Layers/ProviderAdapterRegistry.ts:22:9:@t3tools
 ./apps/server/src/provider/Layers/ProviderInstanceRegistryHydration.ts:49:9:@t3tools
-./apps/server/src/provider/Layers/ProviderInstanceRegistryLive.test.ts:36:9:@t3tools
+./apps/server/src/provider/Layers/ProviderInstanceRegistryLive.test.ts:37:9:@t3tools
 ./apps/server/src/provider/Layers/ProviderInstanceRegistryLive.ts:42:9:@t3tools
 ./apps/server/src/provider/Layers/ProviderRegistry.test.ts:1431:34:t3code
 ./apps/server/src/provider/Layers/ProviderRegistry.test.ts:1546:33:t3code
 ./apps/server/src/provider/Layers/ProviderRegistry.test.ts:1547:34:t3code
-./apps/server/src/provider/Layers/ProviderRegistry.test.ts:2173:39:t3code
+./apps/server/src/provider/Layers/ProviderRegistry.test.ts:2174:39:t3code
 ./apps/server/src/provider/Layers/ProviderRegistry.test.ts:26:9:@t3tools
 ./apps/server/src/provider/Layers/ProviderRegistry.test.ts:30:28:@t3tools
 ./apps/server/src/provider/Layers/ProviderRegistry.test.ts:31:42:@t3tools
@@ -2013,6 +2019,7 @@
 ./apps/server/src/textGeneration/CursorTextGeneration.ts:70:30:t3-code
 ./apps/server/src/textGeneration/CursorTextGeneration.ts:8:59:@t3tools
 ./apps/server/src/textGeneration/CursorTextGeneration.ts:9:68:@t3tools
+./apps/server/src/textGeneration/FenixTextGeneration.ts:1:38:@t3tools
 ./apps/server/src/textGeneration/GrokTextGeneration.test.ts:12:39:@t3tools
 ./apps/server/src/textGeneration/GrokTextGeneration.test.ts:14:51:@t3tools
 ./apps/server/src/textGeneration/GrokTextGeneration.test.ts:29:12:t3code
@@ -2576,7 +2583,7 @@
 ./apps/web/src/components/settings/SourceControlWritingSettings.tsx:4:43:@t3tools
 ./apps/web/src/components/settings/SourceControlWritingSettings.tsx:5:39:@t3tools
 ./apps/web/src/components/settings/SourceControlWritingSettings.tsx:6:59:@t3tools
-./apps/web/src/components/settings/providerDriverMeta.ts:8:9:@t3tools
+./apps/web/src/components/settings/providerDriverMeta.ts:9:9:@t3tools
 ./apps/web/src/components/settings/providerStatus.ts:1:69:@t3tools
 ./apps/web/src/components/sidebar/SidebarProviderUpdatePill.tsx:3:38:@t3tools
 ./apps/web/src/components/threadActionMenu.logic.ts:1:39:@t3tools
