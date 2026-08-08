@@ -1,4 +1,5 @@
 import { FenixSettings, ProviderDriverKind, type ServerProvider } from "@t3tools/contracts";
+import * as Clock from "effect/Clock";
 import * as Effect from "effect/Effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
@@ -27,6 +28,7 @@ import {
   makeProviderSnapshotSettingsSource,
   type ProviderSnapshotSettings,
 } from "../providerUpdateSettings.ts";
+import * as FenixPairingSessionBridge from "../Services/FenixPairingSessionBridge.ts";
 
 const decodeFenixSettings = Schema.decodeSync(FenixSettings);
 
@@ -40,6 +42,7 @@ const UPDATE = makeStaticProviderMaintenanceResolver(
 
 export type FenixDriverEnv =
   | BackgroundPolicy.BackgroundPolicy
+  | FenixPairingSessionBridge.FenixPairingSessionBridge
   | FileSystem.FileSystem
   | Path.Path
   | ServerSettingsService;
@@ -71,6 +74,7 @@ export const FenixDriver: ProviderDriver<FenixSettings, FenixDriverEnv> = {
   create: ({ instanceId, displayName, accentColor, enabled, config }) =>
     Effect.gen(function* () {
       const serverSettings = yield* ServerSettingsService;
+      const pairingSessionBridge = yield* FenixPairingSessionBridge.FenixPairingSessionBridge;
       const continuationIdentity = defaultProviderContinuationIdentity({
         driverKind: DRIVER_KIND,
         instanceId,
@@ -87,7 +91,17 @@ export const FenixDriver: ProviderDriver<FenixSettings, FenixDriverEnv> = {
         env: process.env,
       });
 
-      const adapter = yield* makeFenixAdapter(effectiveConfig, { instanceId });
+      const adapter = yield* makeFenixAdapter(effectiveConfig, {
+        instanceId,
+        pairingSession: () =>
+          Effect.gen(function* () {
+            const nowEpochMs = yield* Clock.currentTimeMillis;
+            return FenixPairingSessionBridge.activePairingSessionFromSnapshot(
+              pairingSessionBridge.resolvePairingSessionSnapshot({ instanceId }),
+              nowEpochMs,
+            );
+          }),
+      });
       const textGeneration = yield* makeFenixTextGeneration;
 
       const snapshotSettings = makeProviderSnapshotSettingsSource(effectiveConfig, serverSettings);

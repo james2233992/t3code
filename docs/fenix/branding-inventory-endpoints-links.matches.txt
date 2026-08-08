@@ -73,6 +73,7 @@
 ./docs/fenix/f0-4-local-builds-byos-report-20260808.md:76:99:t3.codes
 ./docs/fenix/f0-4-local-builds-byos-report-20260808.md:98:150:t3.codes
 ./docs/fenix/f0-bootstrap.md:8:48:github.com/pingdotgg/t3code
+./docs/fenix/fenix-code-pause-handoff-20260808.md:28:228:t3.codes
 ./docs/internals/remote.md:109:9:app.t3.codes
 ./docs/internals/t3-connect.md:85:15:app.t3.codes
 ./docs/operations/release.md:121:49:app.t3.codes

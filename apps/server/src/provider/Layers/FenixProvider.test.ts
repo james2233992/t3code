@@ -34,4 +34,17 @@ describe("FenixProvider", () => {
     expect(models[0]?.slug).toBe(FENIX_FEATURED_CODING_MODEL);
     expect(models.map((model) => model.slug)).toContain("local-experiment");
   });
+
+  it("canonicalizes persisted legacy featured model slugs without rewriting custom models", () => {
+    const models = fenixModelsFromSettings({
+      featuredModel: "openai/gpt-oss-120b",
+      customModels: ["local-experiment"],
+    });
+    const slugs = models.map((model) => model.slug);
+
+    expect(slugs[0]).toBe(FENIX_FEATURED_CODING_MODEL);
+    expect(slugs.filter((slug) => slug === FENIX_FEATURED_CODING_MODEL)).toHaveLength(1);
+    expect(slugs).not.toContain("openai/gpt-oss-120b");
+    expect(slugs).toContain("local-experiment");
+  });
 });

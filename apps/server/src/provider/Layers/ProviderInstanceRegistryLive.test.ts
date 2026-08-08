@@ -50,7 +50,10 @@ import { CursorDriver } from "../Drivers/CursorDriver.ts";
 import { FenixDriver } from "../Drivers/FenixDriver.ts";
 import { GrokDriver } from "../Drivers/GrokDriver.ts";
 import { OpenCodeDriver } from "../Drivers/OpenCodeDriver.ts";
+import type { BuiltInDriversEnv } from "../builtInDrivers.ts";
 import { OpenCodeRuntimeLive } from "../opencodeRuntime.ts";
+import * as FenixPairingSessionBridge from "../Services/FenixPairingSessionBridge.ts";
+import type { AnyProviderDriver } from "../ProviderDriver.ts";
 import { NoOpProviderEventLoggers, ProviderEventLoggers } from "./ProviderEventLoggers.ts";
 import { makeProviderInstanceRegistry } from "./ProviderInstanceRegistryLive.ts";
 
@@ -131,7 +134,7 @@ const makeFenixConfig = (overrides: Partial<FenixSettings>): FenixSettings => ({
   baseUrl: "https://iaonline.io",
   chatModelsPath: "/api/v1/ChatModels",
   sendMessagePath: "/api/v1/ChatModels/SendMessageWithOptions",
-  featuredModel: "openai/gpt-oss-120b",
+  featuredModel: "groq/openai/gpt-oss-120b",
   customModels: [],
   ...overrides,
 });
@@ -156,6 +159,7 @@ describe("ProviderInstanceRegistryLive — multi-instance codex slice", () => {
   }).pipe(
     Layer.provideMerge(NodeServices.layer),
     Layer.provideMerge(BackgroundPolicyAlwaysRunLayer),
+    Layer.provideMerge(FenixPairingSessionBridge.unpairedLayer),
     Layer.provideMerge(ServerSettingsService.layerTest()),
     Layer.provideMerge(TestHttpClientLive),
     Layer.provideMerge(Layer.succeed(ProviderEventLoggers, NoOpProviderEventLoggers)),
@@ -295,6 +299,7 @@ describe("ProviderInstanceRegistryLive — all drivers slice", () => {
   }).pipe(
     Layer.provideMerge(infraLayer),
     Layer.provideMerge(BackgroundPolicyAlwaysRunLayer),
+    Layer.provideMerge(FenixPairingSessionBridge.unpairedLayer),
     Layer.provideMerge(ServerSettingsService.layerTest()),
     Layer.provideMerge(TestHttpClientLive),
     Layer.provideMerge(Layer.succeed(ProviderEventLoggers, NoOpProviderEventLoggers)),
@@ -358,8 +363,17 @@ describe("ProviderInstanceRegistryLive — all drivers slice", () => {
         },
       };
 
+      const drivers: ReadonlyArray<AnyProviderDriver<BuiltInDriversEnv>> = [
+        CodexDriver,
+        ClaudeDriver,
+        CursorDriver,
+        GrokDriver,
+        FenixDriver,
+        OpenCodeDriver,
+      ];
+
       const { registry } = yield* makeProviderInstanceRegistry({
-        drivers: [CodexDriver, ClaudeDriver, CursorDriver, GrokDriver, FenixDriver, OpenCodeDriver],
+        drivers,
         configMap,
       });
 

@@ -1,11 +1,12 @@
 import {
   type FenixSettings,
   type ModelCapabilities,
+  ProviderDriverKind,
   type ServerProviderModel,
 } from "@t3tools/contracts";
 import * as DateTime from "effect/DateTime";
 import * as Effect from "effect/Effect";
-import { createModelCapabilities } from "@t3tools/shared/model";
+import { createModelCapabilities, normalizeModelSlug } from "@t3tools/shared/model";
 
 import {
   buildServerProvider,
@@ -22,8 +23,9 @@ const FENIX_PRESENTATION = {
 const EMPTY_CAPABILITIES: ModelCapabilities = createModelCapabilities({
   optionDescriptors: [],
 });
+const PROVIDER = ProviderDriverKind.make("fenix");
 
-export const FENIX_FEATURED_CODING_MODEL = "openai/gpt-oss-120b";
+export const FENIX_FEATURED_CODING_MODEL = "groq/openai/gpt-oss-120b";
 
 export const FENIX_BUILT_IN_MODELS: ReadonlyArray<ServerProviderModel> = [
   {
@@ -37,7 +39,8 @@ export const FENIX_BUILT_IN_MODELS: ReadonlyArray<ServerProviderModel> = [
 export function fenixModelsFromSettings(
   settings: Pick<FenixSettings, "customModels" | "featuredModel">,
 ): ReadonlyArray<ServerProviderModel> {
-  const featured = settings.featuredModel.trim() || FENIX_FEATURED_CODING_MODEL;
+  const featured =
+    normalizeModelSlug(settings.featuredModel, PROVIDER) ?? FENIX_FEATURED_CODING_MODEL;
   const builtIns =
     featured === FENIX_FEATURED_CODING_MODEL
       ? FENIX_BUILT_IN_MODELS
