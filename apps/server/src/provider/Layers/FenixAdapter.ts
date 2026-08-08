@@ -28,8 +28,6 @@ import type { FenixAdapterShape } from "../Services/FenixAdapter.ts";
 const PROVIDER = ProviderDriverKind.make("fenix");
 const FENIX_TRUSTED_ORIGIN = "https://iaonline.io";
 const DEFAULT_FENIX_MODEL = "groq/openai/gpt-oss-120b";
-const INVALID_HEADER_VALUE = /[\u0000-\u001f\u007f\s]/;
-const INVALID_COOKIE_VALUE = /[\u0000-\u001f\u007f\s;,]/;
 const encodeUnknownJsonString = Schema.encodeUnknownSync(Schema.fromJsonString(Schema.Unknown));
 
 function normalizeFenixModel(model: string | null | undefined): string {
@@ -78,18 +76,32 @@ function firstString(...values: ReadonlyArray<unknown>): string | undefined {
   return undefined;
 }
 
+function hasInvalidHeaderValue(value: string): boolean {
+  for (const char of value) {
+    const code = char.charCodeAt(0);
+    if (code <= 31 || code === 127 || char.trim().length === 0) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function hasInvalidCookieValue(value: string): boolean {
+  return hasInvalidHeaderValue(value) || value.includes(";") || value.includes(",");
+}
+
 function validatePairingSession(
   session: FenixPairingSession | null | undefined,
 ): FenixPairingSession | null {
   if (!session) return null;
   switch (session.kind) {
     case "cookie": {
-      return session.authToken.length > 0 && !INVALID_COOKIE_VALUE.test(session.authToken)
+      return session.authToken.length > 0 && !hasInvalidCookieValue(session.authToken)
         ? { kind: session.kind, authToken: session.authToken }
         : null;
     }
     case "bearer": {
-      return session.token.length > 0 && !INVALID_HEADER_VALUE.test(session.token)
+      return session.token.length > 0 && !hasInvalidHeaderValue(session.token)
         ? { kind: session.kind, token: session.token }
         : null;
     }

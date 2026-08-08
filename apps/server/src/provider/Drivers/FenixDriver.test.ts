@@ -1,11 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "@effect/vitest";
 import * as NodeServices from "@effect/platform-node/NodeServices";
-import {
-  FenixSettings,
-  ProviderDriverKind,
-  ProviderInstanceId,
-  ThreadId,
-} from "@t3tools/contracts";
+import { FenixSettings, ProviderInstanceId, ThreadId } from "@t3tools/contracts";
 import * as Effect from "effect/Effect";
 import * as DateTime from "effect/DateTime";
 import * as Layer from "effect/Layer";
@@ -19,7 +14,6 @@ import { FenixDriver } from "./FenixDriver.ts";
 
 const decodeFenixSettings = Schema.decodeSync(FenixSettings);
 const decodeUnknownJsonString = Schema.decodeUnknownSync(Schema.fromJsonString(Schema.Unknown));
-const DRIVER_KIND = ProviderDriverKind.make("fenix");
 const INSTANCE_ID = ProviderInstanceId.make("fenix");
 const TEST_EPOCH = DateTime.makeUnsafe("1970-01-01T00:00:00.000Z");
 const ACTIVE_EXPIRES_AT_EPOCH_MS = 4_102_444_800_000;
