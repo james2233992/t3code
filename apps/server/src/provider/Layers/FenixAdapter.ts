@@ -25,6 +25,9 @@ import {
 import type { FenixAdapterShape } from "../Services/FenixAdapter.ts";
 
 const PROVIDER = ProviderDriverKind.make("fenix");
+const FENIX_TRUSTED_ORIGIN = "https://iaonline.io";
+const INVALID_HEADER_VALUE = /[\u0000-\u001f\u007f\s]/;
+const INVALID_COOKIE_VALUE = /[\u0000-\u001f\u007f\s;,]/;
 const encodeUnknownJsonString = Schema.encodeUnknownSync(Schema.fromJsonString(Schema.Unknown));
 
 interface FenixSessionContext {
@@ -42,7 +45,7 @@ export interface FenixAdapterLiveOptions {
 export type FenixPairingSession =
   | {
       readonly kind: "cookie";
-      readonly cookieHeader: string;
+      readonly authToken: string;
     }
   | {
       readonly kind: "bearer";
@@ -73,12 +76,16 @@ function validatePairingSession(
   if (!session) return null;
   switch (session.kind) {
     case "cookie": {
-      const cookieHeader = session.cookieHeader.trim();
-      return cookieHeader.length > 0 ? { kind: session.kind, cookieHeader } : null;
+      const authToken = session.authToken.trim();
+      return authToken.length > 0 && !INVALID_COOKIE_VALUE.test(authToken)
+        ? { kind: session.kind, authToken }
+        : null;
     }
     case "bearer": {
       const token = session.token.trim();
-      return token.length > 0 ? { kind: session.kind, token } : null;
+      return token.length > 0 && !INVALID_HEADER_VALUE.test(token)
+        ? { kind: session.kind, token }
+        : null;
     }
   }
 }
@@ -94,7 +101,7 @@ function applyPairingSessionHeaders(
   session: FenixPairingSession,
 ): Record<string, string> {
   if (session.kind === "cookie") {
-    return { ...headers, cookie: session.cookieHeader };
+    return { ...headers, cookie: `AuthToken=${session.authToken}` };
   }
   return { ...headers, authorization: `Bearer ${session.token}` };
 }
@@ -140,6 +147,20 @@ export function makeFenixAdapter(settings: FenixSettings, options?: FenixAdapter
     const runtimeEventPubSub = yield* PubSub.unbounded<ProviderRuntimeEvent>();
     const sessions = new Map<ThreadId, FenixSessionContext>();
     const fetchImpl = options?.fetch ?? fetch;
+    const validateTrustedRequestUrl = (requestUrl: string) =>
+      Effect.sync(() => new URL(requestUrl)).pipe(
+        Effect.flatMap((url) =>
+          url.origin === FENIX_TRUSTED_ORIGIN
+            ? Effect.succeed(requestUrl)
+            : Effect.fail(
+                new ProviderAdapterValidationError({
+                  provider: PROVIDER,
+                  operation: "pairing",
+                  issue: `Fenix pairing credentials can only be sent to ${FENIX_TRUSTED_ORIGIN}.`,
+                }),
+              ),
+        ),
+      );
     const readRequiredPairingSession = () =>
       Effect.sync(() => readPairingSession(options?.pairingSession)).pipe(
         Effect.flatMap((pairingSession) =>
@@ -209,7 +230,12 @@ export function makeFenixAdapter(settings: FenixSettings, options?: FenixAdapter
           provider: PROVIDER,
           providerInstanceId: boundInstanceId,
           threadId: input.threadId,
-          payload: { state: "ready", reason: "Fenix paired session ready" },
+          payload: {
+            state: "ready",
+            reason: readPairingSession(options?.pairingSession)
+              ? "Fenix paired session ready"
+              : "Fenix pairing required",
+          },
         });
         yield* offerRuntimeEvent({
           type: "thread.started",
@@ -222,8 +248,34 @@ export function makeFenixAdapter(settings: FenixSettings, options?: FenixAdapter
         return session;
       });
 
-    const sendTurn: FenixAdapterShape["sendTurn"] = (input) =>
-      Effect.gen(function* () {
+    const sendTurn: FenixAdapterShape["sendTurn"] = (input) => {
+      let activeTurnId: TurnId | undefined;
+      let activeContext: FenixSessionContext | undefined;
+      const failActiveTurn = (error: { readonly message: string }) =>
+        Effect.gen(function* () {
+          if (!activeTurnId || !activeContext) return;
+          if (activeContext.session.activeTurnId !== activeTurnId) return;
+
+          const failedAt = yield* nowIso;
+          const { activeTurnId: _activeTurnId, ...readySession } = activeContext.session;
+          activeContext.session = {
+            ...readySession,
+            status: "ready",
+            updatedAt: failedAt,
+            lastError: error.message,
+          };
+          yield* offerRuntimeEvent({
+            type: "turn.completed",
+            ...(yield* makeEventStamp()),
+            provider: PROVIDER,
+            providerInstanceId: boundInstanceId,
+            threadId: input.threadId,
+            turnId: activeTurnId,
+            payload: { state: "failed", errorMessage: error.message },
+          });
+        });
+
+      return Effect.gen(function* () {
         const ctx = yield* requireSession(input.threadId);
         const text = input.input?.trim();
         if (!text) {
@@ -235,7 +287,12 @@ export function makeFenixAdapter(settings: FenixSettings, options?: FenixAdapter
         }
 
         const pairingSession = yield* readRequiredPairingSession();
+        const requestUrl = yield* validateTrustedRequestUrl(
+          resolveUrl(settings.baseUrl, settings.sendMessagePath),
+        );
         const turnId = TurnId.make(NodeCrypto.randomUUID());
+        activeTurnId = turnId;
+        activeContext = ctx;
         const model =
           input.modelSelection?.instanceId === boundInstanceId
             ? input.modelSelection.model
@@ -258,7 +315,6 @@ export function makeFenixAdapter(settings: FenixSettings, options?: FenixAdapter
           payload: { model },
         });
 
-        const requestUrl = resolveUrl(settings.baseUrl, settings.sendMessagePath);
         const responsePayload = yield* Effect.tryPromise({
           try: async () => {
             const response = await fetchImpl(requestUrl, {
@@ -347,9 +403,11 @@ export function makeFenixAdapter(settings: FenixSettings, options?: FenixAdapter
                 message: error.message,
               },
             });
+            yield* failActiveTurn(error);
           }),
         ),
       );
+    };
 
     return {
       provider: PROVIDER,

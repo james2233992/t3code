@@ -2,7 +2,7 @@
 
 Date: 2026-08-08, Atlantic/Canary.
 
-Repository: `james2233992/t3code` fork, local checkout `/Users/juancarlosalonsonolasco-macmini2/Proyectos/Fenix-Code`.
+Repository: `james2233992/t3code` fork.
 
 ## F1.1 Driver Contract
 
@@ -24,8 +24,10 @@ Fable review notes this is already present in the production Fenix catalog as ru
 
 Fenix Code now fails closed unless the Fenix adapter receives an active paired Fenix session. The adapter accepts a runtime-injected pairing session as either:
 
-- cookie-first session: `Cookie: AuthToken=...`
+- cookie-first session: an exact `AuthToken` value, used to build `Cookie: AuthToken=...`
 - bearer session: `Authorization: Bearer ...`
+
+Pairing credentials are only attached to requests whose resolved origin is exactly `https://iaonline.io`. The adapter rejects malformed cookie and bearer values before fetch, including control characters or multi-cookie input.
 
 The default driver construction passes no credential, so an enabled Fenix provider cannot reach `iaonline.io` until the Code Lab pairing bridge injects the authenticated Fenix identity.
 
@@ -34,5 +36,5 @@ The current Fenix monorepo surface inspected for F1.2 is `ChatWorkspaceControlle
 ## F1.2 Guardrails
 
 - No pairing session: `sendTurn` fails before `fetch`, so the Fenix backend is not reached.
-- Paired cookie session: `sendTurn` calls the Fenix generic chat lane with the cookie header and the standard request body.
+- Paired cookie session: `sendTurn` calls the Fenix generic chat lane with `Cookie: AuthToken=<value>` and the standard request body.
 - Existing upstream drivers remain untouched.
