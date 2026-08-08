@@ -1,0 +1,38 @@
+# Fenix Code F1 Driver
+
+Date: 2026-08-08, Atlantic/Canary.
+
+Repository: `james2233992/t3code` fork, local checkout `/Users/juancarlosalonsonolasco-macmini2/Proyectos/Fenix-Code`.
+
+## F1.1 Driver Contract
+
+- Driver kind: `fenix`.
+- Default state: disabled until pairing QA is complete.
+- Backend lane: Fenix ChatModels only:
+  - Catalog: `GET https://iaonline.io/api/v1/ChatModels`
+  - Turn execution: `POST https://iaonline.io/api/v1/ChatModels/SendMessageWithOptions`
+  - Request marker: `isGenericChatLane: true`
+- Forbidden lane: no direct `run_on_models` access, no new API key, and no third-party catalog in Fenix Code.
+
+## Featured Programming Agent
+
+The featured model is `openai/gpt-oss-120b` for `Agente Groq de Programacion`.
+
+Fable review notes this is already present in the production Fenix catalog as run_on `14`, used by QA agent `234`. F1 therefore does not require a new `run_on_models` row or DML. The documented catalog economics for this driver are `$0.15` input / `$0.60` output per 1M tokens with `131k` context.
+
+## F1.2 Pairing Bridge State
+
+Fenix Code now fails closed unless the Fenix adapter receives an active paired Fenix session. The adapter accepts a runtime-injected pairing session as either:
+
+- cookie-first session: `Cookie: AuthToken=...`
+- bearer session: `Authorization: Bearer ...`
+
+The default driver construction passes no credential, so an enabled Fenix provider cannot reach `iaonline.io` until the Code Lab pairing bridge injects the authenticated Fenix identity.
+
+The current Fenix monorepo surface inspected for F1.2 is `ChatWorkspaceController` plus `InMemoryChatWorkspacePairingService`. That pairing is currently a boolean per `(companyId, userId)` and does not yet issue a cookie/token envelope consumable by Fenix Code. If production pairing requires changes there, it must be a separate monorepo PR.
+
+## F1.2 Guardrails
+
+- No pairing session: `sendTurn` fails before `fetch`, so the Fenix backend is not reached.
+- Paired cookie session: `sendTurn` calls the Fenix generic chat lane with the cookie header and the standard request body.
+- Existing upstream drivers remain untouched.

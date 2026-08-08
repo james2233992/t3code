@@ -36,7 +36,20 @@ interface FenixSessionContext {
 export interface FenixAdapterLiveOptions {
   readonly instanceId?: ProviderInstanceId;
   readonly fetch?: typeof fetch;
+  readonly pairingSession?: FenixPairingSession | FenixPairingSessionResolver;
 }
+
+export type FenixPairingSession =
+  | {
+      readonly kind: "cookie";
+      readonly cookieHeader: string;
+    }
+  | {
+      readonly kind: "bearer";
+      readonly token: string;
+    };
+
+export type FenixPairingSessionResolver = () => FenixPairingSession | null | undefined;
 
 function resolveUrl(baseUrl: string, path: string): string {
   const base = baseUrl.trim() || "https://iaonline.io";
@@ -52,6 +65,38 @@ function firstString(...values: ReadonlyArray<unknown>): string | undefined {
     }
   }
   return undefined;
+}
+
+function validatePairingSession(
+  session: FenixPairingSession | null | undefined,
+): FenixPairingSession | null {
+  if (!session) return null;
+  switch (session.kind) {
+    case "cookie": {
+      const cookieHeader = session.cookieHeader.trim();
+      return cookieHeader.length > 0 ? { kind: session.kind, cookieHeader } : null;
+    }
+    case "bearer": {
+      const token = session.token.trim();
+      return token.length > 0 ? { kind: session.kind, token } : null;
+    }
+  }
+}
+
+function readPairingSession(
+  input: FenixPairingSession | FenixPairingSessionResolver | undefined,
+): FenixPairingSession | null {
+  return validatePairingSession(typeof input === "function" ? input() : input);
+}
+
+function applyPairingSessionHeaders(
+  headers: Record<string, string>,
+  session: FenixPairingSession,
+): Record<string, string> {
+  if (session.kind === "cookie") {
+    return { ...headers, cookie: session.cookieHeader };
+  }
+  return { ...headers, authorization: `Bearer ${session.token}` };
 }
 
 function extractAssistantText(payload: unknown): string {
@@ -95,6 +140,21 @@ export function makeFenixAdapter(settings: FenixSettings, options?: FenixAdapter
     const runtimeEventPubSub = yield* PubSub.unbounded<ProviderRuntimeEvent>();
     const sessions = new Map<ThreadId, FenixSessionContext>();
     const fetchImpl = options?.fetch ?? fetch;
+    const readRequiredPairingSession = () =>
+      Effect.sync(() => readPairingSession(options?.pairingSession)).pipe(
+        Effect.flatMap((pairingSession) =>
+          pairingSession
+            ? Effect.succeed(pairingSession)
+            : Effect.fail(
+                new ProviderAdapterValidationError({
+                  provider: PROVIDER,
+                  operation: "pairing",
+                  issue:
+                    "Fenix provider requires an active Code Lab pairing session before calling the Fenix backend.",
+                }),
+              ),
+        ),
+      );
 
     const nowIso = Effect.map(DateTime.now, DateTime.formatIso);
     const nextEventId = Effect.sync(() => EventId.make(NodeCrypto.randomUUID()));
@@ -174,6 +234,7 @@ export function makeFenixAdapter(settings: FenixSettings, options?: FenixAdapter
           });
         }
 
+        const pairingSession = yield* readRequiredPairingSession();
         const turnId = TurnId.make(NodeCrypto.randomUUID());
         const model =
           input.modelSelection?.instanceId === boundInstanceId
@@ -202,10 +263,13 @@ export function makeFenixAdapter(settings: FenixSettings, options?: FenixAdapter
           try: async () => {
             const response = await fetchImpl(requestUrl, {
               method: "POST",
-              headers: {
-                accept: "application/json",
-                "content-type": "application/json",
-              },
+              headers: applyPairingSessionHeaders(
+                {
+                  accept: "application/json",
+                  "content-type": "application/json",
+                },
+                pairingSession,
+              ),
               credentials: "include",
               body: encodeUnknownJsonString({
                 message: text,

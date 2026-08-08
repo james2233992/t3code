@@ -11,13 +11,14 @@ const decodeFenixSettings = Schema.decodeSync(FenixSettings);
 const decodeUnknownJson = Schema.decodeUnknownSync(Schema.fromJsonString(Schema.Unknown));
 
 describe("FenixAdapter", () => {
-  it.effect("posts turns through the Fenix generic chat lane and emits canonical events", () =>
+  it.effect("posts turns through the Fenix generic chat lane with the paired Fenix cookie", () =>
     Effect.gen(function* () {
-      const requests: Array<{ url: string; body: string }> = [];
+      const requests: Array<{ url: string; body: string; headers: Record<string, string> }> = [];
       const fetchImpl = (async (url, init) => {
         requests.push({
           url: String(url),
           body: String(init?.body ?? "{}"),
+          headers: init?.headers as Record<string, string>,
         });
         return Response.json({ response: "respuesta fenix" });
       }) as typeof fetch;
@@ -28,7 +29,11 @@ describe("FenixAdapter", () => {
           sendMessagePath: "/api/v1/ChatModels/SendMessageWithOptions",
           featuredModel: "openai/gpt-oss-120b",
         }),
-        { fetch: fetchImpl, instanceId: ProviderInstanceId.make("fenix") },
+        {
+          fetch: fetchImpl,
+          instanceId: ProviderInstanceId.make("fenix"),
+          pairingSession: { kind: "cookie", cookieHeader: "AuthToken=fenix-session" },
+        },
       );
       const threadId = ThreadId.make("thread-fenix");
       const eventsFiber = yield* adapter.streamEvents.pipe(
@@ -49,6 +54,11 @@ describe("FenixAdapter", () => {
       expect(result.threadId).toBe(threadId);
       expect(requests).toHaveLength(1);
       expect(requests[0]?.url).toBe("https://iaonline.io/api/v1/ChatModels/SendMessageWithOptions");
+      expect(requests[0]?.headers).toMatchObject({
+        accept: "application/json",
+        "content-type": "application/json",
+        cookie: "AuthToken=fenix-session",
+      });
       expect(requestBody).toMatchObject({
         message: "crea una funcion",
         model: "openai/gpt-oss-120b",
@@ -69,6 +79,38 @@ describe("FenixAdapter", () => {
         streamKind: "assistant_text",
         delta: "respuesta fenix",
       });
+    }),
+  );
+
+  it.effect("fails closed before reaching the Fenix backend without a pairing session", () =>
+    Effect.gen(function* () {
+      const fetchImpl = (() => {
+        throw new Error("fetch must not be called without pairing");
+      }) as unknown as typeof fetch;
+      const adapter = yield* makeFenixAdapter(
+        decodeFenixSettings({
+          enabled: true,
+          baseUrl: "https://iaonline.io",
+          sendMessagePath: "/api/v1/ChatModels/SendMessageWithOptions",
+          featuredModel: "openai/gpt-oss-120b",
+        }),
+        { fetch: fetchImpl, instanceId: ProviderInstanceId.make("fenix") },
+      );
+      const threadId = ThreadId.make("thread-fenix-unpaired");
+
+      yield* adapter.startSession({
+        threadId,
+        runtimeMode: "full-access",
+      });
+      const error = yield* adapter
+        .sendTurn({ threadId, input: "crea una funcion" })
+        .pipe(Effect.flip);
+      const sessions = yield* adapter.listSessions();
+
+      expect(error._tag).toBe("ProviderAdapterValidationError");
+      expect(error.message).toContain("active Code Lab pairing session");
+      expect(sessions[0]?.status).toBe("ready");
+      expect(sessions[0]?.activeTurnId).toBeUndefined();
     }),
   );
 });
