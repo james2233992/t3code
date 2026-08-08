@@ -35,7 +35,7 @@ const makeDesktopClerkLayer = (isDevelopment = true, events: string[] = []) => {
     isDevelopment,
     appDataDirectory: "/tmp/app-data",
     userDataDirName: isDevelopment ? "fenixcode-dev" : "fenixcode",
-    legacyUserDataDirName: isDevelopment ? "T3 Code (Dev)" : "T3 Code (Alpha)",
+    legacyUserDataDirName: isDevelopment ? "Fenix Code (Dev)" : "Fenix Code (Alpha)",
     path: { join: (...parts: ReadonlyArray<string>) => parts.join("/") },
   } as unknown as DesktopEnvironment.DesktopEnvironment["Service"]);
 
@@ -64,11 +64,11 @@ describe("DesktopClerk", () => {
   });
 
   it("derives the Clerk Frontend API hostname used by the desktop CSP", () => {
-    const publishableKey = `pk_test_${btoa("clerk.t3.codes$")}`;
+    const publishableKey = `pk_test_${btoa("clerk.code.iaonline.io$")}`;
 
     assert.equal(
       DesktopClerk.resolveDesktopClerkFrontendApiHostname(publishableKey),
-      "clerk.t3.codes",
+      "clerk.code.iaonline.io",
     );
     assert.equal(DesktopClerk.resolveDesktopClerkFrontendApiHostname(""), undefined);
     assert.equal(DesktopClerk.resolveDesktopClerkFrontendApiHostname("invalid"), undefined);

@@ -1,11 +1,5 @@
-./.agents/skills/ios-debugger-agent/SKILL.md:3:242:T3 Code
-./.agents/skills/ios-simulator-browser/SKILL.md:14:21:T3 Code
-./.agents/skills/ios-simulator-browser/SKILL.md:3:81:T3 Code
-./.agents/skills/ios-simulator-browser/agents/openai.yaml:4:93:T3 Code
 ./.agents/skills/test-t3-app/SKILL.md:15:26:t3code
 ./.agents/skills/test-t3-app/SKILL.md:21:62:T3CODE
-./.agents/skills/test-t3-app/SKILL.md:31:163:T3 Code
-./.agents/skills/test-t3-app/SKILL.md:3:43:T3 Code
 ./.agents/skills/test-t3-mobile/SKILL.md:100:27:t3code
 ./.agents/skills/test-t3-mobile/SKILL.md:105:61:t3code
 ./.agents/skills/test-t3-mobile/SKILL.md:116:52:t3code
@@ -15,23 +9,13 @@
 ./.agents/skills/test-t3-mobile/SKILL.md:143:40:t3code
 ./.agents/skills/test-t3-mobile/SKILL.md:146:7:t3code
 ./.agents/skills/test-t3-mobile/SKILL.md:147:15:t3code
-./.agents/skills/test-t3-mobile/SKILL.md:152:4:T3 Code
-./.agents/skills/test-t3-mobile/SKILL.md:160:168:T3 Code
-./.agents/skills/test-t3-mobile/SKILL.md:174:43:T3 Code
-./.agents/skills/test-t3-mobile/SKILL.md:31:9:T3 Code
 ./.agents/skills/test-t3-mobile/SKILL.md:32:43:t3code
 ./.agents/skills/test-t3-mobile/SKILL.md:33:16:t3code
-./.agents/skills/test-t3-mobile/SKILL.md:3:30:T3 Code
 ./.agents/skills/test-t3-mobile/SKILL.md:75:206:t3code
 ./.agents/skills/test-t3-mobile/SKILL.md:82:15:t3code
 ./.agents/skills/test-t3-mobile/SKILL.md:96:38:T3Code
 ./.agents/skills/test-t3-mobile/SKILL.md:97:12:T3Code
-./.agents/skills/test-t3-mobile/agents/openai.yaml:3:28:T3 Code
-./.agents/skills/test-t3-mobile/agents/openai.yaml:4:50:T3 Code
-./.cursor/rules/cursor-cloud.mdc:2:63:T3 Code
 ./.cursor/rules/cursor-cloud.mdc:32:5:T3CODE
-./.cursor/rules/cursor-cloud.mdc:8:89:T3 Code
-./.devcontainer/devcontainer.json:2:12:T3 Code
 ./.env.example:10:1:T3CODE
 ./.env.example:11:1:T3CODE
 ./.env.example:14:23:T3CODE
@@ -39,11 +23,9 @@
 ./.env.example:17:3:T3CODE
 ./.env.example:17:55:t3code
 ./.env.example:18:3:T3CODE
-./.env.example:1:13:T3 Connect
 ./.env.example:22:1:T3CODE
 ./.env.example:26:3:T3CODE
 ./.env.example:29:3:T3CODE
-./.env.example:2:34:T3 Connect
 ./.env.example:30:37:t3-code
 ./.env.example:30:3:T3CODE
 ./.env.example:31:3:T3CODE
@@ -66,22 +48,21 @@
 ./.github/workflows/ci.yml:89:11:T3CODE
 ./.github/workflows/ci.yml:95:42:t3code
 ./.github/workflows/ci.yml:96:65:t3code
-./.github/workflows/deploy-relay.yml:1:14:T3 Connect
 ./.github/workflows/deploy-relay.yml:54:26:t3code
 ./.github/workflows/deploy-relay.yml:58:30:t3code
-./.github/workflows/fenix-fork-ci.yml:100:11:T3CODE
-./.github/workflows/fenix-fork-ci.yml:100:66:t3code
 ./.github/workflows/fenix-fork-ci.yml:101:11:T3CODE
-./.github/workflows/fenix-fork-ci.yml:107:42:t3code
-./.github/workflows/fenix-fork-ci.yml:108:65:t3code
-./.github/workflows/fenix-fork-ci.yml:127:44:t3code
-./.github/workflows/fenix-fork-ci.yml:146:26:@t3tools
-./.github/workflows/fenix-fork-ci.yml:156:44:t3code
-./.github/workflows/fenix-fork-ci.yml:175:26:@t3tools
+./.github/workflows/fenix-fork-ci.yml:101:66:t3code
+./.github/workflows/fenix-fork-ci.yml:102:11:T3CODE
+./.github/workflows/fenix-fork-ci.yml:108:42:t3code
+./.github/workflows/fenix-fork-ci.yml:109:65:t3code
+./.github/workflows/fenix-fork-ci.yml:128:44:t3code
+./.github/workflows/fenix-fork-ci.yml:147:26:@t3tools
+./.github/workflows/fenix-fork-ci.yml:157:44:t3code
+./.github/workflows/fenix-fork-ci.yml:176:26:@t3tools
 ./.github/workflows/fenix-fork-ci.yml:18:44:t3code
 ./.github/workflows/fenix-fork-ci.yml:43:30:@t3tools
-./.github/workflows/fenix-fork-ci.yml:73:44:t3code
-./.github/workflows/fenix-fork-ci.yml:96:30:@t3tools
+./.github/workflows/fenix-fork-ci.yml:74:44:t3code
+./.github/workflows/fenix-fork-ci.yml:97:30:@t3tools
 ./.github/workflows/mobile-eas-preview.yml:55:26:@t3tools
 ./.github/workflows/mobile-eas-production.yml:73:26:@t3tools
 ./.github/workflows/mobile-showcase-screenshots.yml:102:26:@t3tools
@@ -93,7 +74,7 @@
 ./.github/workflows/release.yml:1023:49:t3code
 ./.github/workflows/release.yml:104:30:@t3tools
 ./.github/workflows/release.yml:1086:26:@t3tools
-./.github/workflows/release.yml:178:19:T3 Connect
+./.github/workflows/release.yml:149:24:Fenix Code
 ./.github/workflows/release.yml:215:26:t3code
 ./.github/workflows/release.yml:221:27:t3code
 ./.github/workflows/release.yml:333:7:T3CODE
@@ -147,59 +128,28 @@
 ./.github/workflows/release.yml:961:28:T3CODE
 ./.github/workflows/release.yml:961:68:T3CODE
 ./.macroscope/check-run-agents/effect-service-conventions.md:30:92:@t3tools
-./.plans/18-server-auth-model.md:5:51:T3 Code
-./.plans/19-remote-endpoints-hosted-static.md:327:122:T3 Code
 ./.plans/t3-connect-remote-setup.html:222:24:t3code
-./.plans/t3-connect-remote-setup.html:240:141:T3 Connect
-./.plans/t3-connect-remote-setup.html:94:11:T3 Connect
-./.plans/t3-connect-remote-setup.html:98:5:T3 Code
-./.plans/t3-connect-remote-setup.html:99:17:T3 Code
-./AGENTS.md:13:1:T3 Code
-./AGENTS.md:17:125:T3 Code
-./AGENTS.md:1:3:T3 Code
-./AGENTS.md:21:21:T3 Code
-./AGENTS.md:21:243:T3 Connect
-./AGENTS.md:25:1:T3 Code
-./AGENTS.md:31:148:T3 Code
-./AGENTS.md:3:1:T3 Code
-./AGENTS.md:41:15:T3 Code
-./AGENTS.md:41:208:T3 Code
-./AGENTS.md:41:52:T3 Code
-./AGENTS.md:47:58:T3 Code
-./AGENTS.md:48:73:T3 Code
-./AGENTS.md:49:35:T3 Code
-./AGENTS.md:50:55:T3 Code
-./AGENTS.md:51:51:T3 Code
-./AGENTS.md:5:18:T3 Code
-./AGENTS.md:62:78:T3 Code
-./AGENTS.md:7:15:T3 Code
 ./AGENTS.md:80:146:T3CODE
-./AGENTS.md:9:37:T3 Code
+./ATTRIBUTION.md:19:38:Fenix Code
+./ATTRIBUTION.md:1:3:Fenix Code
+./ATTRIBUTION.md:3:1:Fenix Code
 ./ATTRIBUTION.md:3:49:t3code
 ./ATTRIBUTION.md:5:53:t3code
 ./ATTRIBUTION.md:6:52:t3code
 ./LICENSE:3:20:T3 Tools
-./README.md:16:3:T3 Code
-./README.md:1:3:T3 Code
-./README.md:26:25:T3 Code
-./README.md:32:18:T3 Code
 ./README.md:38:99:t3code
 ./README.md:3:166:t3-code
-./README.md:3:1:T3 Code
 ./README.md:3:276:t3code
 ./README.md:43:24:T3Code
 ./README.md:49:21:t3-code
 ./README.md:55:8:t3code
-./README.md:5:124:T3 Code
-./README.md:75:15:T3 Code
-./README.md:83:1:T3 Code
-./README.md:9:19:T3 Code
 ./apps/desktop/package.json:18:6:@t3tools
 ./apps/desktop/package.json:19:6:@t3tools
 ./apps/desktop/package.json:20:6:@t3tools
 ./apps/desktop/package.json:21:6:@t3tools
 ./apps/desktop/package.json:22:6:@t3tools
 ./apps/desktop/package.json:2:12:@t3tools
+./apps/desktop/package.json:38:19:Fenix Code
 ./apps/desktop/scripts/dev-electron.mjs:36:41:T3CODE
 ./apps/desktop/scripts/dev-electron.mjs:37:29:t3code
 ./apps/desktop/scripts/dev-electron.mjs:51:12:T3CODE
@@ -218,35 +168,49 @@
 ./apps/desktop/scripts/electron-launcher.mjs:115:7:T3CODE
 ./apps/desktop/scripts/electron-launcher.mjs:116:7:T3CODE
 ./apps/desktop/scripts/electron-launcher.mjs:124:53:t3code
+./apps/desktop/scripts/electron-launcher.mjs:18:50:Fenix Code
+./apps/desktop/scripts/electron-launcher.mjs:18:71:Fenix Code
+./apps/desktop/scripts/electron-launcher.mjs:1:61:Fenix Code
 ./apps/desktop/scripts/electron-launcher.mjs:31:29:t3code
+./apps/desktop/scripts/electron-launcher.mjs:349:66:Fenix Code
+./apps/desktop/scripts/electron-launcher.test.mjs:14:37:Fenix Code
 ./apps/desktop/scripts/electron-launcher.test.mjs:26:9:T3CODE
 ./apps/desktop/scripts/electron-launcher.test.mjs:27:9:T3CODE
 ./apps/desktop/scripts/electron-launcher.test.mjs:38:54:t3code
+./apps/desktop/scripts/electron-launcher.test.mjs:64:45:Fenix Code
+./apps/desktop/scripts/electron-launcher.test.mjs:65:8:Fenix Code
+./apps/desktop/scripts/electron-launcher.test.mjs:68:49:Fenix Code
+./apps/desktop/scripts/electron-launcher.test.mjs:71:45:Fenix Code
+./apps/desktop/scripts/electron-launcher.test.mjs:71:81:Fenix Code
+./apps/desktop/scripts/electron-launcher.test.mjs:75:45:Fenix Code
+./apps/desktop/scripts/electron-launcher.test.mjs:86:51:Fenix Code
 ./apps/desktop/scripts/ensure-electron-runtime.mjs:10:29:t3code
 ./apps/desktop/scripts/ensure-electron-runtime.mjs:8:29:t3code
 ./apps/desktop/src/app/DesktopApp.ts:60:13:T3CODE
 ./apps/desktop/src/app/DesktopApp.ts:7:30:@t3tools
 ./apps/desktop/src/app/DesktopApp.ts:8:36:@t3tools
 ./apps/desktop/src/app/DesktopAppErrors.test.ts:28:34:T3CODE
-./apps/desktop/src/app/DesktopAppIdentity.test.ts:131:71:T3 Code
 ./apps/desktop/src/app/DesktopAppIdentity.test.ts:134:54:t3code
-./apps/desktop/src/app/DesktopAppIdentity.test.ts:152:78:T3 Code
-./apps/desktop/src/app/DesktopAppIdentity.test.ts:159:66:T3 Code
+./apps/desktop/src/app/DesktopAppIdentity.test.ts:197:43:Fenix Code
+./apps/desktop/src/app/DesktopAppIdentity.test.ts:198:71:Fenix Code
 ./apps/desktop/src/app/DesktopAppIdentity.test.ts:207:13:T3CODE
+./apps/desktop/src/app/DesktopAppIdentity.test.ts:23:27:Fenix Code
+./apps/desktop/src/app/DesktopAppIdentity.test.ts:25:33:Fenix Code
+./apps/desktop/src/app/DesktopAppIdentity.test.ts:42:27:Fenix Code
 ./apps/desktop/src/app/DesktopAppIdentity.ts:17:3:t3code
 ./apps/desktop/src/app/DesktopAppIdentity.ts:39:6:@t3tools
 ./apps/desktop/src/app/DesktopAppIdentity.ts:84:41:t3code
-./apps/desktop/src/app/DesktopAssets.test.ts:18:27:T3 Code
-./apps/desktop/src/app/DesktopAssets.test.ts:20:33:T3 Code
+./apps/desktop/src/app/DesktopAssets.test.ts:18:27:Fenix Code
+./apps/desktop/src/app/DesktopAssets.test.ts:20:33:Fenix Code
 ./apps/desktop/src/app/DesktopAssets.ts:37:6:@t3tools
-./apps/desktop/src/app/DesktopClerk.test.ts:38:45:T3 Code
-./apps/desktop/src/app/DesktopClerk.test.ts:38:63:T3 Code
+./apps/desktop/src/app/DesktopClerk.test.ts:38:45:Fenix Code
+./apps/desktop/src/app/DesktopClerk.test.ts:38:66:Fenix Code
 ./apps/desktop/src/app/DesktopClerk.ts:10:61:@t3tools
 ./apps/desktop/src/app/DesktopClerk.ts:17:17:T3CODE
 ./apps/desktop/src/app/DesktopClerk.ts:54:6:@t3tools
 ./apps/desktop/src/app/DesktopClerk.ts:70:12:T3CODE
 ./apps/desktop/src/app/DesktopClerk.ts:72:9:T3CODE
-./apps/desktop/src/app/DesktopClerk.ts:94:29:T3 Code
+./apps/desktop/src/app/DesktopClerk.ts:94:29:Fenix Code
 ./apps/desktop/src/app/DesktopConfig.ts:39:26:T3CODE
 ./apps/desktop/src/app/DesktopConfig.ts:41:42:T3CODE
 ./apps/desktop/src/app/DesktopConfig.ts:42:46:T3CODE
@@ -280,6 +244,8 @@
 ./apps/desktop/src/app/DesktopEnvironment.test.ts:119:11:T3CODE
 ./apps/desktop/src/app/DesktopEnvironment.test.ts:119:59:t3code
 ./apps/desktop/src/app/DesktopEnvironment.test.ts:124:61:t3code
+./apps/desktop/src/app/DesktopEnvironment.test.ts:16:27:Fenix Code
+./apps/desktop/src/app/DesktopEnvironment.test.ts:18:33:Fenix Code
 ./apps/desktop/src/app/DesktopEnvironment.test.ts:43:11:T3CODE
 ./apps/desktop/src/app/DesktopEnvironment.test.ts:44:11:T3CODE
 ./apps/desktop/src/app/DesktopEnvironment.test.ts:45:11:T3CODE
@@ -290,8 +256,11 @@
 ./apps/desktop/src/app/DesktopEnvironment.ts:25:9:@t3tools
 ./apps/desktop/src/app/DesktopEnvironment.ts:6:9:@t3tools
 ./apps/desktop/src/app/DesktopEnvironment.ts:93:6:@t3tools
-./apps/desktop/src/app/DesktopLifecycle.test.ts:23:31:T3 Code
+./apps/desktop/src/app/DesktopLifecycle.test.ts:23:31:Fenix Code
 ./apps/desktop/src/app/DesktopLifecycle.ts:49:6:@t3tools
+./apps/desktop/src/app/DesktopLinuxUrlHandler.test.ts:108:21:Fenix Code
+./apps/desktop/src/app/DesktopLinuxUrlHandler.test.ts:114:33:Fenix Code
+./apps/desktop/src/app/DesktopLinuxUrlHandler.test.ts:25:19:Fenix Code
 ./apps/desktop/src/app/DesktopLinuxUrlHandler.ts:94:6:@t3tools
 ./apps/desktop/src/app/DesktopLinuxUrlHandler.ts:9:57:@t3tools
 ./apps/desktop/src/app/DesktopObservability.test.ts:58:11:T3CODE
@@ -335,13 +304,13 @@
 ./apps/desktop/src/backend/DesktopBackendManager.ts:51:61:@t3tools
 ./apps/desktop/src/backend/DesktopBackendManager.ts:92:6:T3CODE
 ./apps/desktop/src/backend/DesktopBackendPool.ts:171:6:@t3tools
-./apps/desktop/src/backend/DesktopBackendPool.ts:244:27:T3 Code
-./apps/desktop/src/backend/DesktopBackendPool.ts:255:64:T3 Code
+./apps/desktop/src/backend/DesktopBackendPool.ts:244:27:Fenix Code
+./apps/desktop/src/backend/DesktopBackendPool.ts:255:64:Fenix Code
 ./apps/desktop/src/backend/DesktopLocalEnvironmentAuth.test.ts:8:47:@t3tools
 ./apps/desktop/src/backend/DesktopLocalEnvironmentAuth.ts:1:47:@t3tools
 ./apps/desktop/src/backend/DesktopLocalEnvironmentAuth.ts:2:47:@t3tools
 ./apps/desktop/src/backend/DesktopLocalEnvironmentAuth.ts:43:6:@t3tools
-./apps/desktop/src/backend/DesktopLocalEnvironmentAuth.ts:74:21:T3 Code
+./apps/desktop/src/backend/DesktopLocalEnvironmentAuth.ts:74:21:Fenix Code
 ./apps/desktop/src/backend/DesktopNetworkInterfaces.test.ts:2:38:@t3tools
 ./apps/desktop/src/backend/DesktopNetworkInterfaces.ts:3:38:@t3tools
 ./apps/desktop/src/backend/DesktopNetworkInterfaces.ts:40:6:@t3tools
@@ -358,7 +327,7 @@
 ./apps/desktop/src/backend/tailscaleEndpointProvider.ts:1:43:@t3tools
 ./apps/desktop/src/backend/tailscaleEndpointProvider.ts:2:70:@t3tools
 ./apps/desktop/src/backend/tailscaleEndpointProvider.ts:9:9:@t3tools
-./apps/desktop/src/electron/ElectronApp.test.ts:66:12:T3 Code
+./apps/desktop/src/electron/ElectronApp.test.ts:66:12:Fenix Code
 ./apps/desktop/src/electron/ElectronApp.ts:78:6:@t3tools
 ./apps/desktop/src/electron/ElectronDialog.ts:128:6:@t3tools
 ./apps/desktop/src/electron/ElectronMenu.test.ts:2:38:@t3tools
@@ -374,11 +343,11 @@
 ./apps/desktop/src/electron/ElectronTheme.ts:1:56:@t3tools
 ./apps/desktop/src/electron/ElectronTheme.ts:31:6:@t3tools
 ./apps/desktop/src/electron/ElectronUpdater.ts:82:6:@t3tools
-./apps/desktop/src/electron/ElectronWindow.test.ts:107:77:T3 Code
+./apps/desktop/src/electron/ElectronWindow.test.ts:109:51:Fenix Code
 ./apps/desktop/src/electron/ElectronWindow.test.ts:2:38:@t3tools
-./apps/desktop/src/electron/ElectronWindow.test.ts:56:17:T3 Code
+./apps/desktop/src/electron/ElectronWindow.test.ts:56:17:Fenix Code
 ./apps/desktop/src/electron/ElectronWindow.test.ts:69:31:t3code
-./apps/desktop/src/electron/ElectronWindow.test.ts:84:17:T3 Code
+./apps/desktop/src/electron/ElectronWindow.test.ts:84:17:Fenix Code
 ./apps/desktop/src/electron/ElectronWindow.test.ts:96:31:t3code
 ./apps/desktop/src/electron/ElectronWindow.ts:1:38:@t3tools
 ./apps/desktop/src/electron/ElectronWindow.ts:96:6:@t3tools
@@ -396,7 +365,6 @@
 ./apps/desktop/src/ipc/methods/window.ts:11:9:@t3tools
 ./apps/desktop/src/ipc/methods/wsl.test.ts:1:40:@t3tools
 ./apps/desktop/src/ipc/methods/wsl.ts:1:62:@t3tools
-./apps/desktop/src/linuxSecretStorage.test.ts:153:47:T3 Code
 ./apps/desktop/src/linuxSecretStorage.test.ts:2:36:@t3tools
 ./apps/desktop/src/linuxSecretStorage.ts:1:36:@t3tools
 ./apps/desktop/src/main.ts:17:30:@t3tools
@@ -447,7 +415,7 @@
 ./apps/desktop/src/shell/DesktopShellEnvironment.ts:215:42:T3CODE
 ./apps/desktop/src/shell/DesktopShellEnvironment.ts:216:40:T3CODE
 ./apps/desktop/src/shell/DesktopShellEnvironment.ts:68:6:@t3tools
-./apps/desktop/src/ssh/DesktopSshEnvironment.test.ts:33:8:T3 Code
+./apps/desktop/src/ssh/DesktopSshEnvironment.test.ts:33:8:Fenix Code
 ./apps/desktop/src/ssh/DesktopSshEnvironment.test.ts:4:30:@t3tools
 ./apps/desktop/src/ssh/DesktopSshEnvironment.test.ts:5:41:@t3tools
 ./apps/desktop/src/ssh/DesktopSshEnvironment.ts:17:9:@t3tools
@@ -457,14 +425,14 @@
 ./apps/desktop/src/ssh/DesktopSshEnvironment.ts:6:30:@t3tools
 ./apps/desktop/src/ssh/DesktopSshEnvironment.ts:7:27:@t3tools
 ./apps/desktop/src/ssh/DesktopSshEnvironment.ts:8:35:@t3tools
-./apps/desktop/src/ssh/DesktopSshEnvironment.ts:99:18:T3 Code
+./apps/desktop/src/ssh/DesktopSshEnvironment.ts:99:18:Fenix Code
 ./apps/desktop/src/ssh/DesktopSshPasswordPrompts.ts:193:6:@t3tools
 ./apps/desktop/src/ssh/DesktopSshPasswordPrompts.ts:1:55:@t3tools
 ./apps/desktop/src/ssh/DesktopSshPasswordPrompts.ts:2:64:@t3tools
 ./apps/desktop/src/ssh/DesktopSshPasswordPrompts.ts:3:42:@t3tools
-./apps/desktop/src/ssh/DesktopSshPasswordPrompts.ts:66:13:T3 Code
+./apps/desktop/src/ssh/DesktopSshPasswordPrompts.ts:66:13:Fenix Code
 ./apps/desktop/src/telemetry/DesktopTelemetryPublisher.test.ts:1:46:@t3tools
-./apps/desktop/src/telemetry/DesktopTelemetryPublisher.test.ts:28:27:T3 Code
+./apps/desktop/src/telemetry/DesktopTelemetryPublisher.test.ts:28:27:Fenix Code
 ./apps/desktop/src/telemetry/DesktopTelemetryPublisher.ts:69:6:@t3tools
 ./apps/desktop/src/telemetry/DesktopTelemetryPublisher.ts:6:9:@t3tools
 ./apps/desktop/src/updates/DesktopUpdates.test.ts:147:11:T3CODE
@@ -480,9 +448,9 @@
 ./apps/desktop/src/updates/releaseNotes.ts:1:48:@t3tools
 ./apps/desktop/src/updates/updateChannels.ts:1:44:@t3tools
 ./apps/desktop/src/updates/updateMachine.ts:6:9:@t3tools
-./apps/desktop/src/window/DesktopApplicationMenu.test.ts:33:25:T3 Code
+./apps/desktop/src/window/DesktopApplicationMenu.test.ts:33:25:Fenix Code
 ./apps/desktop/src/window/DesktopApplicationMenu.ts:34:6:@t3tools
-./apps/desktop/src/window/DesktopApplicationMenu.ts:69:17:T3 Code
+./apps/desktop/src/window/DesktopApplicationMenu.ts:69:17:Fenix Code
 ./apps/desktop/src/window/DesktopWindow.test.ts:16:9:@t3tools
 ./apps/desktop/src/window/DesktopWindow.test.ts:173:9:T3CODE
 ./apps/desktop/src/window/DesktopWindow.test.ts:25:62:t3code
@@ -496,7 +464,7 @@
 ./apps/desktop/src/wsl/DesktopWslBackend.ts:61:6:@t3tools
 ./apps/desktop/src/wsl/DesktopWslEnvironment.ts:12:43:@t3tools
 ./apps/desktop/src/wsl/DesktopWslEnvironment.ts:13:39:@t3tools
-./apps/desktop/src/wsl/DesktopWslEnvironment.ts:223:41:T3 Code
+./apps/desktop/src/wsl/DesktopWslEnvironment.ts:223:41:Fenix Code
 ./apps/desktop/src/wsl/DesktopWslEnvironment.ts:255:40:t3code
 ./apps/desktop/src/wsl/DesktopWslEnvironment.ts:288:125:t3code
 ./apps/desktop/src/wsl/DesktopWslEnvironment.ts:88:6:@t3tools
@@ -507,132 +475,85 @@
 ./apps/desktop/vite.config.ts:9:13:T3CODE
 ./apps/marketing/package.json:13:6:@t3tools
 ./apps/marketing/package.json:2:12:@t3tools
-./apps/marketing/src/components/LegalPage.astro:21:26:T3 Tools
-./apps/marketing/src/layouts/Layout.astro:72:72:T3 Code
+./apps/marketing/src/layouts/Layout.astro:72:72:Fenix Code
 ./apps/marketing/src/lib/releases.ts:1:41:@t3tools
 ./apps/marketing/src/lib/site.ts:1:60:@t3tools
-./apps/marketing/src/lib/tweets.ts:102:111:T3 Code
-./apps/marketing/src/lib/tweets.ts:104:14:T3 Code
-./apps/marketing/src/lib/tweets.ts:114:15:T3Code
-./apps/marketing/src/lib/tweets.ts:18:38:T3 Code
-./apps/marketing/src/lib/tweets.ts:19:45:T3 Code
-./apps/marketing/src/lib/tweets.ts:30:19:T3 Code
-./apps/marketing/src/lib/tweets.ts:36:24:T3 Code
-./apps/marketing/src/lib/tweets.ts:37:31:T3 Code
-./apps/marketing/src/lib/tweets.ts:43:8:T3 Code
-./apps/marketing/src/lib/tweets.ts:45:8:T3 Code
-./apps/marketing/src/lib/tweets.ts:50:15:T3 Code
-./apps/marketing/src/lib/tweets.ts:71:52:T3 Code
-./apps/marketing/src/lib/tweets.ts:77:123:T3 Code
-./apps/marketing/src/lib/tweets.ts:79:68:T3 Code
-./apps/marketing/src/lib/tweets.ts:85:16:T3 Code
-./apps/marketing/src/lib/tweets.ts:90:15:T3 Code
-./apps/marketing/src/lib/tweets.ts:96:8:T3 Code
-./apps/marketing/src/pages/legal.astro:14:53:T3 Code
-./apps/marketing/src/pages/legal.astro:14:65:T3 Tools
-./apps/marketing/src/pages/legal.astro:27:20:T3 Code
-./apps/marketing/src/pages/legal.astro:28:59:T3 Code
-./apps/marketing/src/pages/legal.astro:33:26:T3 Tools
-./apps/marketing/src/pages/legal.astro:35:33:T3 Code
-./apps/marketing/src/pages/legal.astro:8:23:T3 Code
-./apps/marketing/src/pages/privacy-policy.astro:116:61:T3 Code
-./apps/marketing/src/pages/privacy-policy.astro:119:83:T3 Tools
-./apps/marketing/src/pages/privacy-policy.astro:138:78:T3 Code
-./apps/marketing/src/pages/privacy-policy.astro:160:38:T3 Code
-./apps/marketing/src/pages/privacy-policy.astro:175:70:T3 Tools
-./apps/marketing/src/pages/privacy-policy.astro:20:29:T3 Code
-./apps/marketing/src/pages/privacy-policy.astro:21:20:T3 Tools
-./apps/marketing/src/pages/privacy-policy.astro:21:68:T3 Code
-./apps/marketing/src/pages/privacy-policy.astro:220:49:T3 Connect
-./apps/marketing/src/pages/privacy-policy.astro:228:69:T3 Connect
-./apps/marketing/src/pages/privacy-policy.astro:22:12:T3 Code
-./apps/marketing/src/pages/privacy-policy.astro:236:52:T3 Code
-./apps/marketing/src/pages/privacy-policy.astro:23:123:T3 Code
-./apps/marketing/src/pages/privacy-policy.astro:23:232:T3 Connect
-./apps/marketing/src/pages/privacy-policy.astro:23:43:T3 Tools
-./apps/marketing/src/pages/privacy-policy.astro:289:73:T3 Tools
-./apps/marketing/src/pages/privacy-policy.astro:298:23:T3 Tools
-./apps/marketing/src/pages/privacy-policy.astro:32:66:T3 Tools
-./apps/marketing/src/pages/privacy-policy.astro:34:62:T3 Code
-./apps/marketing/src/pages/privacy-policy.astro:350:67:T3 Connect
-./apps/marketing/src/pages/privacy-policy.astro:35:91:T3 Connect
-./apps/marketing/src/pages/privacy-policy.astro:36:66:T3 Code
-./apps/marketing/src/pages/privacy-policy.astro:372:13:T3 Tools
-./apps/marketing/src/pages/privacy-policy.astro:383:82:T3 Code
-./apps/marketing/src/pages/privacy-policy.astro:414:80:T3 Code
-./apps/marketing/src/pages/privacy-policy.astro:438:21:T3 Tools
-./apps/marketing/src/pages/privacy-policy.astro:45:79:T3 Code
-./apps/marketing/src/pages/privacy-policy.astro:56:13:T3 Code
-./apps/marketing/src/pages/privacy-policy.astro:59:50:T3 Code
-./apps/marketing/src/pages/privacy-policy.astro:62:26:T3 Code
-./apps/marketing/src/pages/privacy-policy.astro:72:82:T3 Connect
+./apps/marketing/src/pages/index.astro:329:41:Fenix Code
+./apps/marketing/src/pages/legal.astro:14:53:Fenix Code
+./apps/marketing/src/pages/legal.astro:27:20:Fenix Code
+./apps/marketing/src/pages/legal.astro:28:59:Fenix Code
+./apps/marketing/src/pages/legal.astro:35:33:Fenix Code
+./apps/marketing/src/pages/legal.astro:8:23:Fenix Code
+./apps/marketing/src/pages/privacy-policy.astro:116:61:Fenix Code
+./apps/marketing/src/pages/privacy-policy.astro:138:78:Fenix Code
+./apps/marketing/src/pages/privacy-policy.astro:160:38:Fenix Code
+./apps/marketing/src/pages/privacy-policy.astro:20:29:Fenix Code
+./apps/marketing/src/pages/privacy-policy.astro:21:61:Fenix Code
+./apps/marketing/src/pages/privacy-policy.astro:220:49:Fenix Connect
+./apps/marketing/src/pages/privacy-policy.astro:228:69:Fenix Connect
+./apps/marketing/src/pages/privacy-policy.astro:22:12:Fenix Code
+./apps/marketing/src/pages/privacy-policy.astro:236:52:Fenix Code
+./apps/marketing/src/pages/privacy-policy.astro:23:116:Fenix Code
+./apps/marketing/src/pages/privacy-policy.astro:23:231:Fenix Connect
+./apps/marketing/src/pages/privacy-policy.astro:34:62:Fenix Code
+./apps/marketing/src/pages/privacy-policy.astro:350:70:Fenix Connect
+./apps/marketing/src/pages/privacy-policy.astro:35:99:Fenix Connect
+./apps/marketing/src/pages/privacy-policy.astro:36:66:Fenix Code
+./apps/marketing/src/pages/privacy-policy.astro:383:82:Fenix Code
+./apps/marketing/src/pages/privacy-policy.astro:414:80:Fenix Code
+./apps/marketing/src/pages/privacy-policy.astro:45:79:Fenix Code
+./apps/marketing/src/pages/privacy-policy.astro:56:13:Fenix Code
+./apps/marketing/src/pages/privacy-policy.astro:59:50:Fenix Code
+./apps/marketing/src/pages/privacy-policy.astro:62:26:Fenix Code
+./apps/marketing/src/pages/privacy-policy.astro:72:82:Fenix Connect
 ./apps/marketing/src/pages/schema/t3.json.ts:3:47:@t3tools
-./apps/marketing/src/pages/security-policy.astro:100:45:T3 Tools
-./apps/marketing/src/pages/security-policy.astro:104:45:T3 Code
-./apps/marketing/src/pages/security-policy.astro:106:37:T3 Tools
-./apps/marketing/src/pages/security-policy.astro:110:47:T3 Tools
-./apps/marketing/src/pages/security-policy.astro:115:49:T3 Code
-./apps/marketing/src/pages/security-policy.astro:125:65:T3 Tools
-./apps/marketing/src/pages/security-policy.astro:145:39:T3 Code
-./apps/marketing/src/pages/security-policy.astro:149:19:T3 Code
-./apps/marketing/src/pages/security-policy.astro:168:45:T3 Code
-./apps/marketing/src/pages/security-policy.astro:16:30:T3 Code
-./apps/marketing/src/pages/security-policy.astro:17:49:T3 Code
-./apps/marketing/src/pages/security-policy.astro:17:65:T3 Tools
-./apps/marketing/src/pages/security-policy.astro:18:12:T3 Code
-./apps/marketing/src/pages/security-policy.astro:19:113:T3 Tools
-./apps/marketing/src/pages/security-policy.astro:19:210:T3 Code
-./apps/marketing/src/pages/security-policy.astro:29:11:T3 Code
-./apps/marketing/src/pages/security-policy.astro:31:23:T3 Connect
-./apps/marketing/src/pages/security-policy.astro:31:51:T3 Code
-./apps/marketing/src/pages/security-policy.astro:36:7:T3 Code
-./apps/marketing/src/pages/security-policy.astro:38:19:T3 Tools
-./apps/marketing/src/pages/security-policy.astro:48:72:T3 Code
-./apps/marketing/src/pages/security-policy.astro:48:83:T3 Tools
-./apps/marketing/src/pages/security-policy.astro:85:67:T3 Tools
-./apps/marketing/src/pages/security-policy.astro:90:91:T3 Tools
-./apps/marketing/src/pages/terms-of-service.astro:106:9:T3 Code
-./apps/marketing/src/pages/terms-of-service.astro:108:7:T3 Tools
-./apps/marketing/src/pages/terms-of-service.astro:113:19:T3 Code
-./apps/marketing/src/pages/terms-of-service.astro:157:7:T3 Code
-./apps/marketing/src/pages/terms-of-service.astro:167:46:T3 Tools
-./apps/marketing/src/pages/terms-of-service.astro:167:7:T3 Code
-./apps/marketing/src/pages/terms-of-service.astro:178:73:T3 Tools
-./apps/marketing/src/pages/terms-of-service.astro:190:14:T3 Code
-./apps/marketing/src/pages/terms-of-service.astro:209:7:T3 Code
-./apps/marketing/src/pages/terms-of-service.astro:248:28:T3 Tools
-./apps/marketing/src/pages/terms-of-service.astro:258:85:T3 Tools
-./apps/marketing/src/pages/terms-of-service.astro:272:51:T3 Tools
-./apps/marketing/src/pages/terms-of-service.astro:280:7:T3 Tools
-./apps/marketing/src/pages/terms-of-service.astro:295:58:T3 Code
-./apps/marketing/src/pages/terms-of-service.astro:29:31:T3 Code
-./apps/marketing/src/pages/terms-of-service.astro:305:66:T3 Code
-./apps/marketing/src/pages/terms-of-service.astro:305:85:T3 Tools
-./apps/marketing/src/pages/terms-of-service.astro:30:50:T3 Code
-./apps/marketing/src/pages/terms-of-service.astro:30:73:T3 Connect
-./apps/marketing/src/pages/terms-of-service.astro:31:12:T3 Code
-./apps/marketing/src/pages/terms-of-service.astro:32:118:T3 Connect
-./apps/marketing/src/pages/terms-of-service.astro:32:40:T3 Code
-./apps/marketing/src/pages/terms-of-service.astro:389:15:T3 Tools
-./apps/marketing/src/pages/terms-of-service.astro:41:88:T3 Tools
-./apps/marketing/src/pages/terms-of-service.astro:42:101:T3 Code
-./apps/marketing/src/pages/terms-of-service.astro:42:11:T3 Tools
-./apps/marketing/src/pages/terms-of-service.astro:43:43:T3 Code
-./apps/marketing/src/pages/terms-of-service.astro:45:27:T3 Connect
-./apps/marketing/src/pages/terms-of-service.astro:45:93:T3 Code
-./apps/marketing/src/pages/terms-of-service.astro:65:24:T3 Code
-./apps/marketing/src/pages/terms-of-service.astro:66:46:T3 Connect
-./apps/marketing/src/pages/terms-of-service.astro:82:7:T3 Code
-./apps/marketing/src/pages/terms-of-service.astro:8:15:T3 Code
-./apps/marketing/src/pages/terms-of-service.astro:90:35:T3 Tools
-./apps/marketing/src/pages/terms-of-service.astro:90:7:T3 Tools
+./apps/marketing/src/pages/security-policy.astro:104:45:Fenix Code
+./apps/marketing/src/pages/security-policy.astro:115:49:Fenix Code
+./apps/marketing/src/pages/security-policy.astro:145:39:Fenix Code
+./apps/marketing/src/pages/security-policy.astro:149:19:Fenix Code
+./apps/marketing/src/pages/security-policy.astro:168:45:Fenix Code
+./apps/marketing/src/pages/security-policy.astro:16:30:Fenix Code
+./apps/marketing/src/pages/security-policy.astro:17:49:Fenix Code
+./apps/marketing/src/pages/security-policy.astro:18:12:Fenix Code
+./apps/marketing/src/pages/security-policy.astro:19:209:Fenix Code
+./apps/marketing/src/pages/security-policy.astro:29:11:Fenix Code
+./apps/marketing/src/pages/security-policy.astro:31:23:Fenix Connect
+./apps/marketing/src/pages/security-policy.astro:31:54:Fenix Code
+./apps/marketing/src/pages/security-policy.astro:36:7:Fenix Code
+./apps/marketing/src/pages/security-policy.astro:48:72:Fenix Code
+./apps/marketing/src/pages/terms-of-service.astro:106:9:Fenix Code
+./apps/marketing/src/pages/terms-of-service.astro:113:19:Fenix Code
+./apps/marketing/src/pages/terms-of-service.astro:157:7:Fenix Code
+./apps/marketing/src/pages/terms-of-service.astro:167:7:Fenix Code
+./apps/marketing/src/pages/terms-of-service.astro:190:14:Fenix Code
+./apps/marketing/src/pages/terms-of-service.astro:209:7:Fenix Code
+./apps/marketing/src/pages/terms-of-service.astro:295:58:Fenix Code
+./apps/marketing/src/pages/terms-of-service.astro:29:31:Fenix Code
+./apps/marketing/src/pages/terms-of-service.astro:305:66:Fenix Code
+./apps/marketing/src/pages/terms-of-service.astro:30:50:Fenix Code
+./apps/marketing/src/pages/terms-of-service.astro:30:80:Fenix Connect
+./apps/marketing/src/pages/terms-of-service.astro:31:12:Fenix Code
+./apps/marketing/src/pages/terms-of-service.astro:32:121:Fenix Connect
+./apps/marketing/src/pages/terms-of-service.astro:32:40:Fenix Code
+./apps/marketing/src/pages/terms-of-service.astro:42:100:Fenix Code
+./apps/marketing/src/pages/terms-of-service.astro:43:43:Fenix Code
+./apps/marketing/src/pages/terms-of-service.astro:45:27:Fenix Connect
+./apps/marketing/src/pages/terms-of-service.astro:45:96:Fenix Code
+./apps/marketing/src/pages/terms-of-service.astro:65:24:Fenix Code
+./apps/marketing/src/pages/terms-of-service.astro:66:46:Fenix Connect
+./apps/marketing/src/pages/terms-of-service.astro:82:7:Fenix Code
+./apps/marketing/src/pages/terms-of-service.astro:8:15:Fenix Code
 ./apps/marketing/vercel.ts:4:69:@t3tools
 ./apps/marketing/vercel.ts:5:34:@t3tools
 ./apps/mobile/.swiftlint.yml:2:9:T3Code
-./apps/mobile/README.md:19:1:T3 Connect
+./apps/mobile/README.md:13:64:Fenix Code
+./apps/mobile/README.md:14:78:Fenix Code
+./apps/mobile/README.md:15:41:Fenix Code
+./apps/mobile/README.md:1:3:Fenix Code
 ./apps/mobile/README.md:42:1:T3CODE
 ./apps/mobile/README.md:43:1:T3CODE
 ./apps/mobile/README.md:43:48:t3code
+./apps/mobile/README.md:4:3:Fenix Code
 ./apps/mobile/README.md:56:1:T3CODE
 ./apps/mobile/README.md:57:1:T3CODE
 ./apps/mobile/README.md:57:48:t3code
@@ -646,24 +567,16 @@
 ./apps/mobile/app.config.ts:361:20:T3CODE
 ./apps/mobile/app.config.ts:40:109:T3CODE
 ./apps/mobile/app.config.ts:40:6:T3CODE
-./apps/mobile/modules/t3-composer-editor/ios/T3ComposerEditor.podspec:4:61:T3 Code
 ./apps/mobile/modules/t3-composer-editor/ios/T3ComposerEditor.podspec:6:23:T3 Tools
-./apps/mobile/modules/t3-markdown-text/T3MarkdownText.podspec:10:93:T3 Code
 ./apps/mobile/modules/t3-markdown-text/T3MarkdownText.podspec:13:17:T3 Tools
 ./apps/mobile/modules/t3-markdown-text/T3MarkdownText.podspec:13:36:@t3tools
-./apps/mobile/modules/t3-markdown-text/T3MarkdownText.podspec:9:56:T3 Code
-./apps/mobile/modules/t3-markdown-text/UPSTREAM.md:10:1:T3 Code
 ./apps/mobile/modules/t3-markdown-text/package.json:2:12:@t3tools
-./apps/mobile/modules/t3-native-controls/ios/T3NativeControls.podspec:4:49:T3 Code
 ./apps/mobile/modules/t3-native-controls/ios/T3NativeControls.podspec:6:23:T3 Tools
 ./apps/mobile/modules/t3-review-diff/T3ReviewDiffNative.podspec:12:17:T3 Tools
 ./apps/mobile/modules/t3-review-diff/T3ReviewDiffNative.podspec:12:36:@t3tools
-./apps/mobile/modules/t3-review-diff/T3ReviewDiffNative.podspec:8:53:T3 Code
 ./apps/mobile/modules/t3-review-diff/package.json:2:12:@t3tools
 ./apps/mobile/modules/t3-terminal/T3TerminalNative.podspec:12:17:T3 Tools
 ./apps/mobile/modules/t3-terminal/T3TerminalNative.podspec:12:36:@t3tools
-./apps/mobile/modules/t3-terminal/T3TerminalNative.podspec:8:44:T3 Code
-./apps/mobile/modules/t3-terminal/T3TerminalNative.podspec:9:63:T3 Code
 ./apps/mobile/modules/t3-terminal/package.json:2:12:@t3tools
 ./apps/mobile/modules/t3-terminal/scripts/build-libghostty-android.sh:11:58:t3code
 ./apps/mobile/modules/t3-terminal/scripts/build-libghostty-android.sh:53:29:t3code
@@ -679,10 +592,10 @@
 ./apps/mobile/plugins/withIosCocoaPodsUuidCache.cjs:6:19:t3code
 ./apps/mobile/scripts/wire-widget-asset-catalog.cjs:19:56:T3Code
 ./apps/mobile/src/App.tsx:14:9:@t3tools
-./apps/mobile/src/Stack.tsx:313:19:T3 Connect
-./apps/mobile/src/Stack.tsx:518:24:T3 Connect
+./apps/mobile/src/Stack.tsx:313:19:Fenix Connect
+./apps/mobile/src/Stack.tsx:518:24:Fenix Connect
 ./apps/mobile/src/components/BrandMark.tsx:5:36:@t3tools
-./apps/mobile/src/components/CompactBrandTitle.tsx:48:27:T3 Code
+./apps/mobile/src/components/CompactBrandTitle.tsx:48:27:Fenix Code
 ./apps/mobile/src/components/PierreEntryIcon.tsx:4:41:@t3tools
 ./apps/mobile/src/components/PierreEntryIcon.tsx:5:42:@t3tools
 ./apps/mobile/src/components/ProjectFavicon.tsx:5:37:@t3tools
@@ -709,8 +622,8 @@
 ./apps/mobile/src/connection/onboarding.ts:1:39:@t3tools
 ./apps/mobile/src/connection/onboarding.ts:5:9:@t3tools
 ./apps/mobile/src/connection/onboarding.ts:6:37:@t3tools
-./apps/mobile/src/connection/platform.ts:125:35:T3 Connect
-./apps/mobile/src/connection/platform.ts:140:28:T3 Connect
+./apps/mobile/src/connection/platform.ts:125:35:Fenix Connect
+./apps/mobile/src/connection/platform.ts:140:28:Fenix Connect
 ./apps/mobile/src/connection/platform.ts:15:9:@t3tools
 ./apps/mobile/src/connection/platform.ts:16:70:@t3tools
 ./apps/mobile/src/connection/platform.ts:17:43:@t3tools
@@ -733,17 +646,17 @@
 ./apps/mobile/src/features/agent-awareness/remoteRegistration.ts:13:35:@t3tools
 ./apps/mobile/src/features/agent-awareness/remoteRegistration.ts:14:31:@t3tools
 ./apps/mobile/src/features/agent-awareness/remoteRegistration.ts:19:9:@t3tools
-./apps/mobile/src/features/agent-awareness/remoteRegistration.ts:483:15:T3 Code
+./apps/mobile/src/features/agent-awareness/remoteRegistration.ts:483:15:Fenix Code
 ./apps/mobile/src/features/agent-awareness/remoteRegistration.ts:7:37:@t3tools
 ./apps/mobile/src/features/archive/ArchivedThreadsRouteScreen.tsx:1:37:@t3tools
 ./apps/mobile/src/features/archive/ArchivedThreadsScreen.tsx:4:9:@t3tools
 ./apps/mobile/src/features/archive/ArchivedThreadsScreen.tsx:6:37:@t3tools
-./apps/mobile/src/features/archive/archivedThreadList.test.ts:128:76:T3 Code
+./apps/mobile/src/features/archive/archivedThreadList.test.ts:128:76:Fenix Code
 ./apps/mobile/src/features/archive/archivedThreadList.test.ts:1:45:@t3tools
 ./apps/mobile/src/features/archive/archivedThreadList.test.ts:2:75:@t3tools
 ./apps/mobile/src/features/archive/archivedThreadList.test.ts:3:73:@t3tools
-./apps/mobile/src/features/archive/archivedThreadList.test.ts:67:76:T3 Code
-./apps/mobile/src/features/archive/archivedThreadList.test.ts:93:81:T3 Code
+./apps/mobile/src/features/archive/archivedThreadList.test.ts:67:76:Fenix Code
+./apps/mobile/src/features/archive/archivedThreadList.test.ts:93:81:Fenix Code
 ./apps/mobile/src/features/archive/archivedThreadList.ts:1:45:@t3tools
 ./apps/mobile/src/features/archive/archivedThreadList.ts:7:9:@t3tools
 ./apps/mobile/src/features/archive/archivedThreadList.ts:8:37:@t3tools
@@ -751,12 +664,12 @@
 ./apps/mobile/src/features/archive/useArchivedThreadSnapshots.ts:7:37:@t3tools
 ./apps/mobile/src/features/cloud/CloudAuthProvider.test.ts:1:42:@t3tools
 ./apps/mobile/src/features/cloud/CloudAuthProvider.tsx:3:55:@t3tools
-./apps/mobile/src/features/cloud/CloudAuthProvider.tsx:73:12:T3 Connect
+./apps/mobile/src/features/cloud/CloudAuthProvider.tsx:73:12:Fenix Connect
 ./apps/mobile/src/features/cloud/CloudAuthProvider.tsx:8:9:@t3tools
-./apps/mobile/src/features/cloud/ConnectOnboardingRouteScreen.tsx:119:52:T3 Connect
-./apps/mobile/src/features/cloud/ConnectOnboardingRouteScreen.tsx:19:38:T3 Connect
-./apps/mobile/src/features/cloud/ConnectOnboardingRouteScreen.tsx:21:27:T3 Connect
-./apps/mobile/src/features/cloud/ConnectOnboardingRouteScreen.tsx:87:25:T3 Connect
+./apps/mobile/src/features/cloud/ConnectOnboardingRouteScreen.tsx:119:55:Fenix Connect
+./apps/mobile/src/features/cloud/ConnectOnboardingRouteScreen.tsx:19:38:Fenix Connect
+./apps/mobile/src/features/cloud/ConnectOnboardingRouteScreen.tsx:21:27:Fenix Connect
+./apps/mobile/src/features/cloud/ConnectOnboardingRouteScreen.tsx:87:25:Fenix Connect
 ./apps/mobile/src/features/cloud/ConnectOnboardingRouteScreen.tsx:8:57:@t3tools
 ./apps/mobile/src/features/cloud/cloudEnvironmentPresentation.test.ts:1:32:@t3tools
 ./apps/mobile/src/features/cloud/cloudEnvironmentPresentation.test.ts:2:54:@t3tools
@@ -793,14 +706,14 @@
 ./apps/mobile/src/features/cloud/publicConfig.ts:2:41:@t3tools
 ./apps/mobile/src/features/cloud/publicConfig.ts:3:42:@t3tools
 ./apps/mobile/src/features/cloud/publicConfig.ts:9:26:T3CODE
-./apps/mobile/src/features/connection/CloudEnvironmentRows.tsx:110:82:T3 Connect
-./apps/mobile/src/features/connection/CloudEnvironmentRows.tsx:181:28:T3 Connect
-./apps/mobile/src/features/connection/CloudEnvironmentRows.tsx:34:16:T3 Connect
-./apps/mobile/src/features/connection/CloudEnvironmentRows.tsx:42:5:T3 Connect
-./apps/mobile/src/features/connection/CloudEnvironmentRows.tsx:44:68:T3 Connect
+./apps/mobile/src/features/connection/CloudEnvironmentRows.tsx:111:13:Fenix Connect
+./apps/mobile/src/features/connection/CloudEnvironmentRows.tsx:183:28:Fenix Connect
+./apps/mobile/src/features/connection/CloudEnvironmentRows.tsx:34:16:Fenix Connect
+./apps/mobile/src/features/connection/CloudEnvironmentRows.tsx:42:5:Fenix Connect
+./apps/mobile/src/features/connection/CloudEnvironmentRows.tsx:44:68:Fenix Connect
 ./apps/mobile/src/features/connection/CloudEnvironmentRows.tsx:6:9:@t3tools
 ./apps/mobile/src/features/connection/CloudEnvironmentRows.tsx:7:37:@t3tools
-./apps/mobile/src/features/connection/ConnectionEnvironmentRow.tsx:136:26:T3 Connect
+./apps/mobile/src/features/connection/ConnectionEnvironmentRow.tsx:136:26:Fenix Connect
 ./apps/mobile/src/features/connection/ConnectionEnvironmentRow.tsx:2:39:@t3tools
 ./apps/mobile/src/features/connection/ConnectionEnvironmentRow.tsx:3:41:@t3tools
 ./apps/mobile/src/features/connection/ConnectionEnvironmentRow.tsx:4:37:@t3tools
@@ -808,7 +721,7 @@
 ./apps/mobile/src/features/connection/EnvironmentConnectionNotice.tsx:4:9:@t3tools
 ./apps/mobile/src/features/connection/environmentSections.test.ts:1:32:@t3tools
 ./apps/mobile/src/features/connection/environmentSections.test.ts:2:52:@t3tools
-./apps/mobile/src/features/connection/environmentSections.test.ts:38:51:T3 Connect
+./apps/mobile/src/features/connection/environmentSections.test.ts:38:51:Fenix Connect
 ./apps/mobile/src/features/connection/environmentSections.ts:1:52:@t3tools
 ./apps/mobile/src/features/connection/pairing.test.ts:40:10:t3code
 ./apps/mobile/src/features/connection/pairing.ts:1:43:@t3tools
@@ -860,21 +773,21 @@
 ./apps/mobile/src/features/home/homeThreadList.test.ts:325:15:t3code
 ./apps/mobile/src/features/home/homeThreadList.test.ts:384:45:t3code
 ./apps/mobile/src/features/home/homeThreadList.test.ts:389:48:t3code
-./apps/mobile/src/features/home/homeThreadList.test.ts:420:15:T3 Code
+./apps/mobile/src/features/home/homeThreadList.test.ts:420:15:Fenix Code
 ./apps/mobile/src/features/home/homeThreadList.test.ts:4:9:@t3tools
 ./apps/mobile/src/features/home/homeThreadList.test.ts:530:41:t3code
 ./apps/mobile/src/features/home/homeThreadList.test.ts:534:44:t3code
 ./apps/mobile/src/features/home/homeThreadList.test.ts:538:14:t3code
-./apps/mobile/src/features/home/homeThreadList.test.ts:539:21:T3 Code
+./apps/mobile/src/features/home/homeThreadList.test.ts:539:21:Fenix Code
 ./apps/mobile/src/features/home/homeThreadList.test.ts:540:30:t3code
 ./apps/mobile/src/features/home/homeThreadList.test.ts:547:37:t3code
 ./apps/mobile/src/features/home/homeThreadList.test.ts:554:37:t3code
-./apps/mobile/src/features/home/homeThreadList.test.ts:585:15:T3 Code
+./apps/mobile/src/features/home/homeThreadList.test.ts:585:15:Fenix Code
 ./apps/mobile/src/features/home/homeThreadList.test.ts:5:39:@t3tools
-./apps/mobile/src/features/home/homeThreadList.test.ts:623:15:T3 Code
-./apps/mobile/src/features/home/homeThreadList.test.ts:650:15:T3 Code
-./apps/mobile/src/features/home/homeThreadList.test.ts:663:67:T3 Code
-./apps/mobile/src/features/home/homeThreadList.test.ts:676:15:T3 Code
+./apps/mobile/src/features/home/homeThreadList.test.ts:623:15:Fenix Code
+./apps/mobile/src/features/home/homeThreadList.test.ts:650:15:Fenix Code
+./apps/mobile/src/features/home/homeThreadList.test.ts:663:67:Fenix Code
+./apps/mobile/src/features/home/homeThreadList.test.ts:676:15:Fenix Code
 ./apps/mobile/src/features/home/homeThreadList.test.ts:6:73:@t3tools
 ./apps/mobile/src/features/home/homeThreadList.test.ts:702:43:t3code
 ./apps/mobile/src/features/home/homeThreadList.test.ts:706:46:t3code
@@ -919,12 +832,12 @@
 ./apps/mobile/src/features/settings/SettingsEnvironmentsRouteScreen.tsx:4:37:@t3tools
 ./apps/mobile/src/features/settings/SettingsProjectGroupingRouteScreen.tsx:3:50:@t3tools
 ./apps/mobile/src/features/settings/SettingsRouteScreen.tsx:21:9:@t3tools
-./apps/mobile/src/features/settings/SettingsRouteScreen.tsx:242:90:T3 Connect
-./apps/mobile/src/features/settings/SettingsRouteScreen.tsx:272:19:T3 Connect
-./apps/mobile/src/features/settings/SettingsRouteScreen.tsx:273:38:T3 Connect
-./apps/mobile/src/features/settings/SettingsRouteScreen.tsx:345:51:T3 Connect
-./apps/mobile/src/features/settings/SettingsRouteScreen.tsx:367:99:T3 Code
-./apps/mobile/src/features/settings/SettingsRouteScreen.tsx:469:13:T3 Code
+./apps/mobile/src/features/settings/SettingsRouteScreen.tsx:242:90:Fenix Connect
+./apps/mobile/src/features/settings/SettingsRouteScreen.tsx:272:19:Fenix Connect
+./apps/mobile/src/features/settings/SettingsRouteScreen.tsx:273:38:Fenix Connect
+./apps/mobile/src/features/settings/SettingsRouteScreen.tsx:345:51:Fenix Connect
+./apps/mobile/src/features/settings/SettingsRouteScreen.tsx:367:99:Fenix Code
+./apps/mobile/src/features/settings/SettingsRouteScreen.tsx:469:13:Fenix Code
 ./apps/mobile/src/features/settings/appearance/components/AppearancePreviews.tsx:76:46:t3code
 ./apps/mobile/src/features/sharing/incoming-share-model.test.ts:5:9:@t3tools
 ./apps/mobile/src/features/sharing/incoming-share-model.ts:4:9:@t3tools
@@ -932,12 +845,12 @@
 ./apps/mobile/src/features/showcase/showcaseEnvironmentRows.test.ts:1:32:@t3tools
 ./apps/mobile/src/features/showcase/showcaseEnvironmentRows.ts:1:32:@t3tools
 ./apps/mobile/src/features/showcase/showcasePendingTasks.test.ts:13:25:t3code
-./apps/mobile/src/features/showcase/showcasePendingTasks.test.ts:14:13:T3 Code
+./apps/mobile/src/features/showcase/showcasePendingTasks.test.ts:14:13:Fenix Code
 ./apps/mobile/src/features/showcase/showcasePendingTasks.test.ts:15:32:t3code
 ./apps/mobile/src/features/showcase/showcasePendingTasks.test.ts:1:42:@t3tools
 ./apps/mobile/src/features/showcase/showcasePendingTasks.test.ts:2:63:@t3tools
 ./apps/mobile/src/features/showcase/showcasePendingTasks.test.ts:50:21:t3code
-./apps/mobile/src/features/showcase/showcasePendingTasks.test.ts:51:17:T3 Code
+./apps/mobile/src/features/showcase/showcasePendingTasks.test.ts:51:17:Fenix Code
 ./apps/mobile/src/features/showcase/showcasePendingTasks.ts:15:17:t3code
 ./apps/mobile/src/features/showcase/showcasePendingTasks.ts:1:42:@t3tools
 ./apps/mobile/src/features/showcase/showcasePendingTasks.ts:9:9:@t3tools
@@ -966,7 +879,7 @@
 ./apps/mobile/src/features/threads/PendingUserInputCard.tsx:1:41:@t3tools
 ./apps/mobile/src/features/threads/ThreadComposer.tsx:10:9:@t3tools
 ./apps/mobile/src/features/threads/ThreadComposer.tsx:16:9:@t3tools
-./apps/mobile/src/features/threads/ThreadComposer.tsx:538:50:T3 Code
+./apps/mobile/src/features/threads/ThreadComposer.tsx:538:50:Fenix Code
 ./apps/mobile/src/features/threads/ThreadComposer.tsx:64:9:@t3tools
 ./apps/mobile/src/features/threads/ThreadDetailScreen.tsx:16:9:@t3tools
 ./apps/mobile/src/features/threads/ThreadDetailScreen.tsx:1:50:@t3tools
@@ -998,7 +911,7 @@
 ./apps/mobile/src/features/threads/new-task-flow-provider.tsx:61:30:@t3tools
 ./apps/mobile/src/features/threads/new-task-project-selection.test.ts:1:43:@t3tools
 ./apps/mobile/src/features/threads/new-task-project-selection.test.ts:27:30:t3code
-./apps/mobile/src/features/threads/new-task-project-selection.test.ts:28:13:T3 Code
+./apps/mobile/src/features/threads/new-task-project-selection.test.ts:28:13:Fenix Code
 ./apps/mobile/src/features/threads/new-task-project-selection.test.ts:40:34:t3code
 ./apps/mobile/src/features/threads/new-task-project-selection.test.ts:45:36:t3code
 ./apps/mobile/src/features/threads/new-task-project-selection.test.ts:45:59:t3code
@@ -1043,6 +956,7 @@
 ./apps/mobile/src/lib/authClientMetadata.ts:2:36:@t3tools
 ./apps/mobile/src/lib/composerImages.test.ts:2:53:@t3tools
 ./apps/mobile/src/lib/composerImages.ts:5:9:@t3tools
+./apps/mobile/src/lib/connection.test.ts:26:15:Fenix Code
 ./apps/mobile/src/lib/connection.test.ts:2:32:@t3tools
 ./apps/mobile/src/lib/connection.ts:1:32:@t3tools
 ./apps/mobile/src/lib/connection.ts:2:43:@t3tools
@@ -1189,10 +1103,10 @@
 ./apps/mobile/src/state/workspaceModel.ts:2:37:@t3tools
 ./apps/mobile/src/state/workspaceModel.ts:3:50:@t3tools
 ./apps/mobile/src/state/workspaceModel.ts:4:51:@t3tools
+./apps/mobile/src/widgets/AgentActivity.test.ts:49:11:Fenix Code
 ./apps/server/integration/NetworkTransferMeasurement.integration.ts:6:29:@t3tools
 ./apps/server/integration/OrchestrationEngineHarness.integration.ts:11:9:@t3tools
 ./apps/server/integration/TestProviderAdapter.integration.ts:12:9:@t3tools
-./apps/server/integration/TransferBudgetReport.integration.ts:146:8:T3 Code
 ./apps/server/integration/TransferBudgetReport.integration.ts:1:42:@t3tools
 ./apps/server/integration/TransferBudgetScenario.integration.ts:11:9:@t3tools
 ./apps/server/integration/fixtures/providerRuntime.ts:1:64:@t3tools
@@ -1234,8 +1148,8 @@
 ./apps/server/src/auth/http.ts:26:41:@t3tools
 ./apps/server/src/auth/http.ts:27:32:@t3tools
 ./apps/server/src/auth/utils.test.ts:15:101:t3code
-./apps/server/src/auth/utils.test.ts:43:17:T3 Code
-./apps/server/src/auth/utils.test.ts:50:15:T3 Code
+./apps/server/src/auth/utils.test.ts:43:17:Fenix Code
+./apps/server/src/auth/utils.test.ts:50:15:Fenix Code
 ./apps/server/src/auth/utils.ts:5:9:@t3tools
 ./apps/server/src/background/BackgroundPolicy.test.ts:7:9:@t3tools
 ./apps/server/src/background/BackgroundPolicy.ts:14:9:@t3tools
@@ -1244,18 +1158,18 @@
 ./apps/server/src/background/HostPowerMonitor.ts:1:41:@t3tools
 ./apps/server/src/bin.test.ts:14:9:@t3tools
 ./apps/server/src/bin.test.ts:15:30:@t3tools
-./apps/server/src/bin.test.ts:198:63:T3 Connect
-./apps/server/src/bin.test.ts:202:39:T3 Connect
-./apps/server/src/bin.test.ts:206:57:T3 Connect
-./apps/server/src/bin.test.ts:210:42:T3 Code
-./apps/server/src/bin.test.ts:252:31:T3 Connect
-./apps/server/src/bin.test.ts:255:83:T3 Connect
-./apps/server/src/bin.test.ts:303:29:T3 Connect
-./apps/server/src/bin.test.ts:323:24:T3 Connect
-./apps/server/src/bin.ts:23:4:T3 Connect
-./apps/server/src/bin.ts:23:63:T3 Connect
-./apps/server/src/bin.ts:34:28:T3 Connect
-./apps/server/src/bin.ts:48:38:T3 Code
+./apps/server/src/bin.test.ts:198:63:Fenix Connect
+./apps/server/src/bin.test.ts:202:39:Fenix Connect
+./apps/server/src/bin.test.ts:206:57:Fenix Connect
+./apps/server/src/bin.test.ts:210:42:Fenix Code
+./apps/server/src/bin.test.ts:252:31:Fenix Connect
+./apps/server/src/bin.test.ts:255:83:Fenix Connect
+./apps/server/src/bin.test.ts:303:29:Fenix Connect
+./apps/server/src/bin.test.ts:323:24:Fenix Connect
+./apps/server/src/bin.ts:23:4:Fenix Connect
+./apps/server/src/bin.ts:23:66:Fenix Connect
+./apps/server/src/bin.ts:34:28:Fenix Connect
+./apps/server/src/bin.ts:48:38:Fenix Code
 ./apps/server/src/bin.ts:8:30:@t3tools
 ./apps/server/src/bootstrap.test.ts:14:38:@t3tools
 ./apps/server/src/bootstrap.ts:12:35:@t3tools
@@ -1314,8 +1228,8 @@
 ./apps/server/src/cli/config.ts:138:36:T3CODE
 ./apps/server/src/cli/config.ts:1:30:@t3tools
 ./apps/server/src/cli/config.ts:2:60:@t3tools
-./apps/server/src/cli/config.ts:35:15:T3 Code
-./apps/server/src/cli/config.ts:35:93:T3CODE
+./apps/server/src/cli/config.ts:35:15:Fenix Code
+./apps/server/src/cli/config.ts:35:96:T3CODE
 ./apps/server/src/cli/config.ts:3:54:@t3tools
 ./apps/server/src/cli/config.ts:61:79:T3CODE
 ./apps/server/src/cli/config.ts:79:30:T3CODE
@@ -1329,87 +1243,91 @@
 ./apps/server/src/cli/config.ts:93:34:T3CODE
 ./apps/server/src/cli/config.ts:97:37:T3CODE
 ./apps/server/src/cli/connect.test.ts:1:31:@t3tools
-./apps/server/src/cli/connect.ts:114:21:T3 Connect
-./apps/server/src/cli/connect.ts:194:54:T3 Connect
-./apps/server/src/cli/connect.ts:196:42:T3 Connect
-./apps/server/src/cli/connect.ts:202:6:T3 Connect
-./apps/server/src/cli/connect.ts:218:53:T3 Connect
-./apps/server/src/cli/connect.ts:323:22:T3 Connect
-./apps/server/src/cli/connect.ts:369:10:T3 Connect
-./apps/server/src/cli/connect.ts:372:27:T3 Connect
-./apps/server/src/cli/connect.ts:413:22:T3 Connect
-./apps/server/src/cli/connect.ts:480:27:T3 Connect
-./apps/server/src/cli/connect.ts:499:42:T3 Connect
-./apps/server/src/cli/connect.ts:504:29:T3 Connect
-./apps/server/src/cli/connect.ts:522:59:T3 Connect
-./apps/server/src/cli/connect.ts:527:29:T3 Connect
-./apps/server/src/cli/connect.ts:546:43:T3 Connect
-./apps/server/src/cli/connect.ts:615:68:T3 Connect
-./apps/server/src/cli/connect.ts:630:32:T3 Connect
-./apps/server/src/cli/connect.ts:643:16:T3 Connect
-./apps/server/src/cli/connect.ts:659:36:T3 Connect
-./apps/server/src/cli/connect.ts:668:36:T3 Connect
-./apps/server/src/cli/connect.ts:678:35:T3 Connect
-./apps/server/src/cli/connect.ts:683:29:T3 Connect
-./apps/server/src/cli/connect.ts:698:48:T3 Code
+./apps/server/src/cli/connect.ts:114:21:Fenix Connect
+./apps/server/src/cli/connect.ts:194:54:Fenix Connect
+./apps/server/src/cli/connect.ts:196:42:Fenix Connect
+./apps/server/src/cli/connect.ts:198:18:Fenix Code
+./apps/server/src/cli/connect.ts:202:6:Fenix Connect
+./apps/server/src/cli/connect.ts:218:56:Fenix Connect
+./apps/server/src/cli/connect.ts:323:22:Fenix Connect
+./apps/server/src/cli/connect.ts:369:10:Fenix Connect
+./apps/server/src/cli/connect.ts:372:27:Fenix Connect
+./apps/server/src/cli/connect.ts:413:22:Fenix Connect
+./apps/server/src/cli/connect.ts:480:27:Fenix Connect
+./apps/server/src/cli/connect.ts:499:42:Fenix Connect
+./apps/server/src/cli/connect.ts:504:29:Fenix Connect
+./apps/server/src/cli/connect.ts:522:59:Fenix Connect
+./apps/server/src/cli/connect.ts:527:29:Fenix Connect
+./apps/server/src/cli/connect.ts:533:81:Fenix Code
+./apps/server/src/cli/connect.ts:546:43:Fenix Connect
+./apps/server/src/cli/connect.ts:615:68:Fenix Connect
+./apps/server/src/cli/connect.ts:630:32:Fenix Connect
+./apps/server/src/cli/connect.ts:643:16:Fenix Connect
+./apps/server/src/cli/connect.ts:643:61:Fenix Code
+./apps/server/src/cli/connect.ts:649:20:Fenix Code
+./apps/server/src/cli/connect.ts:659:36:Fenix Connect
+./apps/server/src/cli/connect.ts:668:36:Fenix Connect
+./apps/server/src/cli/connect.ts:678:35:Fenix Connect
+./apps/server/src/cli/connect.ts:683:29:Fenix Connect
+./apps/server/src/cli/connect.ts:698:48:Fenix Code
 ./apps/server/src/cli/connect.ts:6:9:@t3tools
 ./apps/server/src/cli/connect.ts:7:34:@t3tools
 ./apps/server/src/cli/connect.ts:8:31:@t3tools
 ./apps/server/src/cli/connect.ts:9:41:@t3tools
 ./apps/server/src/cli/invocation.test.ts:39:55:t3code
 ./apps/server/src/cli/invocation.ts:3:39:@t3tools
-./apps/server/src/cli/pair.test.ts:208:44:T3 Code
-./apps/server/src/cli/pair.test.ts:239:46:T3 Code
-./apps/server/src/cli/pair.test.ts:265:44:T3 Code
+./apps/server/src/cli/pair.test.ts:208:44:Fenix Code
+./apps/server/src/cli/pair.test.ts:239:46:Fenix Code
+./apps/server/src/cli/pair.test.ts:265:44:Fenix Code
 ./apps/server/src/cli/pair.test.ts:8:30:@t3tools
-./apps/server/src/cli/pair.ts:111:96:T3 Code
-./apps/server/src/cli/pair.ts:129:104:T3 Code
+./apps/server/src/cli/pair.ts:111:96:Fenix Code
+./apps/server/src/cli/pair.ts:129:104:Fenix Code
 ./apps/server/src/cli/pair.ts:16:9:@t3tools
 ./apps/server/src/cli/pair.ts:17:40:@t3tools
 ./apps/server/src/cli/pair.ts:23:9:@t3tools
 ./apps/server/src/cli/pair.ts:264:43:T3CODE
-./apps/server/src/cli/pair.ts:492:41:T3 Code
-./apps/server/src/cli/pair.ts:79:19:T3 Code
-./apps/server/src/cli/pair.ts:81:68:T3 Connect
+./apps/server/src/cli/pair.ts:492:41:Fenix Code
+./apps/server/src/cli/pair.ts:79:19:Fenix Code
+./apps/server/src/cli/pair.ts:81:68:Fenix Connect
 ./apps/server/src/cli/project.test.ts:3:43:@t3tools
 ./apps/server/src/cli/project.ts:9:9:@t3tools
-./apps/server/src/cli/server.ts:22:36:T3 Code
-./apps/server/src/cli/server.ts:28:14:T3 Code
-./apps/server/src/cli/service.test.ts:17:8:T3 Code
+./apps/server/src/cli/server.ts:22:36:Fenix Code
+./apps/server/src/cli/server.ts:28:14:Fenix Code
+./apps/server/src/cli/service.test.ts:17:8:Fenix Code
 ./apps/server/src/cli/service.test.ts:19:46:t3code
 ./apps/server/src/cli/service.test.ts:9:44:t3code
-./apps/server/src/cli/service.ts:105:31:T3 Code
-./apps/server/src/cli/service.ts:109:68:T3 Code
-./apps/server/src/cli/service.ts:117:48:T3 Code
-./apps/server/src/cli/service.ts:125:34:T3 Code
-./apps/server/src/cli/service.ts:125:55:T3 Code
-./apps/server/src/cli/service.ts:133:45:T3 Code
-./apps/server/src/cli/service.ts:152:25:T3 Code
-./apps/server/src/cli/service.ts:158:26:T3 Code
-./apps/server/src/cli/service.ts:159:16:T3 Code
-./apps/server/src/cli/service.ts:160:39:T3 Connect
-./apps/server/src/cli/service.ts:194:39:T3 Code
-./apps/server/src/cli/service.ts:51:13:T3 Code
-./apps/server/src/cli/service.ts:54:13:T3 Code
-./apps/server/src/cli/service.ts:57:6:T3 Code
-./apps/server/src/cli/service.ts:75:36:T3 Code
-./apps/server/src/cli/service.ts:83:14:T3 Code
-./apps/server/src/cli/service.ts:88:68:T3 Code
+./apps/server/src/cli/service.ts:105:31:Fenix Code
+./apps/server/src/cli/service.ts:109:68:Fenix Code
+./apps/server/src/cli/service.ts:117:48:Fenix Code
+./apps/server/src/cli/service.ts:125:34:Fenix Code
+./apps/server/src/cli/service.ts:125:58:Fenix Code
+./apps/server/src/cli/service.ts:133:45:Fenix Code
+./apps/server/src/cli/service.ts:152:25:Fenix Code
+./apps/server/src/cli/service.ts:158:26:Fenix Code
+./apps/server/src/cli/service.ts:159:16:Fenix Code
+./apps/server/src/cli/service.ts:160:39:Fenix Connect
+./apps/server/src/cli/service.ts:194:39:Fenix Code
+./apps/server/src/cli/service.ts:51:13:Fenix Code
+./apps/server/src/cli/service.ts:54:13:Fenix Code
+./apps/server/src/cli/service.ts:57:6:Fenix Code
+./apps/server/src/cli/service.ts:75:36:Fenix Code
+./apps/server/src/cli/service.ts:83:14:Fenix Code
+./apps/server/src/cli/service.ts:88:68:Fenix Code
 ./apps/server/src/cliAuthFormat.ts:1:78:@t3tools
-./apps/server/src/cloud/CliState.ts:21:28:T3 Connect
-./apps/server/src/cloud/CliTokenManager.test.ts:100:35:T3 Connect
+./apps/server/src/cloud/CliState.ts:21:28:Fenix Connect
+./apps/server/src/cloud/CliTokenManager.test.ts:100:35:Fenix Connect
 ./apps/server/src/cloud/CliTokenManager.test.ts:1:46:@t3tools
 ./apps/server/src/cloud/CliTokenManager.test.ts:22:3:T3CODE
 ./apps/server/src/cloud/CliTokenManager.test.ts:23:3:T3CODE
 ./apps/server/src/cloud/CliTokenManager.test.ts:24:3:T3CODE
-./apps/server/src/cloud/CliTokenManager.ts:172:41:T3 Connect
-./apps/server/src/cloud/CliTokenManager.ts:181:35:T3 Connect
-./apps/server/src/cloud/CliTokenManager.ts:190:39:T3 Connect
-./apps/server/src/cloud/CliTokenManager.ts:199:37:T3 Connect
-./apps/server/src/cloud/CliTokenManager.ts:208:35:T3 Connect
+./apps/server/src/cloud/CliTokenManager.ts:172:41:Fenix Connect
+./apps/server/src/cloud/CliTokenManager.ts:181:35:Fenix Connect
+./apps/server/src/cloud/CliTokenManager.ts:190:39:Fenix Connect
+./apps/server/src/cloud/CliTokenManager.ts:199:37:Fenix Connect
+./apps/server/src/cloud/CliTokenManager.ts:208:35:Fenix Connect
 ./apps/server/src/cloud/CliTokenManager.ts:32:9:@t3tools
-./apps/server/src/cloud/CliTokenManager.ts:380:51:T3 Connect
-./apps/server/src/cloud/CliTokenManager.ts:50:33:T3 Connect
+./apps/server/src/cloud/CliTokenManager.ts:380:51:Fenix Connect
+./apps/server/src/cloud/CliTokenManager.ts:50:33:Fenix Connect
 ./apps/server/src/cloud/ManagedEndpointRuntime.test.ts:12:31:@t3tools
 ./apps/server/src/cloud/ManagedEndpointRuntime.test.ts:139:22:t3-code
 ./apps/server/src/cloud/ManagedEndpointRuntime.test.ts:145:22:t3-code
@@ -1422,19 +1340,19 @@
 ./apps/server/src/cloud/bootService.test.ts:179:35:t3code
 ./apps/server/src/cloud/bootService.test.ts:30:48:t3code
 ./apps/server/src/cloud/bootService.test.ts:7:9:@t3tools
-./apps/server/src/cloud/bootService.ts:112:34:T3 Code
+./apps/server/src/cloud/bootService.ts:112:34:Fenix Code
 ./apps/server/src/cloud/bootService.ts:1:65:@t3tools
 ./apps/server/src/cloud/bootService.ts:28:28:t3code
-./apps/server/src/cloud/bootService.ts:57:18:T3 Code
+./apps/server/src/cloud/bootService.ts:57:18:Fenix Code
 ./apps/server/src/cloud/bootService.ts:64:18:T3CODE
-./apps/server/src/cloud/cliAuthHtml.test.ts:12:27:T3 Code
-./apps/server/src/cloud/cliAuthHtml.test.ts:26:30:T3 Code
-./apps/server/src/cloud/cliAuthHtml.test.ts:28:46:T3 Code
-./apps/server/src/cloud/cliAuthHtml.ts:10:9:T3 Code
-./apps/server/src/cloud/cliAuthHtml.ts:11:13:T3 Code
-./apps/server/src/cloud/cliAuthHtml.ts:12:12:T3 Code
-./apps/server/src/cloud/cliAuthHtml.ts:150:77:T3 Connect
-./apps/server/src/cloud/cliAuthHtml.ts:26:12:T3 Connect
+./apps/server/src/cloud/cliAuthHtml.test.ts:12:27:Fenix Code
+./apps/server/src/cloud/cliAuthHtml.test.ts:26:30:Fenix Code
+./apps/server/src/cloud/cliAuthHtml.test.ts:28:46:Fenix Code
+./apps/server/src/cloud/cliAuthHtml.ts:10:9:Fenix Code
+./apps/server/src/cloud/cliAuthHtml.ts:11:13:Fenix Code
+./apps/server/src/cloud/cliAuthHtml.ts:12:12:Fenix Code
+./apps/server/src/cloud/cliAuthHtml.ts:150:77:Fenix Connect
+./apps/server/src/cloud/cliAuthHtml.ts:26:12:Fenix Connect
 ./apps/server/src/cloud/cliAuthHtml.ts:3:17:T3CODE
 ./apps/server/src/cloud/cliAuthHtml.ts:6:19:T3CODE
 ./apps/server/src/cloud/cliAuthHtml.ts:6:70:T3CODE
@@ -1442,15 +1360,15 @@
 ./apps/server/src/cloud/http.test.ts:17:32:@t3tools
 ./apps/server/src/cloud/http.test.ts:18:36:@t3tools
 ./apps/server/src/cloud/http.test.ts:32:45:@t3tools
-./apps/server/src/cloud/http.ts:1020:15:T3 Connect
+./apps/server/src/cloud/http.ts:1020:15:Fenix Connect
 ./apps/server/src/cloud/http.ts:120:19:T3CODE
 ./apps/server/src/cloud/http.ts:14:9:@t3tools
 ./apps/server/src/cloud/http.ts:32:9:@t3tools
 ./apps/server/src/cloud/http.ts:33:41:@t3tools
 ./apps/server/src/cloud/http.ts:43:9:@t3tools
 ./apps/server/src/cloud/http.ts:44:35:@t3tools
-./apps/server/src/cloud/http.ts:534:21:T3 Connect
-./apps/server/src/cloud/http.ts:621:66:T3 Connect
+./apps/server/src/cloud/http.ts:534:21:Fenix Connect
+./apps/server/src/cloud/http.ts:621:66:Fenix Connect
 ./apps/server/src/cloud/http.ts:709:21:T3CODE
 ./apps/server/src/cloud/publicConfig.test.ts:109:9:T3CODE
 ./apps/server/src/cloud/publicConfig.test.ts:110:9:T3CODE
@@ -1498,14 +1416,14 @@
 ./apps/server/src/cloud/publicConfig.ts:95:48:T3CODE
 ./apps/server/src/cloud/relayTracing.ts:1:46:@t3tools
 ./apps/server/src/cloud/selfUpdate.test.ts:3:44:@t3tools
-./apps/server/src/cloud/selfUpdate.ts:69:40:T3 Code
-./apps/server/src/cloud/selfUpdate.ts:74:37:T3 Code
+./apps/server/src/cloud/selfUpdate.ts:69:40:Fenix Code
+./apps/server/src/cloud/selfUpdate.ts:74:37:Fenix Code
 ./apps/server/src/cloud/selfUpdate.ts:7:9:@t3tools
 ./apps/server/src/cloud/selfUpdate.ts:8:44:@t3tools
 ./apps/server/src/cloud/serviceLauncherClient.test.ts:2:41:@t3tools
 ./apps/server/src/cloud/serviceLauncherClient.ts:1:47:@t3tools
 ./apps/server/src/cloud/serviceLauncherClient.ts:2:41:@t3tools
-./apps/server/src/cloud/servicePreflight.ts:28:40:T3 Code
+./apps/server/src/cloud/servicePreflight.ts:28:40:Fenix Code
 ./apps/server/src/cloud/serviceProtocol.ts:1:47:@t3tools
 ./apps/server/src/cloud/traceRelayRequest.ts:1:41:@t3tools
 ./apps/server/src/codexModelOptions.test.ts:3:37:@t3tools
@@ -1659,7 +1577,7 @@
 ./apps/server/src/keybindings.ts:45:56:@t3tools
 ./apps/server/src/keybindings.ts:52:9:@t3tools
 ./apps/server/src/mcp/McpHttpServer.test.ts:4:76:@t3tools
-./apps/server/src/mcp/McpHttpServer.ts:220:10:T3 Code
+./apps/server/src/mcp/McpHttpServer.ts:220:10:Fenix Code
 ./apps/server/src/mcp/McpHttpServer.ts:79:40:t3-code
 ./apps/server/src/mcp/McpInvocationContext.test.ts:7:9:@t3tools
 ./apps/server/src/mcp/McpInvocationContext.ts:6:9:@t3tools
@@ -1839,11 +1757,11 @@
 ./apps/server/src/project/T3ProjectFileLoader.test.ts:19:14:t3code
 ./apps/server/src/project/T3ProjectFileLoader.ts:19:59:@t3tools
 ./apps/server/src/project/T3ProjectFileLoader.ts:20:40:@t3tools
-./apps/server/src/provider/CodexDeveloperInstructions.ts:171:56:T3 Code
+./apps/server/src/provider/CodexDeveloperInstructions.ts:171:56:Fenix Code
 ./apps/server/src/provider/CodexDeveloperInstructions.ts:1:47:@t3tools
-./apps/server/src/provider/CodexDeveloperInstructions.ts:5:4:T3 Code
-./apps/server/src/provider/CodexDeveloperInstructions.ts:7:24:T3 Code
-./apps/server/src/provider/CodexDeveloperInstructions.ts:7:39:t3-code
+./apps/server/src/provider/CodexDeveloperInstructions.ts:5:4:Fenix Code
+./apps/server/src/provider/CodexDeveloperInstructions.ts:7:24:Fenix Code
+./apps/server/src/provider/CodexDeveloperInstructions.ts:7:42:t3-code
 ./apps/server/src/provider/Drivers/ClaudeDriver.ts:15:74:@t3tools
 ./apps/server/src/provider/Drivers/ClaudeExecutable.test.ts:2:38:@t3tools
 ./apps/server/src/provider/Drivers/ClaudeExecutable.test.ts:3:44:@t3tools
@@ -1885,8 +1803,8 @@
 ./apps/server/src/provider/Layers/ClaudeProvider.ts:21:38:@t3tools
 ./apps/server/src/provider/Layers/ClaudeProvider.ts:22:40:@t3tools
 ./apps/server/src/provider/Layers/ClaudeProvider.ts:7:9:@t3tools
-./apps/server/src/provider/Layers/ClaudeProvider.ts:822:41:T3 Code
-./apps/server/src/provider/Layers/ClaudeProvider.ts:985:43:T3 Code
+./apps/server/src/provider/Layers/ClaudeProvider.ts:822:41:Fenix Code
+./apps/server/src/provider/Layers/ClaudeProvider.ts:985:43:Fenix Code
 ./apps/server/src/provider/Layers/CodexAdapter.test.ts:1244:39:t3-code
 ./apps/server/src/provider/Layers/CodexAdapter.test.ts:20:9:@t3tools
 ./apps/server/src/provider/Layers/CodexAdapter.test.ts:21:39:@t3tools
@@ -1905,12 +1823,12 @@
 ./apps/server/src/provider/Layers/CodexProvider.ts:27:42:@t3tools
 ./apps/server/src/provider/Layers/CodexProvider.ts:28:38:@t3tools
 ./apps/server/src/provider/Layers/CodexProvider.ts:312:14:t3code
-./apps/server/src/provider/Layers/CodexProvider.ts:313:15:T3 Code
+./apps/server/src/provider/Layers/CodexProvider.ts:313:15:Fenix Code
 ./apps/server/src/provider/Layers/CodexProvider.ts:374:14:t3code
-./apps/server/src/provider/Layers/CodexProvider.ts:375:15:T3 Code
-./apps/server/src/provider/Layers/CodexProvider.ts:453:42:T3 Code
-./apps/server/src/provider/Layers/CodexProvider.ts:539:40:T3 Code
-./apps/server/src/provider/Layers/CodexSessionRuntime.test.ts:257:37:T3 Code
+./apps/server/src/provider/Layers/CodexProvider.ts:375:15:Fenix Code
+./apps/server/src/provider/Layers/CodexProvider.ts:453:42:Fenix Code
+./apps/server/src/provider/Layers/CodexProvider.ts:539:40:Fenix Code
+./apps/server/src/provider/Layers/CodexSessionRuntime.test.ts:257:37:Fenix Code
 ./apps/server/src/provider/Layers/CodexSessionRuntime.test.ts:302:39:t3-code
 ./apps/server/src/provider/Layers/CodexSessionRuntime.test.ts:315:50:t3-code
 ./apps/server/src/provider/Layers/CodexSessionRuntime.test.ts:333:29:t3-code
@@ -1929,17 +1847,17 @@
 ./apps/server/src/provider/Layers/CursorAdapter.ts:547:30:t3-code
 ./apps/server/src/provider/Layers/CursorProvider.test.ts:11:38:@t3tools
 ./apps/server/src/provider/Layers/CursorProvider.test.ts:12:42:@t3tools
-./apps/server/src/provider/Layers/CursorProvider.test.ts:304:82:T3 Code
-./apps/server/src/provider/Layers/CursorProvider.test.ts:311:104:T3 Code
-./apps/server/src/provider/Layers/CursorProvider.ts:1009:41:T3 Code
+./apps/server/src/provider/Layers/CursorProvider.test.ts:304:82:Fenix Code
+./apps/server/src/provider/Layers/CursorProvider.test.ts:311:104:Fenix Code
+./apps/server/src/provider/Layers/CursorProvider.ts:1009:41:Fenix Code
 ./apps/server/src/provider/Layers/CursorProvider.ts:10:9:@t3tools
 ./apps/server/src/provider/Layers/CursorProvider.ts:12:32:@t3tools
 ./apps/server/src/provider/Layers/CursorProvider.ts:30:9:@t3tools
 ./apps/server/src/provider/Layers/CursorProvider.ts:31:38:@t3tools
 ./apps/server/src/provider/Layers/CursorProvider.ts:421:30:t3-code
-./apps/server/src/provider/Layers/CursorProvider.ts:620:93:T3 Code
-./apps/server/src/provider/Layers/CursorProvider.ts:67:82:T3 Code
-./apps/server/src/provider/Layers/CursorProvider.ts:95:43:T3 Code
+./apps/server/src/provider/Layers/CursorProvider.ts:620:93:Fenix Code
+./apps/server/src/provider/Layers/CursorProvider.ts:67:82:Fenix Code
+./apps/server/src/provider/Layers/CursorProvider.ts:95:43:Fenix Code
 ./apps/server/src/provider/Layers/EventNdjsonLogger.test.ts:6:27:@t3tools
 ./apps/server/src/provider/Layers/EventNdjsonLogger.ts:11:32:@t3tools
 ./apps/server/src/provider/Layers/EventNdjsonLogger.ts:12:35:@t3tools
@@ -1954,10 +1872,10 @@
 ./apps/server/src/provider/Layers/GrokProvider.test.ts:90:68:t3code
 ./apps/server/src/provider/Layers/GrokProvider.ts:137:28:t3-code
 ./apps/server/src/provider/Layers/GrokProvider.ts:17:42:@t3tools
-./apps/server/src/provider/Layers/GrokProvider.ts:183:39:T3 Code
+./apps/server/src/provider/Layers/GrokProvider.ts:183:39:Fenix Code
 ./apps/server/src/provider/Layers/GrokProvider.ts:18:38:@t3tools
 ./apps/server/src/provider/Layers/GrokProvider.ts:6:9:@t3tools
-./apps/server/src/provider/Layers/GrokProvider.ts:74:41:T3 Code
+./apps/server/src/provider/Layers/GrokProvider.ts:74:41:Fenix Code
 ./apps/server/src/provider/Layers/GrokProvider.ts:8:32:@t3tools
 ./apps/server/src/provider/Layers/OpenCodeAdapter.test.ts:23:9:@t3tools
 ./apps/server/src/provider/Layers/OpenCodeAdapter.test.ts:24:39:@t3tools
@@ -1967,11 +1885,11 @@
 ./apps/server/src/provider/Layers/OpenCodeProvider.test.ts:10:35:@t3tools
 ./apps/server/src/provider/Layers/OpenCodeProvider.ts:11:42:@t3tools
 ./apps/server/src/provider/Layers/OpenCodeProvider.ts:12:40:@t3tools
-./apps/server/src/provider/Layers/OpenCodeProvider.ts:277:42:T3 Code
-./apps/server/src/provider/Layers/OpenCodeProvider.ts:278:42:T3 Code
-./apps/server/src/provider/Layers/OpenCodeProvider.ts:342:38:T3 Code
-./apps/server/src/provider/Layers/OpenCodeProvider.ts:343:38:T3 Code
-./apps/server/src/provider/Layers/OpenCodeProvider.ts:371:85:T3 Code
+./apps/server/src/provider/Layers/OpenCodeProvider.ts:277:42:Fenix Code
+./apps/server/src/provider/Layers/OpenCodeProvider.ts:278:42:Fenix Code
+./apps/server/src/provider/Layers/OpenCodeProvider.ts:342:38:Fenix Code
+./apps/server/src/provider/Layers/OpenCodeProvider.ts:343:38:Fenix Code
+./apps/server/src/provider/Layers/OpenCodeProvider.ts:371:85:Fenix Code
 ./apps/server/src/provider/Layers/OpenCodeProvider.ts:5:9:@t3tools
 ./apps/server/src/provider/Layers/ProviderAdapterRegistry.test.ts:5:9:@t3tools
 ./apps/server/src/provider/Layers/ProviderAdapterRegistry.ts:22:9:@t3tools
@@ -1981,8 +1899,8 @@
 ./apps/server/src/provider/Layers/ProviderRegistry.test.ts:1431:34:t3code
 ./apps/server/src/provider/Layers/ProviderRegistry.test.ts:1546:33:t3code
 ./apps/server/src/provider/Layers/ProviderRegistry.test.ts:1547:34:t3code
-./apps/server/src/provider/Layers/ProviderRegistry.test.ts:1816:40:T3 Code
-./apps/server/src/provider/Layers/ProviderRegistry.test.ts:1831:68:T3 Code
+./apps/server/src/provider/Layers/ProviderRegistry.test.ts:1816:40:Fenix Code
+./apps/server/src/provider/Layers/ProviderRegistry.test.ts:1831:68:Fenix Code
 ./apps/server/src/provider/Layers/ProviderRegistry.test.ts:2173:39:t3code
 ./apps/server/src/provider/Layers/ProviderRegistry.test.ts:26:9:@t3tools
 ./apps/server/src/provider/Layers/ProviderRegistry.test.ts:30:28:@t3tools
@@ -1995,7 +1913,7 @@
 ./apps/server/src/provider/Layers/ProviderService.test.ts:22:39:@t3tools
 ./apps/server/src/provider/Layers/ProviderService.ts:26:9:@t3tools
 ./apps/server/src/provider/Layers/ProviderService.ts:27:32:@t3tools
-./apps/server/src/provider/Layers/ProviderService.ts:562:71:T3 Code
+./apps/server/src/provider/Layers/ProviderService.ts:562:71:Fenix Code
 ./apps/server/src/provider/Layers/ProviderSessionDirectory.test.ts:7:47:@t3tools
 ./apps/server/src/provider/Layers/ProviderSessionDirectory.ts:1:80:@t3tools
 ./apps/server/src/provider/Layers/ProviderSessionReaper.test.ts:8:9:@t3tools
@@ -2030,7 +1948,7 @@
 ./apps/server/src/provider/acp/AcpSessionRuntime.ts:22:38:@t3tools
 ./apps/server/src/provider/acp/CursorAcpExtension.ts:5:41:@t3tools
 ./apps/server/src/provider/acp/CursorAcpSupport.ts:1:68:@t3tools
-./apps/server/src/provider/acp/GrokAcpSupport.test.ts:20:18:T3 Code
+./apps/server/src/provider/acp/GrokAcpSupport.test.ts:20:18:Fenix Code
 ./apps/server/src/provider/acp/GrokAcpSupport.test.ts:32:32:t3code
 ./apps/server/src/provider/acp/GrokAcpSupport.ts:16:33:t3code
 ./apps/server/src/provider/acp/GrokAcpSupport.ts:1:56:@t3tools
@@ -2056,15 +1974,15 @@
 ./apps/server/src/provider/providerMaintenanceRunner.test.ts:7:9:@t3tools
 ./apps/server/src/provider/providerMaintenanceRunner.test.ts:8:44:@t3tools
 ./apps/server/src/provider/providerMaintenanceRunner.ts:10:38:@t3tools
-./apps/server/src/provider/providerMaintenanceRunner.ts:371:52:T3 Code
-./apps/server/src/provider/providerMaintenanceRunner.ts:373:54:T3 Code
+./apps/server/src/provider/providerMaintenanceRunner.ts:371:52:Fenix Code
+./apps/server/src/provider/providerMaintenanceRunner.ts:373:54:Fenix Code
 ./apps/server/src/provider/providerMaintenanceRunner.ts:9:9:@t3tools
 ./apps/server/src/provider/providerSnapshot.test.ts:2:41:@t3tools
 ./apps/server/src/provider/providerSnapshot.test.ts:3:38:@t3tools
 ./apps/server/src/provider/providerSnapshot.test.ts:4:42:@t3tools
 ./apps/server/src/provider/providerSnapshot.ts:10:9:@t3tools
 ./apps/server/src/provider/providerSnapshot.ts:16:43:@t3tools
-./apps/server/src/provider/providerStatusCache.test.ts:196:38:T3 Code
+./apps/server/src/provider/providerStatusCache.test.ts:196:38:Fenix Code
 ./apps/server/src/provider/providerStatusCache.test.ts:7:9:@t3tools
 ./apps/server/src/provider/providerStatusCache.test.ts:8:42:@t3tools
 ./apps/server/src/provider/providerStatusCache.ts:6:9:@t3tools
@@ -2078,16 +1996,16 @@
 ./apps/server/src/relay/AgentAwarenessRelay.test.ts:19:48:@t3tools
 ./apps/server/src/relay/AgentAwarenessRelay.test.ts:20:36:@t3tools
 ./apps/server/src/relay/AgentAwarenessRelay.test.ts:21:61:@t3tools
-./apps/server/src/relay/AgentAwarenessRelay.test.ts:323:21:T3 Code
-./apps/server/src/relay/AgentAwarenessRelay.test.ts:427:19:T3 Code
-./apps/server/src/relay/AgentAwarenessRelay.test.ts:585:19:T3 Code
+./apps/server/src/relay/AgentAwarenessRelay.test.ts:323:21:Fenix Code
+./apps/server/src/relay/AgentAwarenessRelay.test.ts:427:19:Fenix Code
+./apps/server/src/relay/AgentAwarenessRelay.test.ts:585:19:Fenix Code
 ./apps/server/src/relay/AgentAwarenessRelay.ts:12:9:@t3tools
 ./apps/server/src/relay/AgentAwarenessRelay.ts:13:41:@t3tools
 ./apps/server/src/relay/AgentAwarenessRelay.ts:14:38:@t3tools
 ./apps/server/src/relay/AgentAwarenessRelay.ts:15:41:@t3tools
 ./apps/server/src/relay/AgentAwarenessRelay.ts:20:9:@t3tools
-./apps/server/src/relay/AgentAwarenessRelay.ts:591:61:T3 Connect
-./apps/server/src/relay/AgentAwarenessRelay.ts:595:72:T3 Connect
+./apps/server/src/relay/AgentAwarenessRelay.ts:591:61:Fenix Connect
+./apps/server/src/relay/AgentAwarenessRelay.ts:596:52:Fenix Connect
 ./apps/server/src/relay/AgentAwarenessRelay.ts:7:9:@t3tools
 ./apps/server/src/resourceTelemetry/DesktopTelemetryReceiver.ts:11:9:@t3tools
 ./apps/server/src/resourceTelemetry/DesktopTelemetryReceiver.ts:12:58:@t3tools
@@ -2108,10 +2026,10 @@
 ./apps/server/src/resourceTelemetry/ResourceTelemetryHistory.test.ts:6:9:@t3tools
 ./apps/server/src/resourceTelemetry/ResourceTelemetryHistory.ts:9:9:@t3tools
 ./apps/server/src/review/ReviewService.ts:16:9:@t3tools
-./apps/server/src/server.test.ts:1659:19:T3 Code
-./apps/server/src/server.test.ts:1686:17:T3 Code
-./apps/server/src/server.test.ts:2640:36:T3 Connect
-./apps/server/src/server.test.ts:2699:28:T3 Connect
+./apps/server/src/server.test.ts:1659:19:Fenix Code
+./apps/server/src/server.test.ts:1686:17:Fenix Code
+./apps/server/src/server.test.ts:2640:36:Fenix Connect
+./apps/server/src/server.test.ts:2699:28:Fenix Connect
 ./apps/server/src/server.test.ts:3528:33:t3code
 ./apps/server/src/server.test.ts:3528:49:t3code
 ./apps/server/src/server.test.ts:35:9:@t3tools
@@ -2133,17 +2051,17 @@
 ./apps/server/src/server.test.ts:7757:26:t3code
 ./apps/server/src/server.test.ts:8047:48:T3CODE
 ./apps/server/src/server.test.ts:8054:48:T3CODE
-./apps/server/src/server.test.ts:942:49:T3 Connect
+./apps/server/src/server.test.ts:942:49:Fenix Connect
 ./apps/server/src/server.ts:112:30:@t3tools
 ./apps/server/src/server.ts:113:31:@t3tools
 ./apps/server/src/server.ts:114:62:@t3tools
 ./apps/server/src/server.ts:1:37:@t3tools
-./apps/server/src/server.ts:618:48:T3 Connect
-./apps/server/src/server.ts:620:56:T3 Connect
+./apps/server/src/server.ts:618:48:Fenix Connect
+./apps/server/src/server.ts:620:56:Fenix Connect
 ./apps/server/src/serverLifecycleEvents.test.ts:1:32:@t3tools
 ./apps/server/src/serverLifecycleEvents.ts:1:50:@t3tools
 ./apps/server/src/serverRuntimeStartup.test.ts:2:73:@t3tools
-./apps/server/src/serverRuntimeStartup.ts:418:48:T3 Code
+./apps/server/src/serverRuntimeStartup.ts:418:48:Fenix Code
 ./apps/server/src/serverRuntimeStartup.ts:9:9:@t3tools
 ./apps/server/src/serverSettings.test.ts:32:20:t3code
 ./apps/server/src/serverSettings.test.ts:65:18:t3code
@@ -2156,7 +2074,7 @@
 ./apps/server/src/serverSettings.ts:55:59:@t3tools
 ./apps/server/src/serviceLauncher.ts:603:31:T3CODE
 ./apps/server/src/serviceLauncher.ts:605:22:T3CODE
-./apps/server/src/serviceLauncher.ts:605:53:T3 Code
+./apps/server/src/serviceLauncher.ts:605:53:Fenix Code
 ./apps/server/src/sourceControl/AzureDevOpsCli.test.ts:280:30:t3code
 ./apps/server/src/sourceControl/AzureDevOpsCli.test.ts:9:60:@t3tools
 ./apps/server/src/sourceControl/AzureDevOpsCli.ts:12:9:@t3tools
@@ -2307,7 +2225,7 @@
 ./apps/server/src/sourceControl/gitHubPullRequests.ts:8:54:@t3tools
 ./apps/server/src/sourceControl/gitLabMergeRequests.ts:7:53:@t3tools
 ./apps/server/src/sourceControl/gitLabMergeRequests.ts:8:54:@t3tools
-./apps/server/src/startupAccess.ts:124:6:T3 Code
+./apps/server/src/startupAccess.ts:124:6:Fenix Code
 ./apps/server/src/startupAccess.ts:3:25:@t3tools
 ./apps/server/src/telemetry/AnalyticsService.test.ts:49:11:T3CODE
 ./apps/server/src/telemetry/AnalyticsService.test.ts:50:11:T3CODE
@@ -2391,32 +2309,32 @@
 ./apps/server/src/textGeneration/OpenCodeTextGeneration.ts:15:68:@t3tools
 ./apps/server/src/textGeneration/OpenCodeTextGeneration.ts:16:53:@t3tools
 ./apps/server/src/textGeneration/OpenCodeTextGeneration.ts:17:36:@t3tools
-./apps/server/src/textGeneration/OpenCodeTextGeneration.ts:395:23:T3 Code
+./apps/server/src/textGeneration/OpenCodeTextGeneration.ts:395:23:Fenix Code
 ./apps/server/src/textGeneration/TextGeneration.test.ts:8:37:@t3tools
 ./apps/server/src/textGeneration/TextGeneration.test.ts:9:39:@t3tools
 ./apps/server/src/textGeneration/TextGeneration.ts:4:74:@t3tools
 ./apps/server/src/textGeneration/TextGeneration.ts:5:38:@t3tools
 ./apps/server/src/textGeneration/TextGenerationPrompts.test.ts:10:38:@t3tools
-./apps/server/src/textGeneration/TextGenerationPrompts.test.ts:158:64:T3 Code
-./apps/server/src/textGeneration/TextGenerationPrompts.test.ts:198:45:T3 Code
+./apps/server/src/textGeneration/TextGenerationPrompts.test.ts:158:64:Fenix Code
+./apps/server/src/textGeneration/TextGenerationPrompts.test.ts:198:45:Fenix Code
 ./apps/server/src/textGeneration/TextGenerationPrompts.ts:10:38:@t3tools
-./apps/server/src/textGeneration/TextGenerationPrompts.ts:219:94:T3 Code
-./apps/server/src/textGeneration/TextGenerationPrompts.ts:244:48:T3 Code
+./apps/server/src/textGeneration/TextGenerationPrompts.ts:219:94:Fenix Code
+./apps/server/src/textGeneration/TextGenerationPrompts.ts:244:48:Fenix Code
 ./apps/server/src/textGeneration/TextGenerationUtils.ts:1:38:@t3tools
 ./apps/server/src/usage/UsageService.ts:23:9:@t3tools
-./apps/server/src/usage/UsageService.ts:4:68:T3 Code
-./apps/server/src/usage/UsageService.ts:5:68:T3 Code
+./apps/server/src/usage/UsageService.ts:4:68:Fenix Code
+./apps/server/src/usage/UsageService.ts:5:68:Fenix Code
 ./apps/server/src/usage/usagePricing.ts:10:57:@t3tools
 ./apps/server/src/usage/usageScanCache.ts:17:41:@t3tools
 ./apps/server/src/usage/usageTranscriptReader.ts:18:41:@t3tools
-./apps/server/src/usage/usageTranscripts.test.ts:55:8:T3 Code
-./apps/server/src/usage/usageTranscripts.ts:81:4:T3 Code
+./apps/server/src/usage/usageTranscripts.test.ts:55:8:Fenix Code
+./apps/server/src/usage/usageTranscripts.ts:81:4:Fenix Code
 ./apps/server/src/usage/usageTranscripts.ts:9:59:@t3tools
 ./apps/server/src/vcs/GitVcsDriver.test.ts:10:34:@t3tools
 ./apps/server/src/vcs/GitVcsDriver.ts:32:9:@t3tools
-./apps/server/src/vcs/GitVcsDriver.ts:672:27:T3 Code
+./apps/server/src/vcs/GitVcsDriver.ts:672:27:Fenix Code
 ./apps/server/src/vcs/GitVcsDriver.ts:673:28:t3code
-./apps/server/src/vcs/GitVcsDriver.ts:674:30:T3 Code
+./apps/server/src/vcs/GitVcsDriver.ts:674:30:Fenix Code
 ./apps/server/src/vcs/GitVcsDriver.ts:675:31:t3code
 ./apps/server/src/vcs/GitVcsDriverCore.test.ts:1375:83:t3code
 ./apps/server/src/vcs/GitVcsDriverCore.test.ts:1380:42:t3code
@@ -2523,9 +2441,9 @@
 ./apps/web/index.html:18:52:t3code
 ./apps/web/index.html:19:43:t3code
 ./apps/web/index.html:202:60:t3code
-./apps/web/index.html:438:12:T3 Code
-./apps/web/index.html:443:47:T3 Code
-./apps/web/index.html:444:70:T3 Code
+./apps/web/index.html:438:12:Fenix Code
+./apps/web/index.html:443:47:Fenix Code
+./apps/web/index.html:444:70:Fenix Code
 ./apps/web/package.json:28:6:@t3tools
 ./apps/web/package.json:29:6:@t3tools
 ./apps/web/package.json:2:12:@t3tools
@@ -2537,22 +2455,24 @@
 ./apps/web/src/assets/assetUrls.ts:10:34:@t3tools
 ./apps/web/src/assets/assetUrls.ts:2:34:@t3tools
 ./apps/web/src/assets/assetUrls.ts:3:52:@t3tools
-./apps/web/src/authBootstrap.test.ts:69:39:T3 Code
+./apps/web/src/authBootstrap.test.ts:69:39:Fenix Code
 ./apps/web/src/authBootstrap.test.ts:7:9:@t3tools
-./apps/web/src/branding.test.ts:105:20:T3 Code
-./apps/web/src/branding.test.ts:106:31:T3 Code
-./apps/web/src/branding.test.ts:110:13:T3 Code
-./apps/web/src/branding.test.ts:116:20:T3 Code
-./apps/web/src/branding.test.ts:117:31:T3 Code
-./apps/web/src/branding.test.ts:121:13:T3 Code
-./apps/web/src/branding.test.ts:34:24:T3 Code
-./apps/web/src/branding.test.ts:36:27:T3 Code
-./apps/web/src/branding.test.ts:44:42:T3 Code
-./apps/web/src/branding.test.ts:46:45:T3 Code
+./apps/web/src/branding.test.ts:105:20:Fenix Code
+./apps/web/src/branding.test.ts:106:31:Fenix Code
+./apps/web/src/branding.test.ts:110:13:Fenix Code
+./apps/web/src/branding.test.ts:116:20:Fenix Code
+./apps/web/src/branding.test.ts:117:31:Fenix Code
+./apps/web/src/branding.test.ts:121:13:Fenix Code
+./apps/web/src/branding.test.ts:34:24:Fenix Code
+./apps/web/src/branding.test.ts:36:27:Fenix Code
+./apps/web/src/branding.test.ts:44:42:Fenix Code
+./apps/web/src/branding.test.ts:46:45:Fenix Code
+./apps/web/src/branding.test.ts:57:45:Fenix Code
+./apps/web/src/branding.test.ts:68:45:Fenix Code
 ./apps/web/src/branding.test.ts:7:9:@t3tools
-./apps/web/src/branding.test.ts:94:20:T3 Code
-./apps/web/src/branding.test.ts:95:31:T3 Code
-./apps/web/src/branding.test.ts:99:13:T3 Code
+./apps/web/src/branding.test.ts:94:20:Fenix Code
+./apps/web/src/branding.test.ts:95:31:Fenix Code
+./apps/web/src/branding.test.ts:99:13:Fenix Code
 ./apps/web/src/branding.ts:1:42:@t3tools
 ./apps/web/src/branding.ts:2:36:@t3tools
 ./apps/web/src/browser/BrowserDeviceToolbar.test.ts:1:46:@t3tools
@@ -2595,7 +2515,7 @@
 ./apps/web/src/cloud/connectCliAuth.ts:12:45:t3code
 ./apps/web/src/cloud/connectCliAuth.ts:6:9:@t3tools
 ./apps/web/src/cloud/connectCliAuth.ts:7:56:@t3tools
-./apps/web/src/cloud/connectOnboarding.ts:4:48:T3 Connect
+./apps/web/src/cloud/connectOnboarding.ts:4:48:Fenix Connect
 ./apps/web/src/cloud/connectOnboarding.ts:8:56:t3code
 ./apps/web/src/cloud/dpop.test.ts:1:34:@t3tools
 ./apps/web/src/cloud/dpop.ts:24:29:t3code
@@ -2609,7 +2529,7 @@
 ./apps/web/src/cloud/linkEnvironment.test.ts:25:40:@t3tools
 ./apps/web/src/cloud/linkEnvironment.test.ts:6:9:@t3tools
 ./apps/web/src/cloud/linkEnvironment.test.ts:7:35:@t3tools
-./apps/web/src/cloud/linkEnvironment.ts:113:16:T3 Code
+./apps/web/src/cloud/linkEnvironment.ts:113:16:Fenix Code
 ./apps/web/src/cloud/linkEnvironment.ts:17:9:@t3tools
 ./apps/web/src/cloud/linkEnvironment.ts:24:9:@t3tools
 ./apps/web/src/cloud/linkEnvironment.ts:25:38:@t3tools
@@ -2618,9 +2538,9 @@
 ./apps/web/src/cloud/linkEnvironment.ts:288:19:T3CODE
 ./apps/web/src/cloud/linkEnvironment.ts:28:31:@t3tools
 ./apps/web/src/cloud/linkEnvironment.ts:318:19:T3CODE
-./apps/web/src/cloud/linkEnvironment.ts:397:21:T3 Connect
+./apps/web/src/cloud/linkEnvironment.ts:397:21:Fenix Connect
 ./apps/web/src/cloud/linkEnvironment.ts:415:19:T3CODE
-./apps/web/src/cloud/linkEnvironment.ts:77:19:T3 Code
+./apps/web/src/cloud/linkEnvironment.ts:77:19:Fenix Code
 ./apps/web/src/cloud/linkEnvironmentAtoms.ts:4:9:@t3tools
 ./apps/web/src/cloud/managedAuth.test.ts:1:66:@t3tools
 ./apps/web/src/cloud/managedAuth.tsx:2:55:@t3tools
@@ -2630,7 +2550,7 @@
 ./apps/web/src/cloud/managedRelayState.ts:11:9:@t3tools
 ./apps/web/src/cloud/managedRelayState.ts:7:9:@t3tools
 ./apps/web/src/cloud/primaryCloudLinkState.ts:2:55:@t3tools
-./apps/web/src/cloud/primaryCloudLinkState.ts:75:70:T3 Connect
+./apps/web/src/cloud/primaryCloudLinkState.ts:75:70:Fenix Connect
 ./apps/web/src/cloud/publicConfig.test.ts:17:22:T3CODE
 ./apps/web/src/cloud/publicConfig.test.ts:26:22:T3CODE
 ./apps/web/src/cloud/publicConfig.test.ts:33:22:T3CODE
@@ -2641,15 +2561,15 @@
 ./apps/web/src/cloud/publicConfig.ts:80:53:T3CODE
 ./apps/web/src/cloud/publicConfig.ts:8:26:T3CODE
 ./apps/web/src/cloud/relayClientInstallDialog.ts:5:9:@t3tools
-./apps/web/src/cloud/useCloudLinkController.ts:115:51:T3 Connect
-./apps/web/src/cloud/useCloudLinkController.ts:27:37:T3 Connect
-./apps/web/src/cloud/useCloudLinkController.ts:27:54:T3 Connect
+./apps/web/src/cloud/useCloudLinkController.ts:116:51:Fenix Connect
+./apps/web/src/cloud/useCloudLinkController.ts:27:37:Fenix Connect
+./apps/web/src/cloud/useCloudLinkController.ts:27:57:Fenix Connect
 ./apps/web/src/cloud/useCloudLinkController.ts:2:35:@t3tools
-./apps/web/src/cloud/useCloudLinkController.ts:54:80:T3 Connect
-./apps/web/src/cloud/useCloudLinkController.ts:56:50:T3 Connect
-./apps/web/src/cloud/useCloudLinkController.ts:60:32:T3 Connect
+./apps/web/src/cloud/useCloudLinkController.ts:55:66:Fenix Connect
+./apps/web/src/cloud/useCloudLinkController.ts:57:50:Fenix Connect
+./apps/web/src/cloud/useCloudLinkController.ts:61:32:Fenix Connect
 ./apps/web/src/cloud/useCloudLinkController.ts:7:9:@t3tools
-./apps/web/src/cloud/useCloudLinkController.ts:96:40:T3 Connect
+./apps/web/src/cloud/useCloudLinkController.ts:97:40:Fenix Connect
 ./apps/web/src/commandPaletteBus.ts:3:37:t3code
 ./apps/web/src/components/AgentsPanel.tsx:19:9:@t3tools
 ./apps/web/src/components/AgentsPanel.tsx:23:9:@t3tools
@@ -2681,8 +2601,8 @@
 ./apps/web/src/components/ChatView.tsx:47:27:@t3tools
 ./apps/web/src/components/ChatView.tsx:48:62:@t3tools
 ./apps/web/src/components/ChatView.tsx:71:9:@t3tools
-./apps/web/src/components/CommandPalette.logic.test.ts:247:48:T3 Code
-./apps/web/src/components/CommandPalette.logic.test.ts:264:37:T3 Code
+./apps/web/src/components/CommandPalette.logic.test.ts:247:48:Fenix Code
+./apps/web/src/components/CommandPalette.logic.test.ts:264:37:Fenix Code
 ./apps/web/src/components/CommandPalette.logic.test.ts:2:73:@t3tools
 ./apps/web/src/components/CommandPalette.logic.ts:5:9:@t3tools
 ./apps/web/src/components/CommandPalette.logic.ts:6:46:@t3tools
@@ -2736,7 +2656,7 @@
 ./apps/web/src/components/PullRequestThreadDialog.tsx:2:43:@t3tools
 ./apps/web/src/components/RightPanelTabs.tsx:1:63:@t3tools
 ./apps/web/src/components/RightPanelTabs.tsx:2:35:@t3tools
-./apps/web/src/components/RightPanelTabs.tsx:55:56:T3 Code
+./apps/web/src/components/RightPanelTabs.tsx:55:56:Fenix Code
 ./apps/web/src/components/ServerUpdateAction.test.tsx:3:37:@t3tools
 ./apps/web/src/components/ServerUpdateAction.tsx:1:65:@t3tools
 ./apps/web/src/components/ServerUpdateAction.tsx:2:60:@t3tools
@@ -2830,47 +2750,48 @@
 ./apps/web/src/components/chat/modelPickerSearch.ts:1:56:@t3tools
 ./apps/web/src/components/chat/providerIconUtils.ts:1:37:@t3tools
 ./apps/web/src/components/clerk/MobileClientsUserProfilePage.logic.test.ts:1:47:@t3tools
-./apps/web/src/components/clerk/MobileClientsUserProfilePage.logic.test.ts:34:63:T3 Code
-./apps/web/src/components/clerk/MobileClientsUserProfilePage.logic.ts:18:67:T3 Code
+./apps/web/src/components/clerk/MobileClientsUserProfilePage.logic.test.ts:34:63:Fenix Code
+./apps/web/src/components/clerk/MobileClientsUserProfilePage.logic.ts:18:67:Fenix Code
 ./apps/web/src/components/clerk/MobileClientsUserProfilePage.logic.ts:1:47:@t3tools
-./apps/web/src/components/clerk/MobileClientsUserProfilePage.tsx:120:43:T3 Connect
+./apps/web/src/components/clerk/MobileClientsUserProfilePage.tsx:120:43:Fenix Connect
 ./apps/web/src/components/clerk/MobileClientsUserProfilePage.tsx:1:47:@t3tools
-./apps/web/src/components/clerk/MobileClientsUserProfilePage.tsx:99:22:T3 Code
-./apps/web/src/components/clerk/T3ConnectSidebarSignIn.tsx:58:30:T3 Connect
-./apps/web/src/components/cloud/CloudEnvironmentConnectList.tsx:103:66:T3 Connect
+./apps/web/src/components/clerk/MobileClientsUserProfilePage.tsx:99:22:Fenix Code
+./apps/web/src/components/clerk/T3ConnectSidebarSignIn.tsx:58:30:Fenix Connect
+./apps/web/src/components/cloud/CloudEnvironmentConnectList.tsx:103:66:Fenix Connect
 ./apps/web/src/components/cloud/CloudEnvironmentConnectList.tsx:10:9:@t3tools
-./apps/web/src/components/cloud/CloudEnvironmentConnectList.tsx:112:71:T3 Connect
+./apps/web/src/components/cloud/CloudEnvironmentConnectList.tsx:112:71:Fenix Connect
 ./apps/web/src/components/cloud/CloudEnvironmentConnectList.tsx:11:37:@t3tools
 ./apps/web/src/components/cloud/CloudEnvironmentConnectList.tsx:12:52:@t3tools
-./apps/web/src/components/cloud/CloudEnvironmentConnectList.tsx:157:28:T3 Connect
+./apps/web/src/components/cloud/CloudEnvironmentConnectList.tsx:157:28:Fenix Connect
 ./apps/web/src/components/cloud/CloudEnvironmentConnectList.tsx:1:35:@t3tools
-./apps/web/src/components/cloud/CloudEnvironmentConnectList.tsx:48:15:T3 Connect
+./apps/web/src/components/cloud/CloudEnvironmentConnectList.tsx:48:15:Fenix Connect
 ./apps/web/src/components/cloud/CloudEnvironmentConnectList.tsx:6:9:@t3tools
-./apps/web/src/components/cloud/ConnectCliAuthSurface.tsx:188:31:T3 Connect
+./apps/web/src/components/cloud/ConnectCliAuthSurface.tsx:188:31:Fenix Connect
 ./apps/web/src/components/cloud/ConnectCliAuthSurface.tsx:2:69:@t3tools
-./apps/web/src/components/cloud/ConnectCliAuthSurface.tsx:92:41:T3 Connect
-./apps/web/src/components/cloud/ConnectCliAuthSurface.tsx:93:48:T3 Connect
-./apps/web/src/components/cloud/ConnectOnboardingDialog.tsx:203:15:T3 Connect
-./apps/web/src/components/cloud/ConnectOnboardingDialog.tsx:205:72:T3 Connect
-./apps/web/src/components/cloud/ConnectOnboardingDialog.tsx:222:31:T3 Connect
+./apps/web/src/components/cloud/ConnectCliAuthSurface.tsx:92:41:Fenix Connect
+./apps/web/src/components/cloud/ConnectCliAuthSurface.tsx:93:48:Fenix Connect
+./apps/web/src/components/cloud/ConnectOnboardingDialog.tsx:203:15:Fenix Connect
+./apps/web/src/components/cloud/ConnectOnboardingDialog.tsx:205:72:Fenix Connect
+./apps/web/src/components/cloud/ConnectOnboardingDialog.tsx:222:31:Fenix Connect
 ./apps/web/src/components/cloud/ConnectOnboardingDialog.tsx:2:64:@t3tools
-./apps/web/src/components/cloud/ConnectOnboardingDialog.tsx:33:39:T3 Connect
-./apps/web/src/components/cloud/ConnectOnboardingDialog.tsx:364:86:T3 Connect
-./apps/web/src/components/cloud/ConnectOnboardingDialog.tsx:38:14:T3 Connect
-./apps/web/src/components/cloud/RelayClientInstallDialog.tsx:101:17:T3 Code
+./apps/web/src/components/cloud/ConnectOnboardingDialog.tsx:33:39:Fenix Connect
+./apps/web/src/components/cloud/ConnectOnboardingDialog.tsx:364:86:Fenix Connect
+./apps/web/src/components/cloud/ConnectOnboardingDialog.tsx:38:14:Fenix Connect
+./apps/web/src/components/cloud/RelayClientInstallDialog.tsx:101:17:Fenix Code
 ./apps/web/src/components/cloud/RelayClientInstallDialog.tsx:3:55:@t3tools
-./apps/web/src/components/cloud/RelayClientInstallDialog.tsx:72:18:T3 Code
-./apps/web/src/components/cloud/RelayClientInstallDialog.tsx:72:82:T3 Connect
-./apps/web/src/components/cloud/RelayClientInstallDialog.tsx:73:18:T3 Code
-./apps/web/src/components/cloud/RelayClientInstallDialog.tsx:73:92:T3 Connect
-./apps/web/src/components/cloud/RelayClientInstallDialog.tsx:94:22:T3 Code
+./apps/web/src/components/cloud/RelayClientInstallDialog.tsx:72:18:Fenix Code
+./apps/web/src/components/cloud/RelayClientInstallDialog.tsx:72:85:Fenix Connect
+./apps/web/src/components/cloud/RelayClientInstallDialog.tsx:73:18:Fenix Code
+./apps/web/src/components/cloud/RelayClientInstallDialog.tsx:73:95:Fenix Connect
+./apps/web/src/components/cloud/RelayClientInstallDialog.tsx:94:22:Fenix Code
 ./apps/web/src/components/cloud/cloudEnvironmentConnectionPresentation.test.ts:1:57:@t3tools
 ./apps/web/src/components/cloud/cloudEnvironmentConnectionPresentation.ts:4:9:@t3tools
 ./apps/web/src/components/composerInlineTokenPaste.ts:1:46:@t3tools
-./apps/web/src/components/desktop/SshPasswordPromptDialog.tsx:164:86:T3 Code
+./apps/web/src/components/desktop/SshPasswordPromptDialog.tsx:164:86:Fenix Code
 ./apps/web/src/components/desktop/SshPasswordPromptDialog.tsx:1:55:@t3tools
 ./apps/web/src/components/desktopUpdate.logic.test.ts:198:60:t3code
-./apps/web/src/components/desktopUpdate.logic.test.ts:199:50:T3 Code
+./apps/web/src/components/desktopUpdate.logic.test.ts:263:51:Fenix Code
+./apps/web/src/components/desktopUpdate.logic.test.ts:272:45:Fenix Code
 ./apps/web/src/components/desktopUpdate.logic.test.ts:2:69:@t3tools
 ./apps/web/src/components/desktopUpdate.logic.test.ts:3:60:@t3tools
 ./apps/web/src/components/desktopUpdate.logic.ts:1:69:@t3tools
@@ -2902,7 +2823,7 @@
 ./apps/web/src/components/preview/PreviewEmptyState.test.tsx:1:32:@t3tools
 ./apps/web/src/components/preview/PreviewEmptyState.tsx:1:37:@t3tools
 ./apps/web/src/components/preview/PreviewMoreMenu.tsx:3:49:@t3tools
-./apps/web/src/components/preview/PreviewPanel.tsx:36:46:T3 Code
+./apps/web/src/components/preview/PreviewPanel.tsx:36:46:Fenix Code
 ./apps/web/src/components/preview/PreviewPanel.tsx:3:65:@t3tools
 ./apps/web/src/components/preview/PreviewPanelShell.tsx:11:42:t3code
 ./apps/web/src/components/preview/PreviewView.test.tsx:1:42:@t3tools
@@ -2954,40 +2875,40 @@
 ./apps/web/src/components/settings/AddProviderInstanceDialog.tsx:54:29:@t3tools
 ./apps/web/src/components/settings/ConnectionsSettings.logic.test.ts:1:59:@t3tools
 ./apps/web/src/components/settings/ConnectionsSettings.logic.ts:1:74:@t3tools
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1398:33:T3 Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1568:23:T3 Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1607:19:T3 Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1609:58:T3 Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1622:14:T3 Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1624:16:T3 Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1625:16:T3 Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1627:52:T3 Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1630:64:T3 Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1654:16:T3 Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1657:76:T3 Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1658:78:T3 Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1672:141:T3 Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1701:93:T3 Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:2868:164:T3 Code
-./apps/web/src/components/settings/ConnectionsSettings.tsx:3099:24:T3 Code
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1398:33:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1568:23:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1607:19:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1609:58:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1622:14:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1624:16:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1625:16:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1627:52:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1630:64:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1654:16:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1657:76:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1658:78:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1672:141:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1701:93:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:2868:164:Fenix Code
+./apps/web/src/components/settings/ConnectionsSettings.tsx:3099:24:Fenix Code
 ./apps/web/src/components/settings/ConnectionsSettings.tsx:30:9:@t3tools
-./apps/web/src/components/settings/ConnectionsSettings.tsx:3100:24:T3 Code
-./apps/web/src/components/settings/ConnectionsSettings.tsx:3158:26:T3 Code
-./apps/web/src/components/settings/ConnectionsSettings.tsx:3159:152:T3 Code
-./apps/web/src/components/settings/ConnectionsSettings.tsx:3161:26:T3 Code
-./apps/web/src/components/settings/ConnectionsSettings.tsx:3165:30:T3 Code
-./apps/web/src/components/settings/ConnectionsSettings.tsx:3166:30:T3 Code
+./apps/web/src/components/settings/ConnectionsSettings.tsx:3100:24:Fenix Code
+./apps/web/src/components/settings/ConnectionsSettings.tsx:3158:26:Fenix Code
+./apps/web/src/components/settings/ConnectionsSettings.tsx:3159:152:Fenix Code
+./apps/web/src/components/settings/ConnectionsSettings.tsx:3161:26:Fenix Code
+./apps/web/src/components/settings/ConnectionsSettings.tsx:3165:30:Fenix Code
+./apps/web/src/components/settings/ConnectionsSettings.tsx:3166:30:Fenix Code
 ./apps/web/src/components/settings/ConnectionsSettings.tsx:31:39:@t3tools
-./apps/web/src/components/settings/ConnectionsSettings.tsx:3252:19:T3 Code
-./apps/web/src/components/settings/ConnectionsSettings.tsx:3290:19:T3 Code
+./apps/web/src/components/settings/ConnectionsSettings.tsx:3252:19:Fenix Code
+./apps/web/src/components/settings/ConnectionsSettings.tsx:3290:19:Fenix Code
 ./apps/web/src/components/settings/ConnectionsSettings.tsx:35:9:@t3tools
 ./apps/web/src/components/settings/DiagnosticsSettings.tsx:14:9:@t3tools
 ./apps/web/src/components/settings/DiagnosticsSettings.tsx:20:9:@t3tools
 ./apps/web/src/components/settings/KeybindingsSettings.logic.test.ts:2:49:@t3tools
 ./apps/web/src/components/settings/KeybindingsSettings.logic.ts:11:9:@t3tools
 ./apps/web/src/components/settings/KeybindingsSettings.logic.ts:7:9:@t3tools
-./apps/web/src/components/settings/KeybindingsSettings.tsx:1287:67:T3 Code
-./apps/web/src/components/settings/KeybindingsSettings.tsx:261:9:T3 Code
+./apps/web/src/components/settings/KeybindingsSettings.tsx:1287:67:Fenix Code
+./apps/web/src/components/settings/KeybindingsSettings.tsx:261:9:Fenix Code
 ./apps/web/src/components/settings/KeybindingsSettings.tsx:29:9:@t3tools
 ./apps/web/src/components/settings/KeybindingsSettings.tsx:34:9:@t3tools
 ./apps/web/src/components/settings/ProviderInstanceCard.test.ts:2:43:@t3tools
@@ -3000,7 +2921,7 @@
 ./apps/web/src/components/settings/ProviderSettingsPanel.logic.test.ts:1:63:@t3tools
 ./apps/web/src/components/settings/ProviderSettingsPanel.logic.ts:1:50:@t3tools
 ./apps/web/src/components/settings/ProviderSettingsPanel.logic.ts:6:9:@t3tools
-./apps/web/src/components/settings/ProviderSettingsPanel.tsx:158:41:T3 Connect
+./apps/web/src/components/settings/ProviderSettingsPanel.tsx:158:41:Fenix Connect
 ./apps/web/src/components/settings/ProviderSettingsPanel.tsx:15:9:@t3tools
 ./apps/web/src/components/settings/ProviderSettingsPanel.tsx:16:43:@t3tools
 ./apps/web/src/components/settings/ProviderSettingsPanel.tsx:20:9:@t3tools
@@ -3030,15 +2951,15 @@
 ./apps/web/src/components/settings/SourceControlWritingSettings.tsx:4:43:@t3tools
 ./apps/web/src/components/settings/SourceControlWritingSettings.tsx:5:39:@t3tools
 ./apps/web/src/components/settings/SourceControlWritingSettings.tsx:6:59:@t3tools
-./apps/web/src/components/settings/ThemeEditorPanel.tsx:103:56:T3 Code
-./apps/web/src/components/settings/ThemeEditorPanel.tsx:861:20:T3 Code
-./apps/web/src/components/settings/ThemeImportDialog.tsx:508:42:T3 Code
-./apps/web/src/components/settings/ThemePreviewCircles.tsx:61:13:T3 Code
-./apps/web/src/components/settings/ThemeSettings.tsx:400:12:T3 Code
-./apps/web/src/components/settings/ThemeSettings.tsx:548:20:T3 Code
+./apps/web/src/components/settings/ThemeEditorPanel.tsx:103:56:Fenix Code
+./apps/web/src/components/settings/ThemeEditorPanel.tsx:861:20:Fenix Code
+./apps/web/src/components/settings/ThemeImportDialog.tsx:508:42:Fenix Code
+./apps/web/src/components/settings/ThemePreviewCircles.tsx:61:13:Fenix Code
+./apps/web/src/components/settings/ThemeSettings.tsx:400:12:Fenix Code
+./apps/web/src/components/settings/ThemeSettings.tsx:548:20:Fenix Code
 ./apps/web/src/components/settings/providerDriverMeta.ts:8:9:@t3tools
 ./apps/web/src/components/settings/providerStatus.ts:1:69:@t3tools
-./apps/web/src/components/settings/providerStatus.ts:42:90:T3 Code
+./apps/web/src/components/settings/providerStatus.ts:43:70:Fenix Code
 ./apps/web/src/components/sidebar/SidebarProviderUpdatePill.tsx:3:38:@t3tools
 ./apps/web/src/components/threadActionMenu.logic.ts:1:39:@t3tools
 ./apps/web/src/components/threadActionMenu.logic.ts:2:36:@t3tools
@@ -3067,10 +2988,10 @@
 ./apps/web/src/connection/onboarding.ts:5:9:@t3tools
 ./apps/web/src/connection/onboarding.ts:6:51:@t3tools
 ./apps/web/src/connection/platform.test.ts:7:9:@t3tools
-./apps/web/src/connection/platform.ts:120:23:T3 Code
-./apps/web/src/connection/platform.ts:120:43:T3 Code
-./apps/web/src/connection/platform.ts:185:33:T3 Connect
-./apps/web/src/connection/platform.ts:200:26:T3 Connect
+./apps/web/src/connection/platform.ts:120:23:Fenix Code
+./apps/web/src/connection/platform.ts:120:46:Fenix Code
+./apps/web/src/connection/platform.ts:185:33:Fenix Connect
+./apps/web/src/connection/platform.ts:200:26:Fenix Connect
 ./apps/web/src/connection/platform.ts:23:9:@t3tools
 ./apps/web/src/connection/platform.ts:24:47:@t3tools
 ./apps/web/src/connection/platform.ts:25:51:@t3tools
@@ -3276,9 +3197,9 @@
 ./apps/web/src/routes/__root.tsx:1:53:@t3tools
 ./apps/web/src/routes/__root.tsx:2:52:@t3tools
 ./apps/web/src/routes/__root.tsx:3:43:@t3tools
-./apps/web/src/routes/_chat.index.tsx:170:33:T3 Connect
+./apps/web/src/routes/_chat.index.tsx:170:33:Fenix Connect
 ./apps/web/src/routes/_chat.index.tsx:1:34:@t3tools
-./apps/web/src/routes/_chat.tsx:120:34:T3 Code
+./apps/web/src/routes/_chat.tsx:120:34:Fenix Code
 ./apps/web/src/rpc/requestLatencyState.test.ts:1:29:@t3tools
 ./apps/web/src/rpc/requestLatencyState.ts:2:29:@t3tools
 ./apps/web/src/rpc/transportError.ts:4:9:@t3tools
@@ -3367,18 +3288,18 @@
 ./apps/web/src/themeBoot.test.ts:354:10:t3code
 ./apps/web/src/themeBoot.test.ts:371:10:t3code
 ./apps/web/src/themeBoot.test.ts:387:10:t3code
-./apps/web/src/themePalette.test.ts:72:35:T3 Code
+./apps/web/src/themePalette.test.ts:72:35:Fenix Code
 ./apps/web/src/themePalette.ts:14:43:t3code
 ./apps/web/src/themePalette.ts:15:49:t3code
 ./apps/web/src/themePalette.ts:16:51:t3code
 ./apps/web/src/themePalette.ts:17:42:t3code
-./apps/web/src/themePalette.ts:330:6:T3 Code
-./apps/web/src/themePalette.ts:375:60:T3 Code
-./apps/web/src/themePalette.ts:398:6:T3 Code
-./apps/web/src/themePalette.ts:444:61:T3 Code
-./apps/web/src/themePalette.ts:470:16:T3 Code
-./apps/web/src/themePalette.ts:597:17:T3 Code
-./apps/web/src/themePalette.ts:815:22:T3 Code
+./apps/web/src/themePalette.ts:330:6:Fenix Code
+./apps/web/src/themePalette.ts:375:60:Fenix Code
+./apps/web/src/themePalette.ts:398:6:Fenix Code
+./apps/web/src/themePalette.ts:444:61:Fenix Code
+./apps/web/src/themePalette.ts:470:16:Fenix Code
+./apps/web/src/themePalette.ts:597:17:Fenix Code
+./apps/web/src/themePalette.ts:815:22:Fenix Code
 ./apps/web/src/threadRoutes.test.ts:2:33:@t3tools
 ./apps/web/src/threadRoutes.test.ts:3:27:@t3tools
 ./apps/web/src/threadRoutes.ts:1:33:@t3tools
@@ -3399,14 +3320,14 @@
 ./apps/web/src/usage/usageFormat.ts:6:51:@t3tools
 ./apps/web/src/usage/usageMerge.test.ts:8:9:@t3tools
 ./apps/web/src/usage/usageMerge.ts:15:9:@t3tools
-./apps/web/src/versionSkew.test.ts:104:41:T3 Code
+./apps/web/src/versionSkew.test.ts:104:41:Fenix Code
 ./apps/web/src/versionSkew.test.ts:1:32:@t3tools
-./apps/web/src/versionSkew.test.ts:25:78:T3 Code
-./apps/web/src/versionSkew.test.ts:77:93:T3 Code
+./apps/web/src/versionSkew.test.ts:25:78:Fenix Code
+./apps/web/src/versionSkew.test.ts:77:93:Fenix Code
 ./apps/web/src/versionSkew.ts:13:57:t3code
 ./apps/web/src/versionSkew.ts:1:79:@t3tools
-./apps/web/src/versionSkew.ts:42:76:T3 Code
-./apps/web/src/versionSkew.ts:76:48:T3 Code
+./apps/web/src/versionSkew.ts:42:76:Fenix Code
+./apps/web/src/versionSkew.ts:76:48:Fenix Code
 ./apps/web/src/vite-env.d.ts:3:37:@t3tools
 ./apps/web/src/worktreeCleanup.test.ts:100:26:t3code
 ./apps/web/src/worktreeCleanup.test.ts:1:73:@t3tools
@@ -3432,40 +3353,35 @@
 ./apps/web/vite.config.ts:62:51:T3CODE
 ./apps/web/vite.config.ts:63:35:T3CODE
 ./apps/web/vite.config.ts:92:6:T3CODE
-./docs/README.md:19:15:T3 Code
-./docs/README.md:1:3:T3 Code
-./docs/README.md:34:4:T3 Connect
-./docs/README.md:3:10:T3 Code
-./docs/fenix/branding-inventory.md:104:9:T3 Connect
 ./docs/fenix/branding-inventory.md:139:1:T3 Tools
+./docs/fenix/branding-inventory.md:162:43:@t3tools
+./docs/fenix/branding-inventory.md:1:3:Fenix Code
 ./docs/fenix/branding-inventory.md:24:14:T3CODE
 ./docs/fenix/branding-inventory.md:4:27:t3code
-./docs/fenix/branding-inventory.md:54:10:T3 Code
+./docs/fenix/branding-inventory.md:53:44:Fenix Code
 ./docs/fenix/branding-inventory.md:5:21:t3code
 ./docs/fenix/branding-inventory.md:86:3:T3CODE
-./docs/fenix/f0-bootstrap.md:32:17:T3 Code
+./docs/fenix/f0-4-local-builds-byos-report-20260808.md:13:29:t3code
+./docs/fenix/f0-4-local-builds-byos-report-20260808.md:23:41:@t3tools
+./docs/fenix/f0-bootstrap.md:1:3:Fenix Code
 ./docs/fenix/f0-bootstrap.md:7:56:t3code
 ./docs/fenix/f0-bootstrap.md:8:69:t3code
+./docs/fenix/f0-branding-layer.md:14:26:Fenix Code
 ./docs/fenix/f0-branding-layer.md:17:65:t3code
-./docs/fenix/f0-branding-layer.md:21:26:T3 Code
-./docs/fenix/f0-branding-layer.md:21:4:T3 Code
+./docs/fenix/f0-branding-layer.md:1:3:Fenix Code
 ./docs/fenix/f0-branding-layer.md:48:28:@t3tools
 ./docs/fenix/f0-branding-layer.md:48:42:T3CODE
-./docs/internals/ci.md:3:26:T3 Code
-./docs/internals/connection-runtime.md:3:26:T3 Code
-./docs/internals/environment-auth.md:3:26:T3 Code
-./docs/internals/glossary.md:3:26:T3 Code
-./docs/internals/glossary.md:5:31:T3 Code
-./docs/internals/overview.md:3:26:T3 Code
-./docs/internals/overview.md:5:1:T3 Code
-./docs/internals/providers.md:3:26:T3 Code
-./docs/internals/providers.md:5:60:T3 Code
+./docs/fenix/f0-final-visible-rebrand-report-20260808.md:13:51:Fenix Code
+./docs/fenix/f0-final-visible-rebrand-report-20260808.md:13:65:Fenix Connect
+./docs/fenix/f0-final-visible-rebrand-report-20260808.md:15:140:Fenix Code
+./docs/fenix/f0-final-visible-rebrand-report-20260808.md:16:64:Fenix Code
+./docs/fenix/f0-final-visible-rebrand-report-20260808.md:26:4:@t3tools
+./docs/fenix/f0-final-visible-rebrand-report-20260808.md:28:4:T3CODE
+./docs/fenix/f0-final-visible-rebrand-report-20260808.md:5:27:t3code
+./docs/fenix/f0-final-visible-rebrand-report-20260808.md:94:22:Fenix Code
+./docs/fenix/f0-final-visible-rebrand-report-20260808.md:95:23:Fenix Code
 ./docs/internals/remote.md:100:39:@t3tools
-./docs/internals/remote.md:145:9:T3 Connect
-./docs/internals/remote.md:3:26:T3 Code
-./docs/internals/remote.md:57:39:T3 Connect
 ./docs/internals/resource-telemetry.md:228:5:T3CODE
-./docs/internals/resource-telemetry.md:3:26:T3 Code
 ./docs/internals/scripts.md:110:13:T3CODE
 ./docs/internals/scripts.md:114:5:T3CODE
 ./docs/internals/scripts.md:115:5:T3CODE
@@ -3474,28 +3390,17 @@
 ./docs/internals/scripts.md:31:4:T3CODE
 ./docs/internals/scripts.md:31:58:T3CODE
 ./docs/internals/scripts.md:39:31:t3code
-./docs/internals/scripts.md:3:26:T3 Code
 ./docs/internals/scripts.md:44:9:T3CODE
 ./docs/internals/scripts.md:54:72:t3code
-./docs/internals/scripts.md:7:1:T3 Code
 ./docs/internals/scripts.md:81:60:t3code
 ./docs/internals/scripts.md:89:37:T3CODE
 ./docs/internals/scripts.md:90:4:T3CODE
 ./docs/internals/scripts.md:91:42:T3CODE
 ./docs/internals/scripts.md:91:4:T3CODE
-./docs/internals/server-updates.md:3:26:T3 Code
 ./docs/internals/t3-code-connect-auth-flow.html:1013:59:t3code
 ./docs/internals/t3-code-connect-auth-flow.html:1050:32:T3CODE
 ./docs/internals/t3-code-connect-auth-flow.html:1050:63:T3CODE
 ./docs/internals/t3-code-connect-auth-flow.html:1051:27:T3CODE
-./docs/internals/t3-code-connect-auth-flow.html:256:13:T3 Connect
-./docs/internals/t3-code-connect-auth-flow.html:258:11:T3 Connect
-./docs/internals/t3-code-connect-auth-flow.html:282:39:T3 Connect
-./docs/internals/t3-code-connect-auth-flow.html:356:19:T3 Code
-./docs/internals/t3-code-connect-auth-flow.html:550:17:T3 Connect
-./docs/internals/t3-code-connect-auth-flow.html:6:12:T3 Connect
-./docs/internals/t3-code-connect-auth-flow.html:956:50:T3 Connect
-./docs/internals/t3-code-connect-auth-flow.html:966:57:T3 Connect
 ./docs/internals/t3-connect.md:13:2:t3-code
 ./docs/internals/t3-connect.md:13:36:t3-code
 ./docs/internals/t3-connect.md:145:24:t3-code
@@ -3509,11 +3414,9 @@
 ./docs/internals/t3-connect.md:166:34:t3code
 ./docs/internals/t3-connect.md:167:2:t3code
 ./docs/internals/t3-connect.md:177:28:t3code
-./docs/internals/t3-connect.md:17:1:T3 Connect
 ./docs/internals/t3-connect.md:185:48:t3code
 ./docs/internals/t3-connect.md:187:53:t3code
 ./docs/internals/t3-connect.md:194:58:t3code
-./docs/internals/t3-connect.md:1:3:T3 Connect
 ./docs/internals/t3-connect.md:201:1:T3CODE
 ./docs/internals/t3-connect.md:202:1:T3CODE
 ./docs/internals/t3-connect.md:202:53:t3code
@@ -3522,22 +3425,14 @@
 ./docs/internals/t3-connect.md:208:2:T3CODE
 ./docs/internals/t3-connect.md:214:58:T3CODE
 ./docs/internals/t3-connect.md:223:1:T3CODE
-./docs/internals/t3-connect.md:224:18:T3 Code
-./docs/internals/t3-connect.md:224:53:T3 Code
-./docs/internals/t3-connect.md:233:50:T3 Code
-./docs/internals/t3-connect.md:234:46:T3 Code
-./docs/internals/t3-connect.md:242:24:T3 Connect
-./docs/internals/t3-connect.md:244:14:T3 Connect
 ./docs/internals/t3-connect.md:29:1:T3CODE
 ./docs/internals/t3-connect.md:30:1:T3CODE
 ./docs/internals/t3-connect.md:31:1:T3CODE
 ./docs/internals/t3-connect.md:32:1:T3CODE
-./docs/internals/t3-connect.md:3:26:T3 Code
 ./docs/internals/t3-connect.md:49:13:T3CODE
 ./docs/internals/t3-connect.md:49:45:T3CODE
 ./docs/internals/t3-connect.md:50:2:T3CODE
 ./docs/internals/t3-connect.md:50:42:T3CODE
-./docs/internals/t3-connect.md:5:1:T3 Connect
 ./docs/internals/t3-connect.md:64:18:t3code
 ./docs/internals/t3-connect.md:7:2:t3-code
 ./docs/internals/t3-connect.md:87:14:T3CODE
@@ -3553,9 +3448,7 @@
 ./docs/internals/workspace-layout.md:28:31:@t3tools
 ./docs/internals/workspace-layout.md:31:20:@t3tools
 ./docs/internals/workspace-layout.md:33:26:@t3tools
-./docs/internals/workspace-layout.md:3:26:T3 Code
 ./docs/internals/workspace-layout.md:42:19:t3code
-./docs/internals/workspace-layout.md:42:46:T3 Connect
 ./docs/internals/workspace-layout.md:53:18:t3code
 ./docs/internals/workspace-layout.md:59:24:@t3tools
 ./docs/internals/workspace-layout.md:59:2:@t3tools
@@ -3563,11 +3456,6 @@
 ./docs/internals/workspace-layout.md:61:2:@t3tools
 ./docs/internals/workspace-layout.md:62:30:@t3tools
 ./docs/operations/mobile-app-store-screenshots.md:137:16:@t3tools
-./docs/operations/mobile-app-store-screenshots.md:13:51:T3 Connect
-./docs/operations/mobile-app-store-screenshots.md:163:74:T3 Code
-./docs/operations/mobile-app-store-screenshots.md:26:12:T3 Code
-./docs/operations/mobile-app-store-screenshots.md:27:24:T3 Code
-./docs/operations/mobile-app-store-screenshots.md:3:26:T3 Code
 ./docs/operations/observability.md:116:8:T3CODE
 ./docs/operations/observability.md:117:8:T3CODE
 ./docs/operations/observability.md:118:8:T3CODE
@@ -3577,14 +3465,11 @@
 ./docs/operations/observability.md:155:1:T3CODE
 ./docs/operations/observability.md:156:1:T3CODE
 ./docs/operations/observability.md:157:1:T3CODE
-./docs/operations/observability.md:158:16:T3 Code
-./docs/operations/observability.md:158:43:T3 Code
 ./docs/operations/observability.md:164:1:T3CODE
 ./docs/operations/observability.md:165:1:T3CODE
 ./docs/operations/observability.md:166:1:T3CODE
 ./docs/operations/observability.md:186:15:T3CODE
 ./docs/operations/observability.md:388:4:T3CODE
-./docs/operations/observability.md:3:26:T3 Code
 ./docs/operations/observability.md:512:4:T3CODE
 ./docs/operations/observability.md:513:4:T3CODE
 ./docs/operations/observability.md:514:4:T3CODE
@@ -3595,13 +3480,11 @@
 ./docs/operations/observability.md:522:4:T3CODE
 ./docs/operations/observability.md:523:4:T3CODE
 ./docs/operations/observability.md:524:4:T3CODE
-./docs/operations/observability.md:5:1:T3 Code
 ./docs/operations/relay-observability.md:10:4:t3-code
 ./docs/operations/relay-observability.md:11:4:t3-code
 ./docs/operations/relay-observability.md:12:4:t3-code
 ./docs/operations/relay-observability.md:15:2:t3-code
 ./docs/operations/relay-observability.md:32:3:t3-code
-./docs/operations/relay-observability.md:3:26:T3 Code
 ./docs/operations/relay-observability.md:7:4:t3-code
 ./docs/operations/relay-observability.md:9:4:t3-code
 ./docs/operations/release.md:102:17:t3code
@@ -3612,106 +3495,21 @@
 ./docs/operations/release.md:133:5:t3code
 ./docs/operations/release.md:134:2:t3code
 ./docs/operations/release.md:143:13:t3code
-./docs/operations/release.md:15:31:T3 Connect
 ./docs/operations/release.md:207:6:T3CODE
 ./docs/operations/release.md:279:47:t3code
-./docs/operations/release.md:292:54:T3 Connect
 ./docs/operations/release.md:346:76:t3code
-./docs/operations/release.md:3:26:T3 Code
-./docs/operations/release.md:47:4:T3 Connect
-./docs/user/background-service.md:1:11:T3 Code
-./docs/user/background-service.md:32:19:T3 Code
-./docs/user/background-service.md:35:54:T3 Code
-./docs/user/background-service.md:3:18:T3 Code
-./docs/user/background-service.md:41:18:T3 Connect
-./docs/user/background-service.md:43:1:T3 Connect
-./docs/user/background-service.md:44:59:T3 Connect
-./docs/user/background-service.md:46:16:T3 Connect
-./docs/user/background-service.md:47:6:T3 Code
-./docs/user/background-service.md:8:28:T3 Code
-./docs/user/install.md:17:17:T3 Code
-./docs/user/install.md:1:11:T3 Code
 ./docs/user/install.md:23:48:t3code
 ./docs/user/install.md:29:24:T3Code
 ./docs/user/install.md:35:21:t3-code
-./docs/user/install.md:3:1:T3 Code
 ./docs/user/install.md:41:8:t3code
-./docs/user/install.md:46:1:T3 Code
-./docs/user/install.md:58:1:T3 Code
-./docs/user/install.md:60:50:T3 Code
-./docs/user/install.md:68:9:T3 Code
-./docs/user/install.md:73:1:T3 Code
-./docs/user/install.md:73:26:T3 Code
-./docs/user/install.md:7:68:T3 Code
-./docs/user/install.md:81:55:T3 Code
-./docs/user/install.md:83:12:T3 Code
-./docs/user/keybindings.md:7:44:T3 Code
-./docs/user/providers-claude.md:108:34:T3 Code
-./docs/user/providers-claude.md:124:43:T3 Code
-./docs/user/providers-claude.md:183:1:T3 Code
-./docs/user/providers-claude.md:23:4:T3 Code
-./docs/user/providers-claude.md:31:41:T3 Code
-./docs/user/providers-claude.md:33:26:T3 Code
-./docs/user/providers-claude.md:3:72:T3 Code
-./docs/user/providers-claude.md:4:67:T3 Code
-./docs/user/providers-claude.md:56:4:T3 Code
-./docs/user/providers-claude.md:74:55:T3 Code
-./docs/user/providers-claude.md:76:37:T3 Code
-./docs/user/providers-claude.md:91:1:T3 Code
-./docs/user/providers-claude.md:95:47:T3 Code
-./docs/user/providers-codex.md:117:82:T3 Code
-./docs/user/providers-codex.md:3:73:T3 Code
-./docs/user/providers-codex.md:4:69:T3 Code
-./docs/user/providers-codex.md:58:4:T3 Code
-./docs/user/providers-codex.md:75:4:T3 Code
-./docs/user/providers-codex.md:90:1:T3 Code
-./docs/user/remote-access.md:127:58:T3 Code
-./docs/user/remote-access.md:143:57:T3 Code
-./docs/user/remote-access.md:149:20:T3 Code
-./docs/user/remote-access.md:154:213:T3 Code
-./docs/user/remote-access.md:172:10:T3 Code
-./docs/user/remote-access.md:173:90:T3 Code
-./docs/user/remote-access.md:178:14:T3 Code
-./docs/user/remote-access.md:181:33:T3 Code
-./docs/user/remote-access.md:207:47:T3 Code
-./docs/user/remote-access.md:38:68:T3 Code
-./docs/user/remote-access.md:3:40:T3 Code
-./docs/user/source-control.md:101:49:T3 Code
-./docs/user/source-control.md:123:25:T3 Code
-./docs/user/source-control.md:125:73:T3 Code
-./docs/user/source-control.md:35:3:T3 Code
-./docs/user/source-control.md:3:1:T3 Code
-./docs/user/source-control.md:58:50:T3 Code
-./docs/user/source-control.md:66:44:T3 Code
-./docs/user/source-control.md:7:1:T3 Code
-./docs/user/source-control.md:85:17:T3 Code
 ./docs/user/source-control.md:90:8:T3CODE
 ./docs/user/source-control.md:97:8:T3CODE
 ./docs/user/source-control.md:98:8:T3CODE
-./docs/user/thread-sidebar.md:11:62:T3 Code
-./docs/user/updating.md:1:11:T3 Code
-./docs/user/updating.md:27:112:T3 Code
-./docs/user/updating.md:27:50:T3 Code
-./docs/user/updating.md:28:41:T3 Code
-./docs/user/updating.md:29:106:T3 Code
-./docs/user/updating.md:31:62:T3 Code
-./docs/user/updating.md:3:5:T3 Code
-./docs/user/updating.md:46:35:T3 Code
-./docs/user/updating.md:4:32:T3 Code
-./docs/user/updating.md:57:14:T3 Code
 ./experiments/messages-glass-lab/MessagesGlassLab/ContentView.swift:14:56:t3code
 ./experiments/messages-glass-lab/MessagesGlassLab/ContentView.swift:19:59:t3code
 ./infra/relay/.env.example:17:20:t3-code
-./infra/relay/README.md:10:59:T3 Code
-./infra/relay/README.md:12:10:T3 Connect
 ./infra/relay/README.md:12:65:t3-code
-./infra/relay/README.md:162:4:T3 Connect
-./infra/relay/README.md:165:4:T3 Connect
 ./infra/relay/README.md:165:59:t3-code
-./infra/relay/README.md:19:11:T3 Code
-./infra/relay/README.md:1:3:T3 Connect
-./infra/relay/README.md:4:14:T3 Connect
-./infra/relay/README.md:6:43:T3 Connect
 ./infra/relay/README.md:82:17:t3code
 ./infra/relay/README.md:98:17:t3code
 ./infra/relay/README.md:99:17:t3code
@@ -3770,19 +3568,18 @@
 ./infra/relay/scripts/deploy.ts:174:5:T3CODE
 ./infra/relay/scripts/deploy.ts:175:5:T3CODE
 ./infra/relay/scripts/deploy.ts:343:53:T3Code
-./infra/relay/scripts/deploy.ts:493:44:T3 Code
 ./infra/relay/src/Config.ts:31:6:t3code
 ./infra/relay/src/agentActivity/AgentActivityPublisher.test.ts:1:68:@t3tools
-./infra/relay/src/agentActivity/AgentActivityPublisher.ts:221:13:T3 Code
-./infra/relay/src/agentActivity/AgentActivityPublisher.ts:273:15:T3 Code
-./infra/relay/src/agentActivity/AgentActivityPublisher.ts:294:13:T3 Code
+./infra/relay/src/agentActivity/AgentActivityPublisher.ts:221:13:Fenix Code
+./infra/relay/src/agentActivity/AgentActivityPublisher.ts:273:15:Fenix Code
+./infra/relay/src/agentActivity/AgentActivityPublisher.ts:294:13:Fenix Code
 ./infra/relay/src/agentActivity/AgentActivityPublisher.ts:48:6:t3code
 ./infra/relay/src/agentActivity/AgentActivityPublisher.ts:6:9:@t3tools
 ./infra/relay/src/agentActivity/AgentActivityRows.test.ts:1:47:@t3tools
 ./infra/relay/src/agentActivity/AgentActivityRows.ts:1:47:@t3tools
 ./infra/relay/src/agentActivity/AgentActivityRows.ts:2:75:@t3tools
 ./infra/relay/src/agentActivity/AgentActivityRows.ts:92:6:t3code
-./infra/relay/src/agentActivity/ApnsClient.test.ts:35:13:T3 Code
+./infra/relay/src/agentActivity/ApnsClient.test.ts:35:13:Fenix Code
 ./infra/relay/src/agentActivity/ApnsClient.test.ts:3:42:@t3tools
 ./infra/relay/src/agentActivity/ApnsClient.test.ts:4:56:@t3tools
 ./infra/relay/src/agentActivity/ApnsClient.ts:1:56:@t3tools
@@ -3794,7 +3591,7 @@
 ./infra/relay/src/agentActivity/ApnsDeliveries.test.ts:46:22:t3-code
 ./infra/relay/src/agentActivity/ApnsDeliveries.test.ts:479:22:t3code
 ./infra/relay/src/agentActivity/ApnsDeliveries.test.ts:4:9:@t3tools
-./infra/relay/src/agentActivity/ApnsDeliveries.test.ts:80:11:T3 Code
+./infra/relay/src/agentActivity/ApnsDeliveries.test.ts:80:11:Fenix Code
 ./infra/relay/src/agentActivity/ApnsDeliveries.ts:11:9:@t3tools
 ./infra/relay/src/agentActivity/ApnsDeliveries.ts:693:6:t3code
 ./infra/relay/src/agentActivity/ApnsDeliveries.ts:6:9:@t3tools
@@ -3809,7 +3606,7 @@
 ./infra/relay/src/agentActivity/Devices.test.ts:1:54:@t3tools
 ./infra/relay/src/agentActivity/Devices.ts:4:9:@t3tools
 ./infra/relay/src/agentActivity/Devices.ts:71:6:t3code
-./infra/relay/src/agentActivity/LiveActivities.test.ts:16:11:T3 Code
+./infra/relay/src/agentActivity/LiveActivities.test.ts:16:11:Fenix Code
 ./infra/relay/src/agentActivity/LiveActivities.test.ts:4:9:@t3tools
 ./infra/relay/src/agentActivity/LiveActivities.ts:123:6:t3code
 ./infra/relay/src/agentActivity/LiveActivities.ts:5:9:@t3tools
@@ -3819,7 +3616,7 @@
 ./infra/relay/src/agentActivity/MobileRegistrations.ts:41:6:t3code
 ./infra/relay/src/agentActivity/MobileRegistrations.ts:5:9:@t3tools
 ./infra/relay/src/agentActivity/agentActivityPayloads.ts:5:9:@t3tools
-./infra/relay/src/agentActivity/apnsDeliveryJobs.test.ts:14:11:T3 Code
+./infra/relay/src/agentActivity/apnsDeliveryJobs.test.ts:14:11:Fenix Code
 ./infra/relay/src/agentActivity/apnsDeliveryJobs.test.ts:2:42:@t3tools
 ./infra/relay/src/agentActivity/apnsDeliveryJobs.test.ts:3:56:@t3tools
 ./infra/relay/src/agentActivity/apnsDeliveryJobs.ts:7:9:@t3tools
@@ -3898,10 +3695,10 @@
 ./infra/relay/src/http/Api.ts:52:39:@t3tools
 ./infra/relay/src/observability.ts:225:23:t3-code
 ./infra/relay/src/observability.ts:30:38:t3-code
-./infra/relay/src/observability.ts:32:19:T3 Code
+./infra/relay/src/observability.ts:32:19:Fenix Code
 ./infra/relay/src/observability.ts:38:38:t3-code
 ./infra/relay/src/observability.ts:46:38:t3-code
-./infra/relay/src/observability.ts:47:66:T3 Code
+./infra/relay/src/observability.ts:47:66:Fenix Code
 ./infra/relay/src/observability.ts:54:38:t3-code
 ./infra/relay/src/observability.ts:62:38:t3-code
 ./infra/relay/src/persistence/schema.ts:5:9:@t3tools
@@ -3935,10 +3732,10 @@
 ./packages/client-runtime/package.json:152:6:@t3tools
 ./packages/client-runtime/package.json:153:6:@t3tools
 ./packages/client-runtime/package.json:2:12:@t3tools
-./packages/client-runtime/src/authorization/layer.test.ts:134:23:T3 Code
+./packages/client-runtime/src/authorization/layer.test.ts:134:23:Fenix Code
 ./packages/client-runtime/src/authorization/layer.test.ts:1:58:@t3tools
-./packages/client-runtime/src/authorization/remote.test.ts:150:19:T3 Code
-./packages/client-runtime/src/authorization/remote.test.ts:198:19:T3 Code
+./packages/client-runtime/src/authorization/remote.test.ts:150:19:Fenix Code
+./packages/client-runtime/src/authorization/remote.test.ts:198:19:Fenix Code
 ./packages/client-runtime/src/authorization/remote.test.ts:8:46:@t3tools
 ./packages/client-runtime/src/authorization/remote.ts:7:9:@t3tools
 ./packages/client-runtime/src/authorization/remote.ts:8:35:@t3tools
@@ -3956,9 +3753,9 @@
 ./packages/client-runtime/src/connection/errors.ts:1:37:@t3tools
 ./packages/client-runtime/src/connection/errors.ts:2:43:@t3tools
 ./packages/client-runtime/src/connection/model.ts:1:32:@t3tools
-./packages/client-runtime/src/connection/onboarding.test.ts:117:53:T3 Code
+./packages/client-runtime/src/connection/onboarding.test.ts:117:53:Fenix Code
 ./packages/client-runtime/src/connection/onboarding.test.ts:1:58:@t3tools
-./packages/client-runtime/src/connection/onboarding.test.ts:21:15:T3 Code
+./packages/client-runtime/src/connection/onboarding.test.ts:21:15:Fenix Code
 ./packages/client-runtime/src/connection/onboarding.ts:1:66:@t3tools
 ./packages/client-runtime/src/connection/onboarding.ts:2:45:@t3tools
 ./packages/client-runtime/src/connection/onboarding.ts:71:6:@t3tools
@@ -4017,10 +3814,6 @@
 ./packages/client-runtime/src/relay/managedRelay.ts:35:42:@t3tools
 ./packages/client-runtime/src/relay/managedRelayState.test.ts:1:32:@t3tools
 ./packages/client-runtime/src/relay/managedRelayState.test.ts:6:9:@t3tools
-./packages/client-runtime/src/relay/managedRelayState.ts:126:44:T3 Connect
-./packages/client-runtime/src/relay/managedRelayState.ts:184:29:T3 Connect
-./packages/client-runtime/src/relay/managedRelayState.ts:229:30:T3 Connect
-./packages/client-runtime/src/relay/managedRelayState.ts:299:70:T3 Connect
 ./packages/client-runtime/src/relay/managedRelayState.ts:4:9:@t3tools
 ./packages/client-runtime/src/relay/managedRelayState.ts:8:9:@t3tools
 ./packages/client-runtime/src/relay/managedRelayState.ts:9:33:@t3tools
@@ -4075,7 +3868,7 @@
 ./packages/client-runtime/src/state/projectGrouping.test.ts:185:51:t3code
 ./packages/client-runtime/src/state/projectGrouping.test.ts:1:43:@t3tools
 ./packages/client-runtime/src/state/projectGrouping.test.ts:21:10:t3code
-./packages/client-runtime/src/state/projectGrouping.test.ts:22:17:T3 Code
+./packages/client-runtime/src/state/projectGrouping.test.ts:22:17:Fenix Code
 ./packages/client-runtime/src/state/projectGrouping.test.ts:57:20:t3code
 ./packages/client-runtime/src/state/projectGrouping.test.ts:57:36:t3code
 ./packages/client-runtime/src/state/projectGrouping.test.ts:58:20:t3code
@@ -4136,7 +3929,7 @@
 ./packages/client-runtime/src/state/threadDetail.ts:10:9:@t3tools
 ./packages/client-runtime/src/state/threadReducer.test.ts:12:9:@t3tools
 ./packages/client-runtime/src/state/threadReducer.test.ts:13:43:@t3tools
-./packages/client-runtime/src/state/threadReducer.test.ts:60:19:T3 Code
+./packages/client-runtime/src/state/threadReducer.test.ts:60:19:Fenix Code
 ./packages/client-runtime/src/state/threadReducer.ts:14:9:@t3tools
 ./packages/client-runtime/src/state/threadSearch.test.ts:6:9:@t3tools
 ./packages/client-runtime/src/state/threadSearch.ts:6:9:@t3tools
@@ -4165,25 +3958,25 @@
 ./packages/client-runtime/src/state/vcsRefInvalidation.ts:1:37:@t3tools
 ./packages/client-runtime/src/state/vcsStatus.ts:1:37:@t3tools
 ./packages/contracts/package.json:2:12:@t3tools
-./packages/contracts/src/environment.ts:31:28:T3 Code
+./packages/contracts/src/environment.ts:31:28:Fenix Code
 ./packages/contracts/src/environmentHttp.ts:316:6:@t3tools
 ./packages/contracts/src/ipc.ts:606:16:t3code
 ./packages/contracts/src/orchestration.test.ts:283:20:t3code
-./packages/contracts/src/relay.ts:1083:29:T3 Code
+./packages/contracts/src/relay.ts:1083:29:Fenix Code
 ./packages/contracts/src/relay.ts:566:6:@t3tools
 ./packages/contracts/src/relay.ts:574:6:@t3tools
-./packages/contracts/src/relay.ts:579:60:T3 Connect
-./packages/contracts/src/settings.ts:442:42:T3 Code
-./packages/contracts/src/t3ProjectFile.ts:28:61:T3 Code
-./packages/contracts/src/t3ProjectFile.ts:31:47:T3 Code
-./packages/contracts/src/t3ProjectFile.ts:57:68:T3 Code
-./packages/contracts/src/t3ProjectFile.ts:71:97:T3 Code
-./packages/contracts/src/t3ProjectFile.ts:79:89:T3 Code
-./packages/contracts/src/t3ProjectFile.ts:86:43:T3 Code
+./packages/contracts/src/relay.ts:579:60:Fenix Connect
+./packages/contracts/src/settings.ts:442:42:Fenix Code
+./packages/contracts/src/t3ProjectFile.ts:28:61:Fenix Code
+./packages/contracts/src/t3ProjectFile.ts:31:47:Fenix Code
+./packages/contracts/src/t3ProjectFile.ts:57:68:Fenix Code
+./packages/contracts/src/t3ProjectFile.ts:71:97:Fenix Code
+./packages/contracts/src/t3ProjectFile.ts:80:78:Fenix Code
+./packages/contracts/src/t3ProjectFile.ts:87:43:Fenix Code
 ./packages/contracts/src/terminal.test.ts:87:9:T3CODE
 ./packages/contracts/src/terminal.test.ts:92:7:T3CODE
-./packages/contracts/src/usage.ts:6:15:T3 Code
-./packages/contracts/src/usage.ts:7:50:T3 Code
+./packages/contracts/src/usage.ts:6:15:Fenix Code
+./packages/contracts/src/usage.ts:7:50:Fenix Code
 ./packages/effect-codex-app-server/test/fixtures/codex-app-server-mock-peer.ts:39:35:t3code
 ./packages/shared/package.json:222:6:@t3tools
 ./packages/shared/package.json:2:12:@t3tools
@@ -4194,8 +3987,8 @@
 ./packages/shared/src/agentAwareness.test.ts:9:9:@t3tools
 ./packages/shared/src/agentAwareness.ts:6:9:@t3tools
 ./packages/shared/src/backgroundActivitySettings.ts:8:9:@t3tools
-./packages/shared/src/connectAuth.ts:108:39:T3 Connect
-./packages/shared/src/devHome.ts:3:36:T3 Code
+./packages/shared/src/connectAuth.ts:108:39:Fenix Connect
+./packages/shared/src/devHome.ts:3:36:Fenix Code
 ./packages/shared/src/devHome.ts:7:5:T3CODE
 ./packages/shared/src/git.test.ts:15:58:T3Code
 ./packages/shared/src/git.test.ts:16:27:t3code
@@ -4231,7 +4024,7 @@
 ./packages/shared/src/previewViewport.ts:6:46:@t3tools
 ./packages/shared/src/productBranding.ts:17:58:t3code
 ./packages/shared/src/productBranding.ts:18:59:t3code
-./packages/shared/src/productBranding.ts:2:42:T3 Code
+./packages/shared/src/productBranding.ts:1:35:Fenix Code
 ./packages/shared/src/productBranding.ts:4:72:t3code
 ./packages/shared/src/productBranding.ts:5:78:t3code
 ./packages/shared/src/projectScripts.ts:1:37:@t3tools
@@ -4240,7 +4033,7 @@
 ./packages/shared/src/relayClient.test.ts:84:32:T3CODE
 ./packages/shared/src/relayClient.ts:135:4:@t3tools
 ./packages/shared/src/relayClient.ts:23:43:T3CODE
-./packages/shared/src/relayClient.ts:371:19:T3 Code
+./packages/shared/src/relayClient.ts:371:19:Fenix Code
 ./packages/shared/src/relayClient.ts:5:9:@t3tools
 ./packages/shared/src/relayTracing.ts:26:4:@t3tools
 ./packages/shared/src/schemaYaml.test.ts:17:27:t3code
@@ -4305,10 +4098,6 @@
 ./packages/ssh/src/auth.ts:203:83:t3code
 ./packages/ssh/src/auth.ts:45:4:@t3tools
 ./packages/ssh/src/auth.ts:63:31:t3code
-./packages/ssh/src/auth.ts:75:39:T3 Code
-./packages/ssh/src/auth.ts:82:9:T3 Code
-./packages/ssh/src/auth.ts:90:104:T3 Code
-./packages/ssh/src/auth.ts:98:29:T3 Code
 ./packages/ssh/src/command.ts:3:73:@t3tools
 ./packages/ssh/src/command.ts:4:38:@t3tools
 ./packages/ssh/src/config.ts:1:48:@t3tools
@@ -4324,7 +4113,7 @@
 ./packages/tailscale/package.json:2:12:@t3tools
 ./packages/tailscale/src/tailscale.ts:1:38:@t3tools
 ./pnpm-workspace.yaml:4:19:t3code
-./scripts/announce-connect-ga.ts:211:53:T3 Connect
+./scripts/announce-connect-ga.ts:211:53:Fenix Connect
 ./scripts/build-desktop-artifact.test.ts:124:17:T3CODE
 ./scripts/build-desktop-artifact.test.ts:124:62:t3code
 ./scripts/build-desktop-artifact.test.ts:135:47:t3code
@@ -4334,6 +4123,8 @@
 ./scripts/build-desktop-artifact.test.ts:164:12:@t3tools
 ./scripts/build-desktop-artifact.test.ts:165:12:@t3tools
 ./scripts/build-desktop-artifact.test.ts:166:12:@t3tools
+./scripts/build-desktop-artifact.test.ts:353:38:Fenix Code
+./scripts/build-desktop-artifact.test.ts:364:18:Fenix Code
 ./scripts/build-desktop-artifact.test.ts:416:7:T3CODE
 ./scripts/build-desktop-artifact.test.ts:417:48:t3code
 ./scripts/build-desktop-artifact.test.ts:417:7:T3CODE
@@ -4362,11 +4153,14 @@
 ./scripts/build-desktop-artifact.test.ts:502:55:T3CODE
 ./scripts/build-desktop-artifact.test.ts:533:40:t3code
 ./scripts/build-desktop-artifact.test.ts:539:51:t3code
+./scripts/build-desktop-artifact.test.ts:541:18:Fenix Code
 ./scripts/build-desktop-artifact.test.ts:761:17:T3CODE
 ./scripts/build-desktop-artifact.test.ts:762:17:T3CODE
 ./scripts/build-desktop-artifact.test.ts:763:17:T3CODE
 ./scripts/build-desktop-artifact.test.ts:764:17:T3CODE
 ./scripts/build-desktop-artifact.test.ts:765:17:T3CODE
+./scripts/build-desktop-artifact.test.ts:94:56:Fenix Code
+./scripts/build-desktop-artifact.test.ts:95:76:Fenix Code
 ./scripts/build-desktop-artifact.ts:1037:43:T3CODE
 ./scripts/build-desktop-artifact.ts:1038:26:T3CODE
 ./scripts/build-desktop-artifact.ts:1039:35:T3CODE
@@ -4403,10 +4197,10 @@
 ./scripts/build-desktop-artifact.ts:2140:53:T3CODE
 ./scripts/build-desktop-artifact.ts:2145:57:T3CODE
 ./scripts/build-desktop-artifact.ts:2150:107:T3CODE
-./scripts/build-desktop-artifact.ts:2155:57:T3 Code
+./scripts/build-desktop-artifact.ts:2155:57:Fenix Code
 ./scripts/build-desktop-artifact.ts:5:27:@t3tools
 ./scripts/build-desktop-artifact.ts:625:12:t3code
-./scripts/build-desktop-artifact.ts:641:6:T3 Code
+./scripts/build-desktop-artifact.ts:641:6:Fenix Code
 ./scripts/build-desktop-artifact.ts:6:38:@t3tools
 ./scripts/build-desktop-artifact.ts:700:13:T3CODE
 ./scripts/build-desktop-artifact.ts:709:13:T3CODE
@@ -4495,7 +4289,7 @@
 ./scripts/dev-runner.ts:323:56:T3CODE
 ./scripts/dev-runner.ts:338:14:T3CODE
 ./scripts/dev-runner.ts:340:21:T3CODE
-./scripts/dev-runner.ts:345:29:T3 Code
+./scripts/dev-runner.ts:345:29:Fenix Code
 ./scripts/dev-runner.ts:352:14:T3CODE
 ./scripts/dev-runner.ts:375:16:T3CODE
 ./scripts/dev-runner.ts:379:23:T3CODE
@@ -4534,8 +4328,8 @@
 ./scripts/dev-runner.ts:84:32:@t3tools
 ./scripts/dev-runner.ts:85:36:@t3tools
 ./scripts/dev-runner.ts:85:65:@t3tools
-./scripts/dev-runner.ts:863:17:T3 Code
-./scripts/dev-runner.ts:863:95:T3CODE
+./scripts/dev-runner.ts:863:17:Fenix Code
+./scripts/dev-runner.ts:863:98:T3CODE
 ./scripts/dev-runner.ts:873:45:T3CODE
 ./scripts/dev-runner.ts:875:52:T3CODE
 ./scripts/dev-runner.ts:878:73:T3CODE
@@ -4548,14 +4342,15 @@
 ./scripts/dev-runner.ts:90:62:T3CODE
 ./scripts/dev-runner.ts:9:70:@t3tools
 ./scripts/export-brand-icons.ts:5:41:@t3tools
-./scripts/fenix/generate-branding-inventory.sh:53:18:T3 Code
-./scripts/fenix/generate-branding-inventory.sh:53:26:T3Code
-./scripts/fenix/generate-branding-inventory.sh:53:33:T3 Tools
-./scripts/fenix/generate-branding-inventory.sh:53:42:T3 Connect
-./scripts/fenix/generate-branding-inventory.sh:53:53:t3code
-./scripts/fenix/generate-branding-inventory.sh:53:60:t3-code
-./scripts/fenix/generate-branding-inventory.sh:53:68:@t3tools
-./scripts/fenix/generate-branding-inventory.sh:53:77:T3CODE
+./scripts/fenix/check-visible-branding.sh:38:20:T3 Tools
+./scripts/fenix/generate-branding-inventory.sh:53:18:Fenix Code
+./scripts/fenix/generate-branding-inventory.sh:53:29:T3Code
+./scripts/fenix/generate-branding-inventory.sh:53:36:T3 Tools
+./scripts/fenix/generate-branding-inventory.sh:53:45:Fenix Connect
+./scripts/fenix/generate-branding-inventory.sh:53:59:t3code
+./scripts/fenix/generate-branding-inventory.sh:53:66:t3-code
+./scripts/fenix/generate-branding-inventory.sh:53:74:@t3tools
+./scripts/fenix/generate-branding-inventory.sh:53:83:T3CODE
 ./scripts/fenix/generate-branding-inventory.sh:54:19:t3code
 ./scripts/fenix/generate-branding-inventory.sh:54:26:t3-code
 ./scripts/fenix/generate-branding-inventory.sh:54:34:T3CODE
@@ -4642,54 +4437,54 @@
 ./scripts/mobile-native-static-check.ts:5:58:@t3tools
 ./scripts/mobile-showcase-environment.ts:10:37:t3code
 ./scripts/mobile-showcase-environment.ts:117:10:t3code
-./scripts/mobile-showcase-environment.ts:118:13:T3 Code
+./scripts/mobile-showcase-environment.ts:118:13:Fenix Code
 ./scripts/mobile-showcase-environment.ts:119:17:t3code
 ./scripts/mobile-showcase-environment.ts:120:50:t3code
 ./scripts/mobile-showcase-environment.ts:121:31:t3code
 ./scripts/mobile-showcase-environment.ts:143:19:t3code
 ./scripts/mobile-showcase-environment.ts:160:17:t3code
-./scripts/mobile-showcase-environment.ts:165:13:T3 Code
-./scripts/mobile-showcase-environment.ts:167:8:T3 Code
+./scripts/mobile-showcase-environment.ts:165:13:Fenix Code
+./scripts/mobile-showcase-environment.ts:167:8:Fenix Code
 ./scripts/mobile-showcase-environment.ts:171:17:t3code
 ./scripts/mobile-showcase-environment.ts:220:17:t3code
 ./scripts/mobile-showcase-environment.ts:281:20:T3Code
 ./scripts/mobile-showcase-environment.ts:287:32:t3code
 ./scripts/mobile-showcase-environment.ts:289:89:t3code
 ./scripts/mobile-showcase-environment.ts:296:50:t3code
-./scripts/mobile-showcase-environment.ts:320:40:T3 Code
+./scripts/mobile-showcase-environment.ts:320:40:Fenix Code
 ./scripts/mobile-showcase-environment.ts:48:41:t3code
 ./scripts/mobile-showcase-environment.ts:61:103:t3code
 ./scripts/mobile-showcase-environment.ts:61:67:t3code
 ./scripts/mobile-showcase-environment.ts:623:15:T3Code
 ./scripts/mobile-showcase-environment.ts:96:3:t3code
-./scripts/mobile-showcase.test.ts:270:7:T3 Code
+./scripts/mobile-showcase.test.ts:270:7:Fenix Code
 ./scripts/mobile-showcase.ts:16:9:@t3tools
 ./scripts/mobile-showcase.ts:392:17:@t3tools
 ./scripts/mock-update-server.ts:21:24:T3CODE
 ./scripts/mock-update-server.ts:22:26:T3CODE
-./scripts/notify-discord-release.test.ts:15:17:T3 Code
+./scripts/notify-discord-release.test.ts:15:17:Fenix Code
 ./scripts/notify-discord-release.test.ts:18:51:t3-code
-./scripts/notify-discord-release.test.ts:29:21:T3 Code
+./scripts/notify-discord-release.test.ts:29:21:Fenix Code
 ./scripts/notify-discord-release.test.ts:33:37:t3-code
-./scripts/notify-discord-release.test.ts:39:55:T3 Code
-./scripts/notify-discord-release.test.ts:45:19:T3 Code
+./scripts/notify-discord-release.test.ts:39:55:Fenix Code
+./scripts/notify-discord-release.test.ts:45:19:Fenix Code
 ./scripts/notify-discord-release.test.ts:46:44:t3-code
-./scripts/notify-discord-release.test.ts:47:31:T3 Code
-./scripts/notify-discord-release.test.ts:70:56:T3 Code
-./scripts/notify-discord-release.test.ts:76:17:T3 Code
+./scripts/notify-discord-release.test.ts:47:31:Fenix Code
+./scripts/notify-discord-release.test.ts:70:56:Fenix Code
+./scripts/notify-discord-release.test.ts:76:17:Fenix Code
 ./scripts/notify-discord-release.test.ts:77:42:t3-code
-./scripts/notify-discord-release.test.ts:78:29:T3 Code
-./scripts/notify-discord-release.ts:140:20:T3 Code
-./scripts/notify-discord-release.ts:141:20:T3 Code
-./scripts/notify-discord-release.ts:281:40:T3 Code
+./scripts/notify-discord-release.test.ts:78:29:Fenix Code
+./scripts/notify-discord-release.ts:140:20:Fenix Code
+./scripts/notify-discord-release.ts:141:20:Fenix Code
+./scripts/notify-discord-release.ts:281:40:Fenix Code
 ./scripts/package.json:11:6:@t3tools
 ./scripts/package.json:12:6:@t3tools
 ./scripts/package.json:13:6:@t3tools
 ./scripts/package.json:2:12:@t3tools
-./scripts/release-smoke.ts:256:11:T3 Code
+./scripts/release-smoke.ts:256:11:Fenix Code
 ./scripts/release-smoke.ts:26:18:t3code
-./scripts/resolve-nightly-release.test.ts:49:14:T3 Code
-./scripts/resolve-nightly-release.ts:111:12:T3 Code
+./scripts/resolve-nightly-release.test.ts:49:14:Fenix Code
+./scripts/resolve-nightly-release.ts:111:12:Fenix Code
 ./scripts/sync-reference-repos.ts:14:27:@t3tools
 ./scripts/update-release-package-versions.test.ts:13:39:@t3tools
 ./scripts/update-release-package-versions.ts:13:39:@t3tools

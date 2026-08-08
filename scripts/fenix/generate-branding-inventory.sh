@@ -50,7 +50,7 @@ common_rg_args=(
   '!docs/fenix/branding-inventory-*.files.txt'
 )
 
-textual_pattern='T3 Code|T3Code|T3 Tools|T3 Connect|t3code|t3-code|@t3tools|T3CODE'
+textual_pattern='Fenix Code|T3Code|T3 Tools|Fenix Connect|t3code|t3-code|@t3tools|T3CODE'
 platform_pattern='t3code|t3-code|T3CODE|com\.t3tools|@t3tools|t3\.json'
 endpoint_pattern='github\.com/pingdotgg/t3code|app\.t3\.codes|clerk\.t3\.codes|t3\.codes|apps\.apple\.com/us/app/t3-code|play\.google\.com/store/apps/details\?id=com\.t3tools\.t3code'
 
