@@ -29,7 +29,13 @@ Fenix Code now fails closed unless the Fenix adapter receives an active paired F
 
 Pairing credentials are only attached to requests whose resolved origin is exactly `https://iaonline.io`. The adapter rejects malformed cookie and bearer values before fetch, including control characters or multi-cookie input.
 
-The default driver construction passes no credential, so an enabled Fenix provider cannot reach `iaonline.io` until the Code Lab pairing bridge injects the authenticated Fenix identity.
+The Fenix driver now resolves its credential through the runtime
+`FenixPairingSessionBridge` service and injects the active session into the
+adapter on each turn. The production default bridge is deliberately unpaired,
+so an enabled Fenix provider cannot reach `iaonline.io` until the Code Lab
+pairing bridge supplies an active Fenix identity. Expired or unavailable
+sessions must resolve to `null`, which keeps the existing adapter fail-closed
+path: no backend request is made without a valid pairing session.
 
 The current Fenix monorepo surface inspected for F1.2 is `ChatWorkspaceController` plus `InMemoryChatWorkspacePairingService`. That pairing is currently a boolean per `(companyId, userId)` and does not yet issue a cookie/token envelope consumable by Fenix Code. If production pairing requires changes there, it must be a separate monorepo PR.
 
@@ -37,4 +43,7 @@ The current Fenix monorepo surface inspected for F1.2 is `ChatWorkspaceControlle
 
 - No pairing session: `sendTurn` fails before `fetch`, so the Fenix backend is not reached.
 - Paired cookie session: `sendTurn` calls the Fenix generic chat lane with `Cookie: AuthToken=<value>` and the standard request body.
+- Local driver E2E: a simulated bridge session reaches a mocked
+  `ChatModels/SendMessageWithOptions` endpoint, records the turn, and rolls the
+  thread back through the standard adapter cycle.
 - Existing upstream drivers remain untouched.

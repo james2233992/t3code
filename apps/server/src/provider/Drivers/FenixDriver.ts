@@ -27,6 +27,7 @@ import {
   makeProviderSnapshotSettingsSource,
   type ProviderSnapshotSettings,
 } from "../providerUpdateSettings.ts";
+import * as FenixPairingSessionBridge from "../Services/FenixPairingSessionBridge.ts";
 
 const decodeFenixSettings = Schema.decodeSync(FenixSettings);
 
@@ -40,6 +41,7 @@ const UPDATE = makeStaticProviderMaintenanceResolver(
 
 export type FenixDriverEnv =
   | BackgroundPolicy.BackgroundPolicy
+  | FenixPairingSessionBridge.FenixPairingSessionBridge
   | FileSystem.FileSystem
   | Path.Path
   | ServerSettingsService;
@@ -71,6 +73,7 @@ export const FenixDriver: ProviderDriver<FenixSettings, FenixDriverEnv> = {
   create: ({ instanceId, displayName, accentColor, enabled, config }) =>
     Effect.gen(function* () {
       const serverSettings = yield* ServerSettingsService;
+      const pairingSessionBridge = yield* FenixPairingSessionBridge.FenixPairingSessionBridge;
       const continuationIdentity = defaultProviderContinuationIdentity({
         driverKind: DRIVER_KIND,
         instanceId,
@@ -87,7 +90,10 @@ export const FenixDriver: ProviderDriver<FenixSettings, FenixDriverEnv> = {
         env: process.env,
       });
 
-      const adapter = yield* makeFenixAdapter(effectiveConfig, { instanceId });
+      const adapter = yield* makeFenixAdapter(effectiveConfig, {
+        instanceId,
+        pairingSession: () => pairingSessionBridge.resolvePairingSession({ instanceId }),
+      });
       const textGeneration = yield* makeFenixTextGeneration;
 
       const snapshotSettings = makeProviderSnapshotSettingsSource(effectiveConfig, serverSettings);
