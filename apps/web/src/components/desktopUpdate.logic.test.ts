@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vite-plus/test";
 import type { DesktopUpdateActionResult, DesktopUpdateState } from "@t3tools/contracts";
+import { PRODUCT_BASE_NAME, PRODUCT_REPOSITORY_URL } from "@t3tools/shared/productBranding";
 
 import {
   canCheckForUpdate,
@@ -168,6 +169,34 @@ describe("desktop update UI helpers", () => {
     expect(getDesktopUpdateReleaseUrl("0.0.30-nightly.20260728.931")).toBe(
       `${DESKTOP_RELEASE_TAG_URL}/v0.0.30-nightly.20260728.931`,
     );
+  });
+
+  it("keeps release links and visible copy on Fenix branding", () => {
+    const warning = getArm64IntelBuildWarningDescription({
+      ...baseState,
+      status: "available",
+      hostArch: "arm64",
+      appArch: "x64",
+      runningUnderArm64Translation: true,
+      availableVersion: "1.1.0",
+    });
+    const installConfirmation = getDesktopUpdateInstallConfirmationMessage(
+      {
+        availableVersion: "1.1.0",
+        downloadedVersion: "1.1.0",
+      },
+      "Win32",
+    );
+    const serializedUpdaterCopy = JSON.stringify({
+      releaseTagUrl: DESKTOP_RELEASE_TAG_URL,
+      warning,
+      installConfirmation,
+    });
+
+    expect(DESKTOP_RELEASE_TAG_URL).toBe(`${PRODUCT_REPOSITORY_URL}/releases/tag`);
+    expect(serializedUpdaterCopy).toContain(PRODUCT_BASE_NAME);
+    expect(serializedUpdaterCopy).not.toContain("pingdotgg/t3code/releases");
+    expect(serializedUpdaterCopy).not.toContain("T3 Code");
   });
 
   it("omits the release URL when the updater does not report a version", () => {

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
+import { PRODUCT_BASE_NAME } from "@t3tools/shared/productBranding";
 
 import {
   normalizeLinuxPasswordStorePreference,
@@ -133,6 +134,23 @@ describe("linuxSecretStorage", () => {
         env: { XDG_CURRENT_DESKTOP: "niri" },
       }),
     ).toContain("GNOME Keyring");
+  });
+
+  it("uses product branding in Linux credential remediation messages", () => {
+    const gnomeMessage = resolveLinuxSecretStorageUnavailableMessage({
+      configuredPreference: "gnome-libsecret",
+      selectedBackend: null,
+      env: {},
+    });
+    const kwalletMessage = resolveLinuxSecretStorageUnavailableMessage({
+      configuredPreference: "kwallet6",
+      selectedBackend: null,
+      env: {},
+    });
+    const serializedMessages = JSON.stringify({ gnomeMessage, kwalletMessage });
+
+    expect(serializedMessages).toContain(PRODUCT_BASE_NAME);
+    expect(serializedMessages).not.toContain("T3 Code");
   });
 
   it("prefers explicit libsecret selection over KDE desktop heuristics", () => {

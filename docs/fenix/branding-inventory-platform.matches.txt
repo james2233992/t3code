@@ -331,6 +331,8 @@
 ./apps/desktop/src/ipc/methods/window.ts:11:9:@t3tools
 ./apps/desktop/src/ipc/methods/wsl.test.ts:1:40:@t3tools
 ./apps/desktop/src/ipc/methods/wsl.ts:1:62:@t3tools
+./apps/desktop/src/linuxSecretStorage.test.ts:2:36:@t3tools
+./apps/desktop/src/linuxSecretStorage.ts:1:36:@t3tools
 ./apps/desktop/src/main.ts:17:30:@t3tools
 ./apps/desktop/src/main.ts:18:63:@t3tools
 ./apps/desktop/src/main.ts:19:48:@t3tools
@@ -553,11 +555,12 @@
 ./apps/mobile/src/features/cloud/dpop.test.ts:9:34:@t3tools
 ./apps/mobile/src/features/cloud/dpop.ts:11:50:@t3tools
 ./apps/mobile/src/features/cloud/dpop.ts:89:37:t3code
+./apps/mobile/src/features/cloud/linkEnvironment.test.ts:134:61:t3code
+./apps/mobile/src/features/cloud/linkEnvironment.test.ts:14:9:@t3tools
 ./apps/mobile/src/features/cloud/linkEnvironment.test.ts:5:32:@t3tools
 ./apps/mobile/src/features/cloud/linkEnvironment.test.ts:6:38:@t3tools
 ./apps/mobile/src/features/cloud/linkEnvironment.test.ts:7:31:@t3tools
 ./apps/mobile/src/features/cloud/linkEnvironment.test.ts:8:40:@t3tools
-./apps/mobile/src/features/cloud/linkEnvironment.test.ts:9:36:@t3tools
 ./apps/mobile/src/features/cloud/linkEnvironment.ts:12:9:@t3tools
 ./apps/mobile/src/features/cloud/linkEnvironment.ts:13:43:@t3tools
 ./apps/mobile/src/features/cloud/linkEnvironment.ts:24:9:@t3tools
@@ -2163,6 +2166,7 @@
 ./apps/web/src/assets/assetUrls.ts:2:34:@t3tools
 ./apps/web/src/assets/assetUrls.ts:3:52:@t3tools
 ./apps/web/src/authBootstrap.test.ts:7:9:@t3tools
+./apps/web/src/branding.test.ts:7:9:@t3tools
 ./apps/web/src/branding.ts:1:42:@t3tools
 ./apps/web/src/branding.ts:2:36:@t3tools
 ./apps/web/src/browser/BrowserDeviceToolbar.test.ts:1:46:@t3tools
@@ -2441,7 +2445,9 @@
 ./apps/web/src/components/cloud/cloudEnvironmentConnectionPresentation.ts:4:9:@t3tools
 ./apps/web/src/components/composerInlineTokenPaste.ts:1:46:@t3tools
 ./apps/web/src/components/desktop/SshPasswordPromptDialog.tsx:1:55:@t3tools
+./apps/web/src/components/desktopUpdate.logic.test.ts:198:60:t3code
 ./apps/web/src/components/desktopUpdate.logic.test.ts:2:69:@t3tools
+./apps/web/src/components/desktopUpdate.logic.test.ts:3:60:@t3tools
 ./apps/web/src/components/desktopUpdate.logic.ts:1:69:@t3tools
 ./apps/web/src/components/desktopUpdate.logic.ts:2:60:@t3tools
 ./apps/web/src/components/desktopUpdate.toast.test.tsx:3:42:@t3tools
@@ -3908,9 +3914,6 @@
 ./scripts/fenix/generate-branding-inventory.sh:49:114:t3-code
 ./scripts/fenix/generate-branding-inventory.sh:49:177:t3code
 ./scripts/fenix/generate-branding-inventory.sh:49:41:t3code
-./scripts/fenix/product-branding.integration.test.ts:20:9:@t3tools
-./scripts/fenix/product-branding.integration.test.ts:41:58:t3code
-./scripts/fenix/product-branding.integration.test.ts:77:57:t3code
 ./scripts/lib/build-target-arch.test.ts:5:63:@t3tools
 ./scripts/lib/build-target-arch.ts:1:63:@t3tools
 ./scripts/lib/dev-share.ts:23:9:@t3tools

@@ -396,10 +396,9 @@
 ./apps/desktop/src/ipc/methods/window.ts:11:9:@t3tools
 ./apps/desktop/src/ipc/methods/wsl.test.ts:1:40:@t3tools
 ./apps/desktop/src/ipc/methods/wsl.ts:1:62:@t3tools
-./apps/desktop/src/linuxSecretStorage.ts:115:11:T3 Code
-./apps/desktop/src/linuxSecretStorage.ts:115:133:T3 Code
-./apps/desktop/src/linuxSecretStorage.ts:119:11:T3 Code
-./apps/desktop/src/linuxSecretStorage.ts:119:146:T3 Code
+./apps/desktop/src/linuxSecretStorage.test.ts:153:47:T3 Code
+./apps/desktop/src/linuxSecretStorage.test.ts:2:36:@t3tools
+./apps/desktop/src/linuxSecretStorage.ts:1:36:@t3tools
 ./apps/desktop/src/main.ts:17:30:@t3tools
 ./apps/desktop/src/main.ts:18:63:@t3tools
 ./apps/desktop/src/main.ts:19:48:@t3tools
@@ -631,15 +630,10 @@
 ./apps/marketing/vercel.ts:4:69:@t3tools
 ./apps/marketing/vercel.ts:5:34:@t3tools
 ./apps/mobile/.swiftlint.yml:2:9:T3Code
-./apps/mobile/README.md:13:64:T3 Code
-./apps/mobile/README.md:14:78:T3 Code
-./apps/mobile/README.md:15:41:T3 Code
 ./apps/mobile/README.md:19:1:T3 Connect
-./apps/mobile/README.md:1:3:T3 Code
 ./apps/mobile/README.md:42:1:T3CODE
 ./apps/mobile/README.md:43:1:T3CODE
 ./apps/mobile/README.md:43:48:t3code
-./apps/mobile/README.md:4:3:T3 Code
 ./apps/mobile/README.md:56:1:T3CODE
 ./apps/mobile/README.md:57:1:T3CODE
 ./apps/mobile/README.md:57:48:t3code
@@ -773,11 +767,12 @@
 ./apps/mobile/src/features/cloud/dpop.test.ts:9:34:@t3tools
 ./apps/mobile/src/features/cloud/dpop.ts:11:50:@t3tools
 ./apps/mobile/src/features/cloud/dpop.ts:89:37:t3code
+./apps/mobile/src/features/cloud/linkEnvironment.test.ts:134:61:t3code
+./apps/mobile/src/features/cloud/linkEnvironment.test.ts:14:9:@t3tools
 ./apps/mobile/src/features/cloud/linkEnvironment.test.ts:5:32:@t3tools
 ./apps/mobile/src/features/cloud/linkEnvironment.test.ts:6:38:@t3tools
 ./apps/mobile/src/features/cloud/linkEnvironment.test.ts:7:31:@t3tools
 ./apps/mobile/src/features/cloud/linkEnvironment.test.ts:8:40:@t3tools
-./apps/mobile/src/features/cloud/linkEnvironment.test.ts:9:36:@t3tools
 ./apps/mobile/src/features/cloud/linkEnvironment.ts:12:9:@t3tools
 ./apps/mobile/src/features/cloud/linkEnvironment.ts:13:43:@t3tools
 ./apps/mobile/src/features/cloud/linkEnvironment.ts:24:9:@t3tools
@@ -2545,19 +2540,20 @@
 ./apps/web/src/assets/assetUrls.ts:3:52:@t3tools
 ./apps/web/src/authBootstrap.test.ts:69:39:T3 Code
 ./apps/web/src/authBootstrap.test.ts:7:9:@t3tools
-./apps/web/src/branding.test.ts:103:13:T3 Code
-./apps/web/src/branding.test.ts:109:20:T3 Code
-./apps/web/src/branding.test.ts:110:31:T3 Code
-./apps/web/src/branding.test.ts:114:13:T3 Code
-./apps/web/src/branding.test.ts:27:24:T3 Code
-./apps/web/src/branding.test.ts:29:27:T3 Code
-./apps/web/src/branding.test.ts:37:42:T3 Code
-./apps/web/src/branding.test.ts:39:45:T3 Code
-./apps/web/src/branding.test.ts:87:20:T3 Code
-./apps/web/src/branding.test.ts:88:31:T3 Code
-./apps/web/src/branding.test.ts:92:13:T3 Code
-./apps/web/src/branding.test.ts:98:20:T3 Code
-./apps/web/src/branding.test.ts:99:31:T3 Code
+./apps/web/src/branding.test.ts:105:20:T3 Code
+./apps/web/src/branding.test.ts:106:31:T3 Code
+./apps/web/src/branding.test.ts:110:13:T3 Code
+./apps/web/src/branding.test.ts:116:20:T3 Code
+./apps/web/src/branding.test.ts:117:31:T3 Code
+./apps/web/src/branding.test.ts:121:13:T3 Code
+./apps/web/src/branding.test.ts:34:24:T3 Code
+./apps/web/src/branding.test.ts:36:27:T3 Code
+./apps/web/src/branding.test.ts:44:42:T3 Code
+./apps/web/src/branding.test.ts:46:45:T3 Code
+./apps/web/src/branding.test.ts:7:9:@t3tools
+./apps/web/src/branding.test.ts:94:20:T3 Code
+./apps/web/src/branding.test.ts:95:31:T3 Code
+./apps/web/src/branding.test.ts:99:13:T3 Code
 ./apps/web/src/branding.ts:1:42:@t3tools
 ./apps/web/src/branding.ts:2:36:@t3tools
 ./apps/web/src/browser/BrowserDeviceToolbar.test.ts:1:46:@t3tools
@@ -2874,7 +2870,10 @@
 ./apps/web/src/components/composerInlineTokenPaste.ts:1:46:@t3tools
 ./apps/web/src/components/desktop/SshPasswordPromptDialog.tsx:164:86:T3 Code
 ./apps/web/src/components/desktop/SshPasswordPromptDialog.tsx:1:55:@t3tools
+./apps/web/src/components/desktopUpdate.logic.test.ts:198:60:t3code
+./apps/web/src/components/desktopUpdate.logic.test.ts:199:50:T3 Code
 ./apps/web/src/components/desktopUpdate.logic.test.ts:2:69:@t3tools
+./apps/web/src/components/desktopUpdate.logic.test.ts:3:60:@t3tools
 ./apps/web/src/components/desktopUpdate.logic.ts:1:69:@t3tools
 ./apps/web/src/components/desktopUpdate.logic.ts:2:60:@t3tools
 ./apps/web/src/components/desktopUpdate.toast.test.tsx:3:42:@t3tools
@@ -4565,10 +4564,6 @@
 ./scripts/fenix/generate-branding-inventory.sh:49:114:t3-code
 ./scripts/fenix/generate-branding-inventory.sh:49:177:t3code
 ./scripts/fenix/generate-branding-inventory.sh:49:41:t3code
-./scripts/fenix/product-branding.integration.test.ts:20:9:@t3tools
-./scripts/fenix/product-branding.integration.test.ts:41:58:t3code
-./scripts/fenix/product-branding.integration.test.ts:77:57:t3code
-./scripts/fenix/product-branding.integration.test.ts:78:47:T3 Code
 ./scripts/lib/build-target-arch.test.ts:5:63:@t3tools
 ./scripts/lib/build-target-arch.ts:1:63:@t3tools
 ./scripts/lib/dev-share.ts:23:9:@t3tools
