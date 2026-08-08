@@ -76,15 +76,13 @@ function validatePairingSession(
   if (!session) return null;
   switch (session.kind) {
     case "cookie": {
-      const authToken = session.authToken.trim();
-      return authToken.length > 0 && !INVALID_COOKIE_VALUE.test(authToken)
-        ? { kind: session.kind, authToken }
+      return session.authToken.length > 0 && !INVALID_COOKIE_VALUE.test(session.authToken)
+        ? { kind: session.kind, authToken: session.authToken }
         : null;
     }
     case "bearer": {
-      const token = session.token.trim();
-      return token.length > 0 && !INVALID_HEADER_VALUE.test(token)
-        ? { kind: session.kind, token }
+      return session.token.length > 0 && !INVALID_HEADER_VALUE.test(session.token)
+        ? { kind: session.kind, token: session.token }
         : null;
     }
   }
@@ -147,20 +145,25 @@ export function makeFenixAdapter(settings: FenixSettings, options?: FenixAdapter
     const runtimeEventPubSub = yield* PubSub.unbounded<ProviderRuntimeEvent>();
     const sessions = new Map<ThreadId, FenixSessionContext>();
     const fetchImpl = options?.fetch ?? fetch;
-    const validateTrustedRequestUrl = (requestUrl: string) =>
-      Effect.sync(() => new URL(requestUrl)).pipe(
-        Effect.flatMap((url) =>
-          url.origin === FENIX_TRUSTED_ORIGIN
-            ? Effect.succeed(requestUrl)
-            : Effect.fail(
-                new ProviderAdapterValidationError({
-                  provider: PROVIDER,
-                  operation: "pairing",
-                  issue: `Fenix pairing credentials can only be sent to ${FENIX_TRUSTED_ORIGIN}.`,
-                }),
-              ),
-        ),
-      );
+    const resolveTrustedRequestUrl = () =>
+      Effect.try({
+        try: () => {
+          const requestUrl = resolveUrl(settings.baseUrl, settings.sendMessagePath);
+          const url = new URL(requestUrl);
+          if (url.origin !== FENIX_TRUSTED_ORIGIN) {
+            throw new Error(`Resolved origin ${url.origin} is not ${FENIX_TRUSTED_ORIGIN}.`);
+          }
+          return requestUrl;
+        },
+        catch: (cause) =>
+          new ProviderAdapterValidationError({
+            provider: PROVIDER,
+            operation: "pairing",
+            issue: `Fenix pairing credentials can only be sent to ${FENIX_TRUSTED_ORIGIN}: ${
+              cause instanceof Error ? cause.message : String(cause)
+            }`,
+          }),
+      });
     const readRequiredPairingSession = () =>
       Effect.sync(() => readPairingSession(options?.pairingSession)).pipe(
         Effect.flatMap((pairingSession) =>
@@ -233,7 +236,7 @@ export function makeFenixAdapter(settings: FenixSettings, options?: FenixAdapter
           payload: {
             state: "ready",
             reason: readPairingSession(options?.pairingSession)
-              ? "Fenix paired session ready"
+              ? "Fenix pairing credential present"
               : "Fenix pairing required",
           },
         });
@@ -285,11 +288,16 @@ export function makeFenixAdapter(settings: FenixSettings, options?: FenixAdapter
             issue: "Turn requires non-empty text.",
           });
         }
+        if (ctx.session.activeTurnId) {
+          return yield* new ProviderAdapterValidationError({
+            provider: PROVIDER,
+            operation: "sendTurn",
+            issue: "Fenix session already has an active turn.",
+          });
+        }
 
         const pairingSession = yield* readRequiredPairingSession();
-        const requestUrl = yield* validateTrustedRequestUrl(
-          resolveUrl(settings.baseUrl, settings.sendMessagePath),
-        );
+        const requestUrl = yield* resolveTrustedRequestUrl();
         const turnId = TurnId.make(NodeCrypto.randomUUID());
         activeTurnId = turnId;
         activeContext = ctx;
@@ -298,8 +306,9 @@ export function makeFenixAdapter(settings: FenixSettings, options?: FenixAdapter
             ? input.modelSelection.model
             : (ctx.session.model ?? settings.featuredModel);
         const updatedAt = yield* nowIso;
+        const { lastError: _lastError, ...runningSession } = ctx.session;
         ctx.session = {
-          ...ctx.session,
+          ...runningSession,
           status: "running",
           activeTurnId: turnId,
           model,
@@ -369,7 +378,11 @@ export function makeFenixAdapter(settings: FenixSettings, options?: FenixAdapter
         }
 
         const completedAt = yield* nowIso;
-        const { activeTurnId: _activeTurnId, ...readySession } = ctx.session;
+        const {
+          activeTurnId: _activeTurnId,
+          lastError: _completedLastError,
+          ...readySession
+        } = ctx.session;
         ctx.session = {
           ...readySession,
           status: "ready",
