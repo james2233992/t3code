@@ -32,6 +32,7 @@ These are not treated as F0 visible-branding defects. The `t3.json` filename is 
 ## Guardrails Added
 
 - `scripts/fenix/check-visible-branding.sh` fails on visible T3 strings and hosted T3 domains in live source, including `apps/web/index.html`.
+- The guard fails hard when `rg` is unavailable or errors, and includes a red/green `selftest` that plants a temporary visible `T3 Code` fixture and verifies it is caught before checking the clean tree.
 - `.github/workflows/fenix-fork-ci.yml` now runs:
   - `bash scripts/fenix/generate-branding-inventory.sh selftest`
   - `bash scripts/fenix/generate-branding-inventory.sh check`
@@ -47,6 +48,7 @@ vp fmt
 bash scripts/fenix/generate-branding-inventory.sh generate
 bash scripts/fenix/generate-branding-inventory.sh selftest
 bash scripts/fenix/generate-branding-inventory.sh check
+bash scripts/fenix/check-visible-branding.sh selftest
 bash scripts/fenix/check-visible-branding.sh
 vp check
 vpr typecheck
@@ -57,7 +59,7 @@ Result:
 
 - Format: PASS, 2497 files.
 - Branding inventory selftest/check: PASS.
-- Visible branding guard: PASS.
+- Visible branding guard selftest/check: PASS.
 - Lint/check: PASS, 2367 files.
 - Typecheck: PASS with existing Effect suggestions only.
 - Test suite: PASS, 213 files passed, 2 skipped; 1946 tests passed, 7 skipped in the server tranche, with all earlier package/app tranches green.

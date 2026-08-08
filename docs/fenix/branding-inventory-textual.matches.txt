@@ -50,19 +50,19 @@
 ./.github/workflows/ci.yml:96:65:t3code
 ./.github/workflows/deploy-relay.yml:54:26:t3code
 ./.github/workflows/deploy-relay.yml:58:30:t3code
-./.github/workflows/fenix-fork-ci.yml:101:11:T3CODE
-./.github/workflows/fenix-fork-ci.yml:101:66:t3code
 ./.github/workflows/fenix-fork-ci.yml:102:11:T3CODE
-./.github/workflows/fenix-fork-ci.yml:108:42:t3code
-./.github/workflows/fenix-fork-ci.yml:109:65:t3code
-./.github/workflows/fenix-fork-ci.yml:128:44:t3code
-./.github/workflows/fenix-fork-ci.yml:147:26:@t3tools
-./.github/workflows/fenix-fork-ci.yml:157:44:t3code
-./.github/workflows/fenix-fork-ci.yml:176:26:@t3tools
+./.github/workflows/fenix-fork-ci.yml:102:66:t3code
+./.github/workflows/fenix-fork-ci.yml:103:11:T3CODE
+./.github/workflows/fenix-fork-ci.yml:109:42:t3code
+./.github/workflows/fenix-fork-ci.yml:110:65:t3code
+./.github/workflows/fenix-fork-ci.yml:129:44:t3code
+./.github/workflows/fenix-fork-ci.yml:148:26:@t3tools
+./.github/workflows/fenix-fork-ci.yml:158:44:t3code
+./.github/workflows/fenix-fork-ci.yml:177:26:@t3tools
 ./.github/workflows/fenix-fork-ci.yml:18:44:t3code
 ./.github/workflows/fenix-fork-ci.yml:43:30:@t3tools
-./.github/workflows/fenix-fork-ci.yml:74:44:t3code
-./.github/workflows/fenix-fork-ci.yml:97:30:@t3tools
+./.github/workflows/fenix-fork-ci.yml:75:44:t3code
+./.github/workflows/fenix-fork-ci.yml:98:30:@t3tools
 ./.github/workflows/mobile-eas-preview.yml:55:26:@t3tools
 ./.github/workflows/mobile-eas-production.yml:73:26:@t3tools
 ./.github/workflows/mobile-showcase-screenshots.yml:102:26:@t3tools
@@ -3378,8 +3378,8 @@
 ./docs/fenix/f0-final-visible-rebrand-report-20260808.md:26:4:@t3tools
 ./docs/fenix/f0-final-visible-rebrand-report-20260808.md:28:4:T3CODE
 ./docs/fenix/f0-final-visible-rebrand-report-20260808.md:5:27:t3code
-./docs/fenix/f0-final-visible-rebrand-report-20260808.md:94:22:Fenix Code
-./docs/fenix/f0-final-visible-rebrand-report-20260808.md:95:23:Fenix Code
+./docs/fenix/f0-final-visible-rebrand-report-20260808.md:96:22:Fenix Code
+./docs/fenix/f0-final-visible-rebrand-report-20260808.md:97:23:Fenix Code
 ./docs/internals/remote.md:100:39:@t3tools
 ./docs/internals/resource-telemetry.md:228:5:T3CODE
 ./docs/internals/scripts.md:110:13:T3CODE
@@ -4342,7 +4342,7 @@
 ./scripts/dev-runner.ts:90:62:T3CODE
 ./scripts/dev-runner.ts:9:70:@t3tools
 ./scripts/export-brand-icons.ts:5:41:@t3tools
-./scripts/fenix/check-visible-branding.sh:38:20:T3 Tools
+./scripts/fenix/check-visible-branding.sh:77:20:T3 Tools
 ./scripts/fenix/generate-branding-inventory.sh:53:18:Fenix Code
 ./scripts/fenix/generate-branding-inventory.sh:53:29:T3Code
 ./scripts/fenix/generate-branding-inventory.sh:53:36:T3 Tools
