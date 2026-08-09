@@ -218,7 +218,7 @@ scopedLayer("FenixScopedProjectionSnapshotQuery", (it) => {
         projectId: "project-0-cross-user",
         threadId: "thread-cross-user",
         title: "Tenant Same Company Other User",
-        workspaceRoot: "/tmp/fenix-a",
+        workspaceRoot: "/tmp/fenix-cross-user",
       });
       yield* seedScopedTenant(sql, {
         scope: scopeA,
@@ -299,6 +299,16 @@ scopedLayer("FenixScopedProjectionSnapshotQuery", (it) => {
         "/tmp/fenix-b",
       );
       assert.equal(foreignWorkspace._tag, "None");
+      const sameCompanyOtherUserWorkspace = yield* scopedQuery.getActiveProjectByWorkspaceRoot(
+        scopeA,
+        "/tmp/fenix-cross-user",
+      );
+      assert.equal(sameCompanyOtherUserWorkspace._tag, "None");
+      const otherCompanySameUserWorkspace = yield* scopedQuery.getActiveProjectByWorkspaceRoot(
+        scopeA,
+        "/tmp/fenix-c",
+      );
+      assert.equal(otherCompanySameUserWorkspace._tag, "None");
 
       const otherCompanyProject = yield* scopedQuery.getProjectShellById(
         scopeA,
@@ -315,6 +325,45 @@ scopedLayer("FenixScopedProjectionSnapshotQuery", (it) => {
         asProjectId("project-cross-company"),
       );
       assert.equal(otherCompanySameUserProject._tag, "None");
+      const ownFirstThread = yield* scopedQuery.getFirstActiveThreadIdByProjectId(
+        scopeA,
+        asProjectId("project-a"),
+      );
+      assert.equal(ownFirstThread._tag, "Some");
+      if (ownFirstThread._tag === "Some") {
+        assert.equal(ownFirstThread.value, asThreadId("thread-a"));
+      }
+      const foreignFirstThread = yield* scopedQuery.getFirstActiveThreadIdByProjectId(
+        scopeA,
+        asProjectId("project-b"),
+      );
+      assert.equal(foreignFirstThread._tag, "None");
+      const sameCompanyOtherUserFirstThread = yield* scopedQuery.getFirstActiveThreadIdByProjectId(
+        scopeA,
+        asProjectId("project-0-cross-user"),
+      );
+      assert.equal(sameCompanyOtherUserFirstThread._tag, "None");
+      const otherCompanySameUserFirstThread = yield* scopedQuery.getFirstActiveThreadIdByProjectId(
+        scopeA,
+        asProjectId("project-cross-company"),
+      );
+      assert.equal(otherCompanySameUserFirstThread._tag, "None");
+
+      const ownThreadShell = yield* scopedQuery.getThreadShellById(scopeA, asThreadId("thread-a"));
+      assert.equal(ownThreadShell._tag, "Some");
+      if (ownThreadShell._tag === "Some") {
+        assert.equal(ownThreadShell.value.session?.threadId, asThreadId("thread-a"));
+      }
+      const foreignThreadShell = yield* scopedQuery.getThreadShellById(
+        scopeA,
+        asThreadId("thread-b"),
+      );
+      assert.equal(foreignThreadShell._tag, "None");
+      const sameCompanyOtherUserThreadShell = yield* scopedQuery.getThreadShellById(
+        scopeA,
+        asThreadId("thread-cross-user"),
+      );
+      assert.equal(sameCompanyOtherUserThreadShell._tag, "None");
 
       const ownThread = yield* scopedQuery.getThreadDetailById(scopeA, asThreadId("thread-a"));
       assert.equal(ownThread._tag, "Some");
@@ -342,6 +391,25 @@ scopedLayer("FenixScopedProjectionSnapshotQuery", (it) => {
         asThreadId("thread-cross-company"),
       );
       assert.equal(otherCompanySameUserThread._tag, "None");
+      const ownThreadDetailSnapshot = yield* scopedQuery.getThreadDetailSnapshot(
+        scopeA,
+        asThreadId("thread-a"),
+      );
+      assert.equal(ownThreadDetailSnapshot._tag, "Some");
+      if (ownThreadDetailSnapshot._tag === "Some") {
+        assert.equal(ownThreadDetailSnapshot.value.thread.id, asThreadId("thread-a"));
+      }
+      const foreignThreadDetailSnapshot = yield* scopedQuery.getThreadDetailSnapshot(
+        scopeA,
+        asThreadId("thread-b"),
+      );
+      assert.equal(foreignThreadDetailSnapshot._tag, "None");
+      const sameCompanyOtherUserThreadDetailSnapshot = yield* scopedQuery.getThreadDetailSnapshot(
+        scopeA,
+        asThreadId("thread-cross-user"),
+      );
+      assert.equal(sameCompanyOtherUserThreadDetailSnapshot._tag, "None");
+
       const foreignCheckpointContext = yield* scopedQuery.getThreadCheckpointContext(
         scopeA,
         asThreadId("thread-b"),
@@ -368,7 +436,33 @@ scopedLayer("FenixScopedProjectionSnapshotQuery", (it) => {
           ownCheckpointContext.value.checkpoints.map((checkpoint) => checkpoint.turnId),
           [TurnId.make("turn-1")],
         );
+        assert.equal(ownCheckpointContext.value.workspaceRoot, "/tmp/fenix-a");
       }
+      const ownFullDiffContext = yield* scopedQuery.getFullThreadDiffContext(
+        scopeA,
+        asThreadId("thread-a"),
+        1,
+      );
+      assert.equal(ownFullDiffContext._tag, "Some");
+      if (ownFullDiffContext._tag === "Some") {
+        assert.equal(ownFullDiffContext.value.threadId, asThreadId("thread-a"));
+        assert.equal(
+          ownFullDiffContext.value.toCheckpointRef,
+          CheckpointRef.make("thread-a-checkpoint"),
+        );
+      }
+      const foreignFullDiffContext = yield* scopedQuery.getFullThreadDiffContext(
+        scopeA,
+        asThreadId("thread-b"),
+        1,
+      );
+      assert.equal(foreignFullDiffContext._tag, "None");
+      const sameCompanyOtherUserFullDiffContext = yield* scopedQuery.getFullThreadDiffContext(
+        scopeA,
+        asThreadId("thread-cross-user"),
+        1,
+      );
+      assert.equal(sameCompanyOtherUserFullDiffContext._tag, "None");
 
       const search = yield* scopedQuery.searchThreads(scopeA, { query: "shared needle" });
       assert.deepEqual(

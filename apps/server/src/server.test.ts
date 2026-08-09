@@ -18,8 +18,14 @@ import {
   MessageId,
   ExternalLauncherCommandNotFoundError,
   OrchestrationThreadDetailSnapshot,
+  type OrchestrationProject,
   type OrchestrationThreadStreamItem,
   type OrchestrationThreadShell,
+  type ProjectListEntriesError,
+  type ProjectReadFileError,
+  type ProjectSearchContentsError,
+  type ProjectSearchEntriesError,
+  type ProjectWriteFileError,
   TerminalNotRunningError,
   type OrchestrationCommand,
   type OrchestrationEvent,
@@ -436,6 +442,8 @@ const buildAppUnderTest = (options?: {
     serverLifecycleEvents?: Partial<ServerLifecycleEvents.ServerLifecycleEvents["Service"]>;
     serverRuntimeStartup?: Partial<ServerRuntimeStartup.ServerRuntimeStartup["Service"]>;
     serverEnvironment?: Partial<ServerEnvironment.ServerEnvironment["Service"]>;
+    workspaceEntries?: Partial<WorkspaceEntries.WorkspaceEntries["Service"]>;
+    workspaceFileSystem?: Partial<WorkspaceFileSystem.WorkspaceFileSystem["Service"]>;
     repositoryIdentityResolver?: Partial<
       RepositoryIdentityResolver.RepositoryIdentityResolver["Service"]
     >;
@@ -593,11 +601,15 @@ const buildAppUnderTest = (options?: {
     );
     const workspaceAndProjectServicesLayer = Layer.mergeAll(
       WorkspacePaths.layer,
-      workspaceEntriesLayer,
-      WorkspaceFileSystem.layer.pipe(
-        Layer.provide(WorkspacePaths.layer),
-        Layer.provide(workspaceEntriesLayer),
-      ),
+      options?.layers?.workspaceEntries
+        ? Layer.mock(WorkspaceEntries.WorkspaceEntries)(options.layers.workspaceEntries)
+        : workspaceEntriesLayer,
+      options?.layers?.workspaceFileSystem
+        ? Layer.mock(WorkspaceFileSystem.WorkspaceFileSystem)(options.layers.workspaceFileSystem)
+        : WorkspaceFileSystem.layer.pipe(
+            Layer.provide(WorkspacePaths.layer),
+            Layer.provide(workspaceEntriesLayer),
+          ),
       ProjectFaviconResolver.layer.pipe(
         Layer.provide(WorkspacePaths.layer),
         Layer.provide(T3ProjectFileLoader.layer),
@@ -6127,6 +6139,7 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
                       scripts: [],
                       createdAt: now,
                       updatedAt: now,
+                      deletedAt: null,
                     })
                   : Option.none();
               }),
@@ -6360,29 +6373,6 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
               client[WS_METHODS.serverUpdateSettings]({ patch: {} }),
             );
             yield* expectDenied(
-              "projects.readFile",
-              client[WS_METHODS.projectsReadFile]({
-                cwd: "/tmp/foreign",
-                relativePath: "README.md",
-              }),
-            );
-            yield* expectDenied(
-              "projects.writeFile",
-              client[WS_METHODS.projectsWriteFile]({
-                cwd: "/tmp/foreign",
-                relativePath: "README.md",
-                contents: "blocked",
-              }),
-            );
-            yield* expectDenied(
-              "projects.searchEntries",
-              client[WS_METHODS.projectsSearchEntries]({
-                cwd: "/tmp/foreign",
-                query: "README",
-                limit: 1,
-              }),
-            );
-            yield* expectDenied(
               "sourceControl.lookupRepository",
               client[WS_METHODS.sourceControlLookupRepository]({
                 provider: "github",
@@ -6509,6 +6499,250 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
         ),
       );
       assert.equal(dispatchCalls, 0);
+    }).pipe(Effect.provide(NodeHttpServer.layerTest)),
+  );
+
+  it.effect("scopes websocket workspace rpc methods to Fenix tenant project roots", () =>
+    Effect.gen(function* () {
+      const fs = yield* FileSystem.FileSystem;
+      const path = yield* Path.Path;
+      const now = "2026-08-09T00:00:00.000Z";
+      const fenixCodeTenantScope = { companyId: 5, userId: 10 } satisfies FenixCodeTenantScope;
+      const scopedProjectId = ProjectId.make("project-scoped");
+      const ownWorkspaceRoot = yield* fs.makeTempDirectoryScoped({
+        prefix: "fenix-own-workspace-",
+      });
+      const foreignWorkspaceRoot = yield* fs.makeTempDirectoryScoped({
+        prefix: "fenix-foreign-workspace-",
+      });
+      const normalizedOwnWorkspaceRoot = path.resolve(ownWorkspaceRoot);
+      const workspaceCalls: string[] = [];
+      const membershipCalls: string[] = [];
+      const scopedProject: OrchestrationProject = {
+        id: scopedProjectId,
+        title: "Scoped Project",
+        workspaceRoot: normalizedOwnWorkspaceRoot,
+        defaultModelSelection,
+        scripts: [],
+        createdAt: now,
+        updatedAt: now,
+        deletedAt: null,
+      };
+
+      yield* buildAppUnderTest({
+        fenixCodeTenantScope,
+        layers: {
+          fenixScopedProjectionSnapshotQuery: {
+            getActiveProjectByWorkspaceRoot: (scope, workspaceRoot) =>
+              Effect.sync(() => {
+                membershipCalls.push(`${scope.companyId}:${scope.userId}:${workspaceRoot}`);
+                return workspaceRoot === normalizedOwnWorkspaceRoot
+                  ? Option.some(scopedProject)
+                  : Option.none<OrchestrationProject>();
+              }),
+          },
+          workspaceEntries: {
+            browse: () => Effect.die("browse should stay denied for Fenix scoped sessions"),
+            refresh: () => Effect.void,
+            search: (input) =>
+              Effect.sync(() => {
+                workspaceCalls.push(`search:${input.cwd}:${input.query}`);
+                return {
+                  entries: [{ path: "README.md", kind: "file" as const }],
+                  truncated: false,
+                };
+              }),
+            searchContents: (input) =>
+              Effect.sync(() => {
+                workspaceCalls.push(`searchContents:${input.cwd}:${input.query}`);
+                return {
+                  matches: [
+                    {
+                      path: "README.md",
+                      lineNumber: 1,
+                      lineContent: "needle",
+                      matchRanges: [{ start: 0, end: 6 }],
+                    },
+                  ],
+                  truncated: false,
+                };
+              }),
+            list: (input) =>
+              Effect.sync(() => {
+                workspaceCalls.push(`list:${input.cwd}`);
+                return {
+                  entries: [{ path: "README.md", kind: "file" as const }],
+                  truncated: false,
+                };
+              }),
+          },
+          workspaceFileSystem: {
+            readFile: (input) =>
+              Effect.sync(() => {
+                workspaceCalls.push(`read:${input.cwd}:${input.relativePath}`);
+                return {
+                  relativePath: input.relativePath,
+                  contents: "hello",
+                  byteLength: 5,
+                  truncated: false,
+                };
+              }),
+            writeFile: (input) =>
+              Effect.sync(() => {
+                workspaceCalls.push(`write:${input.cwd}:${input.relativePath}:${input.contents}`);
+                return { relativePath: input.relativePath };
+              }),
+          },
+        },
+      });
+
+      const wsUrl = yield* getWsServerUrl("/ws");
+      const expectWorkspaceDenied = <A, E, R>(
+        label: string,
+        effect: Effect.Effect<A, E, R>,
+        tag:
+          | "ProjectSearchEntriesError"
+          | "ProjectSearchContentsError"
+          | "ProjectListEntriesError"
+          | "ProjectReadFileError"
+          | "ProjectWriteFileError",
+      ): Effect.Effect<void, never, R> =>
+        effect.pipe(
+          Effect.result,
+          Effect.map((result) => {
+            assertTrue(result._tag === "Failure", `${label} should be denied`);
+            if (result._tag === "Failure") {
+              const failure = result.failure as
+                | ProjectSearchEntriesError
+                | ProjectSearchContentsError
+                | ProjectListEntriesError
+                | ProjectReadFileError
+                | ProjectWriteFileError;
+              assert.equal(failure._tag, tag);
+              if (
+                failure._tag === "ProjectSearchEntriesError" ||
+                failure._tag === "ProjectSearchContentsError" ||
+                failure._tag === "ProjectListEntriesError"
+              ) {
+                assert.equal(failure.failure, "workspace_root_not_found");
+                assert.equal(failure.detail, "fenix_tenant_scope_denied");
+              } else {
+                assert.equal(failure.failure, "operation_failed");
+                assert.equal(failure.operation, "realpath-workspace-root");
+              }
+            }
+          }),
+        );
+
+      yield* Effect.scoped(
+        withWsRpcClient(wsUrl, (client) =>
+          Effect.gen(function* () {
+            yield* expectWorkspaceDenied(
+              "projects.searchEntries foreign cwd",
+              client[WS_METHODS.projectsSearchEntries]({
+                cwd: foreignWorkspaceRoot,
+                query: "README",
+                limit: 10,
+              }),
+              "ProjectSearchEntriesError",
+            );
+            yield* expectWorkspaceDenied(
+              "projects.searchContents foreign cwd",
+              client[WS_METHODS.projectsSearchContents]({
+                cwd: foreignWorkspaceRoot,
+                query: "needle",
+                limit: 10,
+                caseSensitive: false,
+                wholeWord: false,
+                useRegex: false,
+              }),
+              "ProjectSearchContentsError",
+            );
+            yield* expectWorkspaceDenied(
+              "projects.listEntries foreign cwd",
+              client[WS_METHODS.projectsListEntries]({ cwd: foreignWorkspaceRoot }),
+              "ProjectListEntriesError",
+            );
+            yield* expectWorkspaceDenied(
+              "projects.readFile foreign cwd",
+              client[WS_METHODS.projectsReadFile]({
+                cwd: foreignWorkspaceRoot,
+                relativePath: "README.md",
+              }),
+              "ProjectReadFileError",
+            );
+            yield* expectWorkspaceDenied(
+              "projects.writeFile foreign cwd",
+              client[WS_METHODS.projectsWriteFile]({
+                cwd: foreignWorkspaceRoot,
+                relativePath: "notes.txt",
+                contents: "blocked",
+              }),
+              "ProjectWriteFileError",
+            );
+            assert.deepEqual(workspaceCalls, []);
+
+            const searchEntries = yield* client[WS_METHODS.projectsSearchEntries]({
+              cwd: ownWorkspaceRoot,
+              query: "README",
+              limit: 10,
+            });
+            const searchContents = yield* client[WS_METHODS.projectsSearchContents]({
+              cwd: ownWorkspaceRoot,
+              query: "needle",
+              limit: 10,
+              caseSensitive: false,
+              wholeWord: false,
+              useRegex: false,
+            });
+            const listing = yield* client[WS_METHODS.projectsListEntries]({
+              cwd: ownWorkspaceRoot,
+            });
+            const file = yield* client[WS_METHODS.projectsReadFile]({
+              cwd: ownWorkspaceRoot,
+              relativePath: "README.md",
+            });
+            const write = yield* client[WS_METHODS.projectsWriteFile]({
+              cwd: ownWorkspaceRoot,
+              relativePath: "notes.txt",
+              contents: "ok",
+            });
+
+            assert.deepEqual(searchEntries, {
+              entries: [{ path: "README.md", kind: "file" }],
+              truncated: false,
+            });
+            assert.deepEqual(
+              searchContents.matches.map((match) => match.path),
+              ["README.md"],
+            );
+            assert.deepEqual(
+              listing.entries.map((entry) => entry.path),
+              ["README.md"],
+            );
+            assert.deepEqual(file, {
+              relativePath: "README.md",
+              contents: "hello",
+              byteLength: 5,
+              truncated: false,
+            });
+            assert.deepEqual(write, { relativePath: "notes.txt" });
+          }),
+        ),
+      );
+
+      assert.deepEqual(workspaceCalls, [
+        `search:${ownWorkspaceRoot}:README`,
+        `searchContents:${ownWorkspaceRoot}:needle`,
+        `list:${ownWorkspaceRoot}`,
+        `read:${ownWorkspaceRoot}:README.md`,
+        `write:${ownWorkspaceRoot}:notes.txt:ok`,
+      ]);
+      assert.equal(
+        membershipCalls.filter((call) => call.endsWith(`:${normalizedOwnWorkspaceRoot}`)).length,
+        5,
+      );
+      assert.equal(membershipCalls.filter((call) => call.includes(foreignWorkspaceRoot)).length, 5);
     }).pipe(Effect.provide(NodeHttpServer.layerTest)),
   );
 

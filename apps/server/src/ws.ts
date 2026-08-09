@@ -443,6 +443,7 @@ const makeWsRpcLayer = (
       const startup = yield* ServerRuntimeStartup.ServerRuntimeStartup;
       const workspaceEntries = yield* WorkspaceEntries.WorkspaceEntries;
       const workspaceFileSystem = yield* WorkspaceFileSystem.WorkspaceFileSystem;
+      const workspacePaths = yield* WorkspacePaths.WorkspacePaths;
       const projectSetupScriptRunner = yield* ProjectSetupScriptRunner.ProjectSetupScriptRunner;
       const serverEnvironment = yield* ServerEnvironment.ServerEnvironment;
       const backgroundPolicy = yield* BackgroundPolicy.BackgroundPolicy;
@@ -494,6 +495,11 @@ const makeWsRpcLayer = (
         ORCHESTRATION_WS_METHODS.subscribeShell,
         ORCHESTRATION_WS_METHODS.getArchivedShellSnapshot,
         ORCHESTRATION_WS_METHODS.subscribeThread,
+        WS_METHODS.projectsSearchEntries,
+        WS_METHODS.projectsSearchContents,
+        WS_METHODS.projectsListEntries,
+        WS_METHODS.projectsReadFile,
+        WS_METHODS.projectsWriteFile,
         WS_METHODS.serverProbe,
       ]);
       const fenixScopedAuthorizationError = (method: string, requiredScope: AuthEnvironmentScope) =>
@@ -657,6 +663,30 @@ const makeWsRpcLayer = (
               ? requireDispatchThreadAccess(normalizedCommand.threadId)
               : Effect.void;
         }
+      };
+
+      const requireScopedWorkspaceRootAccess = (
+        cwd: string,
+      ): Effect.Effect<void, "fenix_tenant_workspace_denied"> => {
+        if (currentFenixCodeTenantScope === undefined) {
+          return Effect.void;
+        }
+
+        const scope = currentFenixCodeTenantScope;
+        const denied = () => "fenix_tenant_workspace_denied" as const;
+
+        return workspacePaths.normalizeWorkspaceRoot(cwd).pipe(
+          Effect.flatMap((normalizedWorkspaceRoot) =>
+            fenixScopedProjectionSnapshotQuery.getActiveProjectByWorkspaceRoot(
+              scope,
+              normalizedWorkspaceRoot,
+            ),
+          ),
+          Effect.flatMap((project) =>
+            Option.isSome(project) ? Effect.void : Effect.fail(denied()),
+          ),
+          Effect.mapError(() => denied()),
+        );
       };
 
       const loadAuthAccessSnapshot = () =>
@@ -1868,16 +1898,31 @@ const makeWsRpcLayer = (
         [WS_METHODS.projectsSearchEntries]: (input) =>
           observeRpcEffect(
             WS_METHODS.projectsSearchEntries,
-            workspaceEntries.search(input).pipe(
+            requireScopedWorkspaceRootAccess(input.cwd).pipe(
               Effect.mapError(
-                (cause) =>
+                () =>
                   new ProjectSearchEntriesError({
                     cwd: input.cwd,
                     queryLength: input.query.length,
                     limit: input.limit,
-                    ...projectEntriesFailureContext(cause),
-                    cause,
+                    failure: "workspace_root_not_found",
+                    normalizedCwd: input.cwd,
+                    detail: "fenix_tenant_scope_denied",
                   }),
+              ),
+              Effect.flatMap(() =>
+                workspaceEntries.search(input).pipe(
+                  Effect.mapError(
+                    (cause) =>
+                      new ProjectSearchEntriesError({
+                        cwd: input.cwd,
+                        queryLength: input.query.length,
+                        limit: input.limit,
+                        ...projectEntriesFailureContext(cause),
+                        cause,
+                      }),
+                  ),
+                ),
               ),
             ),
             { "rpc.aggregate": "workspace" },
@@ -1885,16 +1930,31 @@ const makeWsRpcLayer = (
         [WS_METHODS.projectsSearchContents]: (input) =>
           observeRpcEffect(
             WS_METHODS.projectsSearchContents,
-            workspaceEntries.searchContents(input).pipe(
+            requireScopedWorkspaceRootAccess(input.cwd).pipe(
               Effect.mapError(
-                (cause) =>
+                () =>
                   new ProjectSearchContentsError({
                     cwd: input.cwd,
                     queryLength: input.query.length,
                     limit: input.limit,
-                    ...projectEntriesFailureContext(cause),
-                    cause,
+                    failure: "workspace_root_not_found",
+                    normalizedCwd: input.cwd,
+                    detail: "fenix_tenant_scope_denied",
                   }),
+              ),
+              Effect.flatMap(() =>
+                workspaceEntries.searchContents(input).pipe(
+                  Effect.mapError(
+                    (cause) =>
+                      new ProjectSearchContentsError({
+                        cwd: input.cwd,
+                        queryLength: input.query.length,
+                        limit: input.limit,
+                        ...projectEntriesFailureContext(cause),
+                        cause,
+                      }),
+                  ),
+                ),
               ),
             ),
             { "rpc.aggregate": "workspace" },
@@ -1902,14 +1962,27 @@ const makeWsRpcLayer = (
         [WS_METHODS.projectsListEntries]: (input) =>
           observeRpcEffect(
             WS_METHODS.projectsListEntries,
-            workspaceEntries.list(input).pipe(
+            requireScopedWorkspaceRootAccess(input.cwd).pipe(
               Effect.mapError(
-                (cause) =>
+                () =>
                   new ProjectListEntriesError({
-                    ...input,
-                    ...projectEntriesFailureContext(cause),
-                    cause,
+                    cwd: input.cwd,
+                    failure: "workspace_root_not_found",
+                    normalizedCwd: input.cwd,
+                    detail: "fenix_tenant_scope_denied",
                   }),
+              ),
+              Effect.flatMap(() =>
+                workspaceEntries.list(input).pipe(
+                  Effect.mapError(
+                    (cause) =>
+                      new ProjectListEntriesError({
+                        ...input,
+                        ...projectEntriesFailureContext(cause),
+                        cause,
+                      }),
+                  ),
+                ),
               ),
             ),
             { "rpc.aggregate": "workspace" },
@@ -1917,14 +1990,29 @@ const makeWsRpcLayer = (
         [WS_METHODS.projectsReadFile]: (input) =>
           observeRpcEffect(
             WS_METHODS.projectsReadFile,
-            workspaceFileSystem.readFile(input).pipe(
+            requireScopedWorkspaceRootAccess(input.cwd).pipe(
               Effect.mapError(
-                (cause) =>
+                () =>
                   new ProjectReadFileError({
-                    ...input,
-                    ...projectFileFailureContext(cause),
-                    cause,
+                    cwd: input.cwd,
+                    relativePath: input.relativePath,
+                    failure: "operation_failed",
+                    operation: "realpath-workspace-root",
+                    operationPath: input.cwd,
+                    cause: "fenix_tenant_scope_denied",
                   }),
+              ),
+              Effect.flatMap(() =>
+                workspaceFileSystem.readFile(input).pipe(
+                  Effect.mapError(
+                    (cause) =>
+                      new ProjectReadFileError({
+                        ...input,
+                        ...projectFileFailureContext(cause),
+                        cause,
+                      }),
+                  ),
+                ),
               ),
             ),
             { "rpc.aggregate": "workspace" },
@@ -1932,15 +2020,30 @@ const makeWsRpcLayer = (
         [WS_METHODS.projectsWriteFile]: (input) =>
           observeRpcEffect(
             WS_METHODS.projectsWriteFile,
-            workspaceFileSystem.writeFile(input).pipe(
+            requireScopedWorkspaceRootAccess(input.cwd).pipe(
               Effect.mapError(
-                (cause) =>
+                () =>
                   new ProjectWriteFileError({
                     cwd: input.cwd,
                     relativePath: input.relativePath,
-                    ...projectFileFailureContext(cause),
-                    cause,
+                    failure: "operation_failed",
+                    operation: "realpath-workspace-root",
+                    operationPath: input.cwd,
+                    cause: "fenix_tenant_scope_denied",
                   }),
+              ),
+              Effect.flatMap(() =>
+                workspaceFileSystem.writeFile(input).pipe(
+                  Effect.mapError(
+                    (cause) =>
+                      new ProjectWriteFileError({
+                        cwd: input.cwd,
+                        relativePath: input.relativePath,
+                        ...projectFileFailureContext(cause),
+                        cause,
+                      }),
+                  ),
+                ),
               ),
             ),
             { "rpc.aggregate": "workspace" },
