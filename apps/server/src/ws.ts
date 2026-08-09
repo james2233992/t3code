@@ -73,6 +73,7 @@ import {
 import { normalizeDispatchCommand } from "./orchestration/Normalizer.ts";
 import * as OrchestrationEngine from "./orchestration/Services/OrchestrationEngine.ts";
 import * as ProjectionSnapshotQuery from "./orchestration/Services/ProjectionSnapshotQuery.ts";
+import * as FenixScopedProjectionSnapshotQuery from "./orchestration/Services/FenixScopedProjectionSnapshotQuery.ts";
 import {
   observeRpcEffect as instrumentRpcEffect,
   observeRpcStream as instrumentRpcStream,
@@ -123,6 +124,8 @@ import * as SessionStore from "./auth/SessionStore.ts";
 import { failEnvironmentAuthInvalid, failEnvironmentInternal } from "./auth/http.ts";
 import * as RelayClient from "@t3tools/shared/relayClient";
 const isOrchestrationDispatchCommandError = Schema.is(OrchestrationDispatchCommandError);
+const isOrchestrationGetTurnDiffError = Schema.is(OrchestrationGetTurnDiffError);
+const isOrchestrationGetFullThreadDiffError = Schema.is(OrchestrationGetFullThreadDiffError);
 
 const nowIso = Effect.map(DateTime.now, DateTime.formatIso);
 const EDITOR_DISCOVERY_TIMEOUT = Duration.seconds(5);
@@ -356,6 +359,70 @@ const makeWsRpcLayer = (
       const currentSessionId = currentSession.sessionId;
       const crypto = yield* Crypto.Crypto;
       const projectionSnapshotQuery = yield* ProjectionSnapshotQuery.ProjectionSnapshotQuery;
+      const fenixScopedProjectionSnapshotQuery =
+        yield* FenixScopedProjectionSnapshotQuery.FenixScopedProjectionSnapshotQuery;
+      const currentFenixCodeTenantScope = currentSession.fenixCodeTenantScope;
+      const scopedProjectionSnapshotQuery = currentFenixCodeTenantScope
+        ? {
+            getShellSnapshot: () =>
+              fenixScopedProjectionSnapshotQuery.getShellSnapshot(currentFenixCodeTenantScope),
+            getArchivedShellSnapshot: () =>
+              fenixScopedProjectionSnapshotQuery.getArchivedShellSnapshot(
+                currentFenixCodeTenantScope,
+              ),
+            searchThreads: (
+              input: Parameters<
+                ProjectionSnapshotQuery.ProjectionSnapshotQuery["Service"]["searchThreads"]
+              >[0],
+            ) =>
+              fenixScopedProjectionSnapshotQuery.searchThreads(currentFenixCodeTenantScope, input),
+            getProjectShellById: (
+              projectId: Parameters<
+                ProjectionSnapshotQuery.ProjectionSnapshotQuery["Service"]["getProjectShellById"]
+              >[0],
+            ) =>
+              fenixScopedProjectionSnapshotQuery.getProjectShellById(
+                currentFenixCodeTenantScope,
+                projectId,
+              ),
+            getThreadShellById: (
+              threadId: Parameters<
+                ProjectionSnapshotQuery.ProjectionSnapshotQuery["Service"]["getThreadShellById"]
+              >[0],
+            ) =>
+              fenixScopedProjectionSnapshotQuery.getThreadShellById(
+                currentFenixCodeTenantScope,
+                threadId,
+              ),
+            getThreadDetailSnapshot: (
+              threadId: Parameters<
+                ProjectionSnapshotQuery.ProjectionSnapshotQuery["Service"]["getThreadDetailSnapshot"]
+              >[0],
+              window: Parameters<
+                ProjectionSnapshotQuery.ProjectionSnapshotQuery["Service"]["getThreadDetailSnapshot"]
+              >[1],
+            ) =>
+              fenixScopedProjectionSnapshotQuery.getThreadDetailSnapshot(
+                currentFenixCodeTenantScope,
+                threadId,
+                window,
+              ),
+            projectBelongsToScope: (projectId: ProjectId) =>
+              fenixScopedProjectionSnapshotQuery.projectBelongsToScope(
+                currentFenixCodeTenantScope,
+                projectId,
+              ),
+            threadBelongsToScope: (threadId: ThreadId) =>
+              fenixScopedProjectionSnapshotQuery.threadBelongsToScope(
+                currentFenixCodeTenantScope,
+                threadId,
+              ),
+          }
+        : {
+            ...projectionSnapshotQuery,
+            projectBelongsToScope: (_projectId: ProjectId) => Effect.succeed(true),
+            threadBelongsToScope: (_threadId: ThreadId) => Effect.succeed(true),
+          };
       const orchestrationEngine = yield* OrchestrationEngine.OrchestrationEngineService;
       const checkpointDiffQuery = yield* CheckpointDiffQuery.CheckpointDiffQuery;
       const keybindings = yield* Keybindings.Keybindings;
@@ -420,40 +487,59 @@ const makeWsRpcLayer = (
           message: `The authenticated token is missing required scope: ${requiredScope}.`,
           requiredScope,
         });
+      const fenixScopedRpcAllowlist = new Set<string>([
+        ORCHESTRATION_WS_METHODS.getTurnDiff,
+        ORCHESTRATION_WS_METHODS.getFullThreadDiff,
+        ORCHESTRATION_WS_METHODS.searchThreads,
+        ORCHESTRATION_WS_METHODS.subscribeShell,
+        ORCHESTRATION_WS_METHODS.getArchivedShellSnapshot,
+        ORCHESTRATION_WS_METHODS.subscribeThread,
+        WS_METHODS.serverProbe,
+      ]);
+      const fenixScopedAuthorizationError = (method: string, requiredScope: AuthEnvironmentScope) =>
+        new EnvironmentAuthorizationError({
+          message: `Fenix scoped sessions cannot call global RPC method: ${method}.`,
+          requiredScope,
+        });
       const authorizeEffect = <A, E, R>(
-        requiredScope: AuthEnvironmentScope,
+        method: string,
         effect: Effect.Effect<A, E, R>,
       ): Effect.Effect<A, E | EnvironmentAuthorizationError, R> =>
-        currentSession.scopes.includes(requiredScope)
-          ? effect
-          : Effect.fail(authorizationError(requiredScope));
+        Effect.gen(function* () {
+          const requiredScope = requiredScopeForRpcMethod(method);
+          if (!currentSession.scopes.includes(requiredScope)) {
+            return yield* authorizationError(requiredScope);
+          }
+          if (currentFenixCodeTenantScope !== undefined && !fenixScopedRpcAllowlist.has(method)) {
+            return yield* fenixScopedAuthorizationError(method, requiredScope);
+          }
+          return yield* effect;
+        });
       const authorizeStream = <A, E, R>(
-        requiredScope: AuthEnvironmentScope,
+        method: string,
         stream: Stream.Stream<A, E, R>,
       ): Stream.Stream<A, E | EnvironmentAuthorizationError, R> =>
-        currentSession.scopes.includes(requiredScope)
-          ? stream
-          : Stream.fail(authorizationError(requiredScope));
+        Stream.fromEffect(
+          Effect.gen(function* () {
+            const requiredScope = requiredScopeForRpcMethod(method);
+            if (!currentSession.scopes.includes(requiredScope)) {
+              return yield* authorizationError(requiredScope);
+            }
+            if (currentFenixCodeTenantScope !== undefined && !fenixScopedRpcAllowlist.has(method)) {
+              return yield* fenixScopedAuthorizationError(method, requiredScope);
+            }
+          }),
+        ).pipe(Stream.drain, Stream.concat(stream));
       const observeRpcEffect = <A, E, R>(
         method: string,
         effect: Effect.Effect<A, E, R>,
         traceAttributes?: Readonly<Record<string, unknown>>,
-      ) =>
-        instrumentRpcEffect(
-          method,
-          authorizeEffect(requiredScopeForRpcMethod(method), effect),
-          traceAttributes,
-        );
+      ) => instrumentRpcEffect(method, authorizeEffect(method, effect), traceAttributes);
       const observeRpcStream = <A, E, R>(
         method: string,
         stream: Stream.Stream<A, E, R>,
         traceAttributes?: Readonly<Record<string, unknown>>,
-      ) =>
-        instrumentRpcStream(
-          method,
-          authorizeStream(requiredScopeForRpcMethod(method), stream),
-          traceAttributes,
-        );
+      ) => instrumentRpcStream(method, authorizeStream(method, stream), traceAttributes);
       const observeRpcStreamEffect = <A, StreamError, StreamContext, EffectError, EffectContext>(
         method: string,
         effect: Effect.Effect<
@@ -462,12 +548,7 @@ const makeWsRpcLayer = (
           EffectContext
         >,
         traceAttributes?: Readonly<Record<string, unknown>>,
-      ) =>
-        instrumentRpcStreamEffect(
-          method,
-          authorizeEffect(requiredScopeForRpcMethod(method), effect),
-          traceAttributes,
-        );
+      ) => instrumentRpcStreamEffect(method, authorizeEffect(method, effect), traceAttributes);
       const toDispatchCommandError = (cause: unknown, fallbackMessage: string) =>
         isOrchestrationDispatchCommandError(cause)
           ? cause
@@ -483,6 +564,100 @@ const makeWsRpcLayer = (
       const serverEventId = randomUUID.pipe(Effect.map(EventId.make));
       const serverCommandId = (tag: string) =>
         randomUUID.pipe(Effect.map((uuid) => CommandId.make(`server:${tag}:${uuid}`)));
+
+      const scopedProjectAccessExists = (projectId: ProjectId) =>
+        currentFenixCodeTenantScope === undefined
+          ? Effect.succeed(true)
+          : scopedProjectionSnapshotQuery.projectBelongsToScope(projectId);
+
+      const scopedThreadAccessExists = (threadId: ThreadId) =>
+        currentFenixCodeTenantScope === undefined
+          ? Effect.succeed(true)
+          : scopedProjectionSnapshotQuery.threadBelongsToScope(threadId);
+
+      const requireDispatchProjectAccess = (projectId: ProjectId) =>
+        scopedProjectAccessExists(projectId).pipe(
+          Effect.flatMap((exists) =>
+            exists
+              ? Effect.void
+              : Effect.fail(
+                  new OrchestrationDispatchCommandError({
+                    message: "Fenix scoped session cannot access this project",
+                    cause: projectId,
+                  }),
+                ),
+          ),
+          Effect.mapError((cause) =>
+            isOrchestrationDispatchCommandError(cause)
+              ? cause
+              : new OrchestrationDispatchCommandError({
+                  message: "Failed to validate Fenix scoped project access",
+                  cause,
+                }),
+          ),
+        );
+
+      const requireDispatchThreadAccess = (threadId: ThreadId) =>
+        scopedThreadAccessExists(threadId).pipe(
+          Effect.flatMap((exists) =>
+            exists
+              ? Effect.void
+              : Effect.fail(
+                  new OrchestrationDispatchCommandError({
+                    message: "Fenix scoped session cannot access this thread",
+                    cause: threadId,
+                  }),
+                ),
+          ),
+          Effect.mapError((cause) =>
+            isOrchestrationDispatchCommandError(cause)
+              ? cause
+              : new OrchestrationDispatchCommandError({
+                  message: "Failed to validate Fenix scoped thread access",
+                  cause,
+                }),
+          ),
+        );
+
+      const requireScopedDispatchAccess = (
+        normalizedCommand: OrchestrationCommand,
+      ): Effect.Effect<void, OrchestrationDispatchCommandError> => {
+        if (currentFenixCodeTenantScope === undefined) {
+          return Effect.void;
+        }
+
+        switch (normalizedCommand.type) {
+          case "project.create":
+            return Effect.fail(
+              new OrchestrationDispatchCommandError({
+                message: "Fenix scoped sessions cannot create projects through this transport",
+                cause: normalizedCommand.projectId,
+              }),
+            );
+          case "project.meta.update":
+          case "project.delete":
+            return requireDispatchProjectAccess(normalizedCommand.projectId);
+          case "thread.create":
+            return requireDispatchProjectAccess(normalizedCommand.projectId);
+          case "thread.turn.start":
+            return Effect.gen(function* () {
+              if (normalizedCommand.bootstrap?.createThread) {
+                yield* requireDispatchProjectAccess(
+                  normalizedCommand.bootstrap.createThread.projectId,
+                );
+              } else {
+                yield* requireDispatchThreadAccess(normalizedCommand.threadId);
+              }
+              if (normalizedCommand.sourceProposedPlan) {
+                yield* requireDispatchThreadAccess(normalizedCommand.sourceProposedPlan.threadId);
+              }
+            });
+          default:
+            return "threadId" in normalizedCommand
+              ? requireDispatchThreadAccess(normalizedCommand.threadId)
+              : Effect.void;
+        }
+      };
 
       const loadAuthAccessSnapshot = () =>
         Effect.all({
@@ -547,22 +722,10 @@ const makeWsRpcLayer = (
           case "project.meta-updated":
             return projectUpsertOrRemove(event.payload.projectId, event.sequence);
           case "project.deleted":
-            return Effect.succeed(
-              Option.some({
-                kind: "project-removed" as const,
-                sequence: event.sequence,
-                projectId: event.payload.projectId,
-              }),
-            );
+            return projectUpsertOrRemove(event.payload.projectId, event.sequence);
           case "thread.deleted":
           case "thread.archived":
-            return Effect.succeed(
-              Option.some({
-                kind: "thread-removed" as const,
-                sequence: event.sequence,
-                threadId: event.payload.threadId,
-              }),
-            );
+            return threadUpsertOrRemove(event.payload.threadId, event.sequence);
           case "thread.unarchived":
             return threadUpsertOrRemove(event.payload.threadId, event.sequence);
           default:
@@ -596,18 +759,44 @@ const makeWsRpcLayer = (
           Effect.orElseSucceed(() => Option.none()),
         );
 
+      const checkShellProjectionScopeMembership = <E>(
+        aggregateKind: "project" | "thread",
+        aggregateId: string,
+        read: Effect.Effect<boolean, E>,
+      ): Effect.Effect<boolean, never, never> =>
+        read.pipe(
+          Effect.retry({ times: 1 }),
+          Effect.tapError((error) =>
+            Effect.logWarning("orchestration shell scope membership check failed", {
+              aggregateKind,
+              aggregateId,
+              error,
+            }),
+          ),
+          Effect.orElseSucceed(() => false),
+        );
+
       const projectUpsertOrRemove = (
         projectId: ProjectId,
         sequence: number,
       ): Effect.Effect<Option.Option<OrchestrationShellStreamEvent>, never, never> =>
-        retryShellProjectionRead(
+        checkShellProjectionScopeMembership(
           "project",
           projectId,
-          projectionSnapshotQuery.getProjectShellById(projectId),
+          scopedProjectionSnapshotQuery.projectBelongsToScope(projectId),
         ).pipe(
-          Effect.map(
-            Option.flatMap((project) =>
-              Option.match(project, {
+          Effect.flatMap((belongsToScope) =>
+            belongsToScope
+              ? retryShellProjectionRead(
+                  "project",
+                  projectId,
+                  scopedProjectionSnapshotQuery.getProjectShellById(projectId),
+                )
+              : Effect.succeed(Option.none()),
+          ),
+          Effect.map((project) =>
+            Option.flatMap(project, (visibleProject) =>
+              Option.match(visibleProject, {
                 onNone: () =>
                   Option.some<OrchestrationShellStreamEvent>({
                     kind: "project-removed" as const,
@@ -639,14 +828,23 @@ const makeWsRpcLayer = (
         threadId: ThreadId,
         sequence: number,
       ): Effect.Effect<Option.Option<OrchestrationShellStreamEvent>, never, never> =>
-        retryShellProjectionRead(
+        checkShellProjectionScopeMembership(
           "thread",
           threadId,
-          projectionSnapshotQuery.getThreadShellById(threadId),
+          scopedProjectionSnapshotQuery.threadBelongsToScope(threadId),
         ).pipe(
-          Effect.map(
-            Option.flatMap((thread) =>
-              Option.match(thread, {
+          Effect.flatMap((belongsToScope) =>
+            belongsToScope
+              ? retryShellProjectionRead(
+                  "thread",
+                  threadId,
+                  scopedProjectionSnapshotQuery.getThreadShellById(threadId),
+                )
+              : Effect.succeed(Option.none()),
+          ),
+          Effect.map((thread) =>
+            Option.flatMap(thread, (visibleThread) =>
+              Option.match(visibleThread, {
                 onNone: () =>
                   Option.some<OrchestrationShellStreamEvent>({
                     kind: "thread-removed" as const,
@@ -1036,9 +1234,10 @@ const makeWsRpcLayer = (
             ORCHESTRATION_WS_METHODS.dispatchCommand,
             Effect.gen(function* () {
               const normalizedCommand = yield* normalizeDispatchCommand(command);
+              yield* requireScopedDispatchAccess(normalizedCommand);
               const shouldStopSessionAfterArchive =
                 normalizedCommand.type === "thread.archive"
-                  ? yield* projectionSnapshotQuery
+                  ? yield* scopedProjectionSnapshotQuery
                       .getThreadShellById(normalizedCommand.threadId)
                       .pipe(
                         Effect.map(
@@ -1106,13 +1305,23 @@ const makeWsRpcLayer = (
         [ORCHESTRATION_WS_METHODS.getTurnDiff]: (input) =>
           observeRpcEffect(
             ORCHESTRATION_WS_METHODS.getTurnDiff,
-            checkpointDiffQuery.getTurnDiff(input).pipe(
-              Effect.mapError(
-                (cause) =>
-                  new OrchestrationGetTurnDiffError({
-                    message: "Failed to load turn diff",
-                    cause,
-                  }),
+            Effect.gen(function* () {
+              const canReadThread = yield* scopedThreadAccessExists(input.threadId);
+              if (!canReadThread) {
+                return yield* new OrchestrationGetTurnDiffError({
+                  message: `Thread ${input.threadId} was not found`,
+                  cause: input.threadId,
+                });
+              }
+              return yield* checkpointDiffQuery.getTurnDiff(input);
+            }).pipe(
+              Effect.mapError((cause) =>
+                isOrchestrationGetTurnDiffError(cause)
+                  ? cause
+                  : new OrchestrationGetTurnDiffError({
+                      message: "Failed to load turn diff",
+                      cause,
+                    }),
               ),
             ),
             { "rpc.aggregate": "orchestration" },
@@ -1120,13 +1329,23 @@ const makeWsRpcLayer = (
         [ORCHESTRATION_WS_METHODS.getFullThreadDiff]: (input) =>
           observeRpcEffect(
             ORCHESTRATION_WS_METHODS.getFullThreadDiff,
-            checkpointDiffQuery.getFullThreadDiff(input).pipe(
-              Effect.mapError(
-                (cause) =>
-                  new OrchestrationGetFullThreadDiffError({
-                    message: "Failed to load full thread diff",
-                    cause,
-                  }),
+            Effect.gen(function* () {
+              const canReadThread = yield* scopedThreadAccessExists(input.threadId);
+              if (!canReadThread) {
+                return yield* new OrchestrationGetFullThreadDiffError({
+                  message: `Thread ${input.threadId} was not found`,
+                  cause: input.threadId,
+                });
+              }
+              return yield* checkpointDiffQuery.getFullThreadDiff(input);
+            }).pipe(
+              Effect.mapError((cause) =>
+                isOrchestrationGetFullThreadDiffError(cause)
+                  ? cause
+                  : new OrchestrationGetFullThreadDiffError({
+                      message: "Failed to load full thread diff",
+                      cause,
+                    }),
               ),
             ),
             { "rpc.aggregate": "orchestration" },
@@ -1134,7 +1353,7 @@ const makeWsRpcLayer = (
         [ORCHESTRATION_WS_METHODS.searchThreads]: (input) =>
           observeRpcEffect(
             ORCHESTRATION_WS_METHODS.searchThreads,
-            projectionSnapshotQuery.searchThreads(input).pipe(
+            scopedProjectionSnapshotQuery.searchThreads(input).pipe(
               Effect.mapError(
                 (cause) =>
                   new OrchestrationSearchThreadsError({
@@ -1171,7 +1390,7 @@ const makeWsRpcLayer = (
               );
               const bufferedLiveStream = coalesceShellLiveStream(Stream.fromQueue(liveBuffer));
 
-              const loadSnapshot = projectionSnapshotQuery.getShellSnapshot().pipe(
+              const loadSnapshot = scopedProjectionSnapshotQuery.getShellSnapshot().pipe(
                 Effect.tapError((cause) =>
                   Effect.logError("orchestration shell snapshot load failed", { cause }),
                 ),
@@ -1255,7 +1474,7 @@ const makeWsRpcLayer = (
         [ORCHESTRATION_WS_METHODS.getArchivedShellSnapshot]: (_input) =>
           observeRpcEffect(
             ORCHESTRATION_WS_METHODS.getArchivedShellSnapshot,
-            projectionSnapshotQuery.getArchivedShellSnapshot().pipe(
+            scopedProjectionSnapshotQuery.getArchivedShellSnapshot().pipe(
               Effect.tapError((cause) =>
                 Effect.logError("orchestration archived shell snapshot load failed", { cause }),
               ),
@@ -1273,6 +1492,22 @@ const makeWsRpcLayer = (
           observeRpcStreamEffect(
             ORCHESTRATION_WS_METHODS.subscribeThread,
             Effect.gen(function* () {
+              const canReadThread = yield* scopedThreadAccessExists(input.threadId).pipe(
+                Effect.mapError(
+                  (cause) =>
+                    new OrchestrationGetSnapshotError({
+                      message: `Failed to validate thread ${input.threadId}`,
+                      cause,
+                    }),
+                ),
+              );
+              if (!canReadThread) {
+                return yield* new OrchestrationGetSnapshotError({
+                  message: `Thread ${input.threadId} was not found`,
+                  cause: input.threadId,
+                });
+              }
+
               const isThisThreadDetailEvent = (event: OrchestrationEvent) =>
                 event.aggregateKind === "thread" &&
                 event.aggregateId === input.threadId &&
@@ -1353,7 +1588,7 @@ const makeWsRpcLayer = (
                 // fresh thread detail instead of an unbounded replay.
               }
 
-              const snapshot = yield* projectionSnapshotQuery
+              const snapshot = yield* scopedProjectionSnapshotQuery
                 .getThreadDetailSnapshot(
                   input.threadId,
                   // Windowing the fallback snapshot is opt-in per subscription:
