@@ -1137,6 +1137,7 @@
 ./apps/server/src/auth/EnvironmentAuth.test.ts:2:43:@t3tools
 ./apps/server/src/auth/EnvironmentAuth.ts:19:9:@t3tools
 ./apps/server/src/auth/EnvironmentAuth.ts:20:35:@t3tools
+./apps/server/src/auth/EnvironmentAuth.ts:70:30:Fenix Code
 ./apps/server/src/auth/EnvironmentAuthPolicy.ts:1:44:@t3tools
 ./apps/server/src/auth/PairingGrantStore.ts:7:9:@t3tools
 ./apps/server/src/auth/RpcAuthorization.test.ts:8:9:@t3tools
@@ -1611,6 +1612,8 @@
 ./apps/server/src/orchestration/Layers/CheckpointReactor.ts:12:9:@t3tools
 ./apps/server/src/orchestration/Layers/CheckpointReactor.ts:21:38:@t3tools
 ./apps/server/src/orchestration/Layers/CheckpointReactor.ts:22:44:@t3tools
+./apps/server/src/orchestration/Layers/FenixScopedProjectionSnapshotQuery.test.ts:3:72:@t3tools
+./apps/server/src/orchestration/Layers/FenixScopedProjectionSnapshotQuery.ts:11:9:@t3tools
 ./apps/server/src/orchestration/Layers/OrchestrationEngine.test.ts:11:9:@t3tools
 ./apps/server/src/orchestration/Layers/OrchestrationEngine.test.ts:549:18:t3code
 ./apps/server/src/orchestration/Layers/OrchestrationEngine.test.ts:560:18:t3code
@@ -1646,6 +1649,7 @@
 ./apps/server/src/orchestration/Normalizer.test.ts:9:9:@t3tools
 ./apps/server/src/orchestration/Normalizer.ts:11:9:@t3tools
 ./apps/server/src/orchestration/Schemas.ts:30:9:@t3tools
+./apps/server/src/orchestration/Services/FenixScopedProjectionSnapshotQuery.ts:14:9:@t3tools
 ./apps/server/src/orchestration/Services/OrchestrationEngine.ts:13:64:@t3tools
 ./apps/server/src/orchestration/Services/ProjectionPipeline.ts:9:42:@t3tools
 ./apps/server/src/orchestration/Services/ProjectionSnapshotQuery.ts:24:9:@t3tools
@@ -2035,32 +2039,32 @@
 ./apps/server/src/resourceTelemetry/ResourceTelemetryHistory.test.ts:6:9:@t3tools
 ./apps/server/src/resourceTelemetry/ResourceTelemetryHistory.ts:9:9:@t3tools
 ./apps/server/src/review/ReviewService.ts:16:9:@t3tools
-./apps/server/src/server.test.ts:1659:19:Fenix Code
-./apps/server/src/server.test.ts:1686:17:Fenix Code
-./apps/server/src/server.test.ts:2640:36:Fenix Connect
-./apps/server/src/server.test.ts:2699:28:Fenix Connect
-./apps/server/src/server.test.ts:3528:33:t3code
-./apps/server/src/server.test.ts:3528:49:t3code
-./apps/server/src/server.test.ts:35:9:@t3tools
-./apps/server/src/server.test.ts:40:9:@t3tools
-./apps/server/src/server.test.ts:41:67:@t3tools
-./apps/server/src/server.test.ts:42:31:@t3tools
+./apps/server/src/server.test.ts:1003:49:Fenix Connect
+./apps/server/src/server.test.ts:1720:19:Fenix Code
+./apps/server/src/server.test.ts:1747:17:Fenix Code
+./apps/server/src/server.test.ts:2701:36:Fenix Connect
+./apps/server/src/server.test.ts:2760:28:Fenix Connect
+./apps/server/src/server.test.ts:3589:33:t3code
+./apps/server/src/server.test.ts:3589:49:t3code
+./apps/server/src/server.test.ts:36:9:@t3tools
+./apps/server/src/server.test.ts:41:9:@t3tools
+./apps/server/src/server.test.ts:42:67:@t3tools
+./apps/server/src/server.test.ts:43:31:@t3tools
 ./apps/server/src/server.test.ts:5:62:@t3tools
-./apps/server/src/server.test.ts:7183:23:t3code
-./apps/server/src/server.test.ts:7226:29:t3code
-./apps/server/src/server.test.ts:7303:28:t3code
-./apps/server/src/server.test.ts:7327:24:t3code
-./apps/server/src/server.test.ts:7393:27:t3code
-./apps/server/src/server.test.ts:7449:28:t3code
-./apps/server/src/server.test.ts:7467:24:t3code
-./apps/server/src/server.test.ts:7481:25:t3code
-./apps/server/src/server.test.ts:7552:26:t3code
-./apps/server/src/server.test.ts:7586:25:t3code
-./apps/server/src/server.test.ts:7673:26:t3code
-./apps/server/src/server.test.ts:7757:26:t3code
-./apps/server/src/server.test.ts:8047:48:T3CODE
-./apps/server/src/server.test.ts:8054:48:T3CODE
-./apps/server/src/server.test.ts:942:49:Fenix Connect
+./apps/server/src/server.test.ts:7745:23:t3code
+./apps/server/src/server.test.ts:7788:29:t3code
+./apps/server/src/server.test.ts:7865:28:t3code
+./apps/server/src/server.test.ts:7889:24:t3code
+./apps/server/src/server.test.ts:7955:27:t3code
+./apps/server/src/server.test.ts:8011:28:t3code
+./apps/server/src/server.test.ts:8029:24:t3code
+./apps/server/src/server.test.ts:8043:25:t3code
+./apps/server/src/server.test.ts:8114:26:t3code
+./apps/server/src/server.test.ts:8148:25:t3code
+./apps/server/src/server.test.ts:8235:26:t3code
+./apps/server/src/server.test.ts:8319:26:t3code
+./apps/server/src/server.test.ts:8609:48:T3CODE
+./apps/server/src/server.test.ts:8616:48:T3CODE
 ./apps/server/src/server.ts:113:30:@t3tools
 ./apps/server/src/server.ts:114:31:@t3tools
 ./apps/server/src/server.ts:115:62:@t3tools
@@ -2427,7 +2431,7 @@
 ./apps/server/src/workspace/WorkspaceFileSystem.ts:17:9:@t3tools
 ./apps/server/src/workspace/WorkspacePaths.test.ts:19:14:t3code
 ./apps/server/src/workspace/WorkspaceSearchIndex.ts:25:9:@t3tools
-./apps/server/src/ws.ts:124:31:@t3tools
+./apps/server/src/ws.ts:125:31:@t3tools
 ./apps/server/src/ws.ts:60:9:@t3tools
 ./apps/server/src/ws.ts:61:58:@t3tools
 ./apps/server/test/ActivityPayloadProjection.test.ts:10:9:@t3tools
@@ -3390,6 +3394,9 @@
 ./docs/fenix/f0-final-visible-rebrand-report-20260808.md:5:27:t3code
 ./docs/fenix/f0-final-visible-rebrand-report-20260808.md:96:22:Fenix Code
 ./docs/fenix/f0-final-visible-rebrand-report-20260808.md:97:23:Fenix Code
+./docs/fenix/f1-3-e2e-report-20260809.md:11:36:Fenix Code
+./docs/fenix/f1-3-e2e-report-20260809.md:87:32:@t3tools
+./docs/fenix/f1-3-e2e-report-20260809.md:96:83:Fenix Code
 ./docs/fenix/f1-fenix-driver.md:15:99:Fenix Code
 ./docs/fenix/f1-fenix-driver.md:1:3:Fenix Code
 ./docs/fenix/f1-fenix-driver.md:27:1:Fenix Code

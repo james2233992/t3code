@@ -163,6 +163,7 @@ describe("FenixDriver", () => {
           FenixPairingSessionBridge.layerFromSnapshotResolver(() => ({
             session: { kind: "cookie", authToken: `bad-expiry-${index}` },
             expiresAtEpochMs: expiresAtEpochMs as number,
+            tenantScope: { companyId: 1, userId: 1 },
           })),
         );
         const threadId = ThreadId.make(`thread-fenix-driver-bad-expiry-${index}`);

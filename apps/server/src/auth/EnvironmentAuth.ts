@@ -34,6 +34,7 @@ import * as ServerSecretStore from "./ServerSecretStore.ts";
 import * as SessionStore from "./SessionStore.ts";
 import { verifyRequestDpopProof } from "./dpop.ts";
 import { layerConfig as SqlitePersistenceLayer } from "../persistence/Layers/Sqlite.ts";
+import type { FenixCodeTenantScope } from "../fenix/FenixCodeTenantScope.ts";
 
 export const DEFAULT_SESSION_SUBJECT = "cli-issued-session";
 export const INTERNAL_ADMINISTRATIVE_BOOTSTRAP_SUBJECT = "administrative-bootstrap";
@@ -65,6 +66,12 @@ export interface AuthenticatedSession {
   readonly scopes: ReadonlyArray<AuthEnvironmentScope>;
   readonly proofKeyThumbprint?: string;
   readonly expiresAt?: DateTime.DateTime;
+  /**
+   * Present only for future Fenix Code companion sessions minted from the
+   * Code Lab pairing envelope. Normal T3 local sessions never carry this
+   * field and keep the original unscoped desktop behavior.
+   */
+  readonly fenixCodeTenantScope?: FenixCodeTenantScope;
 }
 
 const serverAuthInternalErrorContext = {

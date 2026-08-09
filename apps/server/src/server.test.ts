@@ -11,6 +11,7 @@ import {
   CommandId,
   DEFAULT_SERVER_SETTINGS,
   EnvironmentId,
+  EnvironmentAuthorizationError,
   EventId,
   GitCommandError,
   KeybindingRule,
@@ -110,6 +111,7 @@ import * as ExternalLauncher from "./process/externalLauncher.ts";
 import * as OrchestrationEngine from "./orchestration/Services/OrchestrationEngine.ts";
 import { OrchestrationListenerCallbackError } from "./orchestration/Errors.ts";
 import * as ProjectionSnapshotQuery from "./orchestration/Services/ProjectionSnapshotQuery.ts";
+import * as FenixScopedProjectionSnapshotQuery from "./orchestration/Services/FenixScopedProjectionSnapshotQuery.ts";
 import { SqlitePersistenceMemory } from "./persistence/Layers/Sqlite.ts";
 import { PersistenceSqlError } from "./persistence/Errors.ts";
 import * as ProviderRegistry from "./provider/Services/ProviderRegistry.ts";
@@ -151,6 +153,7 @@ import * as ResourceAttribution from "./resourceTelemetry/ResourceAttribution.ts
 import * as ResourceTelemetry from "./resourceTelemetry/ResourceTelemetry.ts";
 import * as UsageService from "./usage/UsageService.ts";
 import * as Data from "effect/Data";
+import type { FenixCodeTenantScope } from "./fenix/FenixCodeTenantScope.ts";
 
 import { makeOrchestrationIntegrationHarness } from "../integration/OrchestrationEngineHarness.integration.ts";
 import {
@@ -275,11 +278,33 @@ const browserOtlpTracingLayer = Layer.mergeAll(
   Layer.succeed(HttpClient.TracerDisabledWhen, () => true),
 );
 
-const makeAuthTestLayer = () =>
-  EnvironmentAuth.layer.pipe(
+const makeAuthTestLayer = (fenixCodeTenantScope?: FenixCodeTenantScope) => {
+  const baseLayer = EnvironmentAuth.layer.pipe(
     Layer.provide(SqlitePersistenceMemory),
     Layer.provide(ServerSecretStore.layer),
   );
+  if (fenixCodeTenantScope === undefined) {
+    return baseLayer;
+  }
+  const scopedAuthLayer = Layer.effect(
+    EnvironmentAuth.EnvironmentAuth,
+    Effect.gen(function* () {
+      const auth = yield* EnvironmentAuth.EnvironmentAuth;
+      return EnvironmentAuth.EnvironmentAuth.of({
+        ...auth,
+        authenticateHttpRequest: (request) =>
+          auth
+            .authenticateHttpRequest(request)
+            .pipe(Effect.map((session) => ({ ...session, fenixCodeTenantScope }))),
+        authenticateWebSocketUpgrade: (request) =>
+          auth
+            .authenticateWebSocketUpgrade(request)
+            .pipe(Effect.map((session) => ({ ...session, fenixCodeTenantScope }))),
+      });
+    }),
+  );
+  return Layer.mergeAll(baseLayer, scopedAuthLayer.pipe(Layer.provide(baseLayer)));
+};
 
 const makeBrowserOtlpPayload = (spanName: string) =>
   Effect.gen(function* () {
@@ -382,6 +407,7 @@ const makeBrowserOtlpPayload = (spanName: string) =>
 
 const buildAppUnderTest = (options?: {
   config?: Partial<ServerConfig.ServerConfig["Service"]>;
+  fenixCodeTenantScope?: FenixCodeTenantScope;
   layers?: {
     keybindings?: Partial<Keybindings.Keybindings["Service"]>;
     providerRegistry?: Partial<ProviderRegistry.ProviderRegistry["Service"]>;
@@ -402,6 +428,9 @@ const buildAppUnderTest = (options?: {
     terminalManager?: Partial<TerminalManager.TerminalManager["Service"]>;
     orchestrationEngine?: Partial<OrchestrationEngine.OrchestrationEngineService["Service"]>;
     projectionSnapshotQuery?: Partial<ProjectionSnapshotQuery.ProjectionSnapshotQuery["Service"]>;
+    fenixScopedProjectionSnapshotQuery?: Partial<
+      FenixScopedProjectionSnapshotQuery.FenixScopedProjectionSnapshotQuery["Service"]
+    >;
     checkpointDiffQuery?: Partial<CheckpointDiffQuery.CheckpointDiffQuery["Service"]>;
     browserTraceCollector?: Partial<BrowserTraceCollector.BrowserTraceCollector["Service"]>;
     serverLifecycleEvents?: Partial<ServerLifecycleEvents.ServerLifecycleEvents["Service"]>;
@@ -773,54 +802,86 @@ const buildAppUnderTest = (options?: {
         }),
       ),
       Layer.provide(
-        Layer.mock(ProjectionSnapshotQuery.ProjectionSnapshotQuery)({
-          getCommandReadModel: () => Effect.succeed(makeDefaultOrchestrationReadModel()),
-          getSnapshot: () => Effect.succeed(makeDefaultOrchestrationReadModel()),
-          getShellSnapshot: () =>
-            Effect.succeed({
-              snapshotSequence: 0,
-              projects: [],
-              threads: [],
-              updatedAt: "1970-01-01T00:00:00.000Z",
-            }),
-          getArchivedShellSnapshot: () =>
-            Effect.succeed({
-              snapshotSequence: 0,
-              projects: [],
-              threads: [],
-              updatedAt: "1970-01-01T00:00:00.000Z",
-            }),
-          searchThreads: () => Effect.succeed({ matches: [] }),
-          getSnapshotSequence: () => Effect.succeed({ snapshotSequence: 0 }),
-          getProjectShellById: () => Effect.succeed(Option.none()),
-          getThreadShellById: () => Effect.succeed(Option.none()),
-          getThreadDetailById: () => Effect.succeed(Option.none()),
-          getThreadDetailSnapshot: () => Effect.succeed(Option.none()),
-          getCounts: () => Effect.succeed({ projectCount: 0, threadCount: 0 }),
-          getActiveProjectByWorkspaceRoot: () => Effect.succeed(Option.none()),
-          getFirstActiveThreadIdByProjectId: () => Effect.succeed(Option.none()),
-          getThreadCheckpointContext: () => Effect.succeed(Option.none()),
-          ...options?.layers?.projectionSnapshotQuery,
-        }),
-      ),
-      Layer.provide(
-        Layer.mock(CheckpointDiffQuery.CheckpointDiffQuery)({
-          getTurnDiff: () =>
-            Effect.succeed({
-              threadId: defaultThreadId,
-              fromTurnCount: 0,
-              toTurnCount: 0,
-              diff: "",
-            }),
-          getFullThreadDiff: () =>
-            Effect.succeed({
-              threadId: defaultThreadId,
-              fromTurnCount: 0,
-              toTurnCount: 0,
-              diff: "",
-            }),
-          ...options?.layers?.checkpointDiffQuery,
-        }),
+        Layer.mergeAll(
+          Layer.mock(ProjectionSnapshotQuery.ProjectionSnapshotQuery)({
+            getCommandReadModel: () => Effect.succeed(makeDefaultOrchestrationReadModel()),
+            getSnapshot: () => Effect.succeed(makeDefaultOrchestrationReadModel()),
+            getShellSnapshot: () =>
+              Effect.succeed({
+                snapshotSequence: 0,
+                projects: [],
+                threads: [],
+                updatedAt: "1970-01-01T00:00:00.000Z",
+              }),
+            getArchivedShellSnapshot: () =>
+              Effect.succeed({
+                snapshotSequence: 0,
+                projects: [],
+                threads: [],
+                updatedAt: "1970-01-01T00:00:00.000Z",
+              }),
+            searchThreads: () => Effect.succeed({ matches: [] }),
+            getSnapshotSequence: () => Effect.succeed({ snapshotSequence: 0 }),
+            getProjectShellById: () => Effect.succeed(Option.none()),
+            getThreadShellById: () => Effect.succeed(Option.none()),
+            getThreadDetailById: () => Effect.succeed(Option.none()),
+            getThreadDetailSnapshot: () => Effect.succeed(Option.none()),
+            getCounts: () => Effect.succeed({ projectCount: 0, threadCount: 0 }),
+            getActiveProjectByWorkspaceRoot: () => Effect.succeed(Option.none()),
+            getFirstActiveThreadIdByProjectId: () => Effect.succeed(Option.none()),
+            getThreadCheckpointContext: () => Effect.succeed(Option.none()),
+            ...options?.layers?.projectionSnapshotQuery,
+          }),
+          Layer.mock(FenixScopedProjectionSnapshotQuery.FenixScopedProjectionSnapshotQuery)({
+            getCommandReadModel: () => Effect.succeed(makeDefaultOrchestrationReadModel()),
+            getSnapshot: () => Effect.succeed(makeDefaultOrchestrationReadModel()),
+            getShellSnapshot: () =>
+              Effect.succeed({
+                snapshotSequence: 0,
+                projects: [],
+                threads: [],
+                updatedAt: "1970-01-01T00:00:00.000Z",
+              }),
+            getArchivedShellSnapshot: () =>
+              Effect.succeed({
+                snapshotSequence: 0,
+                projects: [],
+                threads: [],
+                updatedAt: "1970-01-01T00:00:00.000Z",
+              }),
+            searchThreads: () => Effect.succeed({ matches: [] }),
+            getSnapshotSequence: () => Effect.succeed({ snapshotSequence: 0 }),
+            getProjectShellById: () => Effect.succeed(Option.none()),
+            getThreadShellById: () => Effect.succeed(Option.none()),
+            getThreadDetailById: () => Effect.succeed(Option.none()),
+            getThreadDetailSnapshot: () => Effect.succeed(Option.none()),
+            getCounts: () => Effect.succeed({ projectCount: 0, threadCount: 0 }),
+            getActiveProjectByWorkspaceRoot: () => Effect.succeed(Option.none()),
+            getFirstActiveThreadIdByProjectId: () => Effect.succeed(Option.none()),
+            getThreadCheckpointContext: () => Effect.succeed(Option.none()),
+            getFullThreadDiffContext: () => Effect.succeed(Option.none()),
+            projectBelongsToScope: () => Effect.succeed(false),
+            threadBelongsToScope: () => Effect.succeed(false),
+            ...options?.layers?.fenixScopedProjectionSnapshotQuery,
+          }),
+          Layer.mock(CheckpointDiffQuery.CheckpointDiffQuery)({
+            getTurnDiff: () =>
+              Effect.succeed({
+                threadId: defaultThreadId,
+                fromTurnCount: 0,
+                toTurnCount: 0,
+                diff: "",
+              }),
+            getFullThreadDiff: () =>
+              Effect.succeed({
+                threadId: defaultThreadId,
+                fromTurnCount: 0,
+                toTurnCount: 0,
+                diff: "",
+              }),
+            ...options?.layers?.checkpointDiffQuery,
+          }),
+        ),
       ),
     );
 
@@ -946,7 +1007,7 @@ const buildAppUnderTest = (options?: {
           ...options?.layers?.cloudCliTokenManager,
         }),
       ),
-      Layer.provideMerge(makeAuthTestLayer()),
+      Layer.provideMerge(makeAuthTestLayer(options?.fenixCodeTenantScope)),
       Layer.provideMerge(ServerSecretStore.layer),
       Layer.provide(workspaceAndProjectServicesLayer),
       Layer.provideMerge(FetchHttpClient.layer),
@@ -5947,6 +6008,507 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
           messageCreatedAt: now,
         },
       ]);
+    }).pipe(Effect.provide(NodeHttpServer.layerTest)),
+  );
+
+  it.effect("routes websocket rpc projection reads through the Fenix tenant scope", () =>
+    Effect.gen(function* () {
+      const now = "2026-08-09T00:00:00.000Z";
+      const fenixCodeTenantScope = { companyId: 5, userId: 10 } satisfies FenixCodeTenantScope;
+      const scopedProjectId = ProjectId.make("project-scoped");
+      const scopedThreadId = ThreadId.make("thread-scoped");
+      const foreignThreadId = ThreadId.make("thread-foreign");
+      const scopeCalls: string[] = [];
+      const liveEvents = yield* PubSub.unbounded<OrchestrationEvent>();
+      let shellSnapshotReads = 0;
+      let diffCalls = 0;
+      let dispatchCalls = 0;
+      const scopedArchivedEvent = {
+        sequence: 10,
+        eventId: EventId.make("event-fenix-scoped-thread-archived"),
+        aggregateKind: "thread",
+        aggregateId: scopedThreadId,
+        occurredAt: now,
+        commandId: null,
+        causationEventId: null,
+        correlationId: null,
+        metadata: {},
+        type: "thread.archived",
+        payload: {
+          threadId: scopedThreadId,
+          archivedAt: now,
+          updatedAt: now,
+        },
+      } satisfies Extract<OrchestrationEvent, { type: "thread.archived" }>;
+      const foreignArchivedEvent = {
+        sequence: 11,
+        eventId: EventId.make("event-fenix-foreign-thread-archived"),
+        aggregateKind: "thread",
+        aggregateId: foreignThreadId,
+        occurredAt: now,
+        commandId: null,
+        causationEventId: null,
+        correlationId: null,
+        metadata: {},
+        type: "thread.archived",
+        payload: {
+          threadId: foreignThreadId,
+          archivedAt: now,
+          updatedAt: now,
+        },
+      } satisfies Extract<OrchestrationEvent, { type: "thread.archived" }>;
+      const thread = {
+        ...makeDefaultOrchestrationReadModel().threads[0]!,
+        id: scopedThreadId,
+        projectId: scopedProjectId,
+        title: "Scoped Thread",
+      };
+
+      yield* buildAppUnderTest({
+        fenixCodeTenantScope,
+        layers: {
+          projectionSnapshotQuery: {
+            getShellSnapshot: () => Effect.die("unscoped shell query must not be used"),
+            searchThreads: () => Effect.die("unscoped search query must not be used"),
+            getProjectShellById: () => Effect.die("unscoped project shell query must not be used"),
+            getThreadShellById: () => Effect.die("unscoped thread shell query must not be used"),
+            getThreadDetailSnapshot: () => Effect.die("unscoped thread query must not be used"),
+          },
+          fenixScopedProjectionSnapshotQuery: {
+            getShellSnapshot: (scope) =>
+              Effect.gen(function* () {
+                scopeCalls.push(`shell:${scope.companyId}:${scope.userId}`);
+                shellSnapshotReads += 1;
+                if (shellSnapshotReads === 2) {
+                  yield* PubSub.publish(liveEvents, scopedArchivedEvent);
+                  yield* PubSub.publish(liveEvents, foreignArchivedEvent);
+                }
+                return {
+                  snapshotSequence: 1,
+                  projects: [
+                    {
+                      id: scopedProjectId,
+                      title: "Scoped Project",
+                      workspaceRoot: "/tmp/scoped",
+                      defaultModelSelection,
+                      scripts: [],
+                      createdAt: now,
+                      updatedAt: now,
+                    },
+                  ],
+                  threads: [makeDefaultOrchestrationThreadShell({ id: scopedThreadId })],
+                  updatedAt: now,
+                };
+              }),
+            searchThreads: (scope) =>
+              Effect.sync(() => {
+                scopeCalls.push(`search:${scope.companyId}:${scope.userId}`);
+                return {
+                  matches: [
+                    {
+                      threadId: scopedThreadId,
+                      projectId: scopedProjectId,
+                      source: "assistant" as const,
+                      snippet: "Scoped result",
+                      messageCreatedAt: now,
+                    },
+                  ],
+                };
+              }),
+            getProjectShellById: (scope, projectId) =>
+              Effect.sync(() => {
+                scopeCalls.push(`project-shell:${scope.companyId}:${scope.userId}:${projectId}`);
+                return projectId === scopedProjectId
+                  ? Option.some({
+                      id: scopedProjectId,
+                      title: "Scoped Project",
+                      workspaceRoot: "/tmp/scoped",
+                      defaultModelSelection,
+                      scripts: [],
+                      createdAt: now,
+                      updatedAt: now,
+                    })
+                  : Option.none();
+              }),
+            projectBelongsToScope: (scope, projectId) =>
+              Effect.sync(() => {
+                scopeCalls.push(`project-belongs:${scope.companyId}:${scope.userId}:${projectId}`);
+                return projectId === scopedProjectId;
+              }),
+            getThreadShellById: (scope, threadId) =>
+              Effect.sync(() => {
+                scopeCalls.push(`thread-shell:${scope.companyId}:${scope.userId}:${threadId}`);
+                return threadId === scopedThreadId
+                  ? Option.some(
+                      makeDefaultOrchestrationThreadShell({
+                        id: scopedThreadId,
+                        projectId: scopedProjectId,
+                      }),
+                    )
+                  : Option.none();
+              }),
+            threadBelongsToScope: (scope, threadId) =>
+              Effect.sync(() => {
+                scopeCalls.push(`thread-belongs:${scope.companyId}:${scope.userId}:${threadId}`);
+                return threadId === scopedThreadId;
+              }),
+            getThreadDetailSnapshot: (scope, threadId) =>
+              Effect.sync(() => {
+                scopeCalls.push(`thread:${scope.companyId}:${scope.userId}:${threadId}`);
+                return Option.some({ snapshotSequence: 1, thread });
+              }),
+          },
+          orchestrationEngine: {
+            dispatch: () =>
+              Effect.sync(() => {
+                dispatchCalls += 1;
+                return { sequence: 1 };
+              }),
+            readEvents: () => Stream.empty,
+            streamDomainEvents: Stream.fromPubSub(liveEvents),
+          },
+          checkpointDiffQuery: {
+            getTurnDiff: (input) =>
+              Effect.sync(() => {
+                diffCalls += 1;
+                return {
+                  threadId: input.threadId,
+                  fromTurnCount: input.fromTurnCount,
+                  toTurnCount: input.toTurnCount,
+                  diff: "scoped-diff",
+                };
+              }),
+            getFullThreadDiff: (input) =>
+              Effect.sync(() => {
+                diffCalls += 1;
+                return {
+                  threadId: input.threadId,
+                  fromTurnCount: 0,
+                  toTurnCount: input.toTurnCount,
+                  diff: "scoped-full-diff",
+                };
+              }),
+          },
+        },
+      });
+
+      const wsUrl = yield* getWsServerUrl("/ws");
+      const shellItem = yield* Effect.scoped(
+        withWsRpcClient(wsUrl, (client) =>
+          client[ORCHESTRATION_WS_METHODS.subscribeShell]({}).pipe(Stream.runHead),
+        ),
+      );
+      assert.equal(Option.getOrThrow(shellItem).kind, "snapshot");
+
+      const shellEvents = yield* Effect.scoped(
+        withWsRpcClient(wsUrl, (client) =>
+          client[ORCHESTRATION_WS_METHODS.subscribeShell]({
+            requestCompletionMarker: true,
+          }).pipe(Stream.take(3), Stream.runCollect),
+        ),
+      );
+      assert.equal(shellEvents[0]?.kind, "snapshot");
+      assert.equal(shellEvents[1]?.kind, "thread-upserted");
+      if (shellEvents[1]?.kind === "thread-upserted") {
+        assert.equal(shellEvents[1].thread.id, scopedThreadId);
+      }
+      assert.deepEqual(shellEvents[2], { kind: "synchronized" });
+
+      const searchResult = yield* Effect.scoped(
+        withWsRpcClient(wsUrl, (client) =>
+          client[ORCHESTRATION_WS_METHODS.searchThreads]({ query: "Scoped" }),
+        ),
+      );
+      assert.deepEqual(
+        searchResult.matches.map((match) => match.threadId),
+        [scopedThreadId],
+      );
+
+      const threadItem = yield* Effect.scoped(
+        withWsRpcClient(wsUrl, (client) =>
+          client[ORCHESTRATION_WS_METHODS.subscribeThread]({ threadId: scopedThreadId }).pipe(
+            Stream.runHead,
+          ),
+        ),
+      );
+      assert.equal(Option.getOrThrow(threadItem).kind, "snapshot");
+
+      const scopedDiff = yield* Effect.scoped(
+        withWsRpcClient(wsUrl, (client) =>
+          client[ORCHESTRATION_WS_METHODS.getTurnDiff]({
+            threadId: scopedThreadId,
+            fromTurnCount: 0,
+            toTurnCount: 1,
+          }),
+        ),
+      );
+      assert.equal(scopedDiff.diff, "scoped-diff");
+
+      const foreignTurnDiff = yield* Effect.scoped(
+        withWsRpcClient(wsUrl, (client) =>
+          client[ORCHESTRATION_WS_METHODS.getTurnDiff]({
+            threadId: foreignThreadId,
+            fromTurnCount: 0,
+            toTurnCount: 1,
+          }),
+        ).pipe(Effect.result),
+      );
+      assertTrue(foreignTurnDiff._tag === "Failure");
+      if (foreignTurnDiff._tag === "Failure") {
+        assert.equal(foreignTurnDiff.failure._tag, "OrchestrationGetTurnDiffError");
+        assertInclude(foreignTurnDiff.failure.message, "was not found");
+      }
+
+      const foreignFullDiff = yield* Effect.scoped(
+        withWsRpcClient(wsUrl, (client) =>
+          client[ORCHESTRATION_WS_METHODS.getFullThreadDiff]({
+            threadId: foreignThreadId,
+            toTurnCount: 1,
+          }),
+        ).pipe(Effect.result),
+      );
+      assertTrue(foreignFullDiff._tag === "Failure");
+      if (foreignFullDiff._tag === "Failure") {
+        assert.equal(foreignFullDiff.failure._tag, "OrchestrationGetFullThreadDiffError");
+        assertInclude(foreignFullDiff.failure.message, "was not found");
+      }
+      assert.equal(diffCalls, 1);
+
+      const foreignDispatch = yield* Effect.scoped(
+        withWsRpcClient(wsUrl, (client) =>
+          client[ORCHESTRATION_WS_METHODS.dispatchCommand]({
+            type: "thread.archive",
+            commandId: CommandId.make("cmd-foreign-thread"),
+            threadId: foreignThreadId,
+          }),
+        ).pipe(Effect.result),
+      );
+      assertTrue(foreignDispatch._tag === "Failure");
+      assert.equal(dispatchCalls, 0);
+      assert.deepEqual(scopeCalls, [
+        "shell:5:10",
+        "shell:5:10",
+        "thread-belongs:5:10:thread-scoped",
+        "thread-shell:5:10:thread-scoped",
+        "thread-belongs:5:10:thread-foreign",
+        "search:5:10",
+        "thread-belongs:5:10:thread-scoped",
+        "thread:5:10:thread-scoped",
+        "thread-belongs:5:10:thread-scoped",
+        "thread-belongs:5:10:thread-foreign",
+        "thread-belongs:5:10:thread-foreign",
+      ]);
+    }).pipe(Effect.provide(NodeHttpServer.layerTest)),
+  );
+
+  it.effect("denies global websocket rpc methods for Fenix tenant scoped sessions", () =>
+    Effect.gen(function* () {
+      const now = "2026-08-09T00:00:00.000Z";
+      const fenixCodeTenantScope = { companyId: 5, userId: 10 } satisfies FenixCodeTenantScope;
+      const scopedProjectId = ProjectId.make("project-scoped");
+      const scopedThreadId = ThreadId.make("thread-scoped");
+      let scopedSearchCalls = 0;
+      let dispatchCalls = 0;
+
+      yield* buildAppUnderTest({
+        fenixCodeTenantScope,
+        layers: {
+          fenixScopedProjectionSnapshotQuery: {
+            searchThreads: () =>
+              Effect.sync(() => {
+                scopedSearchCalls += 1;
+                return { matches: [] };
+              }),
+          },
+          orchestrationEngine: {
+            dispatch: () =>
+              Effect.sync(() => {
+                dispatchCalls += 1;
+                return { sequence: dispatchCalls };
+              }),
+          },
+        },
+      });
+
+      const wsUrl = yield* getWsServerUrl("/ws");
+      const expectDenied = <A, E, R>(
+        label: string,
+        effect: Effect.Effect<A, E, R>,
+      ): Effect.Effect<void, never, R> =>
+        effect.pipe(
+          Effect.result,
+          Effect.map((result) => {
+            assertTrue(result._tag === "Failure", `${label} should be denied`);
+            if (result._tag === "Failure") {
+              const failure = result.failure as EnvironmentAuthorizationError;
+              assert.equal(failure._tag, "EnvironmentAuthorizationError");
+              assertInclude(failure.message, "Fenix scoped sessions cannot call global RPC");
+            }
+          }),
+        );
+
+      yield* Effect.scoped(
+        withWsRpcClient(wsUrl, (client) =>
+          Effect.gen(function* () {
+            yield* client[WS_METHODS.serverProbe]({});
+            yield* client[ORCHESTRATION_WS_METHODS.searchThreads]({ query: "tenant-safe" });
+            assert.equal(scopedSearchCalls, 1);
+
+            yield* expectDenied("server.getSettings", client[WS_METHODS.serverGetSettings]({}));
+            yield* expectDenied(
+              "server.updateSettings",
+              client[WS_METHODS.serverUpdateSettings]({ patch: {} }),
+            );
+            yield* expectDenied(
+              "projects.readFile",
+              client[WS_METHODS.projectsReadFile]({
+                cwd: "/tmp/foreign",
+                relativePath: "README.md",
+              }),
+            );
+            yield* expectDenied(
+              "projects.writeFile",
+              client[WS_METHODS.projectsWriteFile]({
+                cwd: "/tmp/foreign",
+                relativePath: "README.md",
+                contents: "blocked",
+              }),
+            );
+            yield* expectDenied(
+              "projects.searchEntries",
+              client[WS_METHODS.projectsSearchEntries]({
+                cwd: "/tmp/foreign",
+                query: "README",
+                limit: 1,
+              }),
+            );
+            yield* expectDenied(
+              "sourceControl.lookupRepository",
+              client[WS_METHODS.sourceControlLookupRepository]({
+                provider: "github",
+                repository: "owner/repo",
+                cwd: "/tmp/foreign",
+              }),
+            );
+            yield* expectDenied(
+              "vcs.createWorktree",
+              client[WS_METHODS.vcsCreateWorktree]({
+                cwd: "/tmp/foreign",
+                refName: "main",
+                path: null,
+              }),
+            );
+            yield* expectDenied(
+              "terminal.open",
+              client[WS_METHODS.terminalOpen]({
+                threadId: "thread-foreign",
+                terminalId: "term-1",
+                cwd: "/tmp/foreign",
+              }),
+            );
+            yield* expectDenied(
+              "terminal.attach",
+              client[WS_METHODS.terminalAttach]({
+                threadId: "thread-foreign",
+                terminalId: "term-1",
+              }).pipe(Stream.runHead),
+            );
+            yield* expectDenied(
+              "orchestration.dispatchCommand project.meta.update workspaceRoot/scripts",
+              client[ORCHESTRATION_WS_METHODS.dispatchCommand]({
+                type: "project.meta.update",
+                commandId: CommandId.make("cmd-fenix-project-meta-sensitive"),
+                projectId: scopedProjectId,
+                workspaceRoot: "/tmp/foreign-workspace",
+                scripts: [
+                  {
+                    id: "escape",
+                    name: "Escape",
+                    command: "echo blocked",
+                    icon: "play",
+                    runOnWorktreeCreate: true,
+                  },
+                ],
+              }),
+            );
+            yield* expectDenied(
+              "orchestration.dispatchCommand thread.create worktreePath/provider",
+              client[ORCHESTRATION_WS_METHODS.dispatchCommand]({
+                type: "thread.create",
+                commandId: CommandId.make("cmd-fenix-thread-create-sensitive"),
+                threadId: ThreadId.make("thread-created"),
+                projectId: scopedProjectId,
+                title: "Blocked thread",
+                modelSelection: {
+                  instanceId: ProviderInstanceId.make("claude"),
+                  model: "claude-opus-4-1",
+                },
+                runtimeMode: "full-access",
+                interactionMode: "default",
+                branch: "foreign-branch",
+                worktreePath: "/tmp/foreign-worktree",
+                createdAt: now,
+              }),
+            );
+            yield* expectDenied(
+              "orchestration.dispatchCommand thread.meta.update worktreePath/provider",
+              client[ORCHESTRATION_WS_METHODS.dispatchCommand]({
+                type: "thread.meta.update",
+                commandId: CommandId.make("cmd-fenix-thread-meta-sensitive"),
+                threadId: scopedThreadId,
+                modelSelection: {
+                  instanceId: ProviderInstanceId.make("cursor"),
+                  model: "cursor-local",
+                },
+                branch: "foreign-branch",
+                expectedBranch: null,
+                worktreePath: "/tmp/foreign-worktree",
+              }),
+            );
+            yield* expectDenied(
+              "orchestration.dispatchCommand thread.turn.start bootstrap",
+              client[ORCHESTRATION_WS_METHODS.dispatchCommand]({
+                type: "thread.turn.start",
+                commandId: CommandId.make("cmd-fenix-turn-bootstrap-sensitive"),
+                threadId: scopedThreadId,
+                message: {
+                  messageId: MessageId.make("msg-fenix-turn-bootstrap-sensitive"),
+                  role: "user",
+                  text: "blocked",
+                  attachments: [],
+                },
+                modelSelection: {
+                  instanceId: ProviderInstanceId.make("claude"),
+                  model: "claude-opus-4-1",
+                },
+                runtimeMode: "full-access",
+                interactionMode: "default",
+                bootstrap: {
+                  prepareWorktree: {
+                    projectCwd: "/tmp/foreign-workspace",
+                    baseBranch: "main",
+                    branch: "foreign-branch",
+                    startFromOrigin: true,
+                  },
+                  runSetupScript: true,
+                },
+                createdAt: now,
+              }),
+            );
+            yield* expectDenied(
+              "orchestration.dispatchCommand thread.runtime-mode.set full-access",
+              client[ORCHESTRATION_WS_METHODS.dispatchCommand]({
+                type: "thread.runtime-mode.set",
+                commandId: CommandId.make("cmd-fenix-runtime-sensitive"),
+                threadId: scopedThreadId,
+                runtimeMode: "full-access",
+                createdAt: now,
+              }),
+            );
+          }),
+        ),
+      );
+      assert.equal(dispatchCalls, 0);
     }).pipe(Effect.provide(NodeHttpServer.layerTest)),
   );
 
