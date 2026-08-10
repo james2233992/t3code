@@ -112,5 +112,9 @@ Static and branding:
 This candidate does not activate Fenix Code, call real providers, deploy, touch
 production, or modify database schema/data.
 
+`binaryPath` may be a bare executable name resolved by the process `PATH`;
+this is accepted for local BYOS templates and has the same trust boundary as
+the upstream local CLI model.
+
 `F1_4_CUSTOM_AGENTS_COMPLETE` remains a Fable declaration after exact-head
 review and merge verification.
