@@ -3395,6 +3395,12 @@
 ./docs/fenix/f0-final-visible-rebrand-report-20260808.md:5:27:t3code
 ./docs/fenix/f0-final-visible-rebrand-report-20260808.md:96:22:Fenix Code
 ./docs/fenix/f0-final-visible-rebrand-report-20260808.md:97:23:Fenix Code
+./docs/fenix/f1-2c-bridge-e2e-report-20260810.md:101:35:Fenix Code
+./docs/fenix/f1-2c-bridge-e2e-report-20260810.md:140:24:Fenix Code
+./docs/fenix/f1-2c-bridge-e2e-report-20260810.md:19:3:Fenix Code
+./docs/fenix/f1-2c-bridge-e2e-report-20260810.md:1:3:Fenix Code
+./docs/fenix/f1-2c-bridge-e2e-report-20260810.md:27:118:Fenix Code
+./docs/fenix/f1-2c-bridge-e2e-report-20260810.md:87:43:Fenix Code
 ./docs/fenix/f1-3-e2e-complete-report-20260809.md:13:36:Fenix Code
 ./docs/fenix/f1-3-e2e-complete-report-20260809.md:89:32:@t3tools
 ./docs/fenix/f1-3-e2e-report-20260809.md:11:36:Fenix Code
@@ -4379,6 +4385,11 @@
 ./scripts/dev-runner.ts:9:70:@t3tools
 ./scripts/export-brand-icons.ts:5:41:@t3tools
 ./scripts/fenix/check-visible-branding.sh:77:20:T3 Tools
+./scripts/fenix/f1-2c-bridge-e2e.mjs:171:52:Fenix Code
+./scripts/fenix/f1-2c-bridge-e2e.mjs:293:40:Fenix Code
+./scripts/fenix/f1-2c-bridge-e2e.mjs:305:25:Fenix Code
+./scripts/fenix/f1-2c-bridge-e2e.mjs:616:56:Fenix Code
+./scripts/fenix/f1-2c-bridge-e2e.mjs:8:62:@t3tools
 ./scripts/fenix/generate-branding-inventory.sh:53:18:Fenix Code
 ./scripts/fenix/generate-branding-inventory.sh:53:29:T3Code
 ./scripts/fenix/generate-branding-inventory.sh:53:36:T3 Tools
