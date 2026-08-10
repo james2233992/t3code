@@ -9,7 +9,11 @@ import {
   ProviderOptionSelections,
 } from "./model.ts";
 import { ModelSelection } from "./orchestration.ts";
-import { ProviderInstanceConfig, ProviderInstanceId } from "./providerInstance.ts";
+import {
+  ProviderInstanceConfig,
+  ProviderInstanceEnvironment,
+  ProviderInstanceId,
+} from "./providerInstance.ts";
 
 // ── Client Settings (local-only) ───────────────────────────────
 
@@ -465,6 +469,71 @@ export const FenixSettings = makeProviderSettingsSchema(
   },
 );
 export type FenixSettings = typeof FenixSettings.Type;
+
+export const CustomCliSettings = makeProviderSettingsSchema(
+  {
+    enabled: Schema.Boolean.pipe(
+      Schema.withDecodingDefault(Effect.succeed(false)),
+      Schema.annotateKey({ providerSettingsForm: { hidden: true } }),
+    ),
+    name: TrimmedString.pipe(
+      Schema.withDecodingDefault(Effect.succeed("")),
+      Schema.annotateKey({
+        title: "Template name",
+        description: "Local display name for this custom CLI agent template.",
+        providerSettingsForm: { placeholder: "Local code agent", clearWhenEmpty: "omit" },
+      }),
+    ),
+    binaryPath: TrimmedString.pipe(
+      Schema.withDecodingDefault(Effect.succeed("")),
+      Schema.annotateKey({
+        title: "Binary path",
+        description: "Exact local binary or path for this custom CLI agent template.",
+        providerSettingsForm: { placeholder: "my-agent", clearWhenEmpty: "omit" },
+      }),
+    ),
+    args: Schema.Array(TrimmedString).pipe(
+      Schema.withDecodingDefault(Effect.succeed([])),
+      Schema.annotateKey({
+        title: "Arguments",
+        description: "Static argv entries passed to the custom CLI agent without a shell.",
+        providerSettingsForm: { hidden: true },
+      }),
+    ),
+    env: ProviderInstanceEnvironment.pipe(
+      Schema.withDecodingDefault(Effect.succeed([])),
+      Schema.annotateKey({ providerSettingsForm: { hidden: true } }),
+    ),
+    allowedBinaries: Schema.Array(TrimmedString).pipe(
+      Schema.withDecodingDefault(Effect.succeed([])),
+      Schema.annotateKey({
+        title: "Allowed binaries",
+        description: "Extra exact local binaries allowed for this template.",
+        providerSettingsForm: { hidden: true },
+      }),
+    ),
+    allowDangerousFlags: Schema.Boolean.pipe(
+      Schema.withDecodingDefault(Effect.succeed(false)),
+      Schema.annotateKey({
+        title: "Allow dangerous flags",
+        description: "Opt in per template for flags such as --force or --dangerously-*.",
+        providerSettingsForm: { hidden: true },
+      }),
+    ),
+    modelSlug: TrimmedString.pipe(
+      Schema.withDecodingDefault(Effect.succeed("custom-cli/local")),
+      Schema.annotateKey({ providerSettingsForm: { hidden: true } }),
+    ),
+    customModels: Schema.Array(Schema.String).pipe(
+      Schema.withDecodingDefault(Effect.succeed([])),
+      Schema.annotateKey({ providerSettingsForm: { hidden: true } }),
+    ),
+  },
+  {
+    order: ["name", "binaryPath"],
+  },
+);
+export type CustomCliSettings = typeof CustomCliSettings.Type;
 
 export const OpenCodeSettings = makeProviderSettingsSchema(
   {
