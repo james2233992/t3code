@@ -3384,6 +3384,34 @@
 ./docs/fenix/branding-inventory.md:53:44:Fenix Code
 ./docs/fenix/branding-inventory.md:5:21:t3code
 ./docs/fenix/branding-inventory.md:86:3:T3CODE
+./docs/fenix/evidence/qa-f1-20260810.json:112:25:Fenix Code
+./docs/fenix/evidence/qa-f1-20260810.json:134:16:t3code
+./docs/fenix/evidence/qa-f1-20260810.json:151:16:t3code
+./docs/fenix/evidence/qa-f1-20260810.json:165:16:t3code
+./docs/fenix/evidence/qa-f1-20260810.json:16:16:t3code
+./docs/fenix/evidence/qa-f1-20260810.json:179:16:t3code
+./docs/fenix/evidence/qa-f1-20260810.json:193:16:t3code
+./docs/fenix/evidence/qa-f1-20260810.json:205:16:t3code
+./docs/fenix/evidence/qa-f1-20260810.json:207:16:t3code
+./docs/fenix/evidence/qa-f1-20260810.json:219:16:t3code
+./docs/fenix/evidence/qa-f1-20260810.json:221:16:t3code
+./docs/fenix/evidence/qa-f1-20260810.json:229:108:t3code
+./docs/fenix/evidence/qa-f1-20260810.json:233:16:t3code
+./docs/fenix/evidence/qa-f1-20260810.json:235:16:t3code
+./docs/fenix/evidence/qa-f1-20260810.json:247:654:t3code
+./docs/fenix/evidence/qa-f1-20260810.json:247:92:t3code
+./docs/fenix/evidence/qa-f1-20260810.json:273:16:t3code
+./docs/fenix/evidence/qa-f1-20260810.json:33:16:t3code
+./docs/fenix/evidence/qa-f1-20260810.json:4:4:t3code
+./docs/fenix/evidence/qa-f1-20260810.json:50:16:t3code
+./docs/fenix/evidence/qa-f1-20260810.json:58:11961:Fenix Code
+./docs/fenix/evidence/qa-f1-20260810.json:5:15:t3code
+./docs/fenix/evidence/qa-f1-20260810.json:60:3259:Fenix Code
+./docs/fenix/evidence/qa-f1-20260810.json:60:32998:Fenix Code
+./docs/fenix/evidence/qa-f1-20260810.json:60:3944:Fenix Code
+./docs/fenix/evidence/qa-f1-20260810.json:60:802:Fenix Code
+./docs/fenix/evidence/qa-f1-20260810.json:65:16:t3code
+./docs/fenix/evidence/qa-f1-20260810.json:82:16:t3code
 ./docs/fenix/f0-4-local-builds-byos-report-20260808.md:13:29:t3code
 ./docs/fenix/f0-4-local-builds-byos-report-20260808.md:23:41:@t3tools
 ./docs/fenix/f0-bootstrap.md:1:3:Fenix Code
@@ -3433,6 +3461,12 @@
 ./docs/fenix/fenix-code-pause-handoff-20260808.md:66:17:Fenix Code
 ./docs/fenix/fenix-code-pause-handoff-20260808.md:9:187:Fenix Code
 ./docs/fenix/fenix-code-pause-handoff-20260808.md:9:19:Fenix Code
+./docs/fenix/qa-f1-report-20260810.md:23:98:Fenix Code
+./docs/fenix/qa-f1-report-20260810.md:26:101:t3code
+./docs/fenix/qa-f1-report-20260810.md:26:50:t3code
+./docs/fenix/qa-f1-report-20260810.md:26:75:t3code
+./docs/fenix/qa-f1-report-20260810.md:50:3:t3code
+./docs/fenix/qa-f1-report-20260810.md:9:3:t3code
 ./docs/internals/remote.md:100:39:@t3tools
 ./docs/internals/resource-telemetry.md:228:5:T3CODE
 ./docs/internals/scripts.md:110:13:T3CODE
@@ -4416,6 +4450,15 @@
 ./scripts/fenix/generate-branding-inventory.sh:55:114:t3-code
 ./scripts/fenix/generate-branding-inventory.sh:55:177:t3code
 ./scripts/fenix/generate-branding-inventory.sh:55:41:t3code
+./scripts/fenix/qa-f1.mjs:231:8:t3code
+./scripts/fenix/qa-f1.mjs:267:8:t3code
+./scripts/fenix/qa-f1.mjs:399:15:Fenix Code
+./scripts/fenix/qa-f1.mjs:438:21:t3code
+./scripts/fenix/qa-f1.mjs:443:6:t3code
+./scripts/fenix/qa-f1.mjs:453:6:t3code
+./scripts/fenix/qa-f1.mjs:483:5:t3code
+./scripts/fenix/qa-f1.mjs:484:15:t3code
+./scripts/fenix/qa-f1.mjs:73:26:t3code
 ./scripts/lib/build-target-arch.test.ts:5:63:@t3tools
 ./scripts/lib/build-target-arch.ts:1:63:@t3tools
 ./scripts/lib/dev-share.ts:23:9:@t3tools
