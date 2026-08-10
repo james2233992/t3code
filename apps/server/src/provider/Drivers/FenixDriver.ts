@@ -96,10 +96,10 @@ export const FenixDriver: ProviderDriver<FenixSettings, FenixDriverEnv> = {
         pairingSession: () =>
           Effect.gen(function* () {
             const nowEpochMs = yield* Clock.currentTimeMillis;
-            return FenixPairingSessionBridge.activePairingSessionFromSnapshot(
-              pairingSessionBridge.resolvePairingSessionSnapshot({ instanceId }),
-              nowEpochMs,
-            );
+            const snapshot = yield* pairingSessionBridge.resolvePairingSessionSnapshot({
+              instanceId,
+            });
+            return FenixPairingSessionBridge.activePairingSessionFromSnapshot(snapshot, nowEpochMs);
           }),
       });
       const textGeneration = yield* makeFenixTextGeneration;
