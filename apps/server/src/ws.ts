@@ -3,6 +3,7 @@ import * as Crypto from "effect/Crypto";
 import * as DateTime from "effect/DateTime";
 import * as Duration from "effect/Duration";
 import * as Effect from "effect/Effect";
+import * as FileSystem from "effect/FileSystem";
 import * as Layer from "effect/Layer";
 import * as Option from "effect/Option";
 import * as Queue from "effect/Queue";
@@ -358,6 +359,7 @@ const makeWsRpcLayer = (
     Effect.gen(function* () {
       const currentSessionId = currentSession.sessionId;
       const crypto = yield* Crypto.Crypto;
+      const fileSystem = yield* FileSystem.FileSystem;
       const projectionSnapshotQuery = yield* ProjectionSnapshotQuery.ProjectionSnapshotQuery;
       const fenixScopedProjectionSnapshotQuery =
         yield* FenixScopedProjectionSnapshotQuery.FenixScopedProjectionSnapshotQuery;
@@ -676,6 +678,7 @@ const makeWsRpcLayer = (
         const denied = () => "fenix_tenant_workspace_denied" as const;
 
         return workspacePaths.normalizeWorkspaceRoot(cwd).pipe(
+          Effect.flatMap((normalizedWorkspaceRoot) => fileSystem.realPath(normalizedWorkspaceRoot)),
           Effect.flatMap((normalizedWorkspaceRoot) =>
             fenixScopedProjectionSnapshotQuery.getActiveProjectByWorkspaceRoot(
               scope,

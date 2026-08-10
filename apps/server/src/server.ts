@@ -411,7 +411,7 @@ const RuntimeCoreDependenciesLive = ReactorLayerLive.pipe(
 );
 
 const RuntimeCoreWithFenixPairingLive = RuntimeCoreDependenciesLive.pipe(
-  Layer.provideMerge(FenixPairingSessionBridge.unpairedLayer),
+  Layer.provideMerge(FenixPairingSessionBridge.liveLayer),
 );
 
 const RuntimeDependenciesLive = RuntimeCoreWithFenixPairingLive.pipe(

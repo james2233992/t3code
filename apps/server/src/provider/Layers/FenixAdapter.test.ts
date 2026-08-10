@@ -481,6 +481,36 @@ describe("FenixAdapter", () => {
       }),
   );
 
+  it.effect("restores ready state when the Fenix rate limiter rejects the turn", () =>
+    Effect.gen(function* () {
+      const fetchImpl = (async () =>
+        Response.json(
+          { code: "fenix_code_rate_limit_exceeded", message: "Too many requests." },
+          { status: 429 },
+        )) as unknown as typeof fetch;
+      const adapter = yield* makeFenixAdapter(fenixSettings(), {
+        fetch: fetchImpl,
+        instanceId: ProviderInstanceId.make("fenix"),
+        pairingSession: { kind: "bearer", token: "fenix-session" },
+      });
+      const threadId = ThreadId.make("thread-fenix-429");
+
+      yield* adapter.startSession({
+        threadId,
+        runtimeMode: "full-access",
+      });
+      const error = yield* adapter
+        .sendTurn({ threadId, input: "crea una funcion" })
+        .pipe(Effect.flip);
+      const sessions = yield* adapter.listSessions();
+
+      expect(error._tag).toBe("ProviderAdapterRequestError");
+      expect(sessions[0]?.status).toBe("ready");
+      expect(sessions[0]?.activeTurnId).toBeUndefined();
+      expect(sessions[0]?.lastError).toContain("HTTP 429");
+    }),
+  );
+
   it.effect("clears lastError after a later successful paired turn", () =>
     Effect.gen(function* () {
       let calls = 0;

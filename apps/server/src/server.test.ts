@@ -6515,7 +6515,12 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
       const foreignWorkspaceRoot = yield* fs.makeTempDirectoryScoped({
         prefix: "fenix-foreign-workspace-",
       });
-      const normalizedOwnWorkspaceRoot = path.resolve(ownWorkspaceRoot);
+      const symlinkParent = yield* fs.makeTempDirectoryScoped({
+        prefix: "fenix-symlink-parent-",
+      });
+      const symlinkForeignWorkspaceRoot = path.join(symlinkParent, "linked-foreign");
+      yield* fs.symlink(foreignWorkspaceRoot, symlinkForeignWorkspaceRoot);
+      const normalizedOwnWorkspaceRoot = yield* fs.realPath(path.resolve(ownWorkspaceRoot));
       const workspaceCalls: string[] = [];
       const membershipCalls: string[] = [];
       const scopedProject: OrchestrationProject = {
@@ -6664,6 +6669,11 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
               "ProjectListEntriesError",
             );
             yield* expectWorkspaceDenied(
+              "projects.listEntries symlink to foreign cwd",
+              client[WS_METHODS.projectsListEntries]({ cwd: symlinkForeignWorkspaceRoot }),
+              "ProjectListEntriesError",
+            );
+            yield* expectWorkspaceDenied(
               "projects.readFile foreign cwd",
               client[WS_METHODS.projectsReadFile]({
                 cwd: foreignWorkspaceRoot,
@@ -6742,7 +6752,7 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
         membershipCalls.filter((call) => call.endsWith(`:${normalizedOwnWorkspaceRoot}`)).length,
         5,
       );
-      assert.equal(membershipCalls.filter((call) => call.includes(foreignWorkspaceRoot)).length, 5);
+      assert.equal(membershipCalls.filter((call) => call.includes(foreignWorkspaceRoot)).length, 6);
     }).pipe(Effect.provide(NodeHttpServer.layerTest)),
   );
 
