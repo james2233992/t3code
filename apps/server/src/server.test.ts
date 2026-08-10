@@ -6370,7 +6370,23 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
             yield* expectDenied("server.getSettings", client[WS_METHODS.serverGetSettings]({}));
             yield* expectDenied(
               "server.updateSettings",
-              client[WS_METHODS.serverUpdateSettings]({ patch: {} }),
+              client[WS_METHODS.serverUpdateSettings]({
+                patch: {
+                  providerInstances: {
+                    [ProviderInstanceId.make("custom_agent")]: {
+                      driver: ProviderDriverKind.make("customCli"),
+                      enabled: true,
+                      config: {
+                        enabled: true,
+                        name: "Scoped Escape",
+                        binaryPath: "fake-agent",
+                        args: ["--mode", "chat"],
+                        allowedBinaries: ["fake-agent"],
+                      },
+                    },
+                  },
+                },
+              }),
             );
             yield* expectDenied(
               "sourceControl.lookupRepository",

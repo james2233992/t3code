@@ -23,6 +23,7 @@
 import { ClaudeDriver, type ClaudeDriverEnv } from "./Drivers/ClaudeDriver.ts";
 import { CodexDriver, type CodexDriverEnv } from "./Drivers/CodexDriver.ts";
 import { CursorDriver, type CursorDriverEnv } from "./Drivers/CursorDriver.ts";
+import { CustomCliDriver, type CustomCliDriverEnv } from "./Drivers/CustomCliDriver.ts";
 import { FenixDriver, type FenixDriverEnv } from "./Drivers/FenixDriver.ts";
 import { GrokDriver, type GrokDriverEnv } from "./Drivers/GrokDriver.ts";
 import { OpenCodeDriver, type OpenCodeDriverEnv } from "./Drivers/OpenCodeDriver.ts";
@@ -37,6 +38,7 @@ export type BuiltInDriversEnv =
   | ClaudeDriverEnv
   | CodexDriverEnv
   | CursorDriverEnv
+  | CustomCliDriverEnv
   | FenixDriverEnv
   | GrokDriverEnv
   | OpenCodeDriverEnv;
@@ -53,4 +55,5 @@ export const BUILT_IN_DRIVERS: ReadonlyArray<AnyProviderDriver<BuiltInDriversEnv
   GrokDriver,
   FenixDriver,
   OpenCodeDriver,
+  CustomCliDriver,
 ];
