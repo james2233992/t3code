@@ -2975,6 +2975,8 @@
 ./apps/web/vite.config.ts:62:51:T3CODE
 ./apps/web/vite.config.ts:63:35:T3CODE
 ./apps/web/vite.config.ts:92:6:T3CODE
+./docs/fenix/a1-webapp-build-report-20260811.md:14:37:@t3tools
+./docs/fenix/a1-webapp-build-report-20260811.md:5:26:t3code
 ./docs/fenix/branding-inventory.md:162:43:@t3tools
 ./docs/fenix/branding-inventory.md:163:25:t3.json
 ./docs/fenix/branding-inventory.md:163:40:t3.json
