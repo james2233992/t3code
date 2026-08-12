@@ -506,10 +506,10 @@
 ./apps/mobile/src/connection/onboarding.ts:1:39:@t3tools
 ./apps/mobile/src/connection/onboarding.ts:5:9:@t3tools
 ./apps/mobile/src/connection/onboarding.ts:6:37:@t3tools
-./apps/mobile/src/connection/platform.ts:15:9:@t3tools
-./apps/mobile/src/connection/platform.ts:16:70:@t3tools
-./apps/mobile/src/connection/platform.ts:17:43:@t3tools
-./apps/mobile/src/connection/platform.ts:9:9:@t3tools
+./apps/mobile/src/connection/platform.ts:10:9:@t3tools
+./apps/mobile/src/connection/platform.ts:16:9:@t3tools
+./apps/mobile/src/connection/platform.ts:17:70:@t3tools
+./apps/mobile/src/connection/platform.ts:18:43:@t3tools
 ./apps/mobile/src/connection/runtime.ts:1:29:@t3tools
 ./apps/mobile/src/connection/runtime.ts:2:43:@t3tools
 ./apps/mobile/src/connection/runtime.ts:3:44:@t3tools
