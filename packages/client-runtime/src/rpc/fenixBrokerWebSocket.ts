@@ -67,10 +67,22 @@ export class FenixBrokerWebSocket extends EventTarget implements WebSocket {
   }
 
   private forward(type: "open" | "error" | "close", event: Event): void {
-    this.dispatchEvent(event);
-    if (type === "open") this.onopen?.(event);
-    else if (type === "error") this.onerror?.(event);
-    else this.onclose?.(event as CloseEvent);
+    const forwarded =
+      type === "close" && event instanceof CloseEvent
+        ? new CloseEvent("close", {
+            code: event.code,
+            reason: event.reason,
+            wasClean: event.wasClean,
+          })
+        : new Event(type, {
+            bubbles: event.bubbles,
+            cancelable: event.cancelable,
+            composed: event.composed,
+          });
+    this.dispatchEvent(forwarded);
+    if (type === "open") this.onopen?.(forwarded);
+    else if (type === "error") this.onerror?.(forwarded);
+    else this.onclose?.(forwarded as CloseEvent);
   }
 
   get binaryType(): BinaryType {

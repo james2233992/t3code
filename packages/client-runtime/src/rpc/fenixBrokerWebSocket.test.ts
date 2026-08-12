@@ -59,6 +59,22 @@ describe("FenixBrokerWebSocket", () => {
     expect(received).toEqual([]);
   });
 
+  it("clones lifecycle events before forwarding them to the wrapper", () => {
+    const underlying = new TestWebSocket();
+    const socket = new FenixBrokerWebSocket(underlying as unknown as WebSocket);
+    const source = new Event("open");
+    let received: Event | undefined;
+    socket.addEventListener("open", (event) => {
+      received = event;
+    });
+
+    underlying.dispatchEvent(source);
+
+    expect(received).toBeDefined();
+    expect(received).not.toBe(source);
+    expect(received?.target).toBe(socket);
+  });
+
   it("rejects oversized outbound frames and ignores oversized inbound frames", () => {
     const oversized = "x".repeat(128 * 1024 + 1);
     const emptyFrameBytes = new TextEncoder().encode(encodeFenixBrokerFrame("")).byteLength;
