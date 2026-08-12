@@ -463,6 +463,7 @@ export class EnvironmentAuth extends Context.Service<
       readonly subject?: string;
       readonly scopes?: ReadonlyArray<AuthEnvironmentScope>;
       readonly label?: string;
+      readonly fenixCodeTenantScope?: FenixCodeTenantScope;
     }) => Effect.Effect<IssuedBearerSession, ServerAuthInternalError>;
     readonly listSessions: () => Effect.Effect<
       ReadonlyArray<AuthClientSession>,
@@ -491,7 +492,7 @@ export class EnvironmentAuth extends Context.Service<
       request: HttpServerRequest.HttpServerRequest,
     ) => Effect.Effect<AuthenticatedSession, ServerAuthCredentialError | ServerAuthInternalError>;
     readonly issueWebSocketTicket: (
-      session: Pick<AuthenticatedSession, "sessionId">,
+      session: Pick<AuthenticatedSession, "sessionId" | "fenixCodeTenantScope">,
     ) => Effect.Effect<AuthWebSocketTicketResult, ServerAuthInternalError>;
     readonly issueStartupPairingUrl: (
       baseUrl: string,
@@ -592,6 +593,9 @@ export const make = Effect.gen(function* () {
         scopes: session.scopes,
         ...(session.proofKeyThumbprint ? { proofKeyThumbprint: session.proofKeyThumbprint } : {}),
         ...(session.expiresAt ? { expiresAt: session.expiresAt } : {}),
+        ...(session.fenixCodeTenantScope
+          ? { fenixCodeTenantScope: session.fenixCodeTenantScope }
+          : {}),
       })),
       mapSessionVerificationErrors,
     );
@@ -832,6 +836,9 @@ export const make = Effect.gen(function* () {
           deviceType: "bot",
         },
         ...(input?.ttl ? { ttl: input.ttl } : {}),
+        ...(input?.fenixCodeTenantScope
+          ? { fenixCodeTenantScope: input.fenixCodeTenantScope }
+          : {}),
       })
       .pipe(
         Effect.map(
@@ -928,17 +935,22 @@ export const make = Effect.gen(function* () {
     );
 
   const issueWebSocketTicket: EnvironmentAuth["Service"]["issueWebSocketTicket"] = (session) =>
-    sessions.issueWebSocketToken(session.sessionId).pipe(
-      Effect.mapError((cause) => new ServerAuthWebSocketTokenIssueError({ cause })),
-      Effect.map(
-        (issued) =>
-          ({
-            ticket: issued.token,
-            expiresAt: DateTime.toUtc(issued.expiresAt),
-          }) satisfies AuthWebSocketTicketResult,
-      ),
-      Effect.withSpan("EnvironmentAuth.issueWebSocketTicket"),
-    );
+    sessions
+      .issueWebSocketToken(
+        session.sessionId,
+        session.fenixCodeTenantScope ? { fenixCodeTenantScope: session.fenixCodeTenantScope } : {},
+      )
+      .pipe(
+        Effect.mapError((cause) => new ServerAuthWebSocketTokenIssueError({ cause })),
+        Effect.map(
+          (issued) =>
+            ({
+              ticket: issued.token,
+              expiresAt: DateTime.toUtc(issued.expiresAt),
+            }) satisfies AuthWebSocketTicketResult,
+        ),
+        Effect.withSpan("EnvironmentAuth.issueWebSocketTicket"),
+      );
 
   const authenticateHttpRequest: EnvironmentAuth["Service"]["authenticateHttpRequest"] = (
     request,

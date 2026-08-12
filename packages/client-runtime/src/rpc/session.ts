@@ -19,6 +19,7 @@ import {
   ConnectionBlockedError,
   ConnectionTransientError as ConnectionTransientErrorClass,
 } from "../connection/model.ts";
+import { FenixBrokerWebSocket } from "./fenixBrokerWebSocket.ts";
 
 const SOCKET_OPEN_TIMEOUT = "15 seconds";
 
@@ -92,9 +93,17 @@ export const make = Effect.gen(function* () {
         Effect.asVoid,
       ),
     });
+    const socketConstructor: typeof webSocketConstructor =
+      connection.socketTransport === "fenix-code-lab-broker"
+        ? (url: string, protocols?: string | Array<string>) =>
+            new FenixBrokerWebSocket(webSocketConstructor(url, protocols)) as unknown as ReturnType<
+              typeof webSocketConstructor
+            >
+        : webSocketConstructor;
     const socketLayer = Socket.layerWebSocket(connection.socketUrl, {
       openTimeout: SOCKET_OPEN_TIMEOUT,
-    }).pipe(Layer.provide(Layer.succeed(Socket.WebSocketConstructor, webSocketConstructor)));
+      ...(connection.socketProtocols ? { protocols: [...connection.socketProtocols] } : {}),
+    }).pipe(Layer.provide(Layer.succeed(Socket.WebSocketConstructor, socketConstructor)));
     const protocolLayer = Layer.effect(
       RpcClient.Protocol,
       RpcClient.makeProtocolSocket({

@@ -66,3 +66,17 @@ export class SshEnvironmentGateway extends Context.Service<
     ) => Effect.Effect<void, ConnectionAttemptError>;
   }
 >()("@t3tools/client-runtime/platform/capabilities/SshEnvironmentGateway") {}
+
+export interface PreparedFenixCompanionEnvironment {
+  readonly socketUrl: string;
+  readonly protocols: ReadonlyArray<string>;
+}
+
+export class FenixCompanionGateway extends Context.Service<
+  FenixCompanionGateway,
+  {
+    readonly prepare: (input: {
+      readonly deviceId: string;
+    }) => Effect.Effect<PreparedFenixCompanionEnvironment, ConnectionAttemptError>;
+  }
+>()("@t3tools/client-runtime/platform/capabilities/FenixCompanionGateway") {}

@@ -622,12 +622,13 @@
 ./apps/mobile/src/connection/onboarding.ts:1:39:@t3tools
 ./apps/mobile/src/connection/onboarding.ts:5:9:@t3tools
 ./apps/mobile/src/connection/onboarding.ts:6:37:@t3tools
-./apps/mobile/src/connection/platform.ts:125:35:Fenix Connect
-./apps/mobile/src/connection/platform.ts:140:28:Fenix Connect
-./apps/mobile/src/connection/platform.ts:15:9:@t3tools
-./apps/mobile/src/connection/platform.ts:16:70:@t3tools
-./apps/mobile/src/connection/platform.ts:17:43:@t3tools
-./apps/mobile/src/connection/platform.ts:9:9:@t3tools
+./apps/mobile/src/connection/platform.ts:10:9:@t3tools
+./apps/mobile/src/connection/platform.ts:126:35:Fenix Connect
+./apps/mobile/src/connection/platform.ts:141:28:Fenix Connect
+./apps/mobile/src/connection/platform.ts:16:9:@t3tools
+./apps/mobile/src/connection/platform.ts:17:70:@t3tools
+./apps/mobile/src/connection/platform.ts:18:43:@t3tools
+./apps/mobile/src/connection/platform.ts:212:74:Fenix Code
 ./apps/mobile/src/connection/runtime.ts:1:29:@t3tools
 ./apps/mobile/src/connection/runtime.ts:2:43:@t3tools
 ./apps/mobile/src/connection/runtime.ts:3:44:@t3tools
@@ -1167,10 +1168,10 @@
 ./apps/server/src/bin.test.ts:255:83:Fenix Connect
 ./apps/server/src/bin.test.ts:303:29:Fenix Connect
 ./apps/server/src/bin.test.ts:323:24:Fenix Connect
-./apps/server/src/bin.ts:23:4:Fenix Connect
-./apps/server/src/bin.ts:23:66:Fenix Connect
-./apps/server/src/bin.ts:34:28:Fenix Connect
-./apps/server/src/bin.ts:48:38:Fenix Code
+./apps/server/src/bin.ts:24:4:Fenix Connect
+./apps/server/src/bin.ts:24:66:Fenix Connect
+./apps/server/src/bin.ts:35:28:Fenix Connect
+./apps/server/src/bin.ts:49:38:Fenix Code
 ./apps/server/src/bin.ts:8:30:@t3tools
 ./apps/server/src/bootstrap.test.ts:14:38:@t3tools
 ./apps/server/src/bootstrap.ts:12:35:@t3tools
@@ -1275,6 +1276,8 @@
 ./apps/server/src/cli/connect.ts:7:34:@t3tools
 ./apps/server/src/cli/connect.ts:8:31:@t3tools
 ./apps/server/src/cli/connect.ts:9:41:@t3tools
+./apps/server/src/cli/fenix.ts:127:44:Fenix Code
+./apps/server/src/cli/fenix.ts:160:86:Fenix Code
 ./apps/server/src/cli/invocation.test.ts:39:55:t3code
 ./apps/server/src/cli/invocation.ts:3:39:@t3tools
 ./apps/server/src/cli/pair.test.ts:208:44:Fenix Code
@@ -1448,6 +1451,9 @@
 ./apps/server/src/environment/ServerEnvironmentLabel.test.ts:67:23:t3code
 ./apps/server/src/environment/ServerEnvironmentLabel.test.ts:88:23:t3code
 ./apps/server/src/environment/ServerEnvironmentLabel.ts:1:59:@t3tools
+./apps/server/src/fenix/CompanionConfig.ts:59:27:Fenix Code
+./apps/server/src/fenix/FenixCompanionTunnel.ts:126:67:Fenix Code
+./apps/server/src/fenix/FenixCompanionTunnel.ts:1:43:@t3tools
 ./apps/server/src/git/GitManager.test.ts:1023:45:t3code
 ./apps/server/src/git/GitManager.test.ts:1037:54:t3code
 ./apps/server/src/git/GitManager.test.ts:1044:50:t3code
@@ -2047,38 +2053,38 @@
 ./apps/server/src/resourceTelemetry/ResourceTelemetryHistory.test.ts:6:9:@t3tools
 ./apps/server/src/resourceTelemetry/ResourceTelemetryHistory.ts:9:9:@t3tools
 ./apps/server/src/review/ReviewService.ts:16:9:@t3tools
-./apps/server/src/server.test.ts:1015:49:Fenix Connect
-./apps/server/src/server.test.ts:1732:19:Fenix Code
-./apps/server/src/server.test.ts:1759:17:Fenix Code
-./apps/server/src/server.test.ts:2713:36:Fenix Connect
-./apps/server/src/server.test.ts:2772:28:Fenix Connect
-./apps/server/src/server.test.ts:3601:33:t3code
-./apps/server/src/server.test.ts:3601:49:t3code
-./apps/server/src/server.test.ts:42:9:@t3tools
-./apps/server/src/server.test.ts:47:9:@t3tools
-./apps/server/src/server.test.ts:48:67:@t3tools
-./apps/server/src/server.test.ts:49:31:@t3tools
+./apps/server/src/server.test.ts:1018:49:Fenix Connect
+./apps/server/src/server.test.ts:1735:19:Fenix Code
+./apps/server/src/server.test.ts:1762:17:Fenix Code
+./apps/server/src/server.test.ts:2716:36:Fenix Connect
+./apps/server/src/server.test.ts:2775:28:Fenix Connect
+./apps/server/src/server.test.ts:3604:33:t3code
+./apps/server/src/server.test.ts:3604:49:t3code
+./apps/server/src/server.test.ts:43:9:@t3tools
+./apps/server/src/server.test.ts:48:9:@t3tools
+./apps/server/src/server.test.ts:49:67:@t3tools
+./apps/server/src/server.test.ts:50:31:@t3tools
 ./apps/server/src/server.test.ts:5:62:@t3tools
-./apps/server/src/server.test.ts:8005:23:t3code
-./apps/server/src/server.test.ts:8048:29:t3code
-./apps/server/src/server.test.ts:8125:28:t3code
-./apps/server/src/server.test.ts:8149:24:t3code
-./apps/server/src/server.test.ts:8215:27:t3code
-./apps/server/src/server.test.ts:8271:28:t3code
-./apps/server/src/server.test.ts:8289:24:t3code
-./apps/server/src/server.test.ts:8303:25:t3code
-./apps/server/src/server.test.ts:8374:26:t3code
-./apps/server/src/server.test.ts:8408:25:t3code
-./apps/server/src/server.test.ts:8495:26:t3code
-./apps/server/src/server.test.ts:8579:26:t3code
-./apps/server/src/server.test.ts:8869:48:T3CODE
-./apps/server/src/server.test.ts:8876:48:T3CODE
-./apps/server/src/server.ts:113:30:@t3tools
-./apps/server/src/server.ts:114:31:@t3tools
-./apps/server/src/server.ts:115:62:@t3tools
+./apps/server/src/server.test.ts:8362:23:t3code
+./apps/server/src/server.test.ts:8405:29:t3code
+./apps/server/src/server.test.ts:8482:28:t3code
+./apps/server/src/server.test.ts:8506:24:t3code
+./apps/server/src/server.test.ts:8572:27:t3code
+./apps/server/src/server.test.ts:8628:28:t3code
+./apps/server/src/server.test.ts:8646:24:t3code
+./apps/server/src/server.test.ts:8660:25:t3code
+./apps/server/src/server.test.ts:8731:26:t3code
+./apps/server/src/server.test.ts:8765:25:t3code
+./apps/server/src/server.test.ts:8852:26:t3code
+./apps/server/src/server.test.ts:8936:26:t3code
+./apps/server/src/server.test.ts:9226:48:T3CODE
+./apps/server/src/server.test.ts:9233:48:T3CODE
+./apps/server/src/server.ts:114:30:@t3tools
+./apps/server/src/server.ts:115:31:@t3tools
+./apps/server/src/server.ts:116:62:@t3tools
 ./apps/server/src/server.ts:1:37:@t3tools
-./apps/server/src/server.ts:623:48:Fenix Connect
-./apps/server/src/server.ts:625:56:Fenix Connect
+./apps/server/src/server.ts:624:48:Fenix Connect
+./apps/server/src/server.ts:626:56:Fenix Connect
 ./apps/server/src/serverLifecycleEvents.test.ts:1:32:@t3tools
 ./apps/server/src/serverLifecycleEvents.ts:1:50:@t3tools
 ./apps/server/src/serverRuntimeStartup.test.ts:2:73:@t3tools
@@ -2440,9 +2446,9 @@
 ./apps/server/src/workspace/WorkspaceFileSystem.ts:17:9:@t3tools
 ./apps/server/src/workspace/WorkspacePaths.test.ts:19:14:t3code
 ./apps/server/src/workspace/WorkspaceSearchIndex.ts:25:9:@t3tools
-./apps/server/src/ws.ts:126:31:@t3tools
-./apps/server/src/ws.ts:61:9:@t3tools
-./apps/server/src/ws.ts:62:58:@t3tools
+./apps/server/src/ws.ts:134:31:@t3tools
+./apps/server/src/ws.ts:63:9:@t3tools
+./apps/server/src/ws.ts:64:58:@t3tools
 ./apps/server/test/ActivityPayloadProjection.test.ts:10:9:@t3tools
 ./apps/server/vite.config.ts:10:4:@t3tools
 ./apps/server/vite.config.ts:29:24:@t3tools
@@ -2528,6 +2534,7 @@
 ./apps/web/src/browserHistoryStore.ts:1:34:@t3tools
 ./apps/web/src/browserHistoryStore.ts:2:39:@t3tools
 ./apps/web/src/browserHistoryStore.ts:7:38:@t3tools
+./apps/web/src/buildBasePath.test.ts:5:11:Fenix Code
 ./apps/web/src/clientPersistenceStorage.test.ts:1:42:@t3tools
 ./apps/web/src/clientPersistenceStorage.test.ts:57:38:t3code
 ./apps/web/src/clientPersistenceStorage.test.ts:67:22:t3code
@@ -2898,33 +2905,34 @@
 ./apps/web/src/components/settings/AddProviderInstanceDialog.tsx:54:29:@t3tools
 ./apps/web/src/components/settings/ConnectionsSettings.logic.test.ts:1:59:@t3tools
 ./apps/web/src/components/settings/ConnectionsSettings.logic.ts:1:74:@t3tools
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1398:33:Fenix Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1568:23:Fenix Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1607:19:Fenix Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1609:58:Fenix Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1622:14:Fenix Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1624:16:Fenix Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1625:16:Fenix Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1627:52:Fenix Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1630:64:Fenix Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1654:16:Fenix Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1657:76:Fenix Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1658:78:Fenix Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1672:141:Fenix Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:1701:93:Fenix Connect
-./apps/web/src/components/settings/ConnectionsSettings.tsx:2868:164:Fenix Code
-./apps/web/src/components/settings/ConnectionsSettings.tsx:3099:24:Fenix Code
-./apps/web/src/components/settings/ConnectionsSettings.tsx:30:9:@t3tools
-./apps/web/src/components/settings/ConnectionsSettings.tsx:3100:24:Fenix Code
-./apps/web/src/components/settings/ConnectionsSettings.tsx:3158:26:Fenix Code
-./apps/web/src/components/settings/ConnectionsSettings.tsx:3159:152:Fenix Code
-./apps/web/src/components/settings/ConnectionsSettings.tsx:3161:26:Fenix Code
-./apps/web/src/components/settings/ConnectionsSettings.tsx:3165:30:Fenix Code
-./apps/web/src/components/settings/ConnectionsSettings.tsx:3166:30:Fenix Code
-./apps/web/src/components/settings/ConnectionsSettings.tsx:31:39:@t3tools
-./apps/web/src/components/settings/ConnectionsSettings.tsx:3252:19:Fenix Code
-./apps/web/src/components/settings/ConnectionsSettings.tsx:3290:19:Fenix Code
-./apps/web/src/components/settings/ConnectionsSettings.tsx:35:9:@t3tools
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1406:33:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1576:23:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1615:19:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1617:58:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1630:14:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1632:16:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1633:16:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1635:52:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1638:64:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1662:16:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1665:76:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1666:78:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1680:141:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:1709:93:Fenix Connect
+./apps/web/src/components/settings/ConnectionsSettings.tsx:2434:61:Fenix Code
+./apps/web/src/components/settings/ConnectionsSettings.tsx:2963:164:Fenix Code
+./apps/web/src/components/settings/ConnectionsSettings.tsx:3194:24:Fenix Code
+./apps/web/src/components/settings/ConnectionsSettings.tsx:3195:24:Fenix Code
+./apps/web/src/components/settings/ConnectionsSettings.tsx:31:9:@t3tools
+./apps/web/src/components/settings/ConnectionsSettings.tsx:3253:26:Fenix Code
+./apps/web/src/components/settings/ConnectionsSettings.tsx:3254:152:Fenix Code
+./apps/web/src/components/settings/ConnectionsSettings.tsx:3256:26:Fenix Code
+./apps/web/src/components/settings/ConnectionsSettings.tsx:3260:30:Fenix Code
+./apps/web/src/components/settings/ConnectionsSettings.tsx:3261:30:Fenix Code
+./apps/web/src/components/settings/ConnectionsSettings.tsx:32:39:@t3tools
+./apps/web/src/components/settings/ConnectionsSettings.tsx:3347:19:Fenix Code
+./apps/web/src/components/settings/ConnectionsSettings.tsx:3385:19:Fenix Code
+./apps/web/src/components/settings/ConnectionsSettings.tsx:36:9:@t3tools
 ./apps/web/src/components/settings/DiagnosticsSettings.tsx:14:9:@t3tools
 ./apps/web/src/components/settings/DiagnosticsSettings.tsx:20:9:@t3tools
 ./apps/web/src/components/settings/KeybindingsSettings.logic.test.ts:2:49:@t3tools
@@ -3007,21 +3015,29 @@
 ./apps/web/src/connection/desktopLocal.test.ts:5:62:@t3tools
 ./apps/web/src/connection/desktopLocal.ts:1:40:@t3tools
 ./apps/web/src/connection/desktopLocal.ts:6:9:@t3tools
+./apps/web/src/connection/fenixPortal.ts:117:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:139:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:17:12:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:217:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:268:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:5:9:@t3tools
+./apps/web/src/connection/fenixPortal.ts:6:32:@t3tools
 ./apps/web/src/connection/onboarding.ts:1:39:@t3tools
 ./apps/web/src/connection/onboarding.ts:5:9:@t3tools
 ./apps/web/src/connection/onboarding.ts:6:51:@t3tools
 ./apps/web/src/connection/platform.test.ts:7:9:@t3tools
-./apps/web/src/connection/platform.ts:120:23:Fenix Code
-./apps/web/src/connection/platform.ts:120:46:Fenix Code
-./apps/web/src/connection/platform.ts:185:33:Fenix Connect
-./apps/web/src/connection/platform.ts:200:26:Fenix Connect
-./apps/web/src/connection/platform.ts:23:9:@t3tools
-./apps/web/src/connection/platform.ts:24:47:@t3tools
-./apps/web/src/connection/platform.ts:25:51:@t3tools
-./apps/web/src/connection/platform.ts:26:70:@t3tools
-./apps/web/src/connection/platform.ts:27:48:@t3tools
-./apps/web/src/connection/platform.ts:34:9:@t3tools
-./apps/web/src/connection/platform.ts:9:9:@t3tools
+./apps/web/src/connection/platform.ts:10:9:@t3tools
+./apps/web/src/connection/platform.ts:130:23:Fenix Code
+./apps/web/src/connection/platform.ts:130:46:Fenix Code
+./apps/web/src/connection/platform.ts:195:33:Fenix Connect
+./apps/web/src/connection/platform.ts:210:26:Fenix Connect
+./apps/web/src/connection/platform.ts:24:9:@t3tools
+./apps/web/src/connection/platform.ts:25:47:@t3tools
+./apps/web/src/connection/platform.ts:26:51:@t3tools
+./apps/web/src/connection/platform.ts:27:70:@t3tools
+./apps/web/src/connection/platform.ts:28:48:@t3tools
+./apps/web/src/connection/platform.ts:35:9:@t3tools
+./apps/web/src/connection/platform.ts:507:54:Fenix Code
 ./apps/web/src/connection/runtime.ts:1:29:@t3tools
 ./apps/web/src/connection/runtime.ts:2:43:@t3tools
 ./apps/web/src/connection/runtime.ts:3:44:@t3tools
@@ -3220,6 +3236,7 @@
 ./apps/web/src/routes/__root.tsx:1:53:@t3tools
 ./apps/web/src/routes/__root.tsx:2:52:@t3tools
 ./apps/web/src/routes/__root.tsx:3:43:@t3tools
+./apps/web/src/routes/__root.tsx:77:26:Fenix Code
 ./apps/web/src/routes/_chat.index.tsx:170:33:Fenix Connect
 ./apps/web/src/routes/_chat.index.tsx:1:34:@t3tools
 ./apps/web/src/routes/_chat.tsx:120:34:Fenix Code
@@ -3364,18 +3381,18 @@
 ./apps/web/vercel.ts:40:103:@t3tools
 ./apps/web/vercel.ts:40:72:@t3tools
 ./apps/web/vercel.ts:8:9:@t3tools
-./apps/web/vite.config.ts:120:58:T3CODE
-./apps/web/vite.config.ts:130:12:t3code
+./apps/web/vite.config.ts:122:58:T3CODE
+./apps/web/vite.config.ts:132:12:t3code
 ./apps/web/vite.config.ts:13:44:@t3tools
-./apps/web/vite.config.ts:148:45:T3CODE
-./apps/web/vite.config.ts:191:29:T3CODE
-./apps/web/vite.config.ts:27:39:T3CODE
-./apps/web/vite.config.ts:34:41:T3CODE
-./apps/web/vite.config.ts:56:34:T3CODE
-./apps/web/vite.config.ts:60:47:T3CODE
-./apps/web/vite.config.ts:62:51:T3CODE
-./apps/web/vite.config.ts:63:35:T3CODE
-./apps/web/vite.config.ts:92:6:T3CODE
+./apps/web/vite.config.ts:150:45:T3CODE
+./apps/web/vite.config.ts:194:29:T3CODE
+./apps/web/vite.config.ts:29:39:T3CODE
+./apps/web/vite.config.ts:36:41:T3CODE
+./apps/web/vite.config.ts:58:34:T3CODE
+./apps/web/vite.config.ts:62:47:T3CODE
+./apps/web/vite.config.ts:64:51:T3CODE
+./apps/web/vite.config.ts:65:35:T3CODE
+./apps/web/vite.config.ts:94:6:T3CODE
 ./docs/fenix/a1-webapp-build-report-20260811.md:14:37:@t3tools
 ./docs/fenix/a1-webapp-build-report-20260811.md:1:28:Fenix Code
 ./docs/fenix/a1-webapp-build-report-20260811.md:5:26:t3code
@@ -3466,6 +3483,12 @@
 ./docs/fenix/fenix-code-pause-handoff-20260808.md:66:17:Fenix Code
 ./docs/fenix/fenix-code-pause-handoff-20260808.md:9:187:Fenix Code
 ./docs/fenix/fenix-code-pause-handoff-20260808.md:9:19:Fenix Code
+./docs/fenix/local-workspaces-relay-report-20260812.md:1:3:Fenix Code
+./docs/fenix/local-workspaces-relay-report-20260812.md:35:71:Fenix Code
+./docs/fenix/local-workspaces-relay-report-20260812.md:74:40:Fenix Code
+./docs/fenix/local-workspaces-relay-report-20260812.md:85:3:Fenix Code
+./docs/fenix/local-workspaces-relay-report-20260812.md:87:3:Fenix Code
+./docs/fenix/local-workspaces-relay-report-20260812.md:9:35:Fenix Code
 ./docs/fenix/qa-f1-report-20260810.md:23:98:Fenix Code
 ./docs/fenix/qa-f1-report-20260810.md:26:101:t3code
 ./docs/fenix/qa-f1-report-20260810.md:26:50:t3code
@@ -3590,6 +3613,10 @@
 ./docs/operations/release.md:207:6:T3CODE
 ./docs/operations/release.md:279:47:t3code
 ./docs/operations/release.md:346:76:t3code
+./docs/user/fenix-portal-local-environments.md:13:50:Fenix Code
+./docs/user/fenix-portal-local-environments.md:14:22:Fenix Code
+./docs/user/fenix-portal-local-environments.md:3:28:Fenix Code
+./docs/user/fenix-portal-local-environments.md:42:9:Fenix Code
 ./docs/user/install.md:23:48:t3code
 ./docs/user/install.md:29:24:T3Code
 ./docs/user/install.md:35:21:t3-code
@@ -3845,6 +3872,7 @@
 ./packages/client-runtime/src/connection/errors.ts:1:37:@t3tools
 ./packages/client-runtime/src/connection/errors.ts:2:43:@t3tools
 ./packages/client-runtime/src/connection/model.ts:1:32:@t3tools
+./packages/client-runtime/src/connection/model.ts:41:7:Fenix Code
 ./packages/client-runtime/src/connection/onboarding.test.ts:117:53:Fenix Code
 ./packages/client-runtime/src/connection/onboarding.test.ts:1:58:@t3tools
 ./packages/client-runtime/src/connection/onboarding.test.ts:21:15:Fenix Code
@@ -3862,7 +3890,7 @@
 ./packages/client-runtime/src/connection/resolver.test.ts:3:36:@t3tools
 ./packages/client-runtime/src/connection/resolver.ts:1:47:@t3tools
 ./packages/client-runtime/src/connection/resolver.ts:2:41:@t3tools
-./packages/client-runtime/src/connection/resolver.ts:43:6:@t3tools
+./packages/client-runtime/src/connection/resolver.ts:44:6:@t3tools
 ./packages/client-runtime/src/connection/supervisor.test.ts:1:32:@t3tools
 ./packages/client-runtime/src/connection/supervisor.test.ts:2:36:@t3tools
 ./packages/client-runtime/src/connection/supervisor.ts:1:41:@t3tools
@@ -3882,6 +3910,7 @@
 ./packages/client-runtime/src/platform/capabilities.ts:51:6:@t3tools
 ./packages/client-runtime/src/platform/capabilities.ts:68:6:@t3tools
 ./packages/client-runtime/src/platform/capabilities.ts:7:9:@t3tools
+./packages/client-runtime/src/platform/capabilities.ts:82:6:@t3tools
 ./packages/client-runtime/src/platform/persistence.ts:123:6:@t3tools
 ./packages/client-runtime/src/platform/persistence.ts:127:5:@t3tools
 ./packages/client-runtime/src/platform/persistence.ts:46:6:@t3tools
@@ -3918,7 +3947,7 @@
 ./packages/client-runtime/src/rpc/protocol.ts:1:29:@t3tools
 ./packages/client-runtime/src/rpc/session.test.ts:7:9:@t3tools
 ./packages/client-runtime/src/rpc/session.ts:1:48:@t3tools
-./packages/client-runtime/src/rpc/session.ts:40:6:@t3tools
+./packages/client-runtime/src/rpc/session.ts:41:6:@t3tools
 ./packages/client-runtime/src/state/archivedThreads.test.ts:1:65:@t3tools
 ./packages/client-runtime/src/state/archivedThreads.ts:1:65:@t3tools
 ./packages/client-runtime/src/state/assets.test.ts:2:32:@t3tools

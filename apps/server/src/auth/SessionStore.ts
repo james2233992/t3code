@@ -20,6 +20,7 @@ import * as Stream from "effect/Stream";
 import * as Option from "effect/Option";
 
 import * as ServerConfig from "../config.ts";
+import type { FenixCodeTenantScope } from "../fenix/FenixCodeTenantScope.ts";
 import * as AuthSessions from "../persistence/AuthSessions.ts";
 import * as ServerSecretStore from "./ServerSecretStore.ts";
 import {
@@ -38,6 +39,7 @@ export interface IssuedSession {
   readonly expiresAt: DateTime.DateTime;
   readonly scopes: ReadonlyArray<AuthEnvironmentScope>;
   readonly proofKeyThumbprint?: string;
+  readonly fenixCodeTenantScope?: FenixCodeTenantScope;
 }
 
 export interface VerifiedSession {
@@ -49,6 +51,7 @@ export interface VerifiedSession {
   readonly subject: string;
   readonly scopes: ReadonlyArray<AuthEnvironmentScope>;
   readonly proofKeyThumbprint?: string;
+  readonly fenixCodeTenantScope?: FenixCodeTenantScope;
 }
 
 export type SessionCredentialChange =
@@ -366,12 +369,14 @@ export class SessionStore extends Context.Service<
       readonly scopes?: ReadonlyArray<AuthEnvironmentScope>;
       readonly client?: AuthClientMetadata;
       readonly proofKeyThumbprint?: string;
+      readonly fenixCodeTenantScope?: FenixCodeTenantScope;
     }) => Effect.Effect<IssuedSession, SessionCredentialInternalError>;
     readonly verify: (token: string) => Effect.Effect<VerifiedSession, SessionCredentialError>;
     readonly issueWebSocketToken: (
       sessionId: AuthSessionId,
       input?: {
         readonly ttl?: Duration.Duration;
+        readonly fenixCodeTenantScope?: FenixCodeTenantScope;
       },
     ) => Effect.Effect<
       {
@@ -411,6 +416,12 @@ const SessionClaims = Schema.Struct({
   scopes: AuthEnvironmentScopes,
   method: Schema.Literals(["browser-session-cookie", "bearer-access-token", "dpop-access-token"]),
   jkt: Schema.optionalKey(Schema.String),
+  fenix: Schema.optionalKey(
+    Schema.Struct({
+      companyId: Schema.Int.pipe(Schema.check(Schema.isGreaterThan(0))),
+      userId: Schema.Int.pipe(Schema.check(Schema.isGreaterThan(0))),
+    }),
+  ),
   iat: Schema.Number,
   exp: Schema.Number,
 });
@@ -420,6 +431,12 @@ const WebSocketClaims = Schema.Struct({
   v: Schema.Literal(1),
   kind: Schema.Literal("websocket"),
   sid: AuthSessionId,
+  fenix: Schema.optionalKey(
+    Schema.Struct({
+      companyId: Schema.Int.pipe(Schema.check(Schema.isGreaterThan(0))),
+      userId: Schema.Int.pipe(Schema.check(Schema.isGreaterThan(0))),
+    }),
+  ),
   iat: Schema.Number,
   exp: Schema.Number,
 });
@@ -590,6 +607,7 @@ export const make = Effect.gen(function* () {
         scopes: input?.scopes ?? AuthStandardClientScopes,
         method: input?.method ?? "browser-session-cookie",
         ...(input?.proofKeyThumbprint ? { jkt: input.proofKeyThumbprint } : {}),
+        ...(input?.fenixCodeTenantScope ? { fenix: input.fenixCodeTenantScope } : {}),
         iat: issuedAt.epochMilliseconds,
         exp: expiresAt.epochMilliseconds,
       };
@@ -712,6 +730,7 @@ export const make = Effect.gen(function* () {
         subject: claims.sub,
         scopes: claims.scopes,
         ...(claims.jkt ? { proofKeyThumbprint: claims.jkt } : {}),
+        ...(claims.fenix ? { fenixCodeTenantScope: claims.fenix } : {}),
       } satisfies VerifiedSession;
     },
   );
@@ -728,6 +747,7 @@ export const make = Effect.gen(function* () {
       v: 1,
       kind: "websocket",
       sid: sessionId,
+      ...(input?.fenixCodeTenantScope ? { fenix: input.fenixCodeTenantScope } : {}),
       iat: issuedAt.epochMilliseconds,
       exp: expiresAt.epochMilliseconds,
     };
@@ -817,6 +837,7 @@ export const make = Effect.gen(function* () {
       expiresAt: row.value.expiresAt,
       subject: row.value.subject,
       scopes: row.value.scopes,
+      ...(claims.fenix ? { fenixCodeTenantScope: claims.fenix } : {}),
     } satisfies VerifiedSession;
   });
 

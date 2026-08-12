@@ -381,6 +381,24 @@ const makeFenixScopedProjectionSnapshotQuery = Effect.gen(function* () {
       `,
   });
 
+  const claimScopedProjectRow = SqlSchema.findOneOption({
+    Request: ProjectScopeInput,
+    Result: ScopedProjectIdRow,
+    execute: ({ companyId, userId, projectId }) =>
+      sql`
+        UPDATE projection_projects
+        SET
+          fenix_company_id = ${companyId},
+          fenix_user_id = ${userId}
+        WHERE project_id = ${projectId}
+          AND (
+            (fenix_company_id IS NULL AND fenix_user_id IS NULL)
+            OR (fenix_company_id = ${companyId} AND fenix_user_id = ${userId})
+          )
+        RETURNING project_id AS "projectId"
+      `,
+  });
+
   const scopedProjectIds = (scope: FenixCodeTenantScope) =>
     isValidFenixCodeTenantScope(scope)
       ? listScopedProjectRows(scope).pipe(
@@ -492,6 +510,19 @@ const makeFenixScopedProjectionSnapshotQuery = Effect.gen(function* () {
   const projectBelongsToScope: FenixScopedProjectionSnapshotQueryShape["projectBelongsToScope"] =
     projectMatchesScope;
 
+  const claimProjectScope: FenixScopedProjectionSnapshotQueryShape["claimProjectScope"] = (
+    scope,
+    projectId,
+  ) =>
+    isValidFenixCodeTenantScope(scope)
+      ? claimScopedProjectRow({ ...scope, projectId }).pipe(
+          Effect.mapError(
+            toPersistenceSqlError("FenixScopedProjectionSnapshotQuery.claimProjectScope"),
+          ),
+          Effect.map(Option.isSome),
+        )
+      : Effect.succeed(false);
+
   const threadBelongsToScope: FenixScopedProjectionSnapshotQueryShape["threadBelongsToScope"] =
     threadMatchesScope;
 
@@ -601,6 +632,7 @@ const makeFenixScopedProjectionSnapshotQuery = Effect.gen(function* () {
       );
 
   return {
+    claimProjectScope,
     getCommandReadModel,
     getSnapshot,
     getShellSnapshot,

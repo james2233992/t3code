@@ -38,11 +38,21 @@ export class SshConnectionTarget extends Schema.TaggedClass<SshConnectionTarget>
   },
 ) {}
 
+/** A Fenix Code server running on the user's machine, reached through Code Lab. */
+export class FenixCompanionConnectionTarget extends Schema.TaggedClass<FenixCompanionConnectionTarget>()(
+  "FenixCompanionConnectionTarget",
+  {
+    ...ConnectionTargetBase,
+    deviceId: Schema.String,
+  },
+) {}
+
 export const ConnectionTarget = Schema.Union([
   PrimaryConnectionTarget,
   BearerConnectionTarget,
   RelayConnectionTarget,
   SshConnectionTarget,
+  FenixCompanionConnectionTarget,
 ]);
 export type ConnectionTarget = typeof ConnectionTarget.Type;
 
@@ -119,6 +129,8 @@ export interface PreparedConnection {
   readonly httpBaseUrl: string;
   readonly socketUrl: string;
   readonly httpAuthorization: PreparedHttpAuthorization | null;
+  readonly socketProtocols?: ReadonlyArray<string>;
+  readonly socketTransport?: "direct" | "fenix-code-lab-broker";
   readonly target: ConnectionTarget;
 }
 

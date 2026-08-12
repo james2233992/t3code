@@ -1,5 +1,6 @@
 import {
   ChevronsLeftRightEllipsisIcon,
+  LaptopIcon,
   PlusIcon,
   QrCodeIcon,
   RefreshCwIcon,
@@ -130,6 +131,13 @@ import { ConnectionStatusDot } from "../ConnectionStatusDot";
 import { ServerUpdateAction, ServerUpdateProgress } from "../ServerUpdateAction";
 import { CloudEnvironmentConnectRows } from "../cloud/CloudEnvironmentConnectList";
 import { ITEM_ROW_CLASSNAME, ITEM_ROW_INNER_CLASSNAME } from "./itemRows";
+import {
+  buildFenixCompanionPairCommand,
+  isFenixPortalEmbeddedApp,
+  issueFenixPortalPairing,
+  readFenixPortalAgentId,
+  type FenixPortalPairing,
+} from "~/connection/fenixPortal";
 
 const DEFAULT_TAILSCALE_SERVE_PORT = 443;
 const EMPTY_ADVERTISED_ENDPOINTS: ReadonlyArray<AdvertisedEndpoint> = [];
@@ -1726,6 +1734,8 @@ function CloudRemoteEnvironmentRows({
 
 export function ConnectionsSettings() {
   const desktopBridge = window.desktopBridge;
+  const fenixPortalAgentId = readFenixPortalAgentId();
+  const isFenixPortal = isFenixPortalEmbeddedApp();
   const { environments } = useEnvironments();
   const primaryEnvironment = usePrimaryEnvironment();
   const connectPairing = useAtomCommand(connectPairingAtom, { reportFailure: false });
@@ -1801,13 +1811,18 @@ export function ConnectionsSettings() {
   >(null);
   const [isRevokingOtherDesktopClients, setIsRevokingOtherDesktopClients] = useState(false);
   const [addBackendDialogOpen, setAddBackendDialogOpen] = useState(false);
-  const [savedBackendMode, setSavedBackendMode] = useState<"remote" | "ssh">("remote");
+  const [savedBackendMode, setSavedBackendMode] = useState<"remote" | "ssh" | "fenix-local">(
+    isFenixPortal ? "fenix-local" : "remote",
+  );
   const [savedBackendHost, setSavedBackendHost] = useState("");
   const [savedBackendPairingCode, setSavedBackendPairingCode] = useState("");
   const [savedBackendSshHost, setSavedBackendSshHost] = useState("");
   const [savedBackendSshUsername, setSavedBackendSshUsername] = useState("");
   const [savedBackendSshPort, setSavedBackendSshPort] = useState("");
   const [savedBackendError, setSavedBackendError] = useState<string | null>(null);
+  const [fenixLocalDeviceName, setFenixLocalDeviceName] = useState("My local computer");
+  const [fenixLocalPairing, setFenixLocalPairing] = useState<FenixPortalPairing | null>(null);
+  const [isIssuingFenixPairing, setIsIssuingFenixPairing] = useState(false);
   const [isAddingSavedBackend, setIsAddingSavedBackend] = useState(false);
   const [removingSavedEnvironmentId, setRemovingSavedEnvironmentId] =
     useState<EnvironmentId | null>(null);
@@ -2363,7 +2378,7 @@ export function ConnectionsSettings() {
   }, []);
 
   const renderConnectionModeCard = (input: {
-    readonly mode: "remote" | "ssh";
+    readonly mode: "remote" | "ssh" | "fenix-local";
     readonly title: string;
     readonly description: string;
     readonly icon?: ReactNode;
@@ -2403,6 +2418,86 @@ export function ConnectionsSettings() {
       </button>
     );
   };
+
+  const fenixPairCommand =
+    fenixLocalPairing === null
+      ? null
+      : buildFenixCompanionPairCommand({
+          portalOrigin: window.location.origin,
+          pairing: fenixLocalPairing,
+        });
+  const { copyToClipboard: copyFenixPairCommand, isCopied: fenixPairCommandCopied } =
+    useCopyToClipboard({ target: "local companion command" });
+
+  const handleIssueFenixPairing = async () => {
+    if (fenixPortalAgentId === null) {
+      setSavedBackendError("This page does not have a valid Fenix Code agent context.");
+      return;
+    }
+    setIsIssuingFenixPairing(true);
+    setSavedBackendError(null);
+    setFenixLocalPairing(null);
+    try {
+      setFenixLocalPairing(
+        await issueFenixPortalPairing({
+          agentId: fenixPortalAgentId,
+          deviceName: fenixLocalDeviceName,
+        }),
+      );
+    } catch (error) {
+      setSavedBackendError(error instanceof Error ? error.message : "Could not start pairing.");
+    } finally {
+      setIsIssuingFenixPairing(false);
+    }
+  };
+
+  const renderFenixLocalModeBody = () => (
+    <div className="space-y-4">
+      <label className="block">
+        <span className="mb-1.5 block text-xs font-medium text-foreground">Computer name</span>
+        <Input
+          value={fenixLocalDeviceName}
+          onChange={(event) => {
+            setFenixLocalDeviceName(event.target.value);
+            setFenixLocalPairing(null);
+          }}
+          maxLength={80}
+          disabled={isIssuingFenixPairing}
+        />
+      </label>
+      {fenixPairCommand === null ? (
+        <Button
+          variant="outline"
+          className="w-full"
+          disabled={isIssuingFenixPairing || fenixLocalDeviceName.trim().length === 0}
+          onClick={() => void handleIssueFenixPairing()}
+        >
+          <LaptopIcon className="size-3.5" />
+          {isIssuingFenixPairing ? "Preparing…" : "Pair local computer"}
+        </Button>
+      ) : (
+        <div className="space-y-3">
+          <p className="text-xs leading-relaxed text-muted-foreground">
+            Run this command from the local folder you want to add. The one-time token expires at{" "}
+            {formatAccessTimestamp(fenixLocalPairing!.expiresAt)}.
+          </p>
+          <Textarea value={fenixPairCommand} readOnly rows={5} spellCheck={false} />
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => copyFenixPairCommand(fenixPairCommand)}
+          >
+            {fenixPairCommandCopied ? "Copied" : "Copy command"}
+          </Button>
+          <p className="text-[11px] leading-relaxed text-muted-foreground">
+            After the companion connects, Add Project keeps the original folder and Git URL flows.
+            Add more roots locally with <code>t3 fenix root add &lt;folder&gt;</code>.
+          </p>
+        </div>
+      )}
+      {savedBackendError ? <p className="text-xs text-destructive">{savedBackendError}</p> : null}
+    </div>
+  );
 
   const renderRemoteFields = () => (
     <div className="space-y-3">
@@ -3362,6 +3457,7 @@ export function ConnectionsSettings() {
               setAddBackendDialogOpen(open);
               if (!open) {
                 setSavedBackendError(null);
+                setFenixLocalPairing(null);
               }
             }}
           >
@@ -3393,6 +3489,14 @@ export function ConnectionsSettings() {
               <DialogPanel>
                 <div className="space-y-4">
                   <div className="grid gap-3 sm:grid-cols-2">
+                    {isFenixPortal
+                      ? renderConnectionModeCard({
+                          mode: "fenix-local",
+                          title: "Local computer",
+                          description: "Use local folders and local or remote Git URLs.",
+                          icon: <LaptopIcon aria-hidden className="size-4" />,
+                        })
+                      : null}
                     {renderConnectionModeCard({
                       mode: "remote",
                       title: "Remote link",
@@ -3409,7 +3513,11 @@ export function ConnectionsSettings() {
                       : null}
                   </div>
                   <AnimatedHeight>
-                    {savedBackendMode === "ssh" ? renderSshFields() : renderRemoteModeBody()}
+                    {savedBackendMode === "fenix-local"
+                      ? renderFenixLocalModeBody()
+                      : savedBackendMode === "ssh"
+                        ? renderSshFields()
+                        : renderRemoteModeBody()}
                   </AnimatedHeight>
                 </div>
               </DialogPanel>
