@@ -2,6 +2,7 @@ import {
   ClientPresentation,
   CloudSession,
   EnvironmentOwnedDataCleanup,
+  FenixCompanionGateway,
   PlatformConnectionSource,
   PrimaryEnvironmentAuth,
   RelayDeviceIdentity,
@@ -201,6 +202,19 @@ const platformConnectionSourceLayer = Layer.succeed(
   }),
 );
 
+const fenixCompanionGatewayLayer = Layer.succeed(
+  FenixCompanionGateway,
+  FenixCompanionGateway.of({
+    prepare: () =>
+      Effect.fail(
+        new ConnectionBlockedError({
+          reason: "unsupported",
+          detail: "Fenix companion connections are only available in the Fenix Code web app.",
+        }),
+      ),
+  }),
+);
+
 const providedConnectionStorageLayer = connectionStorageLayer.pipe(
   Layer.provide(Runtime.runtimeContextLayer),
 );
@@ -235,6 +249,7 @@ type ConnectionPlatformLayerSource =
   | typeof connectivityLayer
   | typeof wakeupsLayer
   | typeof providedCapabilitiesLayer
+  | typeof fenixCompanionGatewayLayer
   | typeof platformConnectionSourceLayer
   | typeof environmentOwnedDataCleanupLayer;
 
@@ -248,6 +263,7 @@ export const connectionPlatformLayer: Layer.Layer<
   connectivityLayer,
   wakeupsLayer,
   providedCapabilitiesLayer,
+  fenixCompanionGatewayLayer,
   platformConnectionSourceLayer,
   environmentOwnedDataCleanupLayer,
 );

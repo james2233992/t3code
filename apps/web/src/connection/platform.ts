@@ -283,36 +283,38 @@ const capabilitiesLayer = Layer.effectContext(
         });
       }),
     });
-    const fenixCompanion = FenixCompanionGateway.of({
-      prepare: Effect.fn("web.connectionPlatform.fenixCompanion.prepare")(function* ({ deviceId }) {
-        const agentId = readFenixPortalAgentId();
-        if (agentId === null) {
-          return yield* new ConnectionBlockedError({
-            reason: "unsupported",
-            detail: "Fenix companion connections require the Code Lab portal.",
-          });
-        }
-        const ticket = yield* Effect.tryPromise({
-          try: () => issueFenixPortalBrowserTicket({ agentId, deviceId }),
-          catch: (cause) => {
-            const detail = cause instanceof Error ? cause.message : String(cause);
-            const failure = classifyFenixPortalFailure(cause);
-            return failure === "network"
-              ? new ConnectionTransientError({ reason: "network", detail })
-              : new ConnectionBlockedError({ reason: failure, detail });
-          },
-        });
-        return fenixPortalSocket({ ticket });
-      }),
-    });
-
     return Context.make(CloudSession, cloudSession).pipe(
       Context.add(PrimaryEnvironmentAuth, primaryAuth),
       Context.add(RelayDeviceIdentity, identity),
       Context.add(ClientPresentation, presentation),
       Context.add(SshEnvironmentGateway, ssh),
-      Context.add(FenixCompanionGateway, fenixCompanion),
     );
+  }),
+);
+
+const fenixCompanionGatewayLayer = Layer.succeed(
+  FenixCompanionGateway,
+  FenixCompanionGateway.of({
+    prepare: Effect.fn("web.connectionPlatform.fenixCompanion.prepare")(function* ({ deviceId }) {
+      const agentId = readFenixPortalAgentId();
+      if (agentId === null) {
+        return yield* new ConnectionBlockedError({
+          reason: "unsupported",
+          detail: "Fenix companion connections require the Code Lab portal.",
+        });
+      }
+      const ticket = yield* Effect.tryPromise({
+        try: () => issueFenixPortalBrowserTicket({ agentId, deviceId }),
+        catch: (cause) => {
+          const detail = cause instanceof Error ? cause.message : String(cause);
+          const failure = classifyFenixPortalFailure(cause);
+          return failure === "network"
+            ? new ConnectionTransientError({ reason: "network", detail })
+            : new ConnectionBlockedError({ reason: failure, detail });
+        },
+      });
+      return fenixPortalSocket({ ticket });
+    }),
   }),
 );
 
@@ -663,6 +665,7 @@ type ConnectionPlatformLayerSource =
   | typeof connectivityLayer
   | typeof wakeupsLayer
   | typeof capabilitiesLayer
+  | typeof fenixCompanionGatewayLayer
   | typeof platformConnectionSourceLayer
   | typeof environmentOwnedDataCleanupLayer
   | typeof rpcRequestObserverLayer;
@@ -676,6 +679,7 @@ export const connectionPlatformLayer: Layer.Layer<
   connectivityLayer,
   wakeupsLayer,
   capabilitiesLayer,
+  fenixCompanionGatewayLayer,
   platformConnectionSourceLayer,
   environmentOwnedDataCleanupLayer,
   rpcRequestObserverLayer,

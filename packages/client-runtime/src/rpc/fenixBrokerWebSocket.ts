@@ -36,16 +36,16 @@ export function decodeFenixBrokerFrame(data: unknown): string | null {
 }
 
 /** Adapts the broker envelope to the websocket contract used by Effect RPC. */
-export class FenixBrokerWebSocket extends EventTarget implements WebSocket {
+export class FenixBrokerWebSocket extends EventTarget {
   private readonly socket: WebSocket;
   readonly CONNECTING = 0 as const;
   readonly OPEN = 1 as const;
   readonly CLOSING = 2 as const;
   readonly CLOSED = 3 as const;
-  onclose: ((this: WebSocket, ev: CloseEvent) => unknown) | null = null;
-  onerror: ((this: WebSocket, ev: Event) => unknown) | null = null;
-  onmessage: ((this: WebSocket, ev: MessageEvent) => unknown) | null = null;
-  onopen: ((this: WebSocket, ev: Event) => unknown) | null = null;
+  onclose: ((this: FenixBrokerWebSocket, ev: CloseEvent) => unknown) | null = null;
+  onerror: ((this: FenixBrokerWebSocket, ev: Event) => unknown) | null = null;
+  onmessage: ((this: FenixBrokerWebSocket, ev: MessageEvent) => unknown) | null = null;
+  onopen: ((this: FenixBrokerWebSocket, ev: Event) => unknown) | null = null;
 
   constructor(socket: WebSocket) {
     super();

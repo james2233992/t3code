@@ -93,10 +93,12 @@ export const make = Effect.gen(function* () {
         Effect.asVoid,
       ),
     });
-    const socketConstructor =
+    const socketConstructor: typeof webSocketConstructor =
       connection.socketTransport === "fenix-code-lab-broker"
         ? (url: string, protocols?: string | Array<string>) =>
-            new FenixBrokerWebSocket(webSocketConstructor(url, protocols))
+            new FenixBrokerWebSocket(webSocketConstructor(url, protocols)) as unknown as ReturnType<
+              typeof webSocketConstructor
+            >
         : webSocketConstructor;
     const socketLayer = Socket.layerWebSocket(connection.socketUrl, {
       openTimeout: SOCKET_OPEN_TIMEOUT,
