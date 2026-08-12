@@ -34,7 +34,7 @@ describe("FenixBrokerWebSocket", () => {
     const underlying = new TestWebSocket();
     const socket = new FenixBrokerWebSocket(underlying as unknown as WebSocket);
     const received: unknown[] = [];
-    socket.addEventListener("message", (event) => received.push(event.data));
+    socket.addEventListener("message", (event) => received.push((event as MessageEvent).data));
 
     socket.send('{"_tag":"Request","id":1}');
     underlying.receive(
@@ -51,7 +51,7 @@ describe("FenixBrokerWebSocket", () => {
     const underlying = new TestWebSocket();
     const socket = new FenixBrokerWebSocket(underlying as unknown as WebSocket);
     const received: unknown[] = [];
-    socket.addEventListener("message", (event) => received.push(event.data));
+    socket.addEventListener("message", (event) => received.push((event as MessageEvent).data));
 
     underlying.receive(JSON.stringify({ type: "peer.connected", tunnelId: "tunnel-1" }));
     underlying.receive("not-json");
