@@ -28,6 +28,7 @@ import {
   type ProjectWriteFileError,
   TerminalNotRunningError,
   type OrchestrationCommand,
+  type OrchestrationDispatchCommandError,
   type OrchestrationEvent,
   ORCHESTRATION_WS_METHODS,
   type PreviewEvent,
@@ -118,6 +119,7 @@ import * as OrchestrationEngine from "./orchestration/Services/OrchestrationEngi
 import { OrchestrationListenerCallbackError } from "./orchestration/Errors.ts";
 import * as ProjectionSnapshotQuery from "./orchestration/Services/ProjectionSnapshotQuery.ts";
 import * as FenixScopedProjectionSnapshotQuery from "./orchestration/Services/FenixScopedProjectionSnapshotQuery.ts";
+import { writeFenixCompanionConfig } from "./fenix/CompanionConfig.ts";
 import { SqlitePersistenceMemory } from "./persistence/Layers/Sqlite.ts";
 import { PersistenceSqlError } from "./persistence/Errors.ts";
 import * as ProviderRegistry from "./provider/Services/ProviderRegistry.ts";
@@ -873,6 +875,7 @@ const buildAppUnderTest = (options?: {
             getThreadCheckpointContext: () => Effect.succeed(Option.none()),
             getFullThreadDiffContext: () => Effect.succeed(Option.none()),
             projectBelongsToScope: () => Effect.succeed(false),
+            claimProjectScope: () => Effect.succeed(false),
             threadBelongsToScope: () => Effect.succeed(false),
             ...options?.layers?.fenixScopedProjectionSnapshotQuery,
           }),
@@ -5102,6 +5105,224 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
     }).pipe(Effect.provide(NodeHttpServer.layerTest)),
   );
 
+  it.effect("creates and claims tenant ownership only for projects inside paired local roots", () =>
+    Effect.gen(function* () {
+      const fs = yield* FileSystem.FileSystem;
+      const path = yield* Path.Path;
+      const allowedRoot = yield* fs.makeTempDirectoryScoped({ prefix: "fenix-allowed-root-" });
+      const outsideRoot = yield* fs.makeTempDirectoryScoped({ prefix: "fenix-outside-root-" });
+      const localProjectRoot = path.join(allowedRoot, "local-project");
+      const outsideProjectRoot = path.join(outsideRoot, "blocked-project");
+      const localProjectId = ProjectId.make("fenix-local-project");
+      const claimedProjects: string[] = [];
+      const config = yield* buildAppUnderTest({
+        fenixCodeTenantScope: { companyId: 5, userId: 10 },
+        layers: {
+          fenixScopedProjectionSnapshotQuery: {
+            claimProjectScope: (scope, projectId) =>
+              Effect.sync(() => {
+                claimedProjects.push(`${scope.companyId}:${scope.userId}:${projectId}`);
+                return true;
+              }),
+          },
+        },
+      });
+      yield* Effect.promise(() =>
+        writeFenixCompanionConfig(config.stateDir, {
+          version: 1,
+          portalOrigin: "https://iaonline.io",
+          deviceId: "device-1234567890",
+          deviceName: "Test companion",
+          deviceCredential: "credential-123456789012345678901234567890",
+          allowedRoots: [allowedRoot],
+        }),
+      );
+
+      const wsUrl = yield* getWsServerUrl("/ws");
+      yield* Effect.scoped(
+        withWsRpcClient(wsUrl, (client) =>
+          Effect.gen(function* () {
+            const denied = yield* client[ORCHESTRATION_WS_METHODS.dispatchCommand]({
+              type: "project.create",
+              commandId: CommandId.make("cmd-fenix-outside-project"),
+              projectId: ProjectId.make("fenix-outside-project"),
+              title: "Outside project",
+              workspaceRoot: outsideProjectRoot,
+              createWorkspaceRootIfMissing: true,
+              defaultModelSelection,
+              createdAt: "2026-08-12T00:00:00.000Z",
+            }).pipe(Effect.result);
+            assertTrue(denied._tag === "Failure");
+            if (denied._tag === "Failure") {
+              assert.equal(denied.failure._tag, "OrchestrationDispatchCommandError");
+              assertInclude(denied.failure.message, "outside the local roots");
+            }
+
+            yield* client[ORCHESTRATION_WS_METHODS.dispatchCommand]({
+              type: "project.create",
+              commandId: CommandId.make("cmd-fenix-local-project"),
+              projectId: localProjectId,
+              title: "Local project",
+              workspaceRoot: localProjectRoot,
+              createWorkspaceRootIfMissing: true,
+              defaultModelSelection,
+              createdAt: "2026-08-12T00:00:00.000Z",
+            });
+          }),
+        ),
+      );
+
+      assert.deepEqual(claimedProjects, [`5:10:${localProjectId}`]);
+      assert.equal(yield* fs.exists(outsideProjectRoot), false);
+      assert.equal((yield* fs.stat(localProjectRoot)).type, "Directory");
+    }).pipe(Effect.provide(NodeHttpServer.layerTest)),
+  );
+
+  it.effect("clones local paths and remote Git URLs only into paired local roots", () =>
+    Effect.gen(function* () {
+      const fs = yield* FileSystem.FileSystem;
+      const path = yield* Path.Path;
+      const allowedRoot = yield* fs.makeTempDirectoryScoped({ prefix: "fenix-clone-root-" });
+      const outsideRoot = yield* fs.makeTempDirectoryScoped({ prefix: "fenix-clone-outside-" });
+      const canonicalAllowedRoot = yield* fs.realPath(allowedRoot);
+      const canonicalOutsideRoot = yield* fs.realPath(outsideRoot);
+      const localSource = path.join(canonicalAllowedRoot, "source-repository");
+      const outsideSource = path.join(canonicalOutsideRoot, "outside-repository");
+      yield* fs.makeDirectory(localSource);
+      yield* fs.makeDirectory(outsideSource);
+      const cloneInputs: Array<{
+        readonly remoteUrl?: string | undefined;
+        readonly destinationPath: string;
+      }> = [];
+      const config = yield* buildAppUnderTest({
+        fenixCodeTenantScope: { companyId: 5, userId: 10 },
+        layers: {
+          sourceControlRepositoryService: {
+            cloneRepository: (input) =>
+              Effect.gen(function* () {
+                cloneInputs.push(input);
+                yield* fs
+                  .makeDirectory(input.destinationPath, { recursive: true })
+                  .pipe(Effect.orDie);
+                return {
+                  cwd: input.destinationPath,
+                  remoteUrl: input.remoteUrl ?? "https://example.test/repository.git",
+                  repository: null,
+                };
+              }),
+          },
+        },
+      });
+      yield* Effect.promise(() =>
+        writeFenixCompanionConfig(config.stateDir, {
+          version: 1,
+          portalOrigin: "https://iaonline.io",
+          deviceId: "device-1234567890",
+          deviceName: "Test companion",
+          deviceCredential: "credential-123456789012345678901234567890",
+          allowedRoots: [canonicalAllowedRoot],
+        }),
+      );
+
+      const wsUrl = yield* getWsServerUrl("/ws");
+      yield* Effect.scoped(
+        withWsRpcClient(wsUrl, (client) =>
+          Effect.gen(function* () {
+            const outsideSourceResult = yield* client[WS_METHODS.sourceControlCloneRepository]({
+              remoteUrl: outsideSource,
+              destinationPath: path.join(canonicalAllowedRoot, "blocked-source"),
+            }).pipe(Effect.result);
+            const outsideDestinationResult = yield* client[WS_METHODS.sourceControlCloneRepository](
+              {
+                remoteUrl: localSource,
+                destinationPath: path.join(canonicalOutsideRoot, "blocked-destination"),
+              },
+            ).pipe(Effect.result);
+            assertTrue(outsideSourceResult._tag === "Failure");
+            assertTrue(outsideDestinationResult._tag === "Failure");
+            if (outsideSourceResult._tag === "Failure") {
+              assertInclude(outsideSourceResult.failure.message, "outside the local roots");
+            }
+            if (outsideDestinationResult._tag === "Failure") {
+              assertInclude(outsideDestinationResult.failure.message, "outside the authorized");
+            }
+            assert.equal(cloneInputs.length, 0);
+
+            const localClone = yield* client[WS_METHODS.sourceControlCloneRepository]({
+              remoteUrl: localSource,
+              destinationPath: path.join(canonicalAllowedRoot, "local-clone"),
+            });
+            const remoteClone = yield* client[WS_METHODS.sourceControlCloneRepository]({
+              remoteUrl: "https://example.test/team/repository.git",
+              destinationPath: path.join(canonicalAllowedRoot, "remote-clone"),
+            });
+            assert.equal(localClone.cwd, path.join(canonicalAllowedRoot, "local-clone"));
+            assert.equal(remoteClone.cwd, path.join(canonicalAllowedRoot, "remote-clone"));
+            assert.equal(cloneInputs.length, 2);
+          }),
+        ),
+      );
+    }).pipe(Effect.provide(NodeHttpServer.layerTest)),
+  );
+
+  it.effect("deletes a newly-created project when tenant ownership persistence fails", () =>
+    Effect.gen(function* () {
+      const fs = yield* FileSystem.FileSystem;
+      const allowedRoot = yield* fs.makeTempDirectoryScoped({ prefix: "fenix-claim-failure-" });
+      const dispatchedTypes: string[] = [];
+      const config = yield* buildAppUnderTest({
+        fenixCodeTenantScope: { companyId: 5, userId: 10 },
+        layers: {
+          orchestrationEngine: {
+            dispatch: (command) =>
+              Effect.sync(() => {
+                dispatchedTypes.push(command.type);
+                return { sequence: dispatchedTypes.length };
+              }),
+          },
+          fenixScopedProjectionSnapshotQuery: {
+            claimProjectScope: () =>
+              Effect.fail(
+                new PersistenceSqlError({
+                  operation: "claim-project-scope-test",
+                  detail: "simulated persistence failure",
+                }),
+              ),
+          },
+        },
+      });
+      yield* Effect.promise(() =>
+        writeFenixCompanionConfig(config.stateDir, {
+          version: 1,
+          portalOrigin: "https://iaonline.io",
+          deviceId: "device-1234567890",
+          deviceName: "Test companion",
+          deviceCredential: "credential-123456789012345678901234567890",
+          allowedRoots: [allowedRoot],
+        }),
+      );
+
+      const wsUrl = yield* getWsServerUrl("/ws");
+      const result = yield* Effect.scoped(
+        withWsRpcClient(wsUrl, (client) =>
+          client[ORCHESTRATION_WS_METHODS.dispatchCommand]({
+            type: "project.create",
+            commandId: CommandId.make("cmd-fenix-claim-failure"),
+            projectId: ProjectId.make("fenix-claim-failure"),
+            title: "Claim failure",
+            workspaceRoot: allowedRoot,
+            createWorkspaceRootIfMissing: false,
+            defaultModelSelection,
+            createdAt: "2026-08-12T00:00:00.000Z",
+          }),
+        ).pipe(Effect.result),
+      );
+
+      assertTrue(result._tag === "Failure");
+      assert.deepEqual(dispatchedTypes, ["project.create", "project.delete"]);
+    }).pipe(Effect.provide(NodeHttpServer.layerTest)),
+  );
+
   it.effect("routes websocket rpc projects.writeFile errors", () =>
     Effect.gen(function* () {
       const fs = yield* FileSystem.FileSystem;
@@ -6204,7 +6425,6 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
           },
         },
       });
-
       const wsUrl = yield* getWsServerUrl("/ws");
       const shellItem = yield* Effect.scoped(
         withWsRpcClient(wsUrl, (client) =>
@@ -6310,6 +6530,7 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
         "thread-belongs:5:10:thread-scoped",
         "thread-belongs:5:10:thread-foreign",
         "thread-belongs:5:10:thread-foreign",
+        "thread-shell:5:10:thread-foreign",
       ]);
     }).pipe(Effect.provide(NodeHttpServer.layerTest)),
   );
@@ -6356,6 +6577,21 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
               const failure = result.failure as EnvironmentAuthorizationError;
               assert.equal(failure._tag, "EnvironmentAuthorizationError");
               assertInclude(failure.message, "Fenix scoped sessions cannot call global RPC");
+            }
+          }),
+        );
+      const expectScopedCommandDenied = <A, E, R>(
+        label: string,
+        effect: Effect.Effect<A, E, R>,
+      ): Effect.Effect<void, never, R> =>
+        effect.pipe(
+          Effect.result,
+          Effect.map((result) => {
+            assertTrue(result._tag === "Failure", `${label} should be denied`);
+            if (result._tag === "Failure") {
+              const failure = result.failure as OrchestrationDispatchCommandError;
+              assert.equal(failure._tag, "OrchestrationDispatchCommandError");
+              assertInclude(failure.message, "Fenix scoped sessions cannot execute this command");
             }
           }),
         );
@@ -6419,7 +6655,7 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
                 terminalId: "term-1",
               }).pipe(Stream.runHead),
             );
-            yield* expectDenied(
+            yield* expectScopedCommandDenied(
               "orchestration.dispatchCommand project.meta.update workspaceRoot/scripts",
               client[ORCHESTRATION_WS_METHODS.dispatchCommand]({
                 type: "project.meta.update",
@@ -6437,7 +6673,7 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
                 ],
               }),
             );
-            yield* expectDenied(
+            yield* expectScopedCommandDenied(
               "orchestration.dispatchCommand thread.create worktreePath/provider",
               client[ORCHESTRATION_WS_METHODS.dispatchCommand]({
                 type: "thread.create",
@@ -6456,7 +6692,7 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
                 createdAt: now,
               }),
             );
-            yield* expectDenied(
+            yield* expectScopedCommandDenied(
               "orchestration.dispatchCommand thread.meta.update worktreePath/provider",
               client[ORCHESTRATION_WS_METHODS.dispatchCommand]({
                 type: "thread.meta.update",
@@ -6471,7 +6707,7 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
                 worktreePath: "/tmp/foreign-worktree",
               }),
             );
-            yield* expectDenied(
+            yield* expectScopedCommandDenied(
               "orchestration.dispatchCommand thread.turn.start bootstrap",
               client[ORCHESTRATION_WS_METHODS.dispatchCommand]({
                 type: "thread.turn.start",
@@ -6501,7 +6737,7 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
                 createdAt: now,
               }),
             );
-            yield* expectDenied(
+            yield* expectScopedCommandDenied(
               "orchestration.dispatchCommand thread.runtime-mode.set full-access",
               client[ORCHESTRATION_WS_METHODS.dispatchCommand]({
                 type: "thread.runtime-mode.set",
@@ -6515,6 +6751,106 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
         ),
       );
       assert.equal(dispatchCalls, 0);
+    }).pipe(Effect.provide(NodeHttpServer.layerTest)),
+  );
+
+  it.effect("allows the scoped Fenix thread, turn, checkpoint and title cycle", () =>
+    Effect.gen(function* () {
+      const now = "2026-08-12T00:00:00.000Z";
+      const fenixCodeTenantScope = { companyId: 1, userId: 100 } satisfies FenixCodeTenantScope;
+      const scopedProjectId = ProjectId.make("project-fenix-cycle");
+      const scopedThreadId = ThreadId.make("thread-fenix-cycle");
+      const fenixModelSelection = {
+        instanceId: ProviderInstanceId.make("fenix"),
+        model: "groq/openai/gpt-oss-120b",
+      } as const;
+      const dispatchedTypes: string[] = [];
+
+      yield* buildAppUnderTest({
+        fenixCodeTenantScope,
+        layers: {
+          fenixScopedProjectionSnapshotQuery: {
+            projectBelongsToScope: (_scope, projectId) =>
+              Effect.succeed(projectId === scopedProjectId),
+            getThreadShellById: (_scope, threadId) =>
+              Effect.succeed(
+                threadId === scopedThreadId
+                  ? Option.some(
+                      makeDefaultOrchestrationThreadShell({
+                        id: scopedThreadId,
+                        projectId: scopedProjectId,
+                        modelSelection: fenixModelSelection,
+                        runtimeMode: "approval-required",
+                      }),
+                    )
+                  : Option.none(),
+              ),
+          },
+          orchestrationEngine: {
+            dispatch: (command) =>
+              Effect.sync(() => {
+                dispatchedTypes.push(command.type);
+                return { sequence: dispatchedTypes.length };
+              }),
+          },
+        },
+      });
+
+      const wsUrl = yield* getWsServerUrl("/ws");
+      yield* Effect.scoped(
+        withWsRpcClient(wsUrl, (client) =>
+          Effect.gen(function* () {
+            yield* client[ORCHESTRATION_WS_METHODS.dispatchCommand]({
+              type: "thread.create",
+              commandId: CommandId.make("cmd-fenix-thread-create"),
+              threadId: scopedThreadId,
+              projectId: scopedProjectId,
+              title: "Fenix cycle",
+              modelSelection: fenixModelSelection,
+              runtimeMode: "approval-required",
+              interactionMode: "default",
+              branch: null,
+              worktreePath: null,
+              createdAt: now,
+            });
+            yield* client[ORCHESTRATION_WS_METHODS.dispatchCommand]({
+              type: "thread.turn.start",
+              commandId: CommandId.make("cmd-fenix-turn-start"),
+              threadId: scopedThreadId,
+              message: {
+                messageId: MessageId.make("msg-fenix-turn-start"),
+                role: "user",
+                text: "Review this local project",
+                attachments: [],
+              },
+              modelSelection: fenixModelSelection,
+              runtimeMode: "approval-required",
+              interactionMode: "default",
+              createdAt: now,
+            });
+            yield* client[ORCHESTRATION_WS_METHODS.dispatchCommand]({
+              type: "thread.checkpoint.revert",
+              commandId: CommandId.make("cmd-fenix-checkpoint-revert"),
+              threadId: scopedThreadId,
+              turnCount: 1,
+              createdAt: now,
+            });
+            yield* client[ORCHESTRATION_WS_METHODS.dispatchCommand]({
+              type: "thread.meta.update",
+              commandId: CommandId.make("cmd-fenix-thread-title"),
+              threadId: scopedThreadId,
+              title: "Updated Fenix cycle",
+            });
+          }),
+        ),
+      );
+
+      assert.deepEqual(dispatchedTypes, [
+        "thread.create",
+        "thread.turn.start",
+        "thread.checkpoint.revert",
+        "thread.meta.update",
+      ]);
     }).pipe(Effect.provide(NodeHttpServer.layerTest)),
   );
 
@@ -6537,6 +6873,8 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
       const symlinkForeignWorkspaceRoot = path.join(symlinkParent, "linked-foreign");
       yield* fs.symlink(foreignWorkspaceRoot, symlinkForeignWorkspaceRoot);
       const normalizedOwnWorkspaceRoot = yield* fs.realPath(path.resolve(ownWorkspaceRoot));
+      const unregisteredWorkspaceRoot = path.join(normalizedOwnWorkspaceRoot, "not-added-yet");
+      yield* fs.makeDirectory(unregisteredWorkspaceRoot);
       const workspaceCalls: string[] = [];
       const membershipCalls: string[] = [];
       const scopedProject: OrchestrationProject = {
@@ -6550,7 +6888,7 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
         deletedAt: null,
       };
 
-      yield* buildAppUnderTest({
+      const config = yield* buildAppUnderTest({
         fenixCodeTenantScope,
         layers: {
           fenixScopedProjectionSnapshotQuery: {
@@ -6616,6 +6954,16 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
           },
         },
       });
+      yield* Effect.promise(() =>
+        writeFenixCompanionConfig(config.stateDir, {
+          version: 1,
+          portalOrigin: "https://iaonline.io",
+          deviceId: "device-1234567890",
+          deviceName: "Test companion",
+          deviceCredential: "credential-123456789012345678901234567890",
+          allowedRoots: [ownWorkspaceRoot],
+        }),
+      );
 
       const wsUrl = yield* getWsServerUrl("/ws");
       const expectWorkspaceDenied = <A, E, R>(
@@ -6708,6 +7056,14 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
             );
             assert.deepEqual(workspaceCalls, []);
 
+            const unregisteredListing = yield* client[WS_METHODS.projectsListEntries]({
+              cwd: unregisteredWorkspaceRoot,
+            });
+            assert.deepEqual(
+              unregisteredListing.entries.map((entry) => entry.path),
+              ["README.md"],
+            );
+
             const searchEntries = yield* client[WS_METHODS.projectsSearchEntries]({
               cwd: ownWorkspaceRoot,
               query: "README",
@@ -6758,6 +7114,7 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
       );
 
       assert.deepEqual(workspaceCalls, [
+        `list:${unregisteredWorkspaceRoot}`,
         `search:${ownWorkspaceRoot}:README`,
         `searchContents:${ownWorkspaceRoot}:needle`,
         `list:${ownWorkspaceRoot}`,

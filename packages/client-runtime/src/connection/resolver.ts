@@ -25,6 +25,7 @@ import {
 import type {
   BearerConnectionTarget,
   ConnectionTarget,
+  FenixCompanionConnectionTarget,
   PreparedConnection,
   PrimaryConnectionTarget,
   RelayConnectionTarget,
@@ -241,11 +242,34 @@ const makeSshBroker = Effect.fn("clientRuntime.connection.broker.makeSsh")(funct
   });
 });
 
+const makeFenixCompanionBroker = Effect.fn("clientRuntime.connection.broker.makeFenixCompanion")(
+  function* () {
+    const companion = yield* ClientCapabilities.FenixCompanionGateway;
+
+    return Effect.fn("clientRuntime.connection.broker.fenixCompanion")(function* (
+      target: FenixCompanionConnectionTarget,
+    ) {
+      const prepared = yield* companion.prepare({ deviceId: target.deviceId });
+      return {
+        environmentId: target.environmentId,
+        label: target.label,
+        httpBaseUrl: "",
+        socketUrl: prepared.socketUrl,
+        socketProtocols: prepared.protocols,
+        socketTransport: "fenix-code-lab-broker",
+        httpAuthorization: null,
+        target,
+      } satisfies PreparedConnection;
+    });
+  },
+);
+
 export const make = Effect.gen(function* () {
   const primary = yield* makePrimaryBroker();
   const bearer = yield* makeBearerBroker();
   const relay = yield* makeRelayBroker();
   const ssh = yield* makeSshBroker();
+  const fenixCompanion = yield* makeFenixCompanionBroker();
 
   const prepare = Effect.fn("clientRuntime.connection.broker.prepare")(function* (
     entry: ConnectionCatalogEntry,
@@ -264,6 +288,8 @@ export const make = Effect.gen(function* () {
         return yield* relay(target);
       case "SshConnectionTarget":
         return yield* ssh({ ...entry, target });
+      case "FenixCompanionConnectionTarget":
+        return yield* fenixCompanion(target);
     }
   });
 

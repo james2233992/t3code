@@ -201,6 +201,33 @@ const seedScopedTenant = (
   });
 
 scopedLayer("FenixScopedProjectionSnapshotQuery", (it) => {
+  it.effect("claims an unowned project once and rejects a different company or user", () =>
+    Effect.gen(function* () {
+      const scopedQuery = yield* FenixScopedProjectionSnapshotQuery;
+      const sql = yield* SqlClient.SqlClient;
+      const projectId = asProjectId("project-claim");
+
+      yield* sql`DELETE FROM projection_projects WHERE project_id = ${projectId}`;
+      yield* sql`
+        INSERT INTO projection_projects (
+          project_id, title, workspace_root, default_model_selection_json,
+          scripts_json, created_at, updated_at, deleted_at,
+          fenix_company_id, fenix_user_id
+        ) VALUES (
+          ${projectId}, 'Claim', '/tmp/fenix-claim', NULL,
+          '[]', '2026-08-12T00:00:00.000Z', '2026-08-12T00:00:00.000Z', NULL,
+          NULL, NULL
+        )
+      `;
+
+      assert.isTrue(yield* scopedQuery.claimProjectScope(scopeA, projectId));
+      assert.isTrue(yield* scopedQuery.claimProjectScope(scopeA, projectId));
+      assert.isFalse(yield* scopedQuery.claimProjectScope(scopeB, projectId));
+      assert.isTrue(yield* scopedQuery.projectBelongsToScope(scopeA, projectId));
+      assert.isFalse(yield* scopedQuery.projectBelongsToScope(scopeB, projectId));
+    }),
+  );
+
   it.effect("isolates projects, threads, sessions, checkpoints, and search by pairing tenant", () =>
     Effect.gen(function* () {
       const scopedQuery = yield* FenixScopedProjectionSnapshotQuery;

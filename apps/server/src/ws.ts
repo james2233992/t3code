@@ -17,6 +17,7 @@ import {
   type AuthEnvironmentScope,
   AuthSessionId,
   CommandId,
+  type ClientOrchestrationCommand,
   type DiscoveredLocalServerList,
   EventId,
   type OrchestrationCommand,
@@ -45,6 +46,7 @@ import {
   type RelayClientInstallProgressEvent,
   type ServerSelfUpdateError,
   type ServerSelfUpdateProgressEvent,
+  SourceControlRepositoryError,
   type FilesystemBrowseFailure,
   FilesystemBrowseError,
   AssetWorkspaceContextNotFoundError,
@@ -81,6 +83,7 @@ import {
   observeRpcStreamEffect as instrumentRpcStreamEffect,
 } from "./observability/RpcInstrumentation.ts";
 import * as ProviderRegistry from "./provider/Services/ProviderRegistry.ts";
+import { FENIX_FEATURED_CODING_MODEL } from "./provider/Layers/FenixProvider.ts";
 import * as ProviderMaintenanceRunner from "./provider/providerMaintenanceRunner.ts";
 import * as ServerSelfUpdate from "./cloud/selfUpdate.ts";
 import * as ServerLifecycleEvents from "./serverLifecycleEvents.ts";
@@ -122,6 +125,11 @@ import * as VcsProjectConfig from "./vcs/VcsProjectConfig.ts";
 import * as VcsProcess from "./vcs/VcsProcess.ts";
 import * as PairingGrantStore from "./auth/PairingGrantStore.ts";
 import * as SessionStore from "./auth/SessionStore.ts";
+import {
+  requireFenixAllowedCloneSource,
+  requireFenixAllowedDestinationPath,
+  requireFenixAllowedExistingPath,
+} from "./fenix/CompanionConfig.ts";
 import { failEnvironmentAuthInvalid, failEnvironmentInternal } from "./auth/http.ts";
 import * as RelayClient from "@t3tools/shared/relayClient";
 const isOrchestrationDispatchCommandError = Schema.is(OrchestrationDispatchCommandError);
@@ -491,6 +499,7 @@ const makeWsRpcLayer = (
           requiredScope,
         });
       const fenixScopedRpcAllowlist = new Set<string>([
+        ORCHESTRATION_WS_METHODS.dispatchCommand,
         ORCHESTRATION_WS_METHODS.getTurnDiff,
         ORCHESTRATION_WS_METHODS.getFullThreadDiff,
         ORCHESTRATION_WS_METHODS.searchThreads,
@@ -503,6 +512,8 @@ const makeWsRpcLayer = (
         WS_METHODS.projectsReadFile,
         WS_METHODS.projectsWriteFile,
         WS_METHODS.serverProbe,
+        WS_METHODS.serverGetConfig,
+        WS_METHODS.sourceControlCloneRepository,
       ]);
       const fenixScopedAuthorizationError = (method: string, requiredScope: AuthEnvironmentScope) =>
         new EnvironmentAuthorizationError({
@@ -573,57 +584,49 @@ const makeWsRpcLayer = (
       const serverCommandId = (tag: string) =>
         randomUUID.pipe(Effect.map((uuid) => CommandId.make(`server:${tag}:${uuid}`)));
 
-      const scopedProjectAccessExists = (projectId: ProjectId) =>
-        currentFenixCodeTenantScope === undefined
-          ? Effect.succeed(true)
-          : scopedProjectionSnapshotQuery.projectBelongsToScope(projectId);
-
       const scopedThreadAccessExists = (threadId: ThreadId) =>
         currentFenixCodeTenantScope === undefined
           ? Effect.succeed(true)
           : scopedProjectionSnapshotQuery.threadBelongsToScope(threadId);
 
-      const requireDispatchProjectAccess = (projectId: ProjectId) =>
-        scopedProjectAccessExists(projectId).pipe(
-          Effect.flatMap((exists) =>
-            exists
-              ? Effect.void
-              : Effect.fail(
-                  new OrchestrationDispatchCommandError({
-                    message: "Fenix scoped session cannot access this project",
-                    cause: projectId,
-                  }),
-                ),
+      const scopedCommandDenied = (cause: unknown) =>
+        new OrchestrationDispatchCommandError({
+          message: "Fenix scoped sessions cannot execute this command",
+          cause,
+        });
+
+      const isFenixModelSelection = (selection: {
+        readonly instanceId: string;
+        readonly model: string;
+      }) => selection.instanceId === "fenix" && selection.model === FENIX_FEATURED_CODING_MODEL;
+
+      const requireScopedProject = (projectId: ProjectId) =>
+        scopedProjectionSnapshotQuery.projectBelongsToScope(projectId).pipe(
+          Effect.flatMap((allowed) =>
+            allowed ? Effect.void : Effect.fail(scopedCommandDenied("project_not_in_scope")),
           ),
           Effect.mapError((cause) =>
             isOrchestrationDispatchCommandError(cause)
               ? cause
-              : new OrchestrationDispatchCommandError({
-                  message: "Failed to validate Fenix scoped project access",
-                  cause,
-                }),
+              : scopedCommandDenied("project_scope_unavailable"),
           ),
         );
 
-      const requireDispatchThreadAccess = (threadId: ThreadId) =>
-        scopedThreadAccessExists(threadId).pipe(
-          Effect.flatMap((exists) =>
-            exists
-              ? Effect.void
-              : Effect.fail(
-                  new OrchestrationDispatchCommandError({
-                    message: "Fenix scoped session cannot access this thread",
-                    cause: threadId,
-                  }),
-                ),
+      const requireScopedFenixThread = (threadId: ThreadId) =>
+        scopedProjectionSnapshotQuery.getThreadShellById(threadId).pipe(
+          Effect.flatMap(
+            Option.match({
+              onNone: () => Effect.fail(scopedCommandDenied("thread_not_in_scope")),
+              onSome: (thread) =>
+                isFenixModelSelection(thread.modelSelection)
+                  ? Effect.void
+                  : Effect.fail(scopedCommandDenied("thread_provider_not_fenix")),
+            }),
           ),
           Effect.mapError((cause) =>
             isOrchestrationDispatchCommandError(cause)
               ? cause
-              : new OrchestrationDispatchCommandError({
-                  message: "Failed to validate Fenix scoped thread access",
-                  cause,
-                }),
+              : scopedCommandDenied("thread_scope_unavailable"),
           ),
         );
 
@@ -636,39 +639,131 @@ const makeWsRpcLayer = (
 
         switch (normalizedCommand.type) {
           case "project.create":
-            return Effect.fail(
-              new OrchestrationDispatchCommandError({
-                message: "Fenix scoped sessions cannot create projects through this transport",
-                cause: normalizedCommand.projectId,
-              }),
-            );
+            return Effect.void;
           case "project.meta.update":
+            return normalizedCommand.workspaceRoot === undefined &&
+              normalizedCommand.defaultModelSelection === undefined &&
+              normalizedCommand.scripts === undefined
+              ? requireScopedProject(normalizedCommand.projectId)
+              : Effect.fail(scopedCommandDenied("project_sensitive_fields"));
           case "project.delete":
-            return requireDispatchProjectAccess(normalizedCommand.projectId);
+            return requireScopedProject(normalizedCommand.projectId);
           case "thread.create":
-            return requireDispatchProjectAccess(normalizedCommand.projectId);
-          case "thread.turn.start":
-            return Effect.gen(function* () {
-              if (normalizedCommand.bootstrap?.createThread) {
-                yield* requireDispatchProjectAccess(
-                  normalizedCommand.bootstrap.createThread.projectId,
-                );
-              } else {
-                yield* requireDispatchThreadAccess(normalizedCommand.threadId);
-              }
-              if (normalizedCommand.sourceProposedPlan) {
-                yield* requireDispatchThreadAccess(normalizedCommand.sourceProposedPlan.threadId);
-              }
-            });
+            return normalizedCommand.branch === null &&
+              normalizedCommand.worktreePath === null &&
+              isFenixModelSelection(normalizedCommand.modelSelection)
+              ? requireScopedProject(normalizedCommand.projectId)
+              : Effect.fail(scopedCommandDenied("thread_create_boundary"));
+          case "thread.meta.update":
+            return normalizedCommand.modelSelection === undefined &&
+              normalizedCommand.branch === undefined &&
+              normalizedCommand.expectedBranch === undefined &&
+              normalizedCommand.worktreePath === undefined
+              ? requireScopedFenixThread(normalizedCommand.threadId)
+              : Effect.fail(scopedCommandDenied("thread_sensitive_fields"));
+          case "thread.turn.start": {
+            if (
+              normalizedCommand.sourceProposedPlan !== undefined ||
+              (normalizedCommand.modelSelection !== undefined &&
+                !isFenixModelSelection(normalizedCommand.modelSelection)) ||
+              normalizedCommand.bootstrap?.prepareWorktree !== undefined ||
+              normalizedCommand.bootstrap?.runSetupScript !== undefined
+            ) {
+              return Effect.fail(scopedCommandDenied("turn_start_boundary"));
+            }
+            const createThread = normalizedCommand.bootstrap?.createThread;
+            if (createThread === undefined) {
+              return requireScopedFenixThread(normalizedCommand.threadId);
+            }
+            return createThread.branch === null &&
+              createThread.worktreePath === null &&
+              isFenixModelSelection(createThread.modelSelection)
+              ? requireScopedProject(createThread.projectId)
+              : Effect.fail(scopedCommandDenied("turn_bootstrap_boundary"));
+          }
+          case "thread.runtime-mode.set":
+            return normalizedCommand.runtimeMode === "approval-required"
+              ? requireScopedFenixThread(normalizedCommand.threadId)
+              : Effect.fail(scopedCommandDenied("runtime_mode_boundary"));
+          case "thread.delete":
+          case "thread.archive":
+          case "thread.unarchive":
+          case "thread.settle":
+          case "thread.unsettle":
+          case "thread.snooze":
+          case "thread.unsnooze":
+          case "thread.pin":
+          case "thread.unpin":
+          case "thread.pin.reorder":
+          case "thread.interaction-mode.set":
+          case "thread.turn.interrupt":
+          case "thread.approval.respond":
+          case "thread.user-input.respond":
+          case "thread.checkpoint.revert":
+          case "thread.session.stop":
+            return requireScopedFenixThread(normalizedCommand.threadId);
           default:
-            return "threadId" in normalizedCommand
-              ? requireDispatchThreadAccess(normalizedCommand.threadId)
-              : Effect.void;
+            return Effect.fail(scopedCommandDenied(normalizedCommand.type));
         }
       };
 
+      const requireScopedRawDispatchBoundary = (
+        command: ClientOrchestrationCommand,
+      ): Effect.Effect<void, OrchestrationDispatchCommandError> => {
+        if (currentFenixCodeTenantScope === undefined) return Effect.void;
+        switch (command.type) {
+          case "project.meta.update":
+            return command.workspaceRoot === undefined &&
+              command.defaultModelSelection === undefined &&
+              command.scripts === undefined
+              ? Effect.void
+              : Effect.fail(scopedCommandDenied("project_sensitive_fields"));
+          case "thread.create":
+            return command.branch === null &&
+              command.worktreePath === null &&
+              isFenixModelSelection(command.modelSelection)
+              ? Effect.void
+              : Effect.fail(scopedCommandDenied("thread_create_boundary"));
+          case "thread.meta.update":
+            return command.modelSelection === undefined &&
+              command.branch === undefined &&
+              command.expectedBranch === undefined &&
+              command.worktreePath === undefined
+              ? Effect.void
+              : Effect.fail(scopedCommandDenied("thread_sensitive_fields"));
+          case "thread.turn.start":
+            return command.sourceProposedPlan === undefined &&
+              (command.modelSelection === undefined ||
+                isFenixModelSelection(command.modelSelection)) &&
+              command.bootstrap?.prepareWorktree === undefined &&
+              command.bootstrap?.runSetupScript === undefined &&
+              (command.bootstrap?.createThread === undefined ||
+                (command.bootstrap.createThread.branch === null &&
+                  command.bootstrap.createThread.worktreePath === null &&
+                  isFenixModelSelection(command.bootstrap.createThread.modelSelection)))
+              ? Effect.void
+              : Effect.fail(scopedCommandDenied("turn_start_boundary"));
+          case "thread.runtime-mode.set":
+            return command.runtimeMode === "approval-required"
+              ? Effect.void
+              : Effect.fail(scopedCommandDenied("runtime_mode_boundary"));
+          default:
+            return Effect.void;
+        }
+      };
+
+      const requireConfiguredLocalRoot = (value: string, allowMissing: boolean) =>
+        Effect.tryPromise({
+          try: () =>
+            allowMissing
+              ? requireFenixAllowedDestinationPath(config.stateDir, value)
+              : requireFenixAllowedExistingPath(config.stateDir, value),
+          catch: () => "fenix_local_root_denied" as const,
+        });
+
       const requireScopedWorkspaceRootAccess = (
         cwd: string,
+        options?: { readonly allowConfiguredRoot?: boolean },
       ): Effect.Effect<void, "fenix_tenant_workspace_denied"> => {
         if (currentFenixCodeTenantScope === undefined) {
           return Effect.void;
@@ -677,7 +772,7 @@ const makeWsRpcLayer = (
         const scope = currentFenixCodeTenantScope;
         const denied = () => "fenix_tenant_workspace_denied" as const;
 
-        return workspacePaths.normalizeWorkspaceRoot(cwd).pipe(
+        const activeProjectAccess = workspacePaths.normalizeWorkspaceRoot(cwd).pipe(
           Effect.flatMap((normalizedWorkspaceRoot) => fileSystem.realPath(normalizedWorkspaceRoot)),
           Effect.flatMap((normalizedWorkspaceRoot) =>
             fenixScopedProjectionSnapshotQuery.getActiveProjectByWorkspaceRoot(
@@ -690,6 +785,16 @@ const makeWsRpcLayer = (
           ),
           Effect.mapError(() => denied()),
         );
+        return options?.allowConfiguredRoot === true
+          ? activeProjectAccess.pipe(
+              Effect.catch(() =>
+                requireConfiguredLocalRoot(cwd, false).pipe(
+                  Effect.asVoid,
+                  Effect.mapError(() => denied()),
+                ),
+              ),
+            )
+          : activeProjectAccess;
       };
 
       const loadAuthAccessSnapshot = () =>
@@ -1219,6 +1324,23 @@ const makeWsRpcLayer = (
           );
       };
 
+      const cleanupFailedScopedProjectCreate = (projectId: ProjectId) =>
+        Effect.gen(function* () {
+          yield* dispatchNormalizedCommand({
+            type: "project.delete",
+            commandId: yield* serverCommandId("fenix-project-create-cleanup"),
+            projectId,
+            force: true,
+          });
+        }).pipe(
+          Effect.catchCause((cause) =>
+            Effect.logWarning("failed to clean up an unclaimed Fenix project", {
+              projectId,
+              cause,
+            }),
+          ),
+        );
+
       const loadServerConfig = Effect.gen(function* () {
         const keybindingsConfig = yield* keybindings.loadConfigState;
         const providers = yield* providerRegistry.getProviders;
@@ -1266,7 +1388,28 @@ const makeWsRpcLayer = (
           observeRpcEffect(
             ORCHESTRATION_WS_METHODS.dispatchCommand,
             Effect.gen(function* () {
-              const normalizedCommand = yield* normalizeDispatchCommand(command);
+              yield* requireScopedRawDispatchBoundary(command);
+              const commandToNormalize =
+                currentFenixCodeTenantScope !== undefined && command.type === "project.create"
+                  ? {
+                      ...command,
+                      workspaceRoot: yield* requireConfiguredLocalRoot(
+                        command.workspaceRoot,
+                        true,
+                      ).pipe(
+                        Effect.mapError(
+                          (cause) =>
+                            new OrchestrationDispatchCommandError({
+                              message:
+                                "Project path is outside the local roots authorized for this pairing",
+                              cause,
+                            }),
+                        ),
+                      ),
+                      defaultModelSelection: null,
+                    }
+                  : command;
+              const normalizedCommand = yield* normalizeDispatchCommand(commandToNormalize);
               yield* requireScopedDispatchAccess(normalizedCommand);
               const shouldStopSessionAfterArchive =
                 normalizedCommand.type === "thread.archive"
@@ -1284,6 +1427,54 @@ const makeWsRpcLayer = (
                       )
                   : false;
               const result = yield* dispatchNormalizedCommand(normalizedCommand);
+              if (
+                currentFenixCodeTenantScope !== undefined &&
+                normalizedCommand.type === "project.create"
+              ) {
+                const claimed = yield* Effect.gen(function* () {
+                  const canonicalWorkspaceRoot = yield* requireConfiguredLocalRoot(
+                    normalizedCommand.workspaceRoot,
+                    false,
+                  ).pipe(
+                    Effect.mapError(
+                      (cause) =>
+                        new OrchestrationDispatchCommandError({
+                          message: "Created project root failed the local realpath ownership check",
+                          cause,
+                        }),
+                    ),
+                  );
+                  if (canonicalWorkspaceRoot !== normalizedCommand.workspaceRoot) {
+                    return yield* new OrchestrationDispatchCommandError({
+                      message: "Created project root changed during local authorization",
+                      cause: normalizedCommand.workspaceRoot,
+                    });
+                  }
+                  return yield* fenixScopedProjectionSnapshotQuery
+                    .claimProjectScope(currentFenixCodeTenantScope, normalizedCommand.projectId)
+                    .pipe(
+                      Effect.mapError(
+                        (cause) =>
+                          new OrchestrationDispatchCommandError({
+                            message: "Failed to persist Fenix project ownership",
+                            cause,
+                          }),
+                      ),
+                    );
+                }).pipe(
+                  Effect.catchCause((cause) =>
+                    cleanupFailedScopedProjectCreate(normalizedCommand.projectId).pipe(
+                      Effect.andThen(Effect.failCause(cause)),
+                    ),
+                  ),
+                );
+                if (!claimed) {
+                  return yield* new OrchestrationDispatchCommandError({
+                    message: "Project ownership was already claimed by another Fenix tenant",
+                    cause: normalizedCommand.projectId,
+                  });
+                }
+              }
               if (normalizedCommand.type === "thread.archive") {
                 if (shouldStopSessionAfterArchive) {
                   yield* Effect.gen(function* () {
@@ -1875,7 +2066,21 @@ const makeWsRpcLayer = (
         [WS_METHODS.sourceControlLookupRepository]: (input) =>
           observeRpcEffect(
             WS_METHODS.sourceControlLookupRepository,
-            sourceControlRepositories.lookupRepository(input),
+            currentFenixCodeTenantScope === undefined
+              ? sourceControlRepositories.lookupRepository(input)
+              : requireConfiguredLocalRoot(input.cwd ?? config.cwd, false).pipe(
+                  Effect.mapError(
+                    () =>
+                      new SourceControlRepositoryError({
+                        operation: "lookupRepository",
+                        provider: input.provider,
+                        detail: "Repository lookup cwd is outside the authorized local roots.",
+                      }),
+                  ),
+                  Effect.flatMap((cwd) =>
+                    sourceControlRepositories.lookupRepository({ ...input, cwd }),
+                  ),
+                ),
             {
               "rpc.aggregate": "source-control",
             },
@@ -1883,7 +2088,53 @@ const makeWsRpcLayer = (
         [WS_METHODS.sourceControlCloneRepository]: (input) =>
           observeRpcEffect(
             WS_METHODS.sourceControlCloneRepository,
-            sourceControlRepositories.cloneRepository(input),
+            currentFenixCodeTenantScope === undefined
+              ? sourceControlRepositories.cloneRepository(input)
+              : Effect.gen(function* () {
+                  const destinationPath = yield* requireConfiguredLocalRoot(
+                    input.destinationPath,
+                    true,
+                  ).pipe(
+                    Effect.mapError(
+                      () =>
+                        new SourceControlRepositoryError({
+                          operation: "cloneRepository",
+                          provider: input.provider ?? "unknown",
+                          detail: "Clone destination is outside the authorized local roots.",
+                        }),
+                    ),
+                  );
+                  if (input.remoteUrl !== undefined) {
+                    yield* Effect.tryPromise({
+                      try: () =>
+                        requireFenixAllowedCloneSource(config.stateDir, input.remoteUrl ?? ""),
+                      catch: (cause) =>
+                        new SourceControlRepositoryError({
+                          operation: "cloneRepository",
+                          provider: input.provider ?? "unknown",
+                          detail:
+                            cause instanceof Error
+                              ? cause.message
+                              : "Repository URL is not allowed for this local pairing.",
+                        }),
+                    });
+                  }
+                  const result = yield* sourceControlRepositories.cloneRepository({
+                    ...input,
+                    destinationPath,
+                  });
+                  yield* requireConfiguredLocalRoot(result.cwd, false).pipe(
+                    Effect.mapError(
+                      () =>
+                        new SourceControlRepositoryError({
+                          operation: "cloneRepository",
+                          provider: input.provider ?? "unknown",
+                          detail: "Cloned repository failed the final local realpath check.",
+                        }),
+                    ),
+                  );
+                  return result;
+                }),
             {
               "rpc.aggregate": "source-control",
             },
@@ -1901,7 +2152,7 @@ const makeWsRpcLayer = (
         [WS_METHODS.projectsSearchEntries]: (input) =>
           observeRpcEffect(
             WS_METHODS.projectsSearchEntries,
-            requireScopedWorkspaceRootAccess(input.cwd).pipe(
+            requireScopedWorkspaceRootAccess(input.cwd, { allowConfiguredRoot: true }).pipe(
               Effect.mapError(
                 () =>
                   new ProjectSearchEntriesError({
@@ -1965,7 +2216,7 @@ const makeWsRpcLayer = (
         [WS_METHODS.projectsListEntries]: (input) =>
           observeRpcEffect(
             WS_METHODS.projectsListEntries,
-            requireScopedWorkspaceRootAccess(input.cwd).pipe(
+            requireScopedWorkspaceRootAccess(input.cwd, { allowConfiguredRoot: true }).pipe(
               Effect.mapError(
                 () =>
                   new ProjectListEntriesError({

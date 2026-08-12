@@ -4,6 +4,7 @@ import * as Schema from "effect/Schema";
 
 import {
   BearerConnectionTarget,
+  FenixCompanionConnectionTarget,
   PrimaryConnectionTarget,
   RelayConnectionTarget,
   SshConnectionTarget,
@@ -82,6 +83,13 @@ export class SshConnectionRegistration extends Schema.TaggedClass<SshConnectionR
   },
 ) {}
 
+export class FenixCompanionConnectionRegistration extends Schema.TaggedClass<FenixCompanionConnectionRegistration>()(
+  "FenixCompanionConnectionRegistration",
+  {
+    target: FenixCompanionConnectionTarget,
+  },
+) {}
+
 export const ConnectionRegistration = Schema.Union([
   RelayConnectionRegistration,
   BearerConnectionRegistration,
@@ -101,21 +109,23 @@ export type ConnectionRegistration = typeof ConnectionRegistration.Type;
 export const PlatformConnectionRegistration = Schema.Union([
   PrimaryConnectionRegistration,
   BearerConnectionRegistration,
+  FenixCompanionConnectionRegistration,
 ]);
 export type PlatformConnectionRegistration = typeof PlatformConnectionRegistration.Type;
 
 export function connectionRegistrationTarget(
-  registration: ConnectionRegistration | PrimaryConnectionRegistration,
+  registration: ConnectionRegistration | PlatformConnectionRegistration,
 ): ConnectionTarget {
   return registration.target;
 }
 
 export function connectionRegistrationCatalogEntry(
-  registration: ConnectionRegistration | PrimaryConnectionRegistration,
+  registration: ConnectionRegistration | PlatformConnectionRegistration,
 ): ConnectionCatalogEntry {
   switch (registration._tag) {
     case "PrimaryConnectionRegistration":
     case "RelayConnectionRegistration":
+    case "FenixCompanionConnectionRegistration":
       return {
         target: registration.target,
         profile: Option.none(),

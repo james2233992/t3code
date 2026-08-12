@@ -26,6 +26,7 @@ import {
   ConnectionTransientError,
   PrimaryConnectionTarget,
   RelayConnectionTarget,
+  FenixCompanionConnectionTarget,
   SshConnectionTarget,
   type ConnectionTarget,
 } from "./model.ts";
@@ -97,6 +98,7 @@ const makeDependencies = Effect.fn("TestConnectionResolver.makeDependencies")((o
   readonly authorizeDpop?: RemoteEnvironmentAuthorization.RemoteEnvironmentAuthorization["Service"]["authorizeDpop"];
   readonly primaryBearerToken?: string;
   readonly prepareSsh?: ClientCapabilities.SshEnvironmentGateway["Service"]["prepare"];
+  readonly prepareFenixCompanion?: ClientCapabilities.FenixCompanionGateway["Service"]["prepare"];
 }) => {
   const profiles = new Map(
     (options?.profiles ?? []).map((profile) => [profile.connectionId, profile]),
@@ -183,6 +185,18 @@ const makeDependencies = Effect.fn("TestConnectionResolver.makeDependencies")((o
     Layer.succeed(RemoteEnvironmentAuthorization.RemoteEnvironmentAuthorization, remote),
     Layer.succeed(ClientCapabilities.SshEnvironmentGateway, ssh),
     Layer.succeed(
+      ClientCapabilities.FenixCompanionGateway,
+      ClientCapabilities.FenixCompanionGateway.of({
+        prepare:
+          options?.prepareFenixCompanion ??
+          (() =>
+            Effect.succeed({
+              socketUrl: "wss://iaonline.io/code-lab/ws?ticket=browser-ticket",
+              protocols: ["fenix-code-lab-v1", "fenix-code-lab-ticket.browser-ticket"],
+            })),
+      }),
+    ),
+    Layer.succeed(
       ManagedRelay.ManagedRelayClient,
       relayClient(
         options?.connectEnvironment ??
@@ -220,6 +234,37 @@ describe("ConnectionResolver", () => {
         httpAuthorization: null,
         target,
       });
+    }),
+  );
+
+  it.effect("prepares a local Fenix companion through the Code Lab broker", () =>
+    Effect.gen(function* () {
+      const requestedDevices = yield* Ref.make<ReadonlyArray<string>>([]);
+      const brokerLayer = yield* makeDependencies({
+        prepareFenixCompanion: ({ deviceId }) =>
+          Ref.update(requestedDevices, (values) => [...values, deviceId]).pipe(
+            Effect.as({
+              socketUrl: "wss://iaonline.io/code-lab/ws",
+              protocols: ["fenix-code-lab-v1", "fenix-code-lab-ticket.ticket-1"],
+            }),
+          ),
+      });
+      const broker = yield* ConnectionResolver.ConnectionResolver.pipe(Effect.provide(brokerLayer));
+      const target = new FenixCompanionConnectionTarget({
+        environmentId: ENVIRONMENT_ID,
+        label: "Local Mac",
+        deviceId: "device-1",
+      });
+
+      expect(yield* broker.prepare(catalogEntry(target))).toMatchObject({
+        environmentId: ENVIRONMENT_ID,
+        socketUrl: "wss://iaonline.io/code-lab/ws",
+        socketProtocols: ["fenix-code-lab-v1", "fenix-code-lab-ticket.ticket-1"],
+        socketTransport: "fenix-code-lab-broker",
+        httpAuthorization: null,
+        target,
+      });
+      expect(yield* Ref.get(requestedDevices)).toEqual(["device-1"]);
     }),
   );
 

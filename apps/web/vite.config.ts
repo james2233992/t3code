@@ -13,9 +13,11 @@ import pkg from "./package.json" with { type: "json" };
 import { DEV_PROXIED_PATH_PREFIXES } from "@t3tools/shared/devProxy";
 
 import { loadRepoEnv } from "../../scripts/lib/public-config";
+import { normalizeWebBasePath } from "./src/buildBasePath";
 
 const repoEnv = loadRepoEnv();
 Object.assign(process.env, repoEnv);
+const webBasePath = normalizeWebBasePath(process.env.FENIX_CODE_WEB_BASE_PATH);
 
 // Single-origin dev is signalled positively, because it cannot be inferred
 // from the absence of VITE_HTTP_URL/VITE_WS_URL: the runner deletes those keys
@@ -153,6 +155,7 @@ const allowedHosts = [".ts.net", ...configuredAllowedHosts];
 
 export default defineConfig(() => {
   return {
+    base: webBasePath,
     assetsInclude: ["**/*.wasm"],
     plugins: [
       devCompressionPlugin(),

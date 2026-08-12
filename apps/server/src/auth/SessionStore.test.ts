@@ -84,6 +84,26 @@ it.layer(NodeServices.layer)("SessionStore.layer", (it) => {
       expect(verified.expiresAt?.toString()).toBe(issued.expiresAt.toString());
     }).pipe(Effect.provide(makeSessionStoreLayer())),
   );
+  it.effect("preserves the signed Fenix tenant scope across session and websocket tokens", () =>
+    Effect.gen(function* () {
+      const sessions = yield* SessionStore.SessionStore;
+      const fenixCodeTenantScope = { companyId: 5, userId: 10 };
+      const issued = yield* sessions.issue({
+        method: "bearer-access-token",
+        subject: "fenix-code-lab:device-1",
+        scopes: ["orchestration:read"],
+        fenixCodeTenantScope,
+      });
+      const verified = yield* sessions.verify(issued.token);
+      const websocket = yield* sessions.issueWebSocketToken(issued.sessionId, {
+        fenixCodeTenantScope,
+      });
+      const verifiedWebSocket = yield* sessions.verifyWebSocketToken(websocket.token);
+
+      expect(verified.fenixCodeTenantScope).toEqual(fenixCodeTenantScope);
+      expect(verifiedWebSocket.fenixCodeTenantScope).toEqual(fenixCodeTenantScope);
+    }).pipe(Effect.provide(makeSessionStoreLayer())),
+  );
   it.effect("rejects malformed session tokens", () =>
     Effect.gen(function* () {
       const sessions = yield* SessionStore.SessionStore;

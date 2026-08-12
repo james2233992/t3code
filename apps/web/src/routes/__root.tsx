@@ -40,6 +40,11 @@ import { syncBrowserChromeTheme } from "../hooks/useTheme";
 import { configureClientTracing } from "../observability/clientTracing";
 import { resolveInitialServerAuthGateState } from "../environments/primary";
 import { hasHostedPairingRequest, isHostedStaticApp } from "../hostedPairing";
+import {
+  isFenixPortalEmbeddedApp,
+  readFenixPortalAgentId,
+  verifyFenixPortalSession,
+} from "../connection/fenixPortal";
 import { shellEnvironment } from "../state/shell";
 import { useAtomValue } from "@effect/atom-react";
 import { useAtomCommand } from "../state/use-atom-command";
@@ -57,6 +62,7 @@ import {
 
 export const Route = createRootRoute({
   beforeLoad: async ({ location }) => {
+    const browserUrl = new URL(window.location.href);
     if (location.pathname === "/pair" && hasHostedPairingRequest(new URL(window.location.href))) {
       return {
         authGateState: {
@@ -65,7 +71,20 @@ export const Route = createRootRoute({
       };
     }
 
-    if (isHostedStaticApp(new URL(window.location.href))) {
+    if (isFenixPortalEmbeddedApp(browserUrl)) {
+      const agentId = readFenixPortalAgentId(browserUrl);
+      if (agentId === null) {
+        throw new Error("Fenix Code Lab access requires a valid Fenix agent scope.");
+      }
+      await verifyFenixPortalSession({ agentId, url: browserUrl });
+      return {
+        authGateState: {
+          status: "hosted-static",
+        } as const,
+      };
+    }
+
+    if (isHostedStaticApp(browserUrl)) {
       return {
         authGateState: {
           status: "hosted-static",

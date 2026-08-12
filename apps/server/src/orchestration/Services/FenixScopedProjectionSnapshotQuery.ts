@@ -26,6 +26,10 @@ import type {
 } from "./ProjectionSnapshotQuery.ts";
 
 export interface FenixScopedProjectionSnapshotQueryShape {
+  readonly claimProjectScope: (
+    scope: FenixCodeTenantScope,
+    projectId: ProjectId,
+  ) => Effect.Effect<boolean, ProjectionRepositoryError>;
   readonly getCommandReadModel: (
     scope: FenixCodeTenantScope,
   ) => Effect.Effect<OrchestrationReadModel, ProjectionRepositoryError>;

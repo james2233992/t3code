@@ -2,6 +2,7 @@ import {
   ClientPresentation,
   CloudSession,
   EnvironmentOwnedDataCleanup,
+  FenixCompanionGateway,
   PlatformConnectionSource,
   PrimaryEnvironmentAuth,
   RelayDeviceIdentity,
@@ -58,6 +59,15 @@ import {
   type DesktopSecondaryBootstrapsRead,
 } from "./desktopLocal";
 import { connectionStorageLayer } from "./storage";
+import {
+  fenixPortalDeviceRegistration,
+  fenixPortalSocket,
+  classifyFenixPortalFailure,
+  isFenixPortalEmbeddedApp,
+  issueFenixPortalBrowserTicket,
+  listFenixPortalDevices,
+  readFenixPortalAgentId,
+} from "./fenixPortal";
 
 let nextObservedRpcRequestId = 0;
 
@@ -273,12 +283,35 @@ const capabilitiesLayer = Layer.effectContext(
         });
       }),
     });
+    const fenixCompanion = FenixCompanionGateway.of({
+      prepare: Effect.fn("web.connectionPlatform.fenixCompanion.prepare")(function* ({ deviceId }) {
+        const agentId = readFenixPortalAgentId();
+        if (agentId === null) {
+          return yield* new ConnectionBlockedError({
+            reason: "unsupported",
+            detail: "Fenix companion connections require the Code Lab portal.",
+          });
+        }
+        const ticket = yield* Effect.tryPromise({
+          try: () => issueFenixPortalBrowserTicket({ agentId, deviceId }),
+          catch: (cause) => {
+            const detail = cause instanceof Error ? cause.message : String(cause);
+            const failure = classifyFenixPortalFailure(cause);
+            return failure === "network"
+              ? new ConnectionTransientError({ reason: "network", detail })
+              : new ConnectionBlockedError({ reason: failure, detail });
+          },
+        });
+        return fenixPortalSocket({ ticket });
+      }),
+    });
 
     return Context.make(CloudSession, cloudSession).pipe(
       Context.add(PrimaryEnvironmentAuth, primaryAuth),
       Context.add(RelayDeviceIdentity, identity),
       Context.add(ClientPresentation, presentation),
       Context.add(SshEnvironmentGateway, ssh),
+      Context.add(FenixCompanionGateway, fenixCompanion),
     );
   }),
 );
@@ -456,6 +489,33 @@ export function secondaryRegistrationsToRetainAfterTopologyRead(
 const platformConnectionSourceLayer = Layer.effect(
   PlatformConnectionSource,
   Effect.gen(function* () {
+    if (isFenixPortalEmbeddedApp()) {
+      const buildFenixPortalRegistrations = Effect.gen(function* () {
+        const agentId = readFenixPortalAgentId();
+        if (agentId === null) return [];
+        const devices = yield* Effect.tryPromise({
+          try: () => listFenixPortalDevices({ agentId }),
+          catch: (cause) =>
+            new ConnectionTransientError({
+              reason: "network",
+              detail: cause instanceof Error ? cause.message : String(cause),
+            }),
+        }).pipe(
+          Effect.tapError((error) =>
+            Effect.logWarning("Could not list paired Fenix Code companions.", { error }),
+          ),
+          Effect.orElseSucceed(() => []),
+        );
+        return devices
+          .filter((device) => !device.revoked)
+          .map(fenixPortalDeviceRegistration) as ReadonlyArray<PlatformConnectionRegistration>;
+      });
+      return PlatformConnectionSource.of({
+        registrations: Stream.tick(PLATFORM_POLL_INTERVAL).pipe(
+          Stream.mapEffect(() => buildFenixPortalRegistrations),
+        ),
+      });
+    }
     if (isHostedStaticApp()) {
       return PlatformConnectionSource.of({
         registrations: Stream.empty,
