@@ -12,4 +12,5 @@ if [[ ! -x "$node_path" || ! -f "$entry_path" ]]; then
 fi
 
 export T3CODE_HOME="$base_dir"
+export FENIX_CODE_REQUIRE_PORTAL_AUTH=1
 exec "$node_path" "$entry_path" "$@"

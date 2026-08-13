@@ -14,6 +14,7 @@ import { ConnectionSheetButton } from "./ConnectionSheetButton";
 import { extractPairingUrlFromQrPayload } from "./pairing";
 import { useRemoteConnections } from "../../state/use-remote-environment-registry";
 import { buildPairingUrl, parsePairingUrl } from "./pairing";
+import { isFenixMobilePairingUrl, pairFenixMobileController } from "../../connection/fenixMobile";
 
 type ConnectionsNewRouteParams = {
   readonly mode?: string;
@@ -88,7 +89,7 @@ export function ConnectionsNewRouteScreen({
   }, []);
 
   const handleQrScan = useCallback(
-    ({ data }: { readonly data: string }) => {
+    async ({ data }: { readonly data: string }) => {
       if (scannerLocked) {
         return;
       }
@@ -96,6 +97,21 @@ export function ConnectionsNewRouteScreen({
       setScannerLocked(true);
 
       try {
+        if (isFenixMobilePairingUrl(data)) {
+          setIsSubmitting(true);
+          await pairFenixMobileController({ pairingUrl: data });
+          setShowScanner(false);
+          Alert.alert(
+            "Fenix Code connected",
+            "This mobile device can now control only your paired local computers.",
+          );
+          if (navigation.canGoBack()) {
+            navigation.goBack();
+          } else {
+            navigation.dispatch(StackActions.replace("Home"));
+          }
+          return;
+        }
         const pairingUrl = extractPairingUrlFromQrPayload(data);
         const { host, code } = parsePairingUrl(pairingUrl);
         setHostInput(host);
@@ -103,6 +119,7 @@ export function ConnectionsNewRouteScreen({
         onChangeConnectionPairingUrl(pairingUrl);
         setShowScanner(false);
       } catch (error) {
+        setIsSubmitting(false);
         Alert.alert(
           "Invalid QR code",
           error instanceof Error ? error.message : "Scanned QR code was not recognized.",
@@ -113,7 +130,7 @@ export function ConnectionsNewRouteScreen({
         }, 600);
       }
     },
-    [onChangeConnectionPairingUrl, scannerLocked],
+    [navigation, onChangeConnectionPairingUrl, scannerLocked],
   );
 
   const handleSubmit = useCallback(async () => {

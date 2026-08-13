@@ -2,6 +2,8 @@ import { describe, expect, it, vi } from "@effect/vitest";
 
 import {
   buildFenixCompanionPairCommand,
+  buildFenixCompanionInstallCommand,
+  buildFenixMobilePairingUrl,
   classifyFenixPortalFailure,
   fenixPortalDeviceRegistration,
   fenixPortalSocket,
@@ -17,6 +19,25 @@ const PORTAL_URL = new URL("https://iaonline.io/code-lab/?agentId=9");
 const TICKET = "t".repeat(43);
 
 describe("Fenix portal companion API", () => {
+  it("builds a mobile QR bound to the authenticated portal pairing", () => {
+    const url = new URL(
+      buildFenixMobilePairingUrl({
+        portalOrigin: "https://iaonline.io/code-lab/",
+        pairing: {
+          attemptId: "a".repeat(32),
+          pairingToken: "p".repeat(43),
+          expiresAt: "2026-08-13T12:05:00Z",
+        },
+      }),
+    );
+
+    expect(url.protocol).toBe("fenixcode:");
+    expect(url.hostname).toBe("mobile-pair");
+    expect(url.searchParams.get("portal")).toBe("https://iaonline.io");
+    expect(url.searchParams.get("attemptId")).toBe("a".repeat(32));
+    expect(url.searchParams.get("pairingToken")).toBe("p".repeat(43));
+  });
+
   it("recognizes only the embedded Code Lab route and fails closed on an invalid agent", () => {
     expect(isFenixPortalEmbeddedApp(PORTAL_URL)).toBe(true);
     expect(readFenixPortalAgentId(PORTAL_URL)).toBe(9);
@@ -227,5 +248,38 @@ describe("Fenix portal companion API", () => {
       `fenix-code fenix pair --portal 'https://iaonline.io' --attempt-id '${"a".repeat(32)}' --pairing-token '${"p".repeat(43)}' --allow-root "$PWD"`,
     );
     expect(command).not.toMatch(/\bt3\b/i);
+
+    const installCommand = buildFenixCompanionInstallCommand({
+      artifactFileName: "Fenix-Code-Companion-0.0.32-macos-arm64.tar.gz",
+      portalOrigin: PORTAL_URL.origin,
+      pairing,
+    });
+    expect(installCommand).toBe(
+      [
+        "printf 'Ruta absoluta de la carpeta local que autorizas: '",
+        "IFS= read -r FENIX_CODE_ROOT",
+        'case "$FENIX_CODE_ROOT" in /*) ;; *) echo "Debes indicar una ruta absoluta." >&2; exit 1 ;; esac',
+        'test -d "$FENIX_CODE_ROOT" || { echo "La carpeta indicada no existe." >&2; exit 1; }',
+        "cd ~/Downloads",
+        "tar -xzf 'Fenix-Code-Companion-0.0.32-macos-arm64.tar.gz'",
+        "cd 'Fenix-Code-Companion-0.0.32-macos-arm64'",
+        `./install.sh --portal 'https://iaonline.io' --attempt-id '${"a".repeat(32)}' --pairing-token '${"p".repeat(43)}' --allow-root "$FENIX_CODE_ROOT"`,
+      ].join("\n"),
+    );
+    expect(installCommand).not.toMatch(/\bt3\b/i);
+  });
+
+  it("rejects an unsafe package name in the login-bound install command", () => {
+    expect(() =>
+      buildFenixCompanionInstallCommand({
+        artifactFileName: "../companion.tar.gz",
+        portalOrigin: PORTAL_URL.origin,
+        pairing: {
+          attemptId: "a".repeat(32),
+          pairingToken: "p".repeat(43),
+          expiresAt: "2026-08-12T20:00:00Z",
+        },
+      }),
+    ).toThrow("invalid companion archive name");
   });
 });

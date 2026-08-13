@@ -14,10 +14,60 @@ wrapper_staging="${bin_dir}/.fenix-code-install-$$"
 version_backup="${base_dir}/runtime/versions/.backup-${version}-$$"
 node_backup="${base_dir}/runtime/.node-backup-$$"
 wrapper_backup="${bin_dir}/.fenix-code-backup-$$"
+config_path="${base_dir}/userdata/fenix-companion.json"
+config_backup="${base_dir}/userdata/.fenix-companion-backup-$$"
 version_activated=false
 node_activated=false
 wrapper_activated=false
+config_existed=false
+config_was_present=false
 install_complete=false
+portal=""
+attempt_id=""
+pairing_token=""
+allow_root=""
+
+usage() {
+  cat >&2 <<'EOF'
+Uso: ./install.sh --portal URL --attempt-id ID --pairing-token TOKEN --allow-root RUTA
+
+Genera este comando desde https://iaonline.io/code-lab/setup tras iniciar sesion.
+EOF
+}
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --portal|--attempt-id|--pairing-token|--allow-root)
+      if [[ $# -lt 2 || -z "$2" ]]; then
+        usage
+        exit 64
+      fi
+      case "$1" in
+        --portal) portal="$2" ;;
+        --attempt-id) attempt_id="$2" ;;
+        --pairing-token) pairing_token="$2" ;;
+        --allow-root) allow_root="$2" ;;
+      esac
+      shift 2
+      ;;
+    *)
+      usage
+      exit 64
+      ;;
+  esac
+done
+
+if [[ -z "$portal" || -z "$attempt_id" || -z "$pairing_token" || -z "$allow_root" ]]; then
+  echo "La instalacion requiere una autorizacion de un solo uso emitida por Fenix." >&2
+  usage
+  exit 64
+fi
+
+portal="${portal%/}"
+if [[ "$portal" != "https://iaonline.io" ]]; then
+  echo "Este paquete oficial solo acepta autorizaciones emitidas por https://iaonline.io." >&2
+  exit 64
+fi
 
 if [[ "$(uname -s)" != "Darwin" || "$(uname -m)" != "arm64" ]]; then
   echo "Este paquete requiere un Mac con Apple Silicon." >&2
@@ -27,6 +77,7 @@ fi
 for required in \
   "${package_dir}/payload/runtime/node_modules/t3/dist/bin.mjs" \
   "${package_dir}/payload/runtime/node_modules/t3/dist/service-launcher.mjs" \
+  "${package_dir}/payload/runtime/.fenix-portal-auth-required" \
   "${package_dir}/payload/node/bin/node" \
   "${package_dir}/bin/fenix-code"; do
   if [[ ! -f "$required" ]]; then
@@ -57,16 +108,24 @@ cleanup() {
     elif [[ "$wrapper_activated" == true ]]; then
       rm -f "$wrapper_path"
     fi
+    if [[ "$config_existed" == true && -f "$config_backup" ]]; then
+      rm -f "$config_path"
+      mv "$config_backup" "$config_path"
+    elif [[ "$config_was_present" == false ]]; then
+      rm -f "$config_path"
+    fi
   fi
   rm -rf "$version_staging" "$node_staging"
-  rm -f "$wrapper_staging"
+  rm -f "$wrapper_staging" "$config_backup"
   return "$status"
 }
 trap cleanup EXIT
 
 mkdir -p "$(dirname "$version_dir")" "$bin_dir"
+mkdir -p "$(dirname "$config_path")"
+chmod 0700 "$(dirname "$config_path")"
 rm -rf "$version_staging" "$node_staging" "$version_backup" "$node_backup"
-rm -f "$wrapper_staging" "$wrapper_backup"
+rm -f "$wrapper_staging" "$wrapper_backup" "$config_backup"
 mkdir -p "$version_staging" "$node_staging"
 cp -R "${package_dir}/payload/runtime/." "$version_staging/"
 printf '%s\n' "$version" > "${version_staging}/.install-complete"
@@ -78,6 +137,10 @@ staged_version="$(
 )"
 if [[ "$staged_version" != "fenix-code v${version}" ]]; then
   echo "El runtime preparado no supera la verificacion de version." >&2
+  exit 65
+fi
+if [[ "$(cat "${version_staging}/.fenix-portal-auth-required")" != "Fenix portal authorization required" ]]; then
+  echo "El paquete no contiene el marcador obligatorio de autorizacion Fenix." >&2
   exit 65
 fi
 
@@ -92,9 +155,42 @@ mv "$wrapper_staging" "$wrapper_path"
 wrapper_activated=true
 
 "$wrapper_path" --version >/dev/null
+
+if [[ -e "$config_path" || -L "$config_path" ]]; then
+  config_was_present=true
+  if [[ ! -f "$config_path" || -L "$config_path" ]]; then
+    echo "La configuracion Fenix existente no es un fichero regular seguro." >&2
+    exit 65
+  fi
+  cp -p "$config_path" "$config_backup"
+  config_existed=true
+fi
+
+"$wrapper_path" fenix pair \
+  --portal "$portal" \
+  --attempt-id "$attempt_id" \
+  --pairing-token "$pairing_token" \
+  --allow-root "$allow_root" \
+  --base-dir "$base_dir"
+pairing_token=""
+
+if [[ ! -f "$config_path" || -L "$config_path" ]]; then
+  echo "Fenix no genero una credencial de dispositivo valida." >&2
+  exit 65
+fi
+if config_mode="$(stat -f '%Lp' "$config_path" 2>/dev/null)"; then
+  :
+else
+  config_mode="$(stat -c '%a' "$config_path")"
+fi
+if [[ "$config_mode" != "600" ]]; then
+  echo "La credencial local no tiene permisos 0600." >&2
+  exit 65
+fi
+
 install_complete=true
 rm -rf "$version_backup" "$node_backup"
-rm -f "$wrapper_backup"
+rm -f "$wrapper_backup" "$config_backup"
 
 printf '\nFenix Code Companion %s instalado.\n' "$version"
 printf 'Comando: %s\n' "$wrapper_path"
@@ -102,4 +198,4 @@ if [[ ":${PATH}:" != *":${bin_dir}:"* ]]; then
   printf 'Anade esta linea a ~/.zprofile y abre una Terminal nueva:\n'
   printf '  export PATH="$HOME/.local/bin:$PATH"\n'
 fi
-printf '\nSiguiente paso: abre la landing Fenix Code, genera el comando de emparejamiento y ejecutalo desde la carpeta que quieras autorizar.\n'
+printf '\nEquipo autorizado por Fenix. Siguiente paso: ejecuta fenix-code service install.\n'

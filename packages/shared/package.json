@@ -149,7 +149,8 @@
     },
     "./productBranding": {
       "types": "./src/productBranding.ts",
-      "import": "./src/productBranding.ts"
+      "import": "./src/productBranding.ts",
+      "require": "./src/productBranding.ts"
     },
     "./path": {
       "types": "./src/path.ts",
