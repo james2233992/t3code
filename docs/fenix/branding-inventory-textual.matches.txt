@@ -50,19 +50,19 @@
 ./.github/workflows/ci.yml:96:65:t3code
 ./.github/workflows/deploy-relay.yml:54:26:t3code
 ./.github/workflows/deploy-relay.yml:58:30:t3code
-./.github/workflows/fenix-fork-ci.yml:102:11:T3CODE
-./.github/workflows/fenix-fork-ci.yml:102:66:t3code
-./.github/workflows/fenix-fork-ci.yml:103:11:T3CODE
-./.github/workflows/fenix-fork-ci.yml:109:42:t3code
-./.github/workflows/fenix-fork-ci.yml:110:65:t3code
-./.github/workflows/fenix-fork-ci.yml:129:44:t3code
-./.github/workflows/fenix-fork-ci.yml:148:26:@t3tools
-./.github/workflows/fenix-fork-ci.yml:158:44:t3code
-./.github/workflows/fenix-fork-ci.yml:177:26:@t3tools
+./.github/workflows/fenix-fork-ci.yml:101:30:@t3tools
+./.github/workflows/fenix-fork-ci.yml:105:11:T3CODE
+./.github/workflows/fenix-fork-ci.yml:105:66:t3code
+./.github/workflows/fenix-fork-ci.yml:106:11:T3CODE
+./.github/workflows/fenix-fork-ci.yml:112:42:t3code
+./.github/workflows/fenix-fork-ci.yml:113:65:t3code
+./.github/workflows/fenix-fork-ci.yml:132:44:t3code
+./.github/workflows/fenix-fork-ci.yml:151:26:@t3tools
+./.github/workflows/fenix-fork-ci.yml:161:44:t3code
+./.github/workflows/fenix-fork-ci.yml:180:26:@t3tools
 ./.github/workflows/fenix-fork-ci.yml:18:44:t3code
 ./.github/workflows/fenix-fork-ci.yml:43:30:@t3tools
-./.github/workflows/fenix-fork-ci.yml:75:44:t3code
-./.github/workflows/fenix-fork-ci.yml:98:30:@t3tools
+./.github/workflows/fenix-fork-ci.yml:78:44:t3code
 ./.github/workflows/mobile-eas-preview.yml:55:26:@t3tools
 ./.github/workflows/mobile-eas-production.yml:73:26:@t3tools
 ./.github/workflows/mobile-showcase-screenshots.yml:102:26:@t3tools
@@ -1349,14 +1349,14 @@
 ./apps/server/src/cloud/ManagedEndpointRuntime.test.ts:151:22:t3-code
 ./apps/server/src/cloud/ManagedEndpointRuntime.ts:1:57:@t3tools
 ./apps/server/src/cloud/ManagedEndpointRuntime.ts:2:31:@t3tools
-./apps/server/src/cloud/bootService.test.ts:193:32:t3code
-./apps/server/src/cloud/bootService.test.ts:195:35:t3code
-./apps/server/src/cloud/bootService.test.ts:221:32:t3code
-./apps/server/src/cloud/bootService.test.ts:222:35:t3code
+./apps/server/src/cloud/bootService.test.ts:195:32:t3code
+./apps/server/src/cloud/bootService.test.ts:197:35:t3code
+./apps/server/src/cloud/bootService.test.ts:223:32:t3code
+./apps/server/src/cloud/bootService.test.ts:224:35:t3code
 ./apps/server/src/cloud/bootService.test.ts:30:48:t3code
 ./apps/server/src/cloud/bootService.test.ts:7:9:@t3tools
-./apps/server/src/cloud/bootService.ts:117:15:T3CODE
-./apps/server/src/cloud/bootService.ts:173:34:Fenix Code
+./apps/server/src/cloud/bootService.ts:118:15:T3CODE
+./apps/server/src/cloud/bootService.ts:176:34:Fenix Code
 ./apps/server/src/cloud/bootService.ts:1:65:@t3tools
 ./apps/server/src/cloud/bootService.ts:28:28:t3code
 ./apps/server/src/cloud/bootService.ts:70:18:Fenix Code
@@ -1463,8 +1463,8 @@
 ./apps/server/src/environment/ServerEnvironmentLabel.test.ts:88:23:t3code
 ./apps/server/src/environment/ServerEnvironmentLabel.ts:1:59:@t3tools
 ./apps/server/src/fenix/CompanionConfig.ts:64:27:Fenix Code
-./apps/server/src/fenix/FenixCompanionTunnel.ts:142:67:Fenix Code
 ./apps/server/src/fenix/FenixCompanionTunnel.ts:1:43:@t3tools
+./apps/server/src/fenix/FenixCompanionTunnel.ts:208:67:Fenix Code
 ./apps/server/src/git/GitManager.test.ts:1023:45:t3code
 ./apps/server/src/git/GitManager.test.ts:1037:54:t3code
 ./apps/server/src/git/GitManager.test.ts:1044:50:t3code
@@ -2094,8 +2094,8 @@
 ./apps/server/src/server.ts:115:31:@t3tools
 ./apps/server/src/server.ts:116:62:@t3tools
 ./apps/server/src/server.ts:1:37:@t3tools
-./apps/server/src/server.ts:624:48:Fenix Connect
-./apps/server/src/server.ts:626:56:Fenix Connect
+./apps/server/src/server.ts:631:48:Fenix Connect
+./apps/server/src/server.ts:633:56:Fenix Connect
 ./apps/server/src/serverLifecycleEvents.test.ts:1:32:@t3tools
 ./apps/server/src/serverLifecycleEvents.ts:1:50:@t3tools
 ./apps/server/src/serverRuntimeStartup.test.ts:2:73:@t3tools
@@ -2845,14 +2845,14 @@
 ./apps/web/src/components/desktopUpdate.toast.test.tsx:3:42:@t3tools
 ./apps/web/src/components/desktopUpdate.toast.tsx:1:57:@t3tools
 ./apps/web/src/components/diffs/AnnotatableCodeView.tsx:10:39:@t3tools
-./apps/web/src/components/fenix/FenixSetupPage.tsx:190:55:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:233:19:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:251:15:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:304:37:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:312:30:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:394:59:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:503:55:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:565:15:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:191:55:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:234:19:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:252:15:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:305:37:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:313:30:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:395:59:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:506:55:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:568:15:Fenix Code
 ./apps/web/src/components/files/FileBrowserPanel.tsx:5:51:@t3tools
 ./apps/web/src/components/files/FileBrowserPanel.tsx:7:44:@t3tools
 ./apps/web/src/components/files/FilePreviewPanel.tsx:14:9:@t3tools
@@ -3043,7 +3043,8 @@
 ./apps/web/src/connection/fenixPortal.ts:139:22:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:17:12:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:217:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:268:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:245:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:295:22:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:5:9:@t3tools
 ./apps/web/src/connection/fenixPortal.ts:6:32:@t3tools
 ./apps/web/src/connection/onboarding.ts:1:39:@t3tools
@@ -3521,6 +3522,10 @@
 ./docs/fenix/local-workspaces-relay-report-20260812.md:85:3:Fenix Code
 ./docs/fenix/local-workspaces-relay-report-20260812.md:87:3:Fenix Code
 ./docs/fenix/local-workspaces-relay-report-20260812.md:9:35:Fenix Code
+./docs/fenix/login-bound-activation-report-20260813.md:1:3:Fenix Code
+./docs/fenix/login-bound-activation-report-20260813.md:21:17:Fenix Code
+./docs/fenix/login-bound-activation-report-20260813.md:5:14:Fenix Code
+./docs/fenix/login-bound-activation-report-20260813.md:9:162:Fenix Code
 ./docs/fenix/onboarding-downloads-report-20260813.md:15:12:Fenix Code
 ./docs/fenix/onboarding-downloads-report-20260813.md:1:3:Fenix Code
 ./docs/fenix/qa-f1-report-20260810.md:23:98:Fenix Code
@@ -4507,11 +4512,11 @@
 ./scripts/fenix/build-companion-package.sh:122:17:Fenix Code
 ./scripts/fenix/build-companion-package.sh:60:50:t3code
 ./scripts/fenix/check-visible-branding.sh:136:20:T3 Tools
+./scripts/fenix/companion-package/README.txt:28:3:Fenix Code
 ./scripts/fenix/companion-package/README.txt:4:68:Fenix Code
 ./scripts/fenix/companion-package/fenix-code:10:9:Fenix Code
 ./scripts/fenix/companion-package/fenix-code:14:8:T3CODE
-./scripts/fenix/companion-package/install.sh:105:43:Fenix Code
-./scripts/fenix/companion-package/install.sh:99:11:Fenix Code
+./scripts/fenix/companion-package/install.sh:195:11:Fenix Code
 ./scripts/fenix/f1-2c-bridge-e2e.mjs:171:52:Fenix Code
 ./scripts/fenix/f1-2c-bridge-e2e.mjs:293:40:Fenix Code
 ./scripts/fenix/f1-2c-bridge-e2e.mjs:305:25:Fenix Code

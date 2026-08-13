@@ -461,6 +461,13 @@ export const makeRoutesLayer = Layer.mergeAll(
 export const makeServerLayer = Layer.unwrap(
   Effect.gen(function* () {
     const config = yield* ServerConfig.ServerConfig;
+    const fenixPortalAuthorizationRequired =
+      FenixCompanionTunnel.isFenixPortalAuthorizationRequired();
+    const fenixStartupAuthorization =
+      yield* FenixCompanionTunnel.requireFenixCompanionStartupAuthorization(
+        config.stateDir,
+        fenixPortalAuthorizationRequired,
+      );
     const activation = yield* Deferred.make<void>();
     const awaitActivation = Deferred.await(activation);
     const activationLayer = Layer.succeed(ServerActivation, awaitActivation);
@@ -657,7 +664,10 @@ export const makeServerLayer = Layer.unwrap(
       runtimeStateLayer,
       tailscaleServeLayer,
       cloudDesiredLinkReconcileLayer,
-      FenixCompanionTunnel.layer,
+      FenixCompanionTunnel.layerWithOptions({
+        initialAuthorization: fenixStartupAuthorization ?? undefined,
+        required: fenixPortalAuthorizationRequired,
+      }),
     );
 
     return serverApplicationLayer.pipe(

@@ -236,6 +236,33 @@ export function buildFenixCompanionPairCommand(input: {
   ].join(" ");
 }
 
+export function buildFenixCompanionInstallCommand(input: {
+  readonly artifactFileName: string;
+  readonly portalOrigin: string;
+  readonly pairing: FenixPortalPairing;
+}): string {
+  if (!/^Fenix-Code-Companion-[A-Za-z0-9._-]+\.tar\.gz$/u.test(input.artifactFileName)) {
+    throw new Error("Fenix Code returned an invalid companion archive name.");
+  }
+  const directoryName = input.artifactFileName.replace(/\.tar\.gz$/u, "");
+  return [
+    "printf 'Ruta absoluta de la carpeta local que autorizas: '",
+    "IFS= read -r FENIX_CODE_ROOT",
+    'case "$FENIX_CODE_ROOT" in /*) ;; *) echo "Debes indicar una ruta absoluta." >&2; exit 1 ;; esac',
+    'test -d "$FENIX_CODE_ROOT" || { echo "La carpeta indicada no existe." >&2; exit 1; }',
+    "cd ~/Downloads",
+    `tar -xzf ${shellQuote(input.artifactFileName)}`,
+    `cd ${shellQuote(directoryName)}`,
+    [
+      "./install.sh",
+      `--portal ${shellQuote(new URL(input.portalOrigin).origin)}`,
+      `--attempt-id ${shellQuote(input.pairing.attemptId)}`,
+      `--pairing-token ${shellQuote(input.pairing.pairingToken)}`,
+      '--allow-root "$FENIX_CODE_ROOT"',
+    ].join(" "),
+  ].join("\n");
+}
+
 export async function issueFenixPortalBrowserTicket(input: {
   readonly agentId: number;
   readonly deviceId: string;

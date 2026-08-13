@@ -55,6 +55,9 @@ jobs:
           bash scripts/fenix/check-visible-branding.sh selftest
           bash scripts/fenix/check-visible-branding.sh
 
+      - name: Verify login-bound companion installer
+        run: bash scripts/fenix/companion-package/install.test.sh
+
       - name: Typecheck
         run: vpr typecheck
 

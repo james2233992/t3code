@@ -149,6 +149,7 @@ tar -xzf "${work_dir}/${node_archive}" -C "$node_extract" --strip-components=1
 
 mkdir -p "$package_dir/payload/runtime" "$package_dir/payload/node"
 cp -R "${runtime_dir}/." "$package_dir/payload/runtime/"
+printf 'Fenix portal authorization required\n' > "$package_dir/payload/runtime/.fenix-portal-auth-required"
 cp -R "${node_extract}/." "$package_dir/payload/node/"
 cp scripts/fenix/companion-package/install.sh "$package_dir/install.sh"
 cp scripts/fenix/companion-package/fenix-code "$package_dir/bin/fenix-code"
