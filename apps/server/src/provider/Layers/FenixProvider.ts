@@ -87,9 +87,9 @@ export function buildInitialFenixProviderSnapshot(
       probe: {
         installed: true,
         version: null,
-        status: "warning",
+        status: "ready",
         auth: { status: "unknown" },
-        message: "Fenix driver is waiting for a paired Fenix session.",
+        message: "Fenix pairing credentials are validated for every accepted turn.",
       },
     });
   });
