@@ -25,7 +25,6 @@ const MAX_BROKER_ENVELOPE_CHARS = MAX_BROKER_MESSAGE_BYTES * 6 + 256;
 const SESSION_ROTATION_MS = 4 * 60 * 1_000;
 const RUNTIME_TICKET_TIMEOUT_MS = 10_000;
 const PACKAGED_AUTH_MARKER = ".fenix-portal-auth-required";
-const PACKAGED_INSTALL_RECEIPT = ".install-complete";
 let packagedRuntimeCache: boolean | undefined;
 
 export function keepFenixCompanionSessionsAlive<A, E, R>(
@@ -94,9 +93,7 @@ export function isPackagedFenixCompanionRuntime(entryPath = process.argv[1]): bo
       `${NodePath.sep}node_modules${NodePath.sep}t3${NodePath.sep}dist${NodePath.sep}bin.mjs`,
     );
   try {
-    const packaged =
-      pathEntryExists(NodePath.join(runtimeRoot, PACKAGED_INSTALL_RECEIPT)) ||
-      pathEntryExists(NodePath.join(runtimeRoot, PACKAGED_AUTH_MARKER));
+    const packaged = pathEntryExists(NodePath.join(runtimeRoot, PACKAGED_AUTH_MARKER));
     if (useCache) packagedRuntimeCache = packaged;
     return packaged;
   } catch {

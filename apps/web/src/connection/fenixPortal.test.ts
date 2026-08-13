@@ -238,6 +238,7 @@ describe("Fenix portal companion API", () => {
       [
         "printf 'Ruta absoluta de la carpeta local que autorizas: '",
         "IFS= read -r FENIX_CODE_ROOT",
+        'case "$FENIX_CODE_ROOT" in /*) ;; *) echo "Debes indicar una ruta absoluta." >&2; exit 1 ;; esac',
         'test -d "$FENIX_CODE_ROOT" || { echo "La carpeta indicada no existe." >&2; exit 1; }',
         "cd ~/Downloads",
         "tar -xzf 'Fenix-Code-Companion-0.0.32-macos-arm64.tar.gz'",

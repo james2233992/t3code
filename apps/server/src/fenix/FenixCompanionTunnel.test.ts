@@ -99,7 +99,7 @@ describe("FenixCompanionTunnel broker framing", () => {
     expect(isFenixPortalAuthorizationRequired(undefined, false)).toBe(false);
   });
 
-  it("still recognizes an installed runtime when its auth marker is missing", async () => {
+  it("distinguishes the Fenix auth marker from a standard install receipt", async () => {
     const root = await NodeFSP.mkdtemp(NodePath.join(NodeOS.tmpdir(), "fenix-packaged-runtime-"));
     const entryPath = NodePath.join(root, "node_modules/t3/dist/bin.mjs");
     try {
@@ -107,6 +107,9 @@ describe("FenixCompanionTunnel broker framing", () => {
       await NodeFSP.writeFile(entryPath, "export {};\n");
       await NodeFSP.writeFile(NodePath.join(root, ".install-complete"), "0.0.32\n");
 
+      expect(isPackagedFenixCompanionRuntime(entryPath)).toBe(false);
+
+      await NodeFSP.writeFile(NodePath.join(root, ".fenix-portal-auth-required"), "1\n");
       expect(isPackagedFenixCompanionRuntime(entryPath)).toBe(true);
     } finally {
       await NodeFSP.rm(root, { recursive: true, force: true });

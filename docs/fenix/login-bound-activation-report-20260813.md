@@ -36,7 +36,7 @@ The official Fenix Code companion package must not install or start as a usable 
 - Landing: emits the combined authorize-and-install command and rejects unsafe archive names.
 - Server suite: 2,009 passed, 7 skipped on the final source tree.
 - Web suite: 2,022 passed on the final source tree.
-- Final macOS ARM64 artifact: 143,332,151 bytes; SHA-256 `e9bd57594f37cc200952defa7a5790541a2408b4bf26bbc27fab60709e28da54`.
+- Final macOS ARM64 artifact: 143,334,509 bytes; SHA-256 `262e5aeb87e33e3950140024f26777e3fa6668919616206904c63f7347cab3a1`.
 
 ## Limits
 

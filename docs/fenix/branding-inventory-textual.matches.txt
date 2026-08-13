@@ -1464,7 +1464,7 @@
 ./apps/server/src/environment/ServerEnvironmentLabel.ts:1:59:@t3tools
 ./apps/server/src/fenix/CompanionConfig.ts:64:27:Fenix Code
 ./apps/server/src/fenix/FenixCompanionTunnel.ts:1:43:@t3tools
-./apps/server/src/fenix/FenixCompanionTunnel.ts:211:67:Fenix Code
+./apps/server/src/fenix/FenixCompanionTunnel.ts:208:67:Fenix Code
 ./apps/server/src/git/GitManager.test.ts:1023:45:t3code
 ./apps/server/src/git/GitManager.test.ts:1037:54:t3code
 ./apps/server/src/git/GitManager.test.ts:1044:50:t3code
@@ -3044,7 +3044,7 @@
 ./apps/web/src/connection/fenixPortal.ts:17:12:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:217:22:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:245:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:294:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:295:22:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:5:9:@t3tools
 ./apps/web/src/connection/fenixPortal.ts:6:32:@t3tools
 ./apps/web/src/connection/onboarding.ts:1:39:@t3tools

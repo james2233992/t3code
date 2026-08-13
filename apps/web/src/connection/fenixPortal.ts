@@ -248,6 +248,7 @@ export function buildFenixCompanionInstallCommand(input: {
   return [
     "printf 'Ruta absoluta de la carpeta local que autorizas: '",
     "IFS= read -r FENIX_CODE_ROOT",
+    'case "$FENIX_CODE_ROOT" in /*) ;; *) echo "Debes indicar una ruta absoluta." >&2; exit 1 ;; esac',
     'test -d "$FENIX_CODE_ROOT" || { echo "La carpeta indicada no existe." >&2; exit 1; }',
     "cd ~/Downloads",
     `tar -xzf ${shellQuote(input.artifactFileName)}`,
