@@ -27,6 +27,17 @@ export function FenixMobileAccessGate(props: { readonly children: ReactNode }) {
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const mountedRef = useRef(true);
   const validationInFlightRef = useRef(false);
+  const scannerLockedRef = useRef(false);
+  const scannerUnlockTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const resetScannerLock = useCallback(() => {
+    if (scannerUnlockTimeoutRef.current !== null) {
+      clearTimeout(scannerUnlockTimeoutRef.current);
+      scannerUnlockTimeoutRef.current = null;
+    }
+    scannerLockedRef.current = false;
+    setScannerLocked(false);
+  }, []);
 
   const validateAccess = useCallback(async () => {
     if (validationInFlightRef.current) return;
@@ -52,6 +63,10 @@ export function FenixMobileAccessGate(props: { readonly children: ReactNode }) {
     });
     return () => {
       mountedRef.current = false;
+      if (scannerUnlockTimeoutRef.current !== null) {
+        clearTimeout(scannerUnlockTimeoutRef.current);
+        scannerUnlockTimeoutRef.current = null;
+      }
       clearInterval(interval);
       subscription.remove();
     };
@@ -59,13 +74,13 @@ export function FenixMobileAccessGate(props: { readonly children: ReactNode }) {
 
   const openScanner = useCallback(async () => {
     if (cameraPermission?.granted) {
-      setScannerLocked(false);
+      resetScannerLock();
       setShowScanner(true);
       return;
     }
     const permission = await requestCameraPermission();
     if (permission.granted) {
-      setScannerLocked(false);
+      resetScannerLock();
       setShowScanner(true);
       return;
     }
@@ -73,35 +88,37 @@ export function FenixMobileAccessGate(props: { readonly children: ReactNode }) {
       "Acceso a la camara necesario",
       "Permite el acceso a la camara para escanear el QR emitido por Fenix.",
     );
-  }, [cameraPermission?.granted, requestCameraPermission]);
+  }, [cameraPermission?.granted, requestCameraPermission, resetScannerLock]);
 
-  const handleQrScan = useCallback(
-    async ({ data }: { readonly data: string }) => {
-      if (scannerLocked) return;
-      setScannerLocked(true);
-      try {
-        if (!isFenixMobilePairingUrl(data)) {
-          throw new Error("Este QR no es una autorizacion movil emitida por Fenix.");
-        }
-        await pairFenixMobileController({ pairingUrl: data });
-        const authorization = await authorizeFenixMobileController();
-        if (authorization === null) {
-          throw new Error("Fenix no ha autorizado este dispositivo.");
-        }
-        setShowScanner(false);
-        setAccessState("authorized");
-      } catch (error) {
-        setAccessState("locked");
-        Alert.alert(
-          "No se pudo autorizar el dispositivo",
-          error instanceof Error ? error.message : "Vuelve a generar el QR desde Fenix.",
-        );
-      } finally {
-        setTimeout(() => setScannerLocked(false), 600);
+  const handleQrScan = useCallback(async ({ data }: { readonly data: string }) => {
+    if (scannerLockedRef.current) return;
+    scannerLockedRef.current = true;
+    setScannerLocked(true);
+    try {
+      if (!isFenixMobilePairingUrl(data)) {
+        throw new Error("Este QR no es una autorizacion movil emitida por Fenix.");
       }
-    },
-    [scannerLocked],
-  );
+      await pairFenixMobileController({ pairingUrl: data });
+      const authorization = await authorizeFenixMobileController();
+      if (authorization === null) {
+        throw new Error("Fenix no ha autorizado este dispositivo.");
+      }
+      setShowScanner(false);
+      setAccessState("authorized");
+    } catch (error) {
+      setAccessState("locked");
+      Alert.alert(
+        "No se pudo autorizar el dispositivo",
+        error instanceof Error ? error.message : "Vuelve a generar el QR desde Fenix.",
+      );
+    } finally {
+      scannerUnlockTimeoutRef.current = setTimeout(() => {
+        scannerUnlockTimeoutRef.current = null;
+        scannerLockedRef.current = false;
+        if (mountedRef.current) setScannerLocked(false);
+      }, 600);
+    }
+  }, []);
 
   if (accessState === "authorized") return props.children;
 
@@ -138,14 +155,17 @@ export function FenixMobileAccessGate(props: { readonly children: ReactNode }) {
                 <View className="overflow-hidden rounded-[24px] border-continuous">
                   <CameraView
                     barcodeScannerSettings={{ barcodeTypes: ["qr"] }}
-                    onBarcodeScanned={handleQrScan}
+                    onBarcodeScanned={scannerLocked ? undefined : handleQrScan}
                     style={{ aspectRatio: 1, width: "100%" }}
                   />
                 </View>
                 <ConnectionSheetButton
                   icon="xmark"
                   label="Cerrar escaner"
-                  onPress={() => setShowScanner(false)}
+                  onPress={() => {
+                    resetScannerLock();
+                    setShowScanner(false);
+                  }}
                 />
               </View>
             ) : null
