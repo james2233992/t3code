@@ -156,6 +156,24 @@ export function keepFenixCompanionSessionsAuthorized<A, E, R, R2>(
   );
 }
 
+export function keepRequiredFenixCompanionSessionsAuthorized<A, R, R2>(
+  connectOnce: Effect.Effect<A, FenixCompanionTunnelError, R>,
+  onAuthorizationLoss: (error: FenixCompanionTunnelError) => Effect.Effect<void, never, R2>,
+): Effect.Effect<never, never, R | R2> {
+  const connectWithTransientRetry = connectOnce.pipe(
+    Effect.retry({
+      while: (error) => error.kind === "transient",
+      times: 3,
+      schedule: Schedule.exponential("2 seconds").pipe(
+        Schedule.modifyDelay(({ duration }) =>
+          Effect.succeed(Duration.min(duration, Duration.seconds(8))),
+        ),
+      ),
+    }),
+  );
+  return keepFenixCompanionSessionsAuthorized(connectWithTransientRetry, onAuthorizationLoss);
+}
+
 function waitForOpen(socket: WebSocket): Promise<void> {
   if (socket.readyState === WebSocket.OPEN) return Promise.resolve();
   return new Promise((resolve, reject) => {
@@ -441,7 +459,7 @@ export function layerWithOptions(options?: {
         ),
       );
       const maintainSessions = required
-        ? keepFenixCompanionSessionsAuthorized(
+        ? keepRequiredFenixCompanionSessionsAuthorized(
             requiredConnectOnce,
             options?.onAuthorizationLoss ??
               ((cause) =>

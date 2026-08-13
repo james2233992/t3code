@@ -22,6 +22,7 @@ import {
   isFenixPortalAuthorizationRequired,
   keepFenixCompanionSessionsAuthorized,
   keepFenixCompanionSessionsAlive,
+  keepRequiredFenixCompanionSessionsAuthorized,
   requireFenixCompanionStartupAuthorization,
 } from "./FenixCompanionTunnel.ts";
 
@@ -209,6 +210,59 @@ describe("FenixCompanionTunnel broker framing", () => {
       yield* Deferred.await(stopped);
       yield* TestClock.adjust("1 minute");
       expect(yield* Ref.get(failures)).toBe(1);
+      yield* Fiber.interrupt(fiber);
+    }),
+  );
+
+  it.effect("retries transient failures before stopping a required companion", () =>
+    Effect.gen(function* () {
+      const attempts = yield* Ref.make(0);
+      const stopped = yield* Deferred.make<void>();
+      const session = Ref.update(attempts, (value) => value + 1).pipe(
+        Effect.andThen(
+          Effect.fail(
+            new FenixCompanionTunnelError({
+              message: "portal temporarily unavailable",
+              kind: "transient",
+            }),
+          ),
+        ),
+      );
+      const fiber = yield* keepRequiredFenixCompanionSessionsAuthorized(session, () =>
+        Deferred.succeed(stopped, undefined).pipe(Effect.asVoid),
+      ).pipe(Effect.forkChild);
+
+      yield* Effect.yieldNow;
+      yield* TestClock.adjust("30 seconds");
+      yield* Deferred.await(stopped);
+
+      expect(yield* Ref.get(attempts)).toBe(4);
+      yield* Fiber.interrupt(fiber);
+    }),
+  );
+
+  it.effect("does not retry an authorization rejection", () =>
+    Effect.gen(function* () {
+      const attempts = yield* Ref.make(0);
+      const stopped = yield* Deferred.make<void>();
+      const session = Ref.update(attempts, (value) => value + 1).pipe(
+        Effect.andThen(
+          Effect.fail(
+            new FenixCompanionTunnelError({
+              message: "device revoked",
+              kind: "authorization",
+            }),
+          ),
+        ),
+      );
+      const fiber = yield* keepRequiredFenixCompanionSessionsAuthorized(session, () =>
+        Deferred.succeed(stopped, undefined).pipe(Effect.asVoid),
+      ).pipe(Effect.forkChild);
+
+      yield* Deferred.await(stopped);
+      yield* TestClock.adjust("30 seconds");
+
+      expect(yield* Ref.get(attempts)).toBe(1);
       yield* Fiber.interrupt(fiber);
     }),
   );

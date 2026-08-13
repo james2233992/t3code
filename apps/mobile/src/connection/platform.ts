@@ -32,6 +32,7 @@ import { appAtomRegistry } from "../state/atom-registry";
 import { clearThreadOutboxEnvironment } from "../state/thread-outbox";
 import { clearComposerDraftsEnvironment } from "../state/use-composer-drafts";
 import { mobileApplicationActiveWakeup } from "./app-state-wakeups";
+import { startActiveRefreshLoop } from "./activeRefreshLoop";
 import { connectionStorageLayer } from "./storage";
 import {
   FenixMobileHttpError,
@@ -247,11 +248,14 @@ const platformConnectionSourceLayer = Layer.succeed(
                 }
               });
           };
-          refresh();
-          const interval = setInterval(refresh, 3_000);
+          const closeRefreshLoop = startActiveRefreshLoop({
+            initialState: AppState.currentState ?? "unknown",
+            refresh,
+            subscribe: (listener) => AppState.addEventListener("change", listener),
+          });
           return () => {
             active = false;
-            clearInterval(interval);
+            closeRefreshLoop();
           };
         }),
         (close) => Effect.sync(close),
