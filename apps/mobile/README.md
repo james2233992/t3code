@@ -1,24 +1,34 @@
-# Fenix Code Mobile
+# Fenix Code para iOS y Android
 
 > [!WARNING]
-> Fenix Code Mobile is currently in development and is not distributed yet. If you want to try it out, you can build it from source.
+> La app movil esta en validacion interna y todavia no se distribuye en tiendas. Las builds locales y de CI no pueden publicar actualizaciones ni seleccionar cuentas de distribucion sin variables Fenix explicitas.
 
-## Quickstart
+## Uso
 
 > [!NOTE]
-> Uses native modules so using Expo Go is not supported. You need to use the Expo Dev Client.
+> Usa modulos nativos, por lo que Expo Go no es compatible. Para desarrollo se necesita Expo Dev Client.
 
-This app has three variants:
+La app conserva el control remoto del Companion de Fenix Code: proyectos, carpetas y repositorios del equipo emparejado, threads, turnos, diffs, checkpoints, revert, terminal y revision. El telefono nunca abre una carpeta local del propio movil; controla exclusivamente los recursos del equipo Companion asignado al mismo usuario Fenix.
+
+## Emparejamiento privado con Fenix
+
+1. El usuario inicia sesion en `https://iaonline.io` y abre la landing de Fenix Code.
+2. La landing genera un QR de un solo uso mediante la sesion cookie-first del portal.
+3. La app movil consume el QR como dispositivo `mobile_controller` y guarda la credencial en SecureStore con proteccion solo para ese dispositivo.
+4. El backend reautoriza company, usuario y agente en cada consulta. La app solo descubre equipos `local_runner` del mismo owner.
+5. Cada conexion usa un ticket WebSocket temporal. La cookie del navegador y las credenciales BYOS nunca se copian al telefono.
+
+Un dispositivo movil no puede registrarse a la vez como runner local, solicitar credenciales de proveedor ni anunciar carpetas. Si se revoca el owner o deja de estar asignado, el backend revoca el dispositivo y corta sus conexiones.
+
+Hay tres variantes:
 
 - `development`: Expo dev client, installable side-by-side as `Fenix Code Dev`
 - `preview`: persistent internal preview build, installable side-by-side as `Fenix Code Preview`
 - `production`: store/release build as `Fenix Code`
 
-Run commands from `apps/mobile`.
+Ejecuta los comandos desde `apps/mobile`.
 
-T3 Connect is optional and disabled in a fresh clone. Public configuration belongs in the
-repository-root `.env` or `.env.local`, not an `apps/mobile/.env` file. See
-[`../../.env.example`](../../.env.example).
+Una copia limpia no selecciona relay, cuenta Expo, proyecto EAS, equipo Apple ni OTA. La identidad de publicacion solo puede configurarse mediante variables `FENIX_CODE_*` del proceso o del entorno EAS. No uses un fichero `.env` dentro de `apps/mobile`.
 
 ## Development
 
@@ -34,13 +44,11 @@ Build and run the local iOS dev client:
 vp run ios:dev
 ```
 
-If your Xcode account only has a Personal Team, use a bundle identifier you control and opt into the
-reduced-capability local build. Personal Team builds omit the widget and share extensions, push
-entitlement, and native Sign in with Apple entitlement; builds without this opt-in are unchanged.
+Si Xcode solo dispone de un Personal Team, usa un bundle identifier propio. Esta build local omite widgets, share extensions, push y Sign in with Apple nativo.
 
 ```bash
-T3CODE_IOS_PERSONAL_TEAM=1 \
-T3CODE_IOS_PERSONAL_TEAM_BUNDLE_ID=com.example.t3code.dev \
+FENIX_CODE_IOS_PERSONAL_TEAM=1 \
+FENIX_CODE_IOS_PERSONAL_TEAM_BUNDLE_ID=com.aiworks.fenixcode.dev.local \
 vp run ios:dev
 ```
 
@@ -53,8 +61,8 @@ vp run ios:release
 The Personal Team equivalent also needs a unique bundle identifier:
 
 ```bash
-T3CODE_IOS_PERSONAL_TEAM=1 \
-T3CODE_IOS_PERSONAL_TEAM_BUNDLE_ID=com.example.t3code \
+FENIX_CODE_IOS_PERSONAL_TEAM=1 \
+FENIX_CODE_IOS_PERSONAL_TEAM_BUNDLE_ID=com.aiworks.fenixcode.local \
 vp run ios:release
 ```
 
@@ -87,13 +95,17 @@ node ../../scripts/mobile-native-static-check.ts
 
 The native lint task runs SwiftLint for Swift plus ktlint and detekt for Kotlin. Missing native tools are reported as warnings and skipped locally. CI installs the default toolset from `apps/mobile/Brewfile` before running the native checks.
 
-## EAS Builds
+## Distribucion interna
 
-CI uses Expo fingerprinting with the `preview:dev` profile to reuse an existing compatible build when possible, or start a new internal EAS build when native runtime inputs change. Production and default local builds continue to use the `appVersion` runtime policy.
+El perfil `preview:dev` genera una build interna. Para vincular una build a infraestructura de AIWorks hay que declarar, como minimo:
 
-For preview or production EAS environments, set `T3CODE_CLERK_PUBLISHABLE_KEY`,
-`T3CODE_CLERK_JWT_TEMPLATE`, and `T3CODE_RELAY_URL`
-as EAS environment variables. Expo config maps the canonical values into the mobile build.
+```bash
+FENIX_CODE_EXPO_OWNER=aiworks-fenix
+FENIX_CODE_EXPO_PROJECT_ID=<uuid-del-proyecto-fenix>
+FENIX_CODE_IOS_TEAM_ID=<team-id-aiworks>
+```
+
+La autenticacion y el acceso remoto deben usar el pairing Fenix. `FENIX_CODE_RELAY_URL` solo se admite para un relay operado por AIWorks; si no se declara, el relay queda deshabilitado. El gate `scripts/fenix/check-mobile-release-config.mjs` bloquea identidades, dominios o proyectos de distribucion heredados.
 
 Create a PR preview dev-client build manually:
 
@@ -120,3 +132,5 @@ vp run eas:android:dev
 vp run eas:android:preview:dev
 vp run eas:android:preview
 ```
+
+Los exports de Hermes validan que el bundle de iOS y Android compila, pero no son paquetes instalables. Un `.ipa`, `.aab` o build interno requiere las credenciales y el proyecto de distribucion Fenix indicados arriba; nunca se reutilizan cuentas o proyectos heredados.

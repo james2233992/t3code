@@ -94,6 +94,7 @@
 ./docs/user/remote-access.md:59:146:app.t3.codes
 ./docs/user/remote-access.md:81:14:app.t3.codes
 ./packages/shared/src/productBranding.ts:5:57:github.com/pingdotgg/t3code
+./scripts/fenix/check-mobile-release-config.mjs:21:31:t3.codes
 ./scripts/mobile-showcase-environment.ts:120:29:github.com/pingdotgg/t3code
 ./scripts/mobile-showcase-environment.ts:296:29:github.com/pingdotgg/t3code
 ./t3.json:2:23:t3.codes

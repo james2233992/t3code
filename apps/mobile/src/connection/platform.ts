@@ -33,6 +33,13 @@ import { clearThreadOutboxEnvironment } from "../state/thread-outbox";
 import { clearComposerDraftsEnvironment } from "../state/use-composer-drafts";
 import { mobileApplicationActiveWakeup } from "./app-state-wakeups";
 import { connectionStorageLayer } from "./storage";
+import {
+  FenixMobileHttpError,
+  fenixMobileSocket,
+  fenixMobileTargetRegistration,
+  issueFenixMobileTargetTicket,
+  listFenixMobileTargets,
+} from "./fenixMobile";
 
 function networkStatus(state: Network.NetworkState): "unknown" | "offline" | "online" {
   if (state.isConnected === false) {
@@ -195,23 +202,75 @@ const capabilitiesLayer = Layer.effectContext(
   }),
 );
 
+function fenixMobileConnectionError(
+  cause: unknown,
+): ConnectionBlockedError | ConnectionTransientError {
+  if (cause instanceof FenixMobileHttpError && [401, 403, 404].includes(cause.status)) {
+    return new ConnectionBlockedError({
+      reason: "authentication",
+      detail: "Pair this mobile device again from an active Fenix session.",
+    });
+  }
+  if (cause instanceof Error && cause.message.includes("Pair this mobile device")) {
+    return new ConnectionBlockedError({ reason: "authentication", detail: cause.message });
+  }
+  return new ConnectionTransientError({
+    reason: "remote-unavailable",
+    detail: cause instanceof Error ? cause.message : "Fenix mobile control is unavailable.",
+  });
+}
+
 const platformConnectionSourceLayer = Layer.succeed(
   PlatformConnectionSource,
   PlatformConnectionSource.of({
-    registrations: Stream.empty,
+    registrations: Stream.callback((queue) =>
+      Effect.acquireRelease(
+        Effect.sync(() => {
+          let active = true;
+          let latestRequestId = 0;
+          const refresh = () => {
+            const requestId = ++latestRequestId;
+            void listFenixMobileTargets()
+              .then((targets) => {
+                if (active && requestId === latestRequestId) {
+                  Queue.offerUnsafe(queue, targets.map(fenixMobileTargetRegistration));
+                }
+              })
+              .catch((cause: unknown) => {
+                if (
+                  active &&
+                  requestId === latestRequestId &&
+                  cause instanceof FenixMobileHttpError &&
+                  [401, 403, 404].includes(cause.status)
+                ) {
+                  Queue.offerUnsafe(queue, []);
+                }
+              });
+          };
+          refresh();
+          const interval = setInterval(refresh, 3_000);
+          return () => {
+            active = false;
+            clearInterval(interval);
+          };
+        }),
+        (close) => Effect.sync(close),
+      ).pipe(Effect.asVoid),
+    ),
   }),
 );
 
 const fenixCompanionGatewayLayer = Layer.succeed(
   FenixCompanionGateway,
   FenixCompanionGateway.of({
-    prepare: () =>
-      Effect.fail(
-        new ConnectionBlockedError({
-          reason: "unsupported",
-          detail: "Fenix companion connections are only available in the Fenix Code web app.",
-        }),
-      ),
+    prepare: ({ deviceId }) =>
+      Effect.tryPromise({
+        try: async () => {
+          const prepared = await issueFenixMobileTargetTicket({ deviceId });
+          return fenixMobileSocket(prepared);
+        },
+        catch: fenixMobileConnectionError,
+      }),
   }),
 );
 

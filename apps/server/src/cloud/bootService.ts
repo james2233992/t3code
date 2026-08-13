@@ -75,6 +75,7 @@ export function renderBootServiceUnit(plan: BootServicePlan): string {
     "Type=simple",
     "WorkingDirectory=%h",
     `Environment=T3CODE_HOME=${quoteSystemdValue(plan.baseDir)}`,
+    "Environment=FENIX_CODE_REQUIRE_PORTAL_AUTH=1",
     `Environment=${BOOT_SERVICE_UNIT_ENV}=${BOOT_SERVICE_UNIT_FILE}`,
     `ExecStart=${quoteSystemdValue(plan.nodePath)} ${quoteSystemdValue(plan.launcherPath)}`,
     // Let the launcher mark an explicit stop before it signals the server.
@@ -116,6 +117,8 @@ export function renderBootServiceLaunchdPlist(plan: BootServicePlan): string {
     stringEntry(pathEnvironment),
     "    <key>T3CODE_HOME</key>",
     stringEntry(plan.baseDir),
+    "    <key>FENIX_CODE_REQUIRE_PORTAL_AUTH</key>",
+    "    <string>1</string>",
     `    <key>${BOOT_SERVICE_UNIT_ENV}</key>`,
     stringEntry(BOOT_SERVICE_LAUNCHD_FILE),
     "  </dict>",

@@ -32,6 +32,7 @@ it("keeps systemd pinned to the stable launcher rather than a versioned server",
 
   expect(unit).toContain("ExecStart=/usr/bin/node /home/theo/.t3/runtime/service-launcher.mjs");
   expect(unit).toContain("KillMode=mixed");
+  expect(unit).toContain("Environment=FENIX_CODE_REQUIRE_PORTAL_AUTH=1");
   expect(unit).not.toContain("versions/1.2.3");
 });
 
@@ -54,6 +55,7 @@ it("renders a launchd agent with direct argv and escaped values", () => {
   expect(plist).toContain("<key>PATH</key>\n    <string>/opt/homebrew/bin:/usr/bin:/bin</string>");
   expect(plist).toContain("<key>Umask</key>\n  <integer>63</integer>");
   expect(plist).toContain("<key>KeepAlive</key>\n  <true/>");
+  expect(plist).toContain("<key>FENIX_CODE_REQUIRE_PORTAL_AUTH</key>\n    <string>1</string>");
   expect(plist).not.toContain("sh -c");
 });
 
