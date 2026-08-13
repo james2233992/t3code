@@ -1,5 +1,6 @@
 import * as NodeChildProcess from "node:child_process";
 import * as NodeFS from "node:fs";
+import * as NodeModule from "node:module";
 import * as NodePath from "node:path";
 import * as NodeURL from "node:url";
 
@@ -7,6 +8,8 @@ const repoRoot = NodePath.dirname(
   NodePath.dirname(NodePath.dirname(NodeURL.fileURLToPath(import.meta.url))),
 );
 const mobileRoot = NodePath.join(repoRoot, "apps/mobile");
+const require = NodeModule.createRequire(import.meta.url);
+const expoCliPath = require.resolve("expo/bin/cli", { paths: [mobileRoot] });
 const inspectedFiles = [
   "apps/mobile/app.config.ts",
   "apps/mobile/eas.json",
@@ -59,15 +62,18 @@ function cleanEnvironment(overrides = {}) {
 
 function resolveExpoConfig(overrides = {}) {
   const result = NodeChildProcess.spawnSync(
-    "pnpm",
-    ["exec", "expo", "config", "--type", "public", "--json"],
+    process.execPath,
+    [expoCliPath, "config", "--type", "public", "--json"],
     {
       cwd: mobileRoot,
       env: cleanEnvironment(overrides),
       encoding: "utf8",
     },
   );
-  assert(result.status === 0, result.stderr || result.stdout || "Expo config failed");
+  assert(
+    result.status === 0,
+    result.error?.message || result.stderr || result.stdout || "Expo config failed",
+  );
   return JSON.parse(result.stdout);
 }
 
