@@ -5,7 +5,12 @@ import * as NodePath from "node:path";
 import * as NodeURL from "node:url";
 
 export const FENIX_COMPANION_CONFIG_FILE = "fenix-companion.json";
-export const FENIX_COMPANION_CAPABILITIES = ["rpc", "workspace.local", "git.clone"] as const;
+export const FENIX_COMPANION_CAPABILITIES = [
+  "local_runner",
+  "rpc",
+  "workspace.local",
+  "git.clone",
+] as const;
 
 export interface FenixCompanionConfig {
   readonly version: 1;
