@@ -25,6 +25,21 @@ const MAX_BROKER_MESSAGE_BYTES = 128 * 1024;
 const MAX_BROKER_ENVELOPE_CHARS = MAX_BROKER_MESSAGE_BYTES * 6 + 256;
 const SESSION_ROTATION_MS = 4 * 60 * 1_000;
 
+export function keepFenixCompanionSessionsAlive<A, E, R>(
+  connectOnce: Effect.Effect<A, E, R>,
+): Effect.Effect<never, E, R> {
+  return connectOnce.pipe(
+    Effect.retry(
+      Schedule.exponential("1 second").pipe(
+        Schedule.modifyDelay(({ duration }) =>
+          Effect.succeed(Duration.min(duration, Duration.seconds(30))),
+        ),
+      ),
+    ),
+    Effect.forever,
+  );
+}
+
 const RuntimeTicketEnvelope = Schema.Struct({
   ticket: Schema.String,
   expiresAt: Schema.String,
@@ -264,15 +279,6 @@ export const layer = Layer.effectDiscard(
       ),
     );
 
-    yield* connectOnce.pipe(
-      Effect.retry(
-        Schedule.exponential("1 second").pipe(
-          Schedule.modifyDelay(({ duration }) =>
-            Effect.succeed(Duration.min(duration, Duration.seconds(30))),
-          ),
-        ),
-      ),
-      Effect.forkScoped,
-    );
+    yield* keepFenixCompanionSessionsAlive(connectOnce).pipe(Effect.forkScoped);
   }),
 );
