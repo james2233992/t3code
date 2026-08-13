@@ -212,32 +212,33 @@ describe("FenixPairingSessionBridge", () => {
 
   it.effect("resolves the paired companion config through the trusted portal", () =>
     Effect.gen(function* () {
-      const fs = yield* FileSystem.FileSystem;
-      const stateDir = yield* fs.makeTempDirectoryScoped({ prefix: "fenix-live-bridge-" });
       vi.stubEnv("FENIX_CODE_COMPANION_BASE_URL", "");
       vi.stubEnv("FENIX_CODE_COMPANION_DEVICE_ID", "");
       vi.stubEnv("FENIX_CODE_COMPANION_DEVICE_CREDENTIAL_FILE", "");
       vi.stubGlobal("fetch", (async () => Response.json(envelope())) as unknown as typeof fetch);
-      yield* Effect.promise(() =>
-        writeFenixCompanionConfig(stateDir, {
-          version: 1,
-          portalOrigin: "https://iaonline.io",
-          deviceId: DEVICE_ID,
-          deviceName: "Fenix test companion",
-          deviceCredential: DEVICE_CREDENTIAL,
-          allowedRoots: [stateDir],
-        }),
-      );
-      const serverConfigLayer = ServerConfig.layer({
-        stateDir,
-      } as ServerConfig.ServerConfig["Service"]);
+      const serverConfigLayer = ServerConfig.layerTest(process.cwd(), {
+        prefix: "fenix-live-bridge-",
+      }).pipe(Layer.provide(NodeServices.layer));
       const snapshot = yield* Effect.gen(function* () {
+        const { stateDir } = yield* ServerConfig.ServerConfig;
+        yield* Effect.promise(() =>
+          writeFenixCompanionConfig(stateDir, {
+            version: 1,
+            portalOrigin: "https://iaonline.io",
+            deviceId: DEVICE_ID,
+            deviceName: "Fenix test companion",
+            deviceCredential: DEVICE_CREDENTIAL,
+            allowedRoots: [stateDir],
+          }),
+        );
         const bridge = yield* FenixPairingSessionBridge.FenixPairingSessionBridge;
         return yield* bridge.resolvePairingSessionSnapshot({
           instanceId: ProviderInstanceId.make("fenix"),
         });
       }).pipe(
-        Effect.provide(FenixPairingSessionBridge.liveLayer.pipe(Layer.provide(serverConfigLayer))),
+        Effect.provide(
+          FenixPairingSessionBridge.liveLayer.pipe(Layer.provideMerge(serverConfigLayer)),
+        ),
       );
 
       expect(snapshot?.tenantScope).toEqual({ companyId: 5, userId: 10 });

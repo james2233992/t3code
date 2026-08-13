@@ -3,6 +3,7 @@ import * as Deferred from "effect/Deferred";
 import * as Effect from "effect/Effect";
 import * as Fiber from "effect/Fiber";
 import * as Ref from "effect/Ref";
+import * as TestClock from "effect/testing/TestClock";
 
 import {
   decodeFenixCompanionBrokerPayload,
@@ -66,6 +67,10 @@ describe("FenixCompanionTunnel broker framing", () => {
       );
 
       const fiber = yield* keepFenixCompanionSessionsAlive(session).pipe(Effect.forkChild);
+      yield* Effect.yieldNow;
+
+      expect(yield* Ref.get(attempts)).toBe(1);
+      yield* TestClock.adjust("1 second");
       yield* Deferred.await(secondSessionStarted);
 
       expect(yield* Ref.get(attempts)).toBe(2);

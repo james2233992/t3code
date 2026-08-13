@@ -36,6 +36,7 @@ export function keepFenixCompanionSessionsAlive<A, E, R>(
         ),
       ),
     ),
+    Effect.andThen(Effect.sleep("1 second")),
     Effect.forever,
   );
 }
