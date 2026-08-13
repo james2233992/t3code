@@ -1451,7 +1451,7 @@
 ./apps/server/src/environment/ServerEnvironmentLabel.test.ts:67:23:t3code
 ./apps/server/src/environment/ServerEnvironmentLabel.test.ts:88:23:t3code
 ./apps/server/src/environment/ServerEnvironmentLabel.ts:1:59:@t3tools
-./apps/server/src/fenix/CompanionConfig.ts:59:27:Fenix Code
+./apps/server/src/fenix/CompanionConfig.ts:64:27:Fenix Code
 ./apps/server/src/fenix/FenixCompanionTunnel.ts:126:67:Fenix Code
 ./apps/server/src/fenix/FenixCompanionTunnel.ts:1:43:@t3tools
 ./apps/server/src/git/GitManager.test.ts:1023:45:t3code
