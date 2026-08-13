@@ -6,6 +6,7 @@ import * as NodePath from "node:path";
 import { expect, it } from "@effect/vitest";
 
 import {
+  FENIX_COMPANION_CAPABILITIES,
   fenixCompanionConfigPath,
   normalizeFenixPortalOrigin,
   readFenixCompanionConfig,
@@ -14,6 +15,10 @@ import {
   requireFenixAllowedExistingPath,
   writeFenixCompanionConfig,
 } from "./CompanionConfig.ts";
+
+it("advertises the control-plane local runner capability", () => {
+  expect(FENIX_COMPANION_CAPABILITIES).toContain("local_runner");
+});
 
 async function withFixture(
   run: (fixture: {

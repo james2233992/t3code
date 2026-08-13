@@ -25,6 +25,19 @@ describe("FenixProvider", () => {
     }),
   );
 
+  it.effect("is selectable when enabled while deferring pairing validation to each turn", () =>
+    Effect.gen(function* () {
+      const settings = decodeFenixSettings({ enabled: true });
+      const snapshot = yield* buildInitialFenixProviderSnapshot(settings);
+
+      expect(snapshot.enabled).toBe(true);
+      expect(snapshot.status).toBe("ready");
+      expect(snapshot.auth.status).toBe("unknown");
+      expect(snapshot.models.map((model) => model.slug)).toContain(FENIX_FEATURED_CODING_MODEL);
+      expect(snapshot.message).toMatch(/validated for every accepted turn/i);
+    }),
+  );
+
   it("keeps the featured model ahead of custom model additions", () => {
     const models = fenixModelsFromSettings({
       featuredModel: FENIX_FEATURED_CODING_MODEL,

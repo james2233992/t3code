@@ -1,8 +1,14 @@
 import { describe, expect, it } from "@effect/vitest";
+import * as Deferred from "effect/Deferred";
+import * as Effect from "effect/Effect";
+import * as Fiber from "effect/Fiber";
+import * as Ref from "effect/Ref";
+import * as TestClock from "effect/testing/TestClock";
 
 import {
   decodeFenixCompanionBrokerPayload,
   encodeFenixCompanionBrokerFrame,
+  keepFenixCompanionSessionsAlive,
 } from "./FenixCompanionTunnel.ts";
 
 describe("FenixCompanionTunnel broker framing", () => {
@@ -47,4 +53,28 @@ describe("FenixCompanionTunnel broker framing", () => {
     ).toBeNull();
     expect(decodeFenixCompanionBrokerPayload(oversizedEnvelope)).toBeNull();
   });
+
+  it.effect("starts a replacement session after a clean rotation", () =>
+    Effect.gen(function* () {
+      const attempts = yield* Ref.make(0);
+      const secondSessionStarted = yield* Deferred.make<void>();
+      const session = Ref.updateAndGet(attempts, (value) => value + 1).pipe(
+        Effect.flatMap((attempt) =>
+          attempt === 2
+            ? Deferred.succeed(secondSessionStarted, undefined).pipe(Effect.andThen(Effect.never))
+            : Effect.void,
+        ),
+      );
+
+      const fiber = yield* keepFenixCompanionSessionsAlive(session).pipe(Effect.forkChild);
+      yield* Effect.yieldNow;
+
+      expect(yield* Ref.get(attempts)).toBe(1);
+      yield* TestClock.adjust("1 second");
+      yield* Deferred.await(secondSessionStarted);
+
+      expect(yield* Ref.get(attempts)).toBe(2);
+      yield* Fiber.interrupt(fiber);
+    }),
+  );
 });

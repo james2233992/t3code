@@ -10,9 +10,14 @@ import * as Path from "effect/Path";
 import * as Schema from "effect/Schema";
 
 import {
+  readFenixCompanionConfig,
+  type FenixCompanionConfig,
+} from "../../fenix/CompanionConfig.ts";
+import {
   isValidFenixCodeTenantScope,
   type FenixCodeTenantScope,
 } from "../../fenix/FenixCodeTenantScope.ts";
+import * as ServerConfig from "../../config.ts";
 import type { FenixPairingSession } from "../Layers/FenixAdapter.ts";
 
 export interface FenixPairingSessionSnapshot {
@@ -188,6 +193,24 @@ function resolveCompanionEndpoint(config: FenixCompanionBridgeHttpConfig): strin
   }
 }
 
+function resolveTrustedPortalEndpoint(config: FenixCompanionBridgeHttpConfig): string | null {
+  const deviceId = config.deviceId.trim();
+  if (!DEVICE_ID_PATTERN.test(deviceId)) return null;
+
+  try {
+    const base = new URL(config.baseUrl.trim());
+    if (base.origin !== FENIX_AUDIENCE || base.pathname !== "/" || base.search || base.hash) {
+      return null;
+    }
+    return new URL(
+      `/api/v1/code-lab/companion/devices/${encodeURIComponent(deviceId)}/fenix-credential`,
+      base.origin,
+    ).toString();
+  } catch {
+    return null;
+  }
+}
+
 function snapshotFromCompanionEnvelope(
   payload: unknown,
   config: FenixCompanionBridgeHttpConfig,
@@ -245,11 +268,11 @@ function snapshotFromCompanionEnvelope(
   return activePairingEnvelopeFromSnapshot(snapshot, nowEpochMs);
 }
 
-export function resolvePairingSessionSnapshotFromHttp(
+function resolvePairingSessionSnapshot(
   config: FenixCompanionBridgeHttpConfig,
+  requestUrl: string | null,
 ): Effect.Effect<FenixPairingSessionSnapshot | null> {
   return Effect.gen(function* () {
-    const requestUrl = resolveCompanionEndpoint(config);
     const deviceCredential = yield* readDeviceCredential(config);
     if (!requestUrl || !deviceCredential) return null;
     const audience = config.audience ?? FENIX_AUDIENCE;
@@ -283,6 +306,18 @@ export function resolvePairingSessionSnapshotFromHttp(
   }).pipe(Effect.provide(NodeServices.layer));
 }
 
+export function resolvePairingSessionSnapshotFromHttp(
+  config: FenixCompanionBridgeHttpConfig,
+): Effect.Effect<FenixPairingSessionSnapshot | null> {
+  return resolvePairingSessionSnapshot(config, resolveCompanionEndpoint(config));
+}
+
+export function resolvePairingSessionSnapshotFromTrustedPortal(
+  config: FenixCompanionBridgeHttpConfig,
+): Effect.Effect<FenixPairingSessionSnapshot | null> {
+  return resolvePairingSessionSnapshot(config, resolveTrustedPortalEndpoint(config));
+}
+
 export const layerFromHttpConfig = (config: FenixCompanionBridgeHttpConfig) =>
   layerFromEffectResolver(() => resolvePairingSessionSnapshotFromHttp(config));
 
@@ -294,12 +329,33 @@ function configFromEnvironment(): FenixCompanionBridgeHttpConfig | null {
   return { baseUrl, deviceId, deviceCredentialFile };
 }
 
-export const liveLayer = Layer.succeed(
+function configFromCompanion(companion: FenixCompanionConfig): FenixCompanionBridgeHttpConfig {
+  return {
+    baseUrl: companion.portalOrigin,
+    deviceId: companion.deviceId,
+    deviceCredential: companion.deviceCredential,
+  };
+}
+
+export const liveLayer = Layer.effect(
   FenixPairingSessionBridge,
-  FenixPairingSessionBridge.of({
-    resolvePairingSessionSnapshot: () => {
-      const config = configFromEnvironment();
-      return config ? resolvePairingSessionSnapshotFromHttp(config) : Effect.succeed(null);
-    },
+  Effect.gen(function* () {
+    const serverConfig = yield* ServerConfig.ServerConfig;
+    return FenixPairingSessionBridge.of({
+      resolvePairingSessionSnapshot: () => {
+        const environmentConfig = configFromEnvironment();
+        if (environmentConfig) {
+          return resolvePairingSessionSnapshotFromHttp(environmentConfig);
+        }
+        return Effect.tryPromise(() => readFenixCompanionConfig(serverConfig.stateDir)).pipe(
+          Effect.flatMap((companion) =>
+            companion
+              ? resolvePairingSessionSnapshotFromTrustedPortal(configFromCompanion(companion))
+              : Effect.succeed(null),
+          ),
+          Effect.orElseSucceed(() => null),
+        );
+      },
+    });
   }),
 );
