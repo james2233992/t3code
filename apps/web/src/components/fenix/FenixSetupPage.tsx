@@ -15,7 +15,7 @@ import {
 import { useEffect, useMemo, useState } from "react";
 
 import {
-  buildFenixCompanionPairCommand,
+  buildFenixCompanionInstallCommand,
   issueFenixPortalPairing,
   readFenixPortalAgentId,
   type FenixPortalPairing,
@@ -150,15 +150,16 @@ export function FenixSetupPage() {
   const { failed: manifestFailed, manifest } = useCompanionManifest();
   const artifact = companionArtifactForPlatform(manifest, platform, architecture);
   const agentId = readFenixPortalAgentId();
-  const pairCommand = useMemo(
+  const installCommand = useMemo(
     () =>
-      pairing === null
+      pairing === null || artifact === null
         ? null
-        : buildFenixCompanionPairCommand({
+        : buildFenixCompanionInstallCommand({
+            artifactFileName: artifact.fileName,
             portalOrigin: window.location.origin,
             pairing,
           }),
-    [pairing],
+    [artifact, pairing],
   );
   const baseUrl = import.meta.env.BASE_URL.endsWith("/")
     ? import.meta.env.BASE_URL
@@ -219,8 +220,8 @@ export function FenixSetupPage() {
   };
 
   const copyPairCommand = async () => {
-    if (pairCommand === null) return;
-    await navigator.clipboard.writeText(pairCommand);
+    if (installCommand === null) return;
+    await navigator.clipboard.writeText(installCommand);
     setCopied(true);
   };
 
@@ -411,9 +412,10 @@ export function FenixSetupPage() {
                   <p className="break-all font-mono text-xs leading-5 text-white/42">
                     SHA-256: {artifact.sha256}
                   </p>
-                  {platform === "macos" ? (
+                  {platform === "macos" && installCommand === null ? (
                     <pre className="overflow-x-auto rounded-md border border-white/10 bg-black p-4 font-mono text-xs leading-6 text-[#bfdbfe]">
-                      {`cd ~/Downloads\ntar -xzf ${artifact.fileName}\ncd ${artifact.fileName.replace(/\.tar\.gz$/, "")}\n./install.sh`}
+                      Inicia sesión y genera abajo el comando seguro. El instalador no funciona sin
+                      una autorización Fenix vigente.
                     </pre>
                   ) : null}
                 </div>
@@ -423,8 +425,8 @@ export function FenixSetupPage() {
                 {[
                   [
                     "1",
-                    "Descarga e instala",
-                    "Usa solo el paquete de esta página. No requiere acceso de administrador.",
+                    "Descarga el paquete",
+                    "Usa solo el paquete de esta página. Una copia no puede instalarse sin tu autorización Fenix.",
                   ],
                   [
                     "2",
@@ -433,8 +435,8 @@ export function FenixSetupPage() {
                   ],
                   [
                     "3",
-                    "Empareja el equipo",
-                    "Genera abajo un comando de un solo uso y ejecútalo desde esa carpeta.",
+                    "Autoriza e instala",
+                    "Genera abajo el comando de un solo uso. Al ejecutarlo te pedirá la ruta local exacta que quieres autorizar.",
                   ],
                   [
                     "4",
@@ -466,9 +468,10 @@ export function FenixSetupPage() {
                   <TerminalSquareIcon className="size-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold">Emparejar este equipo</h3>
+                  <h3 className="text-base font-semibold">Autorizar e instalar este equipo</h3>
                   <p className="mt-1 text-sm leading-6 text-white/52">
                     El comando caduca y queda vinculado a tu usuario, empresa, agente y dispositivo.
+                    Sin esta autorización la instalación se cancela sin dejar una copia utilizable.
                   </p>
                 </div>
               </div>
@@ -493,7 +496,7 @@ export function FenixSetupPage() {
                   onClick={() => void generatePairing()}
                   className="h-10 rounded-md bg-white px-4 text-sm font-semibold text-black disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {pairingBusy ? "Generando…" : "Generar comando"}
+                  {pairingBusy ? "Generando…" : "Generar instalación segura"}
                 </button>
               </div>
 
@@ -505,7 +508,7 @@ export function FenixSetupPage() {
                 </p>
               ) : null}
 
-              {pairCommand !== null && pairing !== null ? (
+              {installCommand !== null && pairing !== null ? (
                 <div className="mt-5">
                   <div className="flex items-center justify-between gap-3">
                     <span className="text-xs text-white/44">
@@ -525,7 +528,7 @@ export function FenixSetupPage() {
                     </button>
                   </div>
                   <pre className="mt-2 max-h-48 overflow-auto whitespace-pre-wrap break-all rounded-md border border-white/10 bg-[#0b0b0b] p-4 font-mono text-xs leading-6 text-[#bfdbfe]">
-                    {pairCommand}
+                    {installCommand}
                   </pre>
                   <p className="mt-3 text-xs leading-5 text-white/40">
                     No compartas este comando. Contiene una credencial de un solo uso.
