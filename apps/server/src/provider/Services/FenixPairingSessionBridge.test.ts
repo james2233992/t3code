@@ -3,8 +3,11 @@ import { afterEach, describe, expect, it, vi } from "@effect/vitest";
 import { ProviderInstanceId } from "@t3tools/contracts";
 import * as Effect from "effect/Effect";
 import * as FileSystem from "effect/FileSystem";
+import * as Layer from "effect/Layer";
 import * as Path from "effect/Path";
 
+import * as ServerConfig from "../../config.ts";
+import { writeFenixCompanionConfig } from "../../fenix/CompanionConfig.ts";
 import * as FenixPairingSessionBridge from "./FenixPairingSessionBridge.ts";
 
 const DEVICE_ID = "device-fenix-0001";
@@ -59,6 +62,7 @@ const resolveSnapshot = (
 describe("FenixPairingSessionBridge", () => {
   afterEach(() => {
     vi.unstubAllEnvs();
+    vi.unstubAllGlobals();
   });
 
   it.effect("issues an active bearer snapshot from the local companion endpoint", () =>
@@ -128,6 +132,39 @@ describe("FenixPairingSessionBridge", () => {
     }),
   );
 
+  it.effect("uses an exact trusted portal origin for a paired production companion", () =>
+    Effect.gen(function* () {
+      const requests: string[] = [];
+      const fetchMock = (async (url: Parameters<typeof fetch>[0]) => {
+        requests.push(String(url));
+        return Response.json(envelope());
+      }) as unknown as typeof fetch;
+
+      const trusted =
+        yield* FenixPairingSessionBridge.resolvePairingSessionSnapshotFromTrustedPortal({
+          baseUrl: "https://iaonline.io",
+          deviceId: DEVICE_ID,
+          deviceCredential: DEVICE_CREDENTIAL,
+          fetch: fetchMock,
+          nowEpochMs: () => 1,
+        });
+      const foreign =
+        yield* FenixPairingSessionBridge.resolvePairingSessionSnapshotFromTrustedPortal({
+          baseUrl: "https://evil.example",
+          deviceId: DEVICE_ID,
+          deviceCredential: DEVICE_CREDENTIAL,
+          fetch: fetchMock,
+          nowEpochMs: () => 1,
+        });
+
+      expect(trusted?.session).toEqual({ kind: "bearer", token: "fenix.access-token_1" });
+      expect(foreign).toBeNull();
+      expect(requests).toEqual([
+        `https://iaonline.io/api/v1/code-lab/companion/devices/${DEVICE_ID}/fenix-credential`,
+      ]);
+    }),
+  );
+
   it.effect("fails closed for expired, malformed, revoked, and rate-limited envelopes", () =>
     Effect.gen(function* () {
       const cases: ReadonlyArray<{
@@ -173,17 +210,37 @@ describe("FenixPairingSessionBridge", () => {
     }),
   );
 
-  it.effect("keeps the live layer unpaired without local companion configuration", () =>
+  it.effect("resolves the paired companion config through the trusted portal", () =>
     Effect.gen(function* () {
+      const fs = yield* FileSystem.FileSystem;
+      const stateDir = yield* fs.makeTempDirectoryScoped({ prefix: "fenix-live-bridge-" });
       vi.stubEnv("FENIX_CODE_COMPANION_BASE_URL", "");
       vi.stubEnv("FENIX_CODE_COMPANION_DEVICE_ID", "");
       vi.stubEnv("FENIX_CODE_COMPANION_DEVICE_CREDENTIAL_FILE", "");
-      const bridge = yield* FenixPairingSessionBridge.FenixPairingSessionBridge;
-      const snapshot = yield* bridge.resolvePairingSessionSnapshot({
-        instanceId: ProviderInstanceId.make("fenix"),
-      });
+      vi.stubGlobal("fetch", (async () => Response.json(envelope())) as unknown as typeof fetch);
+      yield* Effect.promise(() =>
+        writeFenixCompanionConfig(stateDir, {
+          version: 1,
+          portalOrigin: "https://iaonline.io",
+          deviceId: DEVICE_ID,
+          deviceName: "Fenix test companion",
+          deviceCredential: DEVICE_CREDENTIAL,
+          allowedRoots: [stateDir],
+        }),
+      );
+      const serverConfigLayer = ServerConfig.layer({
+        stateDir,
+      } as ServerConfig.ServerConfig["Service"]);
+      const snapshot = yield* Effect.gen(function* () {
+        const bridge = yield* FenixPairingSessionBridge.FenixPairingSessionBridge;
+        return yield* bridge.resolvePairingSessionSnapshot({
+          instanceId: ProviderInstanceId.make("fenix"),
+        });
+      }).pipe(
+        Effect.provide(FenixPairingSessionBridge.liveLayer.pipe(Layer.provide(serverConfigLayer))),
+      );
 
-      expect(snapshot).toBeNull();
-    }).pipe(Effect.provide(FenixPairingSessionBridge.liveLayer)),
+      expect(snapshot?.tenantScope).toEqual({ companyId: 5, userId: 10 });
+    }).pipe(Effect.provide(NodeServices.layer)),
   );
 });
