@@ -4503,8 +4503,8 @@
 ./scripts/export-brand-icons.ts:5:41:@t3tools
 ./scripts/fenix/build-companion-package.sh:122:17:Fenix Code
 ./scripts/fenix/build-companion-package.sh:60:50:t3code
-./scripts/fenix/check-mobile-release-config.mjs:22:42:T3CODE
-./scripts/fenix/check-mobile-release-config.mjs:78:27:Fenix Code
+./scripts/fenix/check-mobile-release-config.mjs:25:42:T3CODE
+./scripts/fenix/check-mobile-release-config.mjs:84:27:Fenix Code
 ./scripts/fenix/check-visible-branding.sh:136:20:T3 Tools
 ./scripts/fenix/companion-package/README.txt:28:3:Fenix Code
 ./scripts/fenix/companion-package/README.txt:4:68:Fenix Code

@@ -3964,7 +3964,7 @@
 ./scripts/dev-runner.ts:9:70:@t3tools
 ./scripts/export-brand-icons.ts:5:41:@t3tools
 ./scripts/fenix/build-companion-package.sh:60:50:t3code
-./scripts/fenix/check-mobile-release-config.mjs:22:42:T3CODE
+./scripts/fenix/check-mobile-release-config.mjs:25:42:T3CODE
 ./scripts/fenix/companion-package/fenix-code:14:8:T3CODE
 ./scripts/fenix/f1-2c-bridge-e2e.mjs:8:62:@t3tools
 ./scripts/fenix/generate-branding-inventory.sh:53:59:t3code
