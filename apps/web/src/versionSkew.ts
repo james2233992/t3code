@@ -59,7 +59,8 @@ export function resolveServerSelfUpdateCapability(
 
 /** The command to hand users whose server cannot update itself. */
 export function manualServerUpdateCommand(targetVersion: string): string {
-  return `npx t3@${targetVersion}`;
+  void targetVersion;
+  return "fenix-code service update";
 }
 
 /** One sentence telling the user how to resolve version skew for a server,

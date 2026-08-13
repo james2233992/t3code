@@ -41,34 +41,42 @@ it("treats stable installs as direct invocations", () => {
   assert.isNull(detectCliRunner(""));
 });
 
-it("re-suggests the nightly channel only for nightly builds", () => {
-  assert.equal(suggestedPackageSpec("0.0.31-nightly.20260729"), "t3@nightly");
-  assert.equal(suggestedPackageSpec("0.0.31"), "t3");
+it("uses the Fenix Code binary alias for every release channel", () => {
+  assert.equal(suggestedPackageSpec("0.0.31-nightly.20260729"), "fenix-code");
+  assert.equal(suggestedPackageSpec("0.0.31"), "fenix-code");
 });
 
-it("formats serve suggestions to match the launching command", () => {
-  assert.equal(
+it("fails closed instead of suggesting an untrusted package after ephemeral runners exit", () => {
+  assert.isNull(
     formatCliCommand({
       subcommand: "serve",
       entryPath: "/home/theo/.npm/_npx/abc/node_modules/t3/dist/bin.mjs",
       version: "0.0.31-nightly.20260729",
     }),
-    "npx t3@nightly serve",
   );
-  assert.equal(
+  assert.isNull(
     formatCliCommand({
       subcommand: "serve",
       entryPath: "/tmp/bunx-1000-t3@latest/node_modules/t3/dist/bin.mjs",
       version: "0.0.31",
     }),
-    "bunx t3 serve",
   );
+  assert.isNull(
+    formatCliCommand({
+      subcommand: "serve",
+      entryPath: "/home/theo/.cache/pnpm/dlx/abc/node_modules/t3/dist/bin.mjs",
+      version: "0.0.31",
+    }),
+  );
+});
+
+it("uses the Fenix Code alias for durable local installations", () => {
   assert.equal(
     formatCliCommand({
       subcommand: "serve",
       entryPath: "/usr/local/lib/node_modules/t3/dist/bin.mjs",
       version: "0.0.31-nightly.20260729",
     }),
-    "t3 serve",
+    "fenix-code serve",
   );
 });

@@ -118,7 +118,12 @@ function RootRouteView() {
     };
   }, [pathname]);
 
-  if (pathname === "/pair" || pathname === "/connect" || pathname.startsWith("/connect/")) {
+  if (
+    pathname === "/pair" ||
+    pathname === "/setup" ||
+    pathname === "/connect" ||
+    pathname.startsWith("/connect/")
+  ) {
     return (
       <>
         <DocumentTitleSync />

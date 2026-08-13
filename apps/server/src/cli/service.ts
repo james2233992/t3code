@@ -48,17 +48,17 @@ export function formatServiceStatus(
   cliVersion: string,
 ): string {
   if (!status.supported) {
-    return "Fenix Code service\n  Status: unavailable on this machine\n  Supported on: Linux with systemd";
+    return "Fenix Code service\n  Status: unavailable on this machine\n  Supported on: Linux with systemd or macOS with launchd";
   }
   if (!status.installed) {
-    return "Fenix Code service\n  Status: not installed\n  Next: Run `t3 service install`.";
+    return "Fenix Code service\n  Status: not installed\n  Next: Run `fenix-code service install`.";
   }
   return [
     "Fenix Code service",
-    `  Status: ${status.current ? `installed · t3@${cliVersion}` : "needs an update or repair"}`,
+    `  Status: ${status.current ? `installed · Fenix Code v${cliVersion}` : "needs an update or repair"}`,
     `  Unit: ${status.unitPath}`,
     `  Logs: ${status.logPath}`,
-    ...(status.current ? [] : ["  Next: Run `npx t3@latest service update`."]),
+    ...(status.current ? [] : ["  Next: Run `fenix-code service update`."]),
   ].join("\n");
 }
 
@@ -80,12 +80,12 @@ const serviceInstallCommand = Command.make("install", projectLocationFlags).pipe
         const result = yield* reconcileService();
         if (!result.changed) {
           yield* Console.log(
-            `Fenix Code service is already installed with t3@${packageJson.version}.`,
+            `Fenix Code service is already installed with Fenix Code v${packageJson.version}.`,
           );
           return;
         }
         yield* Console.log(
-          `${result.previouslyInstalled ? "Updated" : "Installed"} Fenix Code service with t3@${packageJson.version}.\nLogs: ${result.plan.logPath}`,
+          `${result.previouslyInstalled ? "Updated" : "Installed"} Fenix Code service v${packageJson.version}.\nLogs: ${result.plan.logPath}`,
         );
       }),
     ),
@@ -94,7 +94,7 @@ const serviceInstallCommand = Command.make("install", projectLocationFlags).pipe
 
 const serviceUpdateCommand = Command.make("update", projectLocationFlags).pipe(
   Command.withDescription(
-    "Update or repair the background service using this CLI version. Use `npx t3@latest service update` for the latest release.",
+    "Update or repair the Fenix Code background service using this CLI version.",
   ),
   Command.withHandler((flags) =>
     runServiceCommand(
@@ -102,11 +102,13 @@ const serviceUpdateCommand = Command.make("update", projectLocationFlags).pipe(
       Effect.gen(function* () {
         const result = yield* reconcileService();
         if (!result.changed) {
-          yield* Console.log(`Fenix Code service is already using t3@${packageJson.version}.`);
+          yield* Console.log(
+            `Fenix Code service is already using Fenix Code v${packageJson.version}.`,
+          );
           return;
         }
         yield* Console.log(
-          `${result.previouslyInstalled ? "Updated" : "Installed"} Fenix Code service with t3@${packageJson.version}.\nLogs: ${result.plan.logPath}`,
+          `${result.previouslyInstalled ? "Updated" : "Installed"} Fenix Code service v${packageJson.version}.\nLogs: ${result.plan.logPath}`,
         );
       }),
     ),

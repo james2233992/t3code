@@ -219,13 +219,13 @@ describe("Fenix portal companion API", () => {
         body: JSON.stringify({ agentId: 9, deviceName: "Juan Carlos's Mac" }),
       }),
     );
-    expect(
-      buildFenixCompanionPairCommand({
-        portalOrigin: PORTAL_URL.origin,
-        pairing,
-      }),
-    ).toBe(
-      `t3 fenix pair --portal 'https://iaonline.io' --attempt-id '${"a".repeat(32)}' --pairing-token '${"p".repeat(43)}' --allow-root "$PWD"`,
+    const command = buildFenixCompanionPairCommand({
+      portalOrigin: PORTAL_URL.origin,
+      pairing,
+    });
+    expect(command).toBe(
+      `fenix-code fenix pair --portal 'https://iaonline.io' --attempt-id '${"a".repeat(32)}' --pairing-token '${"p".repeat(43)}' --allow-root "$PWD"`,
     );
+    expect(command).not.toMatch(/\bt3\b/i);
   });
 });

@@ -28,6 +28,8 @@ import {
 const BOOT_SERVICE_NAME = "t3code";
 export const BOOT_SERVICE_UNIT_FILE = `${BOOT_SERVICE_NAME}.service`;
 export const BOOT_SERVICE_UNIT_ENV = "T3_BOOT_SERVICE_UNIT";
+export const BOOT_SERVICE_LAUNCHD_LABEL = "io.aiworks.fenix-code";
+export const BOOT_SERVICE_LAUNCHD_FILE = `${BOOT_SERVICE_LAUNCHD_LABEL}.plist`;
 
 /** systemd expands `%` specifiers, including in unquoted append-log paths. */
 export function escapeSystemdSpecifiers(value: string): string {
@@ -41,10 +43,21 @@ export function quoteSystemdValue(value: string): string {
     : escaped;
 }
 
+function escapePlistValue(value: string): string {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&apos;");
+}
+
 export interface BootServicePlan {
   readonly nodePath: string;
   readonly launcherPath: string;
   readonly baseDir: string;
+  readonly homeDir?: string;
+  readonly pathEnvironment?: string;
   readonly logPath: string;
   readonly unitPath: string;
 }
@@ -78,12 +91,60 @@ export function renderBootServiceUnit(plan: BootServicePlan): string {
   ].join("\n");
 }
 
+/** Pure renderer: launchd receives argv directly and never invokes a shell. */
+export function renderBootServiceLaunchdPlist(plan: BootServicePlan): string {
+  const stringEntry = (value: string) => `    <string>${escapePlistValue(value)}</string>`;
+  const homeDir = plan.homeDir ?? "";
+  const pathEnvironment = plan.pathEnvironment ?? "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+  return [
+    '<?xml version="1.0" encoding="UTF-8"?>',
+    '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">',
+    '<plist version="1.0">',
+    "<dict>",
+    "  <key>Label</key>",
+    stringEntry(BOOT_SERVICE_LAUNCHD_LABEL),
+    "  <key>ProgramArguments</key>",
+    "  <array>",
+    stringEntry(plan.nodePath),
+    stringEntry(plan.launcherPath),
+    "  </array>",
+    ...(homeDir === "" ? [] : ["  <key>WorkingDirectory</key>", stringEntry(homeDir)]),
+    "  <key>EnvironmentVariables</key>",
+    "  <dict>",
+    ...(homeDir === "" ? [] : ["    <key>HOME</key>", stringEntry(homeDir)]),
+    "    <key>PATH</key>",
+    stringEntry(pathEnvironment),
+    "    <key>T3CODE_HOME</key>",
+    stringEntry(plan.baseDir),
+    `    <key>${BOOT_SERVICE_UNIT_ENV}</key>`,
+    stringEntry(BOOT_SERVICE_LAUNCHD_FILE),
+    "  </dict>",
+    "  <key>RunAtLoad</key>",
+    "  <true/>",
+    "  <key>KeepAlive</key>",
+    "  <true/>",
+    "  <key>ProcessType</key>",
+    "  <string>Background</string>",
+    "  <key>ThrottleInterval</key>",
+    "  <integer>5</integer>",
+    "  <key>Umask</key>",
+    "  <integer>63</integer>",
+    "  <key>StandardOutPath</key>",
+    stringEntry(plan.logPath),
+    "  <key>StandardErrorPath</key>",
+    stringEntry(plan.logPath),
+    "</dict>",
+    "</plist>",
+    "",
+  ].join("\n");
+}
+
 export class BootServiceUnsupportedError extends Schema.TaggedErrorClass<BootServiceUnsupportedError>()(
   "BootServiceUnsupportedError",
   { platform: Schema.String },
 ) {
   override get message(): string {
-    return `Background setup currently supports Linux with systemd; this machine reports '${this.platform}'.`;
+    return `Background setup supports Linux with systemd and macOS with launchd; this machine reports '${this.platform}'.`;
   }
 }
 
@@ -148,6 +209,7 @@ export class BootService extends Context.Service<
 export interface BootServiceHost {
   readonly execPath: string;
   readonly launcherSourcePath?: string;
+  readonly userId?: number;
 }
 
 export const make = Effect.fn("cloud.boot_service.make")(function* (input: {
@@ -159,13 +221,23 @@ export const make = Effect.fn("cloud.boot_service.make")(function* (input: {
   const hostExecPath = yield* HostProcessExecutablePath;
   const platform = yield* HostProcessPlatform;
   const homeDir = yield* Config.string("HOME").pipe(Config.withDefault(""));
+  const pathEnvironment = yield* Config.string("PATH").pipe(
+    Config.withDefault("/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"),
+  );
   const fs = yield* FileSystem.FileSystem;
   const path = yield* Path.Path;
   const runner = yield* ProcessRunner.ProcessRunner;
   const host = input.host ?? { execPath: hostExecPath };
+  const userId = host.userId ?? process.getuid?.();
+  const launchdDomain = userId === undefined ? "" : `gui/${userId}`;
 
-  const unitDir = path.join(homeDir, ".config", "systemd", "user");
-  const unitPath = path.join(unitDir, BOOT_SERVICE_UNIT_FILE);
+  const systemdUnitDir = path.join(homeDir, ".config", "systemd", "user");
+  const launchdUnitDir = path.join(homeDir, "Library", "LaunchAgents");
+  const unitDir = platform === "darwin" ? launchdUnitDir : systemdUnitDir;
+  const unitPath = path.join(
+    unitDir,
+    platform === "darwin" ? BOOT_SERVICE_LAUNCHD_FILE : BOOT_SERVICE_UNIT_FILE,
+  );
   const logPath = path.join(input.logsDir, "boot-service.log");
   const launcherPath = path.join(input.baseDir, "runtime", SERVICE_LAUNCHER_FILE);
   const statePath = path.join(input.baseDir, "runtime", SERVICE_STATE_FILE);
@@ -189,12 +261,18 @@ export const make = Effect.fn("cloud.boot_service.make")(function* (input: {
     nodePath: host.execPath,
     launcherPath,
     baseDir: input.baseDir,
+    homeDir,
+    pathEnvironment,
     logPath,
     unitPath,
   };
 
-  const requireSystemdLinux = Effect.gen(function* () {
-    if (platform !== "linux" || homeDir === "") {
+  const requireSupportedPlatform = Effect.gen(function* () {
+    if (
+      (platform !== "linux" && platform !== "darwin") ||
+      homeDir === "" ||
+      (platform === "darwin" && launchdDomain === "")
+    ) {
       return yield* new BootServiceUnsupportedError({ platform });
     }
   });
@@ -231,7 +309,7 @@ export const make = Effect.fn("cloud.boot_service.make")(function* (input: {
   });
 
   const install: BootService["Service"]["install"] = Effect.gen(function* () {
-    yield* requireSystemdLinux;
+    yield* requireSupportedPlatform;
     yield* fs
       .makeDirectory(input.logsDir, { recursive: true })
       .pipe(Effect.mapError((cause) => new BootServiceInstallError({ cause })));
@@ -293,11 +371,19 @@ export const make = Effect.fn("cloud.boot_service.make")(function* (input: {
       .exists(unitPath)
       .pipe(Effect.mapError((cause) => new BootServiceInstallError({ cause })));
     if (installed) {
-      yield* runStep("stopping the installed service", "systemctl", [
-        "--user",
-        "stop",
-        BOOT_SERVICE_UNIT_FILE,
-      ]);
+      if (platform === "darwin") {
+        yield* runStep("stopping the installed launchd agent", "launchctl", [
+          "bootout",
+          launchdDomain,
+          unitPath,
+        ]).pipe(Effect.ignore);
+      } else {
+        yield* runStep("stopping the installed service", "systemctl", [
+          "--user",
+          "stop",
+          BOOT_SERVICE_UNIT_FILE,
+        ]);
+      }
     }
 
     yield* Effect.gen(function* () {
@@ -326,29 +412,47 @@ export const make = Effect.fn("cloud.boot_service.make")(function* (input: {
           2,
         )}\n`,
       );
-      yield* writeDurably(unitPath, renderBootServiceUnit(plan));
+      yield* writeDurably(
+        unitPath,
+        platform === "darwin" ? renderBootServiceLaunchdPlist(plan) : renderBootServiceUnit(plan),
+      );
 
-      yield* runStep("reloading systemd user units", "systemctl", ["--user", "daemon-reload"]);
-      yield* runStep("enabling the service", "systemctl", [
-        "--user",
-        "enable",
-        BOOT_SERVICE_UNIT_FILE,
-      ]);
-      yield* runStep("enabling lingering for this user", "loginctl", ["enable-linger"]);
-      // Start last. No administrative state write occurs after this succeeds.
-      yield* runStep("starting the service", "systemctl", [
-        "--user",
-        "restart",
-        BOOT_SERVICE_UNIT_FILE,
-      ]);
+      if (platform === "darwin") {
+        // Bootstrap last. No local state write occurs after this succeeds.
+        yield* runStep("starting the launchd agent", "launchctl", [
+          "bootstrap",
+          launchdDomain,
+          unitPath,
+        ]);
+      } else {
+        yield* runStep("reloading systemd user units", "systemctl", ["--user", "daemon-reload"]);
+        yield* runStep("enabling the service", "systemctl", [
+          "--user",
+          "enable",
+          BOOT_SERVICE_UNIT_FILE,
+        ]);
+        yield* runStep("enabling lingering for this user", "loginctl", ["enable-linger"]);
+        // Start last. No administrative state write occurs after this succeeds.
+        yield* runStep("starting the service", "systemctl", [
+          "--user",
+          "restart",
+          BOOT_SERVICE_UNIT_FILE,
+        ]);
+      }
     }).pipe(
       Effect.tapError(() =>
         installed
-          ? runStep("restarting the service after a failed update", "systemctl", [
-              "--user",
-              "restart",
-              BOOT_SERVICE_UNIT_FILE,
-            ]).pipe(Effect.ignore)
+          ? platform === "darwin"
+            ? runStep("restarting the service after a failed update", "launchctl", [
+                "bootstrap",
+                launchdDomain,
+                unitPath,
+              ]).pipe(Effect.ignore)
+            : runStep("restarting the service after a failed update", "systemctl", [
+                "--user",
+                "restart",
+                BOOT_SERVICE_UNIT_FILE,
+              ]).pipe(Effect.ignore)
           : Effect.void,
       ),
     );
@@ -356,28 +460,42 @@ export const make = Effect.fn("cloud.boot_service.make")(function* (input: {
   }).pipe(Effect.withSpan("cloud.boot_service.install"));
 
   const uninstall: BootService["Service"]["uninstall"] = Effect.gen(function* () {
-    yield* requireSystemdLinux;
+    yield* requireSupportedPlatform;
     if (
       !(yield* fs
         .exists(unitPath)
         .pipe(Effect.mapError((cause) => new BootServiceInstallError({ cause }))))
     )
       return false;
-    yield* runStep("stopping the service", "systemctl", [
-      "--user",
-      "disable",
-      "--now",
-      BOOT_SERVICE_UNIT_FILE,
-    ]);
+    if (platform === "darwin") {
+      yield* runStep("stopping the launchd agent", "launchctl", [
+        "bootout",
+        launchdDomain,
+        unitPath,
+      ]).pipe(Effect.ignore);
+    } else {
+      yield* runStep("stopping the service", "systemctl", [
+        "--user",
+        "disable",
+        "--now",
+        BOOT_SERVICE_UNIT_FILE,
+      ]);
+    }
     yield* fs
       .remove(unitPath)
       .pipe(Effect.mapError((cause) => new BootServiceInstallError({ cause })));
-    yield* runStep("reloading systemd user units", "systemctl", ["--user", "daemon-reload"]);
+    if (platform === "linux") {
+      yield* runStep("reloading systemd user units", "systemctl", ["--user", "daemon-reload"]);
+    }
     return true;
   }).pipe(Effect.withSpan("cloud.boot_service.uninstall"));
 
   const status: BootService["Service"]["status"] = Effect.gen(function* () {
-    if (platform !== "linux" || homeDir === "") {
+    if (
+      (platform !== "linux" && platform !== "darwin") ||
+      homeDir === "" ||
+      (platform === "darwin" && launchdDomain === "")
+    ) {
       return { supported: false, installed: false, current: false, unitPath, logPath };
     }
     if (!(yield* fs.exists(unitPath))) {
@@ -396,7 +514,10 @@ export const make = Effect.fn("cloud.boot_service.make")(function* (input: {
       supported: true,
       installed: true,
       current:
-        unit === renderBootServiceUnit(plan) &&
+        unit ===
+          (platform === "darwin"
+            ? renderBootServiceLaunchdPlist(plan)
+            : renderBootServiceUnit(plan)) &&
         launcherExists &&
         runtimeEntryExists &&
         Option.isSome(runtimeSentinel) &&

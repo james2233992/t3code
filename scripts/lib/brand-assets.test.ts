@@ -36,6 +36,9 @@ describe("brand-assets", () => {
       sourceRelativePath: BRAND_ASSET_PATHS.developmentWebFaviconIco,
       targetRelativePath: "dist/client/favicon.ico",
     });
+    expect(BRAND_ASSET_PATHS.developmentWebFaviconIco).toBe(
+      BRAND_ASSET_PATHS.productionWebFaviconIco,
+    );
   });
 
   it("maps development web assets to the public splash and favicon files", () => {

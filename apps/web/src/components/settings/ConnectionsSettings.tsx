@@ -2491,7 +2491,7 @@ export function ConnectionsSettings() {
           </Button>
           <p className="text-[11px] leading-relaxed text-muted-foreground">
             After the companion connects, Add Project keeps the original folder and Git URL flows.
-            Add more roots locally with <code>t3 fenix root add &lt;folder&gt;</code>.
+            Add more roots locally with <code>fenix-code fenix root add &lt;folder&gt;</code>.
           </p>
         </div>
       )}

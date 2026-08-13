@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+version="__FENIX_CODE_VERSION__"
+base_dir="${FENIX_CODE_HOME:-${HOME}/.fenix-code}"
+node_path="${base_dir}/runtime/node/bin/node"
+entry_path="${base_dir}/runtime/versions/${version}/node_modules/t3/dist/bin.mjs"
+
+if [[ ! -x "$node_path" || ! -f "$entry_path" ]]; then
+  echo "Fenix Code no esta instalado correctamente. Vuelve a ejecutar install.sh." >&2
+  exit 70
+fi
+
+export T3CODE_HOME="$base_dir"
+exec "$node_path" "$entry_path" "$@"

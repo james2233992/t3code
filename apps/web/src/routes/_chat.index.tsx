@@ -1,6 +1,6 @@
 import { scopeProjectRef } from "@t3tools/client-runtime/environment";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { LinkIcon, PlusIcon, RotateCcwIcon } from "lucide-react";
+import { LaptopIcon, LinkIcon, PlusIcon, RotateCcwIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { openCommandPalette } from "../commandPaletteBus";
@@ -17,6 +17,7 @@ import {
 import { useEnvironments } from "../state/environments";
 import { APP_DISPLAY_NAME } from "~/branding";
 import { hasCloudPublicConfig } from "~/cloud/publicConfig";
+import { isFenixPortalEmbeddedApp } from "~/connection/fenixPortal";
 import { cn } from "~/lib/utils";
 import { COLLAPSED_SIDEBAR_TITLEBAR_INSET_CLASS } from "~/workspaceTitlebar";
 
@@ -139,6 +140,7 @@ export const Route = createFileRoute("/_chat/")({
 
 function HostedStaticOnboardingState() {
   const cloudEnabled = hasCloudPublicConfig();
+  const fenixPortal = isFenixPortalEmbeddedApp(new URL(window.location.href));
 
   return (
     <SidebarInset className="h-dvh min-h-0 overflow-hidden overscroll-y-none bg-background text-foreground">
@@ -170,7 +172,13 @@ function HostedStaticOnboardingState() {
                   ? "Sign in to Fenix Connect to connect a linked environment through its managed tunnel, or add a reachable backend manually."
                   : "Add a reachable backend manually to start working from this browser."}
               </EmptyDescription>
-              <div className="mt-6 flex justify-center">
+              <div className="mt-6 flex flex-wrap justify-center gap-2">
+                {fenixPortal ? (
+                  <Button render={<Link to="/setup" />} size="sm" variant="outline">
+                    <LaptopIcon className="size-4" />
+                    Configurar este equipo
+                  </Button>
+                ) : null}
                 <Button render={<Link to="/settings/connections" />} size="sm">
                   <PlusIcon className="size-4" />
                   {cloudEnabled ? "Open Connections" : "Add environment"}

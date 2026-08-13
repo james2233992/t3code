@@ -15,7 +15,7 @@ it("reports the installed service version and host paths", () => {
     formatServiceStatus(status, "0.0.29"),
     [
       "Fenix Code service",
-      "  Status: installed · t3@0.0.29",
+      "  Status: installed · Fenix Code v0.0.29",
       "  Unit: /home/me/.config/systemd/user/t3code.service",
       "  Logs: /home/me/.t3/userdata/logs/boot-service.log",
     ].join("\n"),
@@ -25,13 +25,13 @@ it("reports the installed service version and host paths", () => {
 it("gives a direct repair command for a stale service", () => {
   assert.include(
     formatServiceStatus({ ...status, current: false }, "0.0.29"),
-    "Next: Run `npx t3@latest service update`.",
+    "Next: Run `fenix-code service update`.",
   );
 });
 
-it("explains service availability without systemd", () => {
+it("explains service availability without a supported service manager", () => {
   assert.include(
     formatServiceStatus({ ...status, supported: false, installed: false }, "0.0.29"),
-    "Supported on: Linux with systemd",
+    "Supported on: Linux with systemd or macOS with launchd",
   );
 });
