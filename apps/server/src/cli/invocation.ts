@@ -16,7 +16,8 @@ export type CliRunner = "npx" | "pnpm dlx" | "bunx";
  *   bunx     ~/.bun/install/cache/... or $TMPDIR/bunx-<uid>-<spec>/...
  *
  * Global installs and repo checkouts match none of these and return null.
- * Detection is best-effort; callers must fail closed to a plain `t3` command.
+ * Detection is best-effort; Fenix-facing suggestions always use the branded
+ * binary alias exposed by this fork.
  */
 export function detectCliRunner(entryPath: string): CliRunner | null {
   const path = entryPath.replaceAll("\\", "/");
@@ -43,25 +44,25 @@ export function detectCliRunner(entryPath: string): CliRunner | null {
  * anything else suggests the bare package.
  */
 export function suggestedPackageSpec(version: string): string {
-  return version.includes("-nightly.") ? "t3@nightly" : "t3";
+  void version;
+  return "fenix-code";
 }
 
 /**
- * Render a `t3 <subcommand>` suggestion that matches how this process was
- * launched, so copy/pasting it actually works: `npx t3 connect` suggests
- * `npx t3 serve`, a global install suggests `t3 serve`, and a nightly build
- * keeps the `@nightly` tag.
+ * Render a Fenix Code command for a durable local installation. Package-runner
+ * aliases disappear with the ephemeral process, and there is no trusted public
+ * Fenix Code package to re-download, so those launches fail closed to null.
  */
 export function formatCliCommand(input: {
   readonly subcommand: string;
   readonly entryPath: string;
   readonly version: string;
-}): string {
-  const runner = detectCliRunner(input.entryPath);
-  if (runner === null) {
-    return `t3 ${input.subcommand}`;
+}): string | null {
+  void input.version;
+  if (detectCliRunner(input.entryPath) !== null) {
+    return null;
   }
-  return `${runner} ${suggestedPackageSpec(input.version)} ${input.subcommand}`;
+  return `fenix-code ${input.subcommand}`;
 }
 
 /** `formatCliCommand` against this process's real entry path and version. */

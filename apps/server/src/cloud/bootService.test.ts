@@ -35,6 +35,28 @@ it("keeps systemd pinned to the stable launcher rather than a versioned server",
   expect(unit).not.toContain("versions/1.2.3");
 });
 
+it("renders a launchd agent with direct argv and escaped values", () => {
+  const plist = BootService.renderBootServiceLaunchdPlist({
+    nodePath: "/Applications/Fenix & Node/node",
+    launcherPath: "/Users/test/.t3/runtime/service-launcher.mjs",
+    baseDir: "/Users/test/.t3",
+    homeDir: "/Users/test",
+    pathEnvironment: "/opt/homebrew/bin:/usr/bin:/bin",
+    logPath: "/Users/test/Fenix <logs>/boot-service.log",
+    unitPath: "/Users/test/Library/LaunchAgents/io.aiworks.fenix-code.plist",
+  });
+
+  expect(plist).toContain("<string>io.aiworks.fenix-code</string>");
+  expect(plist).toContain("<string>/Applications/Fenix &amp; Node/node</string>");
+  expect(plist).toContain("<string>/Users/test/Fenix &lt;logs&gt;/boot-service.log</string>");
+  expect(plist).toContain("<key>WorkingDirectory</key>\n    <string>/Users/test</string>");
+  expect(plist).toContain("<key>HOME</key>\n    <string>/Users/test</string>");
+  expect(plist).toContain("<key>PATH</key>\n    <string>/opt/homebrew/bin:/usr/bin:/bin</string>");
+  expect(plist).toContain("<key>Umask</key>\n  <integer>63</integer>");
+  expect(plist).toContain("<key>KeepAlive</key>\n  <true/>");
+  expect(plist).not.toContain("sh -c");
+});
+
 const makeHarness = Effect.fn("test.make_boot_service_harness")(function* (
   platform: NodeJS.Platform = "linux",
   usePinnedLauncher = false,
@@ -78,6 +100,7 @@ const makeHarness = Effect.fn("test.make_boot_service_harness")(function* (
     cliVersion: "1.2.3",
     host: {
       execPath: "/usr/bin/node",
+      userId: 501,
       ...(usePinnedLauncher ? {} : { launcherSourcePath: sourceLauncher }),
     },
   }).pipe(
@@ -137,6 +160,26 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
     }),
   );
 
+  it.effect("installs, reports, and uninstalls a macOS launchd agent", () =>
+    Effect.gen(function* () {
+      const { service, fs, commands } = yield* makeHarness("darwin");
+      const plan = yield* service.install;
+
+      expect(plan.unitPath).toContain("Library/LaunchAgents/io.aiworks.fenix-code.plist");
+      expect(yield* fs.readFileString(plan.unitPath)).toBe(
+        BootService.renderBootServiceLaunchdPlist(plan),
+      );
+      expect(commands.filter((command) => command.startsWith("launchctl "))).toEqual([
+        `launchctl bootstrap gui/501 ${plan.unitPath}`,
+      ]);
+      expect((yield* service.status).current).toBe(true);
+
+      commands.length = 0;
+      expect(yield* service.uninstall).toBe(true);
+      expect(commands).toEqual([`launchctl bootout gui/501 ${plan.unitPath}`]);
+    }),
+  );
+
   it.effect("restarts an installed service when repair fails", () =>
     Effect.gen(function* () {
       const { service, commands, control } = yield* makeHarness();
@@ -181,9 +224,9 @@ it.layer(NodeServices.layer)("boot service install", (it) => {
     }),
   );
 
-  it.effect("fails closed off Linux", () =>
+  it.effect("fails closed off Linux and macOS", () =>
     Effect.gen(function* () {
-      const { service } = yield* makeHarness("darwin");
+      const { service } = yield* makeHarness("win32");
       expect((yield* service.status).supported).toBe(false);
       expect((yield* service.install.pipe(Effect.flip))._tag).toBe("BootServiceUnsupportedError");
     }),

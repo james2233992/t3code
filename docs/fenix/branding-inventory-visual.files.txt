@@ -85,6 +85,9 @@ assets/nightly/nightly-web-favicon-16x16.png
 assets/nightly/nightly-web-favicon-32x32.png
 assets/nightly/nightly-web-favicon.ico
 assets/prod/app-icon.icon/icon.json
+assets/prod/fenix-web-favicon-16x16.png
+assets/prod/fenix-web-favicon-32x32.png
+assets/prod/fenix-web-favicon.ico
 assets/prod/logo.svg
 assets/prod/t3-black-web-favicon-16x16.png
 assets/prod/t3-black-web-favicon-32x32.png

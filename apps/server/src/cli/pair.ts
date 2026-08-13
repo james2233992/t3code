@@ -78,7 +78,7 @@ export class NoRunningServerError extends Schema.TaggedErrorClass<NoRunningServe
     return [
       "No running Fenix Code server found.",
       ...this.checkedStatePaths.map((statePath) => `  checked ${statePath}`),
-      "Start one with `npx t3 serve`, or connect this machine with Fenix Connect: `npx t3 connect`.",
+      "Start one with `fenix-code serve`, or connect this machine with Fenix Connect: `fenix-code connect`.",
     ].join("\n");
   }
 }

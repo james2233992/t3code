@@ -228,7 +228,7 @@ export function buildFenixCompanionPairCommand(input: {
   readonly pairing: FenixPortalPairing;
 }): string {
   return [
-    "t3 fenix pair",
+    "fenix-code fenix pair",
     `--portal ${shellQuote(new URL(input.portalOrigin).origin)}`,
     `--attempt-id ${shellQuote(input.pairing.attemptId)}`,
     `--pairing-token ${shellQuote(input.pairing.pairingToken)}`,

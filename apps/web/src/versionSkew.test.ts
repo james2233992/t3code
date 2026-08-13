@@ -10,6 +10,7 @@ import {
   resolveServerConfigVersionMismatch,
   resolveServerSelfUpdateCapability,
   resolveVersionMismatch,
+  manualServerUpdateCommand,
   serverUpdateGuidance,
 } from "./versionSkew";
 
@@ -106,5 +107,9 @@ describe("versionSkew", () => {
     expect(serverUpdateGuidance(null, "Local server")).toBe(
       "Relaunch the Local server with the copied command to sync them.",
     );
+  });
+
+  it("never suggests the upstream package for manual updates", () => {
+    expect(manualServerUpdateCommand("9.9.9")).toBe("fenix-code service update");
   });
 });
