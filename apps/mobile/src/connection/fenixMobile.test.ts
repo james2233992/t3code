@@ -26,6 +26,7 @@ vi.mock("expo-secure-store", () => ({
 }));
 
 import {
+  authorizeFenixMobileController,
   fenixMobileSocket,
   fenixMobileTargetRegistration,
   isFenixMobilePairingUrl,
@@ -135,6 +136,53 @@ describe("Fenix mobile controller", () => {
       }),
     );
   });
+
+  it("keeps the app locked when no Fenix device credential exists", async () => {
+    const storage = {
+      getItemAsync: vi.fn(async () => null),
+      setItemAsync: vi.fn(async () => undefined),
+      deleteItemAsync: vi.fn(async () => undefined),
+    };
+    const fetchImpl = vi.fn<typeof fetch>();
+
+    await expect(authorizeFenixMobileController({ storage, fetchImpl })).resolves.toBeNull();
+    expect(fetchImpl).not.toHaveBeenCalled();
+  });
+
+  it("authorizes startup only after Fenix validates the stored device credential", async () => {
+    const storage = {
+      getItemAsync: vi.fn(async () => JSON.stringify(controller)),
+      setItemAsync: vi.fn(async () => undefined),
+      deleteItemAsync: vi.fn(async () => undefined),
+    };
+    const fetchImpl = vi.fn<typeof fetch>().mockResolvedValueOnce(
+      new Response(JSON.stringify({ targets: [] }), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+
+    await expect(authorizeFenixMobileController({ storage, fetchImpl })).resolves.toEqual({
+      controller,
+      targets: [],
+    });
+    expect(storage.deleteItemAsync).not.toHaveBeenCalled();
+  });
+
+  it.each([401, 403])(
+    "revokes local app access after Fenix rejects the device with HTTP %s",
+    async (status) => {
+      const storage = {
+        getItemAsync: vi.fn(async () => JSON.stringify(controller)),
+        setItemAsync: vi.fn(async () => undefined),
+        deleteItemAsync: vi.fn(async () => undefined),
+      };
+      const fetchImpl = vi.fn<typeof fetch>().mockResolvedValueOnce(new Response(null, { status }));
+
+      await expect(authorizeFenixMobileController({ storage, fetchImpl })).resolves.toBeNull();
+      expect(storage.deleteItemAsync).toHaveBeenCalledTimes(1);
+    },
+  );
 
   it("uses a short-lived ticket for the selected local Companion", async () => {
     const fetchImpl = vi.fn<typeof fetch>().mockResolvedValueOnce(
