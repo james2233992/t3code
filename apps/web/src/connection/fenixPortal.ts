@@ -44,6 +44,7 @@ export interface FenixPortalDevice {
   readonly deviceName: string;
   readonly capabilities: ReadonlyArray<string>;
   readonly revoked: boolean;
+  readonly connected: boolean;
 }
 
 export interface FenixPortalBrowserTicket {
@@ -165,7 +166,8 @@ export async function listFenixPortalDevices(input: {
       typeof device.deviceName !== "string" ||
       !Array.isArray(device.capabilities) ||
       device.capabilities.some((value) => typeof value !== "string") ||
-      typeof device.revoked !== "boolean"
+      typeof device.revoked !== "boolean" ||
+      typeof device.connected !== "boolean"
     ) {
       return [];
     }
@@ -175,6 +177,7 @@ export async function listFenixPortalDevices(input: {
         deviceName: device.deviceName,
         capabilities: device.capabilities as ReadonlyArray<string>,
         revoked: device.revoked,
+        connected: device.connected,
       },
     ];
   });
@@ -331,4 +334,12 @@ export function fenixPortalDeviceRegistration(
       deviceId: device.deviceId,
     }),
   });
+}
+
+export function fenixPortalConnectedDeviceRegistrations(
+  devices: ReadonlyArray<FenixPortalDevice>,
+): ReadonlyArray<PlatformConnectionRegistration> {
+  return devices
+    .filter((device) => device.connected && !device.revoked)
+    .map(fenixPortalDeviceRegistration);
 }

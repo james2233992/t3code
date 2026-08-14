@@ -6,6 +6,7 @@ import {
   buildFenixMobilePairingUrl,
   classifyFenixPortalFailure,
   fenixPortalDeviceRegistration,
+  fenixPortalConnectedDeviceRegistrations,
   fenixPortalSocket,
   isFenixPortalEmbeddedApp,
   issueFenixPortalBrowserTicket,
@@ -59,8 +60,22 @@ describe("Fenix portal companion API", () => {
                 deviceName: "Juan Carlos Mac mini",
                 capabilities: ["rpc"],
                 revoked: false,
+                connected: true,
               },
-              { deviceId: 1, deviceName: "invalid", capabilities: [], revoked: false },
+              {
+                deviceId: "b".repeat(32),
+                deviceName: "Offline Mac",
+                capabilities: ["rpc"],
+                revoked: false,
+                connected: false,
+              },
+              {
+                deviceId: 1,
+                deviceName: "invalid",
+                capabilities: [],
+                revoked: false,
+                connected: true,
+              },
             ],
           }),
           { status: 200, headers: { "Content-Type": "application/json" } },
@@ -69,7 +84,7 @@ describe("Fenix portal companion API", () => {
 
     const devices = await listFenixPortalDevices({ agentId: 9, fetchImpl, url: PORTAL_URL });
 
-    expect(devices).toHaveLength(1);
+    expect(devices).toHaveLength(2);
     expect(fetchImpl).toHaveBeenCalledWith(
       new URL("https://iaonline.io/api/v1/code-lab/devices?agentId=9"),
       expect.objectContaining({ credentials: "include" }),
@@ -81,6 +96,10 @@ describe("Fenix portal companion API", () => {
         environmentId: `fenix-code-lab:${"a".repeat(32)}`,
         deviceId: "a".repeat(32),
       },
+    });
+    expect(fenixPortalConnectedDeviceRegistrations(devices)).toHaveLength(1);
+    expect(fenixPortalConnectedDeviceRegistrations(devices)[0]).toMatchObject({
+      target: { deviceId: "a".repeat(32) },
     });
   });
 
