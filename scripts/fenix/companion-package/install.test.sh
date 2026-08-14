@@ -8,6 +8,7 @@ trap 'rm -rf "$test_root"' EXIT
 package_dir="${test_root}/package"
 fake_bin="${test_root}/fake-bin"
 token_state="${test_root}/used-token"
+xattr_state="${test_root}/xattr-calls"
 mkdir -p \
   "${package_dir}/payload/runtime/node_modules/t3/dist" \
   "${package_dir}/payload/node/bin" \
@@ -25,6 +26,13 @@ printf 'Fenix portal authorization required\n' > "${package_dir}/payload/runtime
 cat > "${package_dir}/payload/node/bin/node" <<'FAKE_NODE'
 #!/usr/bin/env bash
 set -euo pipefail
+entrypoint="$1"
+node_root="$(cd "$(dirname "$0")/.." && pwd -P)"
+runtime_root="$(cd "$(dirname "$entrypoint")/../../.." && pwd -P)"
+if find "$node_root" "$runtime_root" -name '*.fenix-test-quarantined' -print -quit | grep -q .; then
+  echo "quarantine was not cleared before runtime verification" >&2
+  exit 78
+fi
 shift
 if [[ "${1:-}" == "--version" ]]; then
   printf 'fenix-code v1.2.3\n'
@@ -52,6 +60,26 @@ printf '{"paired":true}\n' > "${base_dir}/userdata/fenix-companion.json"
 chmod 0600 "${base_dir}/userdata/fenix-companion.json"
 FAKE_NODE
 
+cat > "${fake_bin}/xattr" <<'FAKE_XATTR'
+#!/usr/bin/env bash
+set -euo pipefail
+if [[ "$#" -ne 3 || "$2" != "com.apple.quarantine" ]]; then exit 79; fi
+marker="${3}.fenix-test-quarantined"
+case "$1" in
+  -p) test -e "$marker" ;;
+  -d)
+    test -e "$marker"
+    if [[ -n "${FENIX_INSTALL_TEST_XATTR_FAIL_MATCH:-}" &&
+      "$3" == *"${FENIX_INSTALL_TEST_XATTR_FAIL_MATCH}"* ]]; then
+      exit 80
+    fi
+    printf '%s\n' "$3" >> "${FENIX_INSTALL_TEST_XATTR_STATE}"
+    unlink "$marker"
+    ;;
+  *) exit 79 ;;
+esac
+FAKE_XATTR
+
 cat > "${fake_bin}/uname" <<'FAKE_UNAME'
 #!/usr/bin/env bash
 if [[ "${1:-}" == "-s" ]]; then printf 'Darwin\n'; else printf 'arm64\n'; fi
@@ -60,12 +88,22 @@ chmod 0755 \
   "${package_dir}/install.sh" \
   "${package_dir}/bin/fenix-code" \
   "${package_dir}/payload/node/bin/node" \
+  "${fake_bin}/xattr" \
   "${fake_bin}/uname"
+
+printf 'native fixture\n' > "${package_dir}/payload/runtime/native-addon.node"
+printf 'private executable fixture\n' > "${package_dir}/payload/runtime/private-helper"
+chmod 0700 "${package_dir}/payload/runtime/private-helper"
+touch \
+  "${package_dir}/payload/runtime/native-addon.node.fenix-test-quarantined" \
+  "${package_dir}/payload/runtime/private-helper.fenix-test-quarantined" \
+  "${package_dir}/payload/node/bin/node.fenix-test-quarantined"
 
 run_install() {
   HOME="${test_root}/home" \
   FENIX_CODE_HOME="${test_root}/home/.fenix-code" \
   FENIX_INSTALL_TEST_TOKEN_STATE="$token_state" \
+  FENIX_INSTALL_TEST_XATTR_STATE="$xattr_state" \
   PATH="${fake_bin}:${PATH}" \
     "${package_dir}/install.sh" "$@"
 }
@@ -86,6 +124,21 @@ if run_install \
 fi
 test ! -e "${test_root}/home/.fenix-code"
 
+if failure_output="$(
+  FENIX_INSTALL_TEST_XATTR_FAIL_MATCH=private-helper \
+    run_install \
+      --portal https://iaonline.io \
+      --attempt-id attempt-xattr-failure \
+      --pairing-token valid-token \
+      --allow-root "$test_root" 2>&1
+)"; then
+  echo "installer ignored an xattr authorization failure" >&2
+  exit 1
+fi
+test "$failure_output" = "macOS no pudo autorizar el runtime local de Fenix Code (private-helper)."
+test ! -e "${test_root}/home/.fenix-code/runtime/versions/1.2.3"
+rm -f "$xattr_state"
+
 run_install \
   --portal https://iaonline.io \
   --attempt-id attempt-1 \
@@ -97,6 +150,7 @@ test "$(cat "$config")" = '{"paired":true}'
 if mode="$(stat -f '%Lp' "$config" 2>/dev/null)"; then :; else mode="$(stat -c '%a' "$config")"; fi
 test "$mode" = "600"
 test -x "${test_root}/home/.local/bin/fenix-code"
+test "$(wc -l < "$xattr_state" | tr -d ' ')" = "3"
 before_sha="$(shasum -a 256 "$config" | awk '{print $1}')"
 
 if run_install \

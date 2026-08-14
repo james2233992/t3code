@@ -132,6 +132,33 @@ printf '%s\n' "$version" > "${version_staging}/.install-complete"
 cp -R "${package_dir}/payload/node/." "$node_staging/"
 install -m 0755 "${package_dir}/bin/fenix-code" "$wrapper_staging"
 
+# Browser downloads inherit macOS quarantine on extracted executables and
+# native addons. Inspect regular runtime files only: the pnpm payload contains
+# optional dangling symlinks that make recursive xattr fail even when every
+# executable was cleared correctly.
+if command -v xattr >/dev/null 2>&1; then
+  while IFS= read -r -d '' runtime_file; do
+    if [[ ! -x "$runtime_file" && \
+      "$runtime_file" != *.node && \
+      "$runtime_file" != *.dylib && \
+      "$runtime_file" != *.so ]]; then
+      continue
+    fi
+    if xattr -p com.apple.quarantine "$runtime_file" >/dev/null 2>&1; then
+      if ! xattr -d com.apple.quarantine "$runtime_file"; then
+        runtime_label="${runtime_file#${version_staging}/}"
+        if [[ "$runtime_label" == "$runtime_file" ]]; then
+          runtime_label="node/${runtime_file#${node_staging}/}"
+        fi
+        echo "macOS no pudo autorizar el runtime local de Fenix Code (${runtime_label})." >&2
+        exit 65
+      fi
+    fi
+  done < <(
+    find "$version_staging" "$node_staging" -type f -print0
+  )
+fi
+
 staged_version="$(
   "$node_staging/bin/node" "$version_staging/node_modules/t3/dist/bin.mjs" --version
 )"
