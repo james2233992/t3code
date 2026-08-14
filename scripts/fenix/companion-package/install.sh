@@ -31,7 +31,7 @@ usage() {
   cat >&2 <<'EOF'
 Uso: ./install.sh --portal URL --attempt-id ID --pairing-token TOKEN --allow-root RUTA
 
-Genera este comando desde https://iaonline.io/code-lab/setup tras iniciar sesion.
+Genera este comando desde https://iaonline.io/code-lab/setup tras iniciar sesión.
 EOF
 }
 
@@ -58,7 +58,7 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [[ -z "$portal" || -z "$attempt_id" || -z "$pairing_token" || -z "$allow_root" ]]; then
-  echo "La instalacion requiere una autorizacion de un solo uso emitida por Fenix." >&2
+  echo "La instalación requiere una autorización de un solo uso emitida por Fenix." >&2
   usage
   exit 64
 fi
@@ -136,11 +136,11 @@ staged_version="$(
   "$node_staging/bin/node" "$version_staging/node_modules/t3/dist/bin.mjs" --version
 )"
 if [[ "$staged_version" != "fenix-code v${version}" ]]; then
-  echo "El runtime preparado no supera la verificacion de version." >&2
+  echo "El runtime preparado no supera la verificación de versión." >&2
   exit 65
 fi
 if [[ "$(cat "${version_staging}/.fenix-portal-auth-required")" != "Fenix portal authorization required" ]]; then
-  echo "El paquete no contiene el marcador obligatorio de autorizacion Fenix." >&2
+  echo "El paquete no contiene el marcador obligatorio de autorización Fenix." >&2
   exit 65
 fi
 
@@ -159,7 +159,7 @@ wrapper_activated=true
 if [[ -e "$config_path" || -L "$config_path" ]]; then
   config_was_present=true
   if [[ ! -f "$config_path" || -L "$config_path" ]]; then
-    echo "La configuracion Fenix existente no es un fichero regular seguro." >&2
+    echo "La configuración Fenix existente no es un fichero regular seguro." >&2
     exit 65
   fi
   cp -p "$config_path" "$config_backup"
@@ -175,7 +175,7 @@ fi
 pairing_token=""
 
 if [[ ! -f "$config_path" || -L "$config_path" ]]; then
-  echo "Fenix no genero una credencial de dispositivo valida." >&2
+  echo "Fenix no generó una credencial de dispositivo válida." >&2
   exit 65
 fi
 if config_mode="$(stat -f '%Lp' "$config_path" 2>/dev/null)"; then
@@ -195,7 +195,7 @@ rm -f "$wrapper_backup" "$config_backup"
 printf '\nFenix Code Companion %s instalado.\n' "$version"
 printf 'Comando: %s\n' "$wrapper_path"
 if [[ ":${PATH}:" != *":${bin_dir}:"* ]]; then
-  printf 'Anade esta linea a ~/.zprofile y abre una Terminal nueva:\n'
+  printf 'Añade esta línea a ~/.zprofile y abre una Terminal nueva:\n'
   printf '  export PATH="$HOME/.local/bin:$PATH"\n'
 fi
 printf '\nEquipo autorizado por Fenix. Siguiente paso: ejecuta fenix-code service install.\n'

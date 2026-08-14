@@ -48,17 +48,17 @@ export function formatServiceStatus(
   cliVersion: string,
 ): string {
   if (!status.supported) {
-    return "Fenix Code service\n  Status: unavailable on this machine\n  Supported on: Linux with systemd or macOS with launchd";
+    return "Servicio Fenix Code\n  Estado: no disponible en este equipo\n  Compatible con: Linux con systemd o macOS con launchd";
   }
   if (!status.installed) {
-    return "Fenix Code service\n  Status: not installed\n  Next: Run `fenix-code service install`.";
+    return "Servicio Fenix Code\n  Estado: no instalado\n  Siguiente paso: ejecuta `fenix-code service install`.";
   }
   return [
-    "Fenix Code service",
-    `  Status: ${status.current ? `installed · Fenix Code v${cliVersion}` : "needs an update or repair"}`,
-    `  Unit: ${status.unitPath}`,
-    `  Logs: ${status.logPath}`,
-    ...(status.current ? [] : ["  Next: Run `fenix-code service update`."]),
+    "Servicio Fenix Code",
+    `  Estado: ${status.current ? `instalado · Fenix Code v${cliVersion}` : "necesita actualización o reparación"}`,
+    `  Unidad: ${status.unitPath}`,
+    `  Registros: ${status.logPath}`,
+    ...(status.current ? [] : ["  Siguiente paso: ejecuta `fenix-code service update`."]),
   ].join("\n");
 }
 
@@ -72,7 +72,7 @@ const runServiceCommand = Effect.fn("cli.service.run")(function* <A, E>(
 });
 
 const serviceInstallCommand = Command.make("install", projectLocationFlags).pipe(
-  Command.withDescription("Install Fenix Code as a background service for this user."),
+  Command.withDescription("Instala Fenix Code como servicio en segundo plano para este usuario."),
   Command.withHandler((flags) =>
     runServiceCommand(
       flags,
@@ -80,12 +80,12 @@ const serviceInstallCommand = Command.make("install", projectLocationFlags).pipe
         const result = yield* reconcileService();
         if (!result.changed) {
           yield* Console.log(
-            `Fenix Code service is already installed with Fenix Code v${packageJson.version}.`,
+            `El servicio Fenix Code ya está instalado con Fenix Code v${packageJson.version}.`,
           );
           return;
         }
         yield* Console.log(
-          `${result.previouslyInstalled ? "Updated" : "Installed"} Fenix Code service v${packageJson.version}.\nLogs: ${result.plan.logPath}`,
+          `Servicio Fenix Code v${packageJson.version} ${result.previouslyInstalled ? "actualizado" : "instalado"}.\nRegistros: ${result.plan.logPath}`,
         );
       }),
     ),
@@ -93,22 +93,18 @@ const serviceInstallCommand = Command.make("install", projectLocationFlags).pipe
 );
 
 const serviceUpdateCommand = Command.make("update", projectLocationFlags).pipe(
-  Command.withDescription(
-    "Update or repair the Fenix Code background service using this CLI version.",
-  ),
+  Command.withDescription("Actualiza o repara el servicio Fenix Code con esta versión."),
   Command.withHandler((flags) =>
     runServiceCommand(
       flags,
       Effect.gen(function* () {
         const result = yield* reconcileService();
         if (!result.changed) {
-          yield* Console.log(
-            `Fenix Code service is already using Fenix Code v${packageJson.version}.`,
-          );
+          yield* Console.log(`El servicio Fenix Code ya usa Fenix Code v${packageJson.version}.`);
           return;
         }
         yield* Console.log(
-          `${result.previouslyInstalled ? "Updated" : "Installed"} Fenix Code service v${packageJson.version}.\nLogs: ${result.plan.logPath}`,
+          `Servicio Fenix Code v${packageJson.version} ${result.previouslyInstalled ? "actualizado" : "instalado"}.\nRegistros: ${result.plan.logPath}`,
         );
       }),
     ),
@@ -116,7 +112,7 @@ const serviceUpdateCommand = Command.make("update", projectLocationFlags).pipe(
 );
 
 const serviceUninstallCommand = Command.make("uninstall", projectLocationFlags).pipe(
-  Command.withDescription("Stop and remove the Fenix Code background service."),
+  Command.withDescription("Detiene y elimina el servicio Fenix Code."),
   Command.withHandler((flags) =>
     runServiceCommand(
       flags,
@@ -124,7 +120,7 @@ const serviceUninstallCommand = Command.make("uninstall", projectLocationFlags).
         const service = yield* BootService.BootService;
         const removed = yield* service.uninstall;
         yield* Console.log(
-          removed ? "Removed the Fenix Code service." : "Fenix Code service is not installed.",
+          removed ? "Servicio Fenix Code eliminado." : "El servicio Fenix Code no está instalado.",
         );
       }),
     ),
@@ -132,7 +128,7 @@ const serviceUninstallCommand = Command.make("uninstall", projectLocationFlags).
 );
 
 const serviceStatusCommand = Command.make("status", projectLocationFlags).pipe(
-  Command.withDescription("Show whether the Fenix Code background service is installed."),
+  Command.withDescription("Muestra el estado de instalación del servicio Fenix Code."),
   Command.withHandler((flags) =>
     runServiceCommand(
       flags,
@@ -151,15 +147,15 @@ export const offerServiceDuringOnboarding = Effect.gen(function* () {
     return false;
   }
   if (installed && current) {
-    yield* Console.log("Fenix Code is already set up to run in the background on this machine.");
+    yield* Console.log("Fenix Code ya está configurado para ejecutarse en segundo plano.");
     return true;
   }
   const wanted = yield* Prompt.run(
     Prompt.confirm({
       message: installed
-        ? "The installed Fenix Code service needs an update or repair. Update it now?"
-        : "Run Fenix Code in the background whenever this machine boots? " +
-          "It stays reachable through Fenix Connect even after you log out.",
+        ? "El servicio Fenix Code necesita una actualización o reparación. ¿Actualizarlo ahora?"
+        : "¿Iniciar Fenix Code en segundo plano al arrancar este equipo? " +
+          "Seguirá disponible mediante Fenix Connect aunque cierres sesión.",
       initial: true,
     }),
   );
@@ -169,7 +165,7 @@ export const offerServiceDuringOnboarding = Effect.gen(function* () {
   const result = yield* reconcileService();
   if (result.changed) {
     yield* Console.log(
-      `Background service ${result.previouslyInstalled ? "updated" : "installed"}. Logs: ${result.plan.logPath}`,
+      `Servicio en segundo plano ${result.previouslyInstalled ? "actualizado" : "instalado"}. Registros: ${result.plan.logPath}`,
     );
   }
   return true;
@@ -182,18 +178,26 @@ export const recoverServiceOnboardingOffer = <R>(
     Effect.catchTags({
       QuitError: () => Effect.succeed(false),
       BootServiceUnsupportedError: (error) =>
-        Console.log(`Skipping background setup: ${error.message}`).pipe(Effect.as(false)),
+        Console.log(`Se omite la configuración en segundo plano: ${error.message}`).pipe(
+          Effect.as(false),
+        ),
       BootServiceCommandError: (error) =>
-        Console.warn(`Background setup did not finish: ${error.message}`).pipe(Effect.as(false)),
+        Console.warn(`No terminó la configuración en segundo plano: ${error.message}`).pipe(
+          Effect.as(false),
+        ),
       BootServiceInstallError: (error) =>
-        Console.warn(`Background setup did not finish: ${error.message}`).pipe(Effect.as(false)),
+        Console.warn(`No terminó la configuración en segundo plano: ${error.message}`).pipe(
+          Effect.as(false),
+        ),
       BootServiceUpdatePendingError: (error) =>
-        Console.warn(`Background setup did not finish: ${error.message}`).pipe(Effect.as(false)),
+        Console.warn(`No terminó la configuración en segundo plano: ${error.message}`).pipe(
+          Effect.as(false),
+        ),
     }),
   );
 
 export const serviceCommand = Command.make("service").pipe(
-  Command.withDescription("Manage the Fenix Code background service."),
+  Command.withDescription("Gestiona el servicio Fenix Code en segundo plano."),
   Command.withSubcommands([
     serviceInstallCommand,
     serviceUninstallCommand,

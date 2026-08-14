@@ -17,7 +17,7 @@ function formatClientMetadata(metadata: AuthClientMetadata): string {
     metadata.browser,
     metadata.ipAddress,
   ]);
-  return details.length > 0 ? details.join(" | ") : "unlabeled client";
+  return details.length > 0 ? details.join(" | ") : "cliente sin etiqueta";
 }
 
 function toIsoString(value: DateTime.DateTime | DateTime.Utc): string {
@@ -58,10 +58,10 @@ export function formatIssuedPairingCredential(
 
   return (
     [
-      `Issued client pairing token ${credential.id}.`,
+      `Token de emparejamiento ${credential.id} emitido.`,
       `Token: ${credential.credential}`,
-      ...(pairUrl ? [`Pair URL: ${pairUrl}`] : []),
-      `Expires at: ${credential.expiresAt}`,
+      ...(pairUrl ? [`URL de emparejamiento: ${pairUrl}`] : []),
+      `Caduca: ${credential.expiresAt}`,
     ].join(newline) + newline
   );
 }
@@ -87,7 +87,7 @@ export function formatPairingCredentialList(
   }
 
   if (credentials.length === 0) {
-    return `No active pairing credentials.${newline}`;
+    return `No hay emparejamientos activos.${newline}`;
   }
 
   return (
@@ -95,9 +95,9 @@ export function formatPairingCredentialList(
       .map((credential) =>
         [
           `${credential.id}${credential.label ? ` (${credential.label})` : ""}`,
-          `  scopes: ${credential.scopes.join(" ")}`,
-          `  created: ${toIsoString(credential.createdAt)}`,
-          `  expires: ${toIsoString(credential.expiresAt)}`,
+          `  permisos: ${credential.scopes.join(" ")}`,
+          `  creado: ${toIsoString(credential.createdAt)}`,
+          `  caduca: ${toIsoString(credential.expiresAt)}`,
         ].join(newline),
       )
       .join(`${newline}${newline}`) + newline
@@ -133,12 +133,12 @@ export function formatIssuedSession(
 
   return (
     [
-      `Issued bearer access token ${session.sessionId}.`,
-      `Scopes: ${session.scopes.join(" ")}`,
+      `Token de acceso ${session.sessionId} emitido.`,
+      `Permisos: ${session.scopes.join(" ")}`,
       `Token: ${session.token}`,
-      `Subject: ${session.subject}`,
-      `Client: ${formatClientMetadata(session.client)}`,
-      `Expires at: ${toIsoString(session.expiresAt)}`,
+      `Sujeto: ${session.subject}`,
+      `Cliente: ${formatClientMetadata(session.client)}`,
+      `Caduca: ${toIsoString(session.expiresAt)}`,
     ].join(newline) + newline
   );
 }
@@ -168,23 +168,23 @@ export function formatSessionList(
   }
 
   if (sessions.length === 0) {
-    return `No active sessions.${newline}`;
+    return `No hay sesiones activas.${newline}`;
   }
 
   return (
     sessions
       .map((session) =>
         [
-          `${session.sessionId}${session.connected ? " connected" : ""}`,
-          `  scopes: ${session.scopes.join(" ")}`,
-          `  method: ${session.method}`,
-          `  subject: ${session.subject}`,
-          `  client: ${formatClientMetadata(session.client)}`,
-          `  issued: ${toIsoString(session.issuedAt)}`,
-          `  last connected: ${
-            session.lastConnectedAt ? toIsoString(session.lastConnectedAt) : "never"
+          `${session.sessionId}${session.connected ? " conectado" : ""}`,
+          `  permisos: ${session.scopes.join(" ")}`,
+          `  método: ${session.method}`,
+          `  sujeto: ${session.subject}`,
+          `  cliente: ${formatClientMetadata(session.client)}`,
+          `  emitido: ${toIsoString(session.issuedAt)}`,
+          `  última conexión: ${
+            session.lastConnectedAt ? toIsoString(session.lastConnectedAt) : "nunca"
           }`,
-          `  expires: ${toIsoString(session.expiresAt)}`,
+          `  caduca: ${toIsoString(session.expiresAt)}`,
         ].join(newline),
       )
       .join(`${newline}${newline}`) + newline

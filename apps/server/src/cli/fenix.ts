@@ -17,16 +17,16 @@ import {
 import { baseDirFlag, resolveCliAuthConfig } from "./config.ts";
 
 const portalFlag = Flag.string("portal").pipe(
-  Flag.withDescription("Fenix portal origin, for example https://iaonline.io."),
+  Flag.withDescription("Origen del portal Fenix, por ejemplo https://iaonline.io."),
 );
 const attemptIdFlag = Flag.string("attempt-id").pipe(
-  Flag.withDescription("One-time pairing attempt issued by the Fenix portal."),
+  Flag.withDescription("Intento de emparejamiento de un solo uso emitido por el portal Fenix."),
 );
 const pairingTokenFlag = Flag.string("pairing-token").pipe(
-  Flag.withDescription("One-time pairing token issued by the Fenix portal."),
+  Flag.withDescription("Token de emparejamiento de un solo uso emitido por el portal Fenix."),
 );
 const allowRootFlag = Flag.string("allow-root").pipe(
-  Flag.withDescription("Initial local workspace root (defaults to the current directory)."),
+  Flag.withDescription("Carpeta local inicial permitida (por defecto, la carpeta actual)."),
   Flag.optional,
 );
 
@@ -80,7 +80,7 @@ async function consumePairing(input: {
     },
   );
   if (!response.ok) {
-    throw new Error(`Fenix pairing was rejected (HTTP ${response.status}).`);
+    throw new Error(`El emparejamiento con Fenix fue rechazado (HTTP ${response.status}).`);
   }
   const value = (await response.json()) as Record<string, unknown>;
   const device = value.device as Record<string, unknown> | undefined;
@@ -89,7 +89,7 @@ async function consumePairing(input: {
     typeof device.deviceName !== "string" ||
     typeof value.deviceCredential !== "string"
   ) {
-    throw new Error("Fenix pairing returned a malformed credential envelope.");
+    throw new Error("El portal Fenix devolvió credenciales con un formato no válido.");
   }
   return {
     device: { deviceId: device.deviceId, deviceName: device.deviceName },
@@ -99,7 +99,7 @@ async function consumePairing(input: {
 
 class FenixCompanionNotPairedError extends CliError.UserError {
   override get message() {
-    return "Pair this machine before adding local roots.";
+    return "Empareja este equipo antes de añadir carpetas locales.";
   }
 }
 
@@ -124,7 +124,7 @@ const pairCommand = Command.make("pair", {
   allowRoot: allowRootFlag,
   baseDir: baseDirFlag,
 }).pipe(
-  Command.withDescription("Pair this local Fenix Code server with the Fenix portal."),
+  Command.withDescription("Empareja este servidor local de Fenix Code con el portal Fenix."),
   Command.withHandler((input) =>
     Effect.gen(function* () {
       const logLevel = yield* GlobalFlag.LogLevel;
@@ -133,7 +133,7 @@ const pairCommand = Command.make("pair", {
       const allowedRoot = yield* Effect.tryPromise({
         try: () =>
           canonicalizeFenixCompanionRoot(Option.getOrElse(input.allowRoot, () => process.cwd())),
-        catch: commandFailure("The initial local root could not be authorized."),
+        catch: commandFailure("No se pudo autorizar la carpeta local inicial."),
       });
       const paired = yield* Effect.tryPromise({
         try: () =>
@@ -142,7 +142,7 @@ const pairCommand = Command.make("pair", {
             attemptId: input.attemptId,
             pairingToken: input.pairingToken,
           }),
-        catch: commandFailure("Fenix pairing failed."),
+        catch: commandFailure("Falló el emparejamiento con Fenix."),
       });
       const companion: FenixCompanionConfig = {
         version: 1,
@@ -154,34 +154,34 @@ const pairCommand = Command.make("pair", {
       };
       yield* Effect.tryPromise({
         try: () => writeFenixCompanionConfig(config.stateDir, companion),
-        catch: commandFailure("The Fenix companion credential could not be stored."),
+        catch: commandFailure("No se pudieron guardar las credenciales de Fenix Code."),
       });
       yield* Console.log(
-        `Paired ${companion.deviceName}. Local root allowed: ${allowedRoot}. Restart Fenix Code to connect.`,
+        `${companion.deviceName} emparejado. Carpeta local permitida: ${allowedRoot}. Reinicia Fenix Code para conectar.`,
       );
     }),
   ),
 );
 
 const statusCommand = Command.make("status", { baseDir: baseDirFlag }).pipe(
-  Command.withDescription("Show the local Fenix portal companion status."),
+  Command.withDescription("Muestra el estado de conexión de este equipo con el portal Fenix."),
   Command.withHandler(({ baseDir }) =>
     Effect.gen(function* () {
       const logLevel = yield* GlobalFlag.LogLevel;
       const config = yield* resolveCliAuthConfig({ baseDir }, logLevel);
       const companion = yield* Effect.tryPromise({
         try: () => readFenixCompanionConfig(config.stateDir),
-        catch: commandFailure("The Fenix companion configuration could not be read."),
+        catch: commandFailure("No se pudo leer la configuración local de Fenix Code."),
       });
       if (companion === null) {
-        yield* Console.log("This machine is not paired with the Fenix portal.");
+        yield* Console.log("Este equipo no está emparejado con el portal Fenix.");
         return;
       }
       yield* Console.log(
         [
-          `Device: ${companion.deviceName}`,
+          `Equipo: ${companion.deviceName}`,
           `Portal: ${companion.portalOrigin}`,
-          "Allowed local roots:",
+          "Carpetas locales permitidas:",
           ...companion.allowedRoots.map((root) => `  ${root}`),
         ].join("\n"),
       );
@@ -193,21 +193,21 @@ const rootAddCommand = Command.make("add", {
   root: Argument.string("root"),
   baseDir: baseDirFlag,
 }).pipe(
-  Command.withDescription("Authorize one additional local workspace root."),
+  Command.withDescription("Autoriza una carpeta local adicional."),
   Command.withHandler(({ root, baseDir }) =>
     Effect.gen(function* () {
       const logLevel = yield* GlobalFlag.LogLevel;
       const serverConfig = yield* resolveCliAuthConfig({ baseDir }, logLevel);
       const companion = yield* Effect.tryPromise({
         try: () => readFenixCompanionConfig(serverConfig.stateDir),
-        catch: commandFailure("The Fenix companion configuration could not be read."),
+        catch: commandFailure("No se pudo leer la configuración local de Fenix Code."),
       });
       if (companion === null) {
         return yield* new FenixCompanionNotPairedError({ cause: "not-paired" });
       }
       const canonicalRoot = yield* Effect.tryPromise({
         try: () => canonicalizeFenixCompanionRoot(root),
-        catch: commandFailure("The local root could not be authorized."),
+        catch: commandFailure("No se pudo autorizar la carpeta local."),
       });
       yield* Effect.tryPromise({
         try: () =>
@@ -215,19 +215,19 @@ const rootAddCommand = Command.make("add", {
             ...companion,
             allowedRoots: [...new Set([...companion.allowedRoots, canonicalRoot])],
           }),
-        catch: commandFailure("The Fenix companion configuration could not be updated."),
+        catch: commandFailure("No se pudo actualizar la configuración local de Fenix Code."),
       });
-      yield* Console.log(`Authorized local root: ${canonicalRoot}`);
+      yield* Console.log(`Carpeta local autorizada: ${canonicalRoot}`);
     }),
   ),
 );
 
 const rootCommand = Command.make("root").pipe(
-  Command.withDescription("Manage local workspace roots exposed to this pairing."),
+  Command.withDescription("Gestiona las carpetas locales autorizadas para este emparejamiento."),
   Command.withSubcommands([rootAddCommand]),
 );
 
 export const fenixCommand = Command.make("fenix").pipe(
-  Command.withDescription("Pair and configure the Fenix portal companion."),
+  Command.withDescription("Empareja y configura este equipo con el portal Fenix."),
   Command.withSubcommands([pairCommand, statusCommand, rootCommand]),
 );

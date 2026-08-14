@@ -21,7 +21,7 @@ import { servicePreflightCommand } from "./cli/servicePreflight.ts";
 const CliRuntimeLayer = Layer.mergeAll(NodeServices.layer, NetService.layer);
 
 const connectPublicConfigMissingMessage =
-  "Fenix Connect commands are unavailable: this build is missing Fenix Connect public configuration.";
+  "Los comandos de Fenix Connect no están disponibles: esta compilación no incluye su configuración pública.";
 
 class ConnectPublicConfigMissingError extends CliError.UserError {
   override get message() {
@@ -32,7 +32,7 @@ class ConnectPublicConfigMissingError extends CliError.UserError {
 const connectUnavailableCommand = Command.make("connect", {
   command: Argument.string("command").pipe(Argument.variadic),
 }).pipe(
-  Command.withDescription("Fenix Connect is unavailable in builds without public configuration."),
+  Command.withDescription("Fenix Connect no está disponible sin configuración pública."),
   Command.withHidden,
   Command.withHandler(() =>
     Effect.fail(
@@ -46,7 +46,7 @@ const connectUnavailableCommand = Command.make("connect", {
 
 export const makeCli = ({ cloudEnabled = hasCloudPublicConfig } = {}) =>
   Command.make("fenix-code", { ...sharedServerCommandFlags }).pipe(
-    Command.withDescription("Run the Fenix Code server."),
+    Command.withDescription("Inicia el servidor de Fenix Code."),
     Command.withHandler((flags) => runServerCommand(flags)),
     Command.withSubcommands([
       startCommand,
