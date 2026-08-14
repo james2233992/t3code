@@ -709,7 +709,7 @@ export function FenixSetupPage() {
                   <button
                     type="button"
                     onClick={() => void refreshDevices()}
-                    disabled={devicesBusy || revokingDeviceId !== null}
+                    disabled={agentId === null || devicesBusy || revokingDeviceId !== null}
                     className="h-8 rounded-md border border-white/14 px-3 text-xs font-semibold text-white hover:bg-white/8 disabled:opacity-50"
                   >
                     {devicesBusy ? "Actualizando…" : "Actualizar"}
@@ -749,7 +749,7 @@ export function FenixSetupPage() {
                           <button
                             type="button"
                             onClick={() => void revokeDevice(device)}
-                            disabled={devicesBusy || revokingDeviceId !== null}
+                            disabled={agentId === null || devicesBusy || revokingDeviceId !== null}
                             className="inline-flex h-8 shrink-0 items-center gap-2 rounded-md border border-[#7f1d1d] px-3 text-xs font-semibold text-[#fca5a5] hover:bg-[#450a0a] disabled:opacity-50"
                             aria-label={`Revocar ${device.deviceName}`}
                           >

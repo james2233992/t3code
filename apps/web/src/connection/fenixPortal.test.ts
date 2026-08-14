@@ -176,7 +176,7 @@ describe("Fenix portal companion API", () => {
         fetchImpl,
         url: PORTAL_URL,
       }),
-    ).rejects.toThrow("invalid device identifier");
+    ).rejects.toThrow("identificador local del equipo no es válido");
     expect(fetchImpl).not.toHaveBeenCalled();
   });
 

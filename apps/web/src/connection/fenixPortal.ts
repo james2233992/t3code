@@ -37,6 +37,7 @@ export function classifyFenixPortalFailure(cause: unknown): FenixPortalFailureKi
 
 const SAFE_PORTAL_ERROR_MESSAGES = new Set([
   "El token CSRF de Fenix Code Lab no está disponible.",
+  "El identificador local del equipo no es válido.",
   "Fenix Code Lab returned an invalid pairing envelope.",
   "Introduce un nombre de entorno local de 1 a 80 caracteres.",
 ]);
@@ -216,7 +217,7 @@ export async function revokeFenixPortalDevice(input: {
   const fetchImpl = input.fetchImpl ?? fetch;
   const url = input.url ?? new URL(window.location.href);
   if (!isFenixPortalDeviceId(input.deviceId)) {
-    throw new Error("Fenix Code Lab returned an invalid device identifier.");
+    throw new Error("El identificador local del equipo no es válido.");
   }
   const endpoint = new URL(apiUrl(`/devices/${encodeURIComponent(input.deviceId)}`, url));
   endpoint.searchParams.set("agentId", String(input.agentId));

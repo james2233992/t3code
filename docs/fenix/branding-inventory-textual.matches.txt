@@ -3034,17 +3034,16 @@
 ./apps/web/src/connection/desktopLocal.ts:1:40:@t3tools
 ./apps/web/src/connection/desktopLocal.ts:6:9:@t3tools
 ./apps/web/src/connection/fenixPortal.test.ts:363:46:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:141:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:165:39:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:142:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:166:39:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:17:28:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:219:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:271:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:311:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:314:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:325:42:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:375:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:272:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:312:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:315:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:326:42:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:376:22:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:39:21:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:40:4:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:41:4:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:5:9:@t3tools
 ./apps/web/src/connection/fenixPortal.ts:6:32:@t3tools
 ./apps/web/src/connection/onboarding.ts:1:39:@t3tools
