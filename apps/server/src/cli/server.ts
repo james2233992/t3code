@@ -19,13 +19,13 @@ export const runServerCommand = (
   });
 
 export const startCommand = Command.make("start", { ...sharedServerCommandFlags }).pipe(
-  Command.withDescription("Run the Fenix Code server."),
+  Command.withDescription("Inicia el servidor de Fenix Code."),
   Command.withHandler((flags) => runServerCommand(flags)),
 );
 
 export const serveCommand = Command.make("serve", { ...sharedServerCommandFlags }).pipe(
   Command.withDescription(
-    "Run the Fenix Code server without opening a browser and print headless pairing details.",
+    "Inicia Fenix Code sin abrir el navegador y muestra los datos de emparejamiento.",
   ),
   Command.withHandler((flags) =>
     runServerCommand(flags, {

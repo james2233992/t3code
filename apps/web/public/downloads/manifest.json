@@ -1,13 +1,13 @@
 {
   "schemaVersion": 1,
-  "releaseVersion": "0.0.32-pilot.20260813",
+  "releaseVersion": "0.0.32-pilot.20260814",
   "artifacts": [
     {
       "platform": "macos",
       "architecture": "arm64",
       "fileName": "Fenix-Code-Companion-0.0.32-macos-arm64.tar.gz",
-      "sha256": "78fff80ae3b2cfc6faffb04813e69f580901a8b2808acf56ae670f738e454b51",
-      "sizeBytes": 143324145,
+      "sha256": "415f5ae3249419764e7c05ad447d64d170635378488ffad64d5d68502682207d",
+      "sizeBytes": 143336980,
       "available": true
     },
     {

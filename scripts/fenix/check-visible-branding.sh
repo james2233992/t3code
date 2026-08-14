@@ -195,6 +195,19 @@ run_checks() {
     return 1
   fi
 
+  local visible_internal_identifier_hits
+  visible_internal_identifier_hits="$(
+    run_rg_allow_no_matches "${common_args[@]}" \
+    -e 'equivalent to T3CODE_|forwards to T3CODE_' \
+    "${scan_paths[@]}"
+  )"
+
+  if [[ -n "$visible_internal_identifier_hits" ]]; then
+    echo "Internal upstream identifiers remain exposed in user-facing help:" >&2
+    echo "$visible_internal_identifier_hits" >&2
+    return 1
+  fi
+
   local domain_hits
   domain_hits="$(
     run_rg_allow_no_matches "${common_args[@]}" \
@@ -247,6 +260,17 @@ selftest() {
   set -e
   if [[ "$red_status" -eq 0 || "$red_output" != *"visibleCommandRegression"* ]]; then
     echo "selftest failed: visible upstream command fixture was not detected." >&2
+    echo "$red_output" >&2
+    return 1
+  fi
+
+  printf 'export const visibleInternalIdentifierRegression = "equivalent to T3CODE_HOME";\n' > "$test_file"
+  set +e
+  red_output="$(run_checks 2>&1)"
+  red_status=$?
+  set -e
+  if [[ "$red_status" -eq 0 || "$red_output" != *"visibleInternalIdentifierRegression"* ]]; then
+    echo "selftest failed: user-facing internal identifier fixture was not detected." >&2
     echo "$red_output" >&2
     return 1
   fi

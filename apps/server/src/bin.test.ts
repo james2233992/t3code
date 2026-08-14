@@ -195,11 +195,11 @@ it.layer(NodeServices.layer)("bin cli parsing", (it) => {
         assert.fail(`Expected ShowHelp, got ${error._tag}`);
       }
       assert.deepEqual(error.commandPath, ["fenix-code", "connect"]);
-      assert.include(error.errors[0]?.message ?? "", "missing Fenix Connect public configuration");
+      assert.include(error.errors[0]?.message ?? "", "no incluye su configuración pública");
 
       const output = (yield* TestConsole.errorLines).join("\n");
       assert.include(output, "ERROR");
-      assert.include(output, "missing Fenix Connect public configuration");
+      assert.include(output, "no incluye su configuración pública");
     }).pipe(Effect.provide(Layer.mergeAll(CliRuntimeLayer, TestConsole.layer))),
   );
 
@@ -207,7 +207,7 @@ it.layer(NodeServices.layer)("bin cli parsing", (it) => {
     Effect.gen(function* () {
       const { output } = yield* captureStdout(runCli(["service", "--help"], noConnectCli));
 
-      assert.include(output, "Manage the Fenix Code background service.");
+      assert.include(output, "Gestiona el servicio Fenix Code en segundo plano.");
       assert.include(output, "install");
       assert.include(output, "uninstall");
       assert.include(output, "update");

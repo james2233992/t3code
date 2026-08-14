@@ -181,7 +181,7 @@ const fs = require("node:fs");
 const [file, version, fileName, sha256, sizeBytes] = process.argv.slice(2);
 const manifest = {
   schemaVersion: 1,
-  releaseVersion: `${version}-pilot.20260813`,
+  releaseVersion: `${version}-pilot.20260814`,
   artifacts: [
     { platform: "macos", architecture: "arm64", fileName, sha256, sizeBytes: Number(sizeBytes), available: true },
     { platform: "windows", architecture: "x64", fileName: `Fenix-Code-Companion-${version}-windows-x64.zip`, sha256: "0".repeat(64), sizeBytes: 0, available: false },

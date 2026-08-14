@@ -76,9 +76,9 @@ export class NoRunningServerError extends Schema.TaggedErrorClass<NoRunningServe
 ) {
   override get message(): string {
     return [
-      "No running Fenix Code server found.",
-      ...this.checkedStatePaths.map((statePath) => `  checked ${statePath}`),
-      "Start one with `fenix-code serve`, or connect this machine with Fenix Connect: `fenix-code connect`.",
+      "No se encontró un servidor Fenix Code en ejecución.",
+      ...this.checkedStatePaths.map((statePath) => `  comprobado: ${statePath}`),
+      "Inicia uno con `fenix-code serve` o conecta este equipo con Fenix Connect: `fenix-code connect`.",
     ].join("\n");
   }
 }
@@ -90,7 +90,7 @@ export class TailscaleUnavailableError extends Schema.TaggedErrorClass<Tailscale
   { cause: Schema.Defect() },
 ) {
   override get message(): string {
-    return "Could not talk to Tailscale. Is tailscaled running? Try `tailscale status`.";
+    return "No se pudo contactar con Tailscale. Comprueba `tailscale status`.";
   }
 }
 
@@ -99,7 +99,7 @@ export class MagicDnsNameMissingError extends Schema.TaggedErrorClass<MagicDnsNa
   {},
 ) {
   override get message(): string {
-    return "This machine has no MagicDNS name. Run `tailscale up` and enable MagicDNS.";
+    return "Este equipo no tiene un nombre MagicDNS. Ejecuta `tailscale up` y activa MagicDNS.";
   }
 }
 
@@ -108,7 +108,7 @@ export class ServesOtherEnvironmentError extends Schema.TaggedErrorClass<ServesO
   { servePort: Schema.Number },
 ) {
   override get message(): string {
-    return `Tailscale Serve on HTTPS port ${String(this.servePort)} already fronts a different Fenix Code server. Pass --tailscale-serve-port to publish this one on another port.`;
+    return `Tailscale Serve en el puerto HTTPS ${String(this.servePort)} ya publica otro servidor Fenix Code. Usa --tailscale-serve-port para elegir otro puerto.`;
   }
 }
 
@@ -117,7 +117,7 @@ export class TailscaleServeFailedError extends Schema.TaggedErrorClass<Tailscale
   { servePort: Schema.Number, cause: Schema.Defect() },
 ) {
   override get message(): string {
-    return `tailscale serve failed for HTTPS port ${String(this.servePort)}. Run \`tailscale serve --https=${String(this.servePort)} --bg <local-url>\` by hand to see why.`;
+    return `Falló Tailscale Serve en el puerto HTTPS ${String(this.servePort)}. Ejecuta \`tailscale serve --https=${String(this.servePort)} --bg <url-local>\` para ver el motivo.`;
   }
 }
 
@@ -126,7 +126,7 @@ export class ServePortOccupiedError extends Schema.TaggedErrorClass<ServePortOcc
   { servePort: Schema.Number },
 ) {
   override get message(): string {
-    return `HTTPS port ${String(this.servePort)} on the tailnet already serves something that is not a Fenix Code server. Pass --tailscale-serve-port to publish this one on another port.`;
+    return `El puerto HTTPS ${String(this.servePort)} de la tailnet ya publica otro servicio. Usa --tailscale-serve-port para elegir otro puerto.`;
   }
 }
 
@@ -139,7 +139,7 @@ export class DevServerNotProxiableError extends Schema.TaggedErrorClass<DevServe
   { devUrl: Schema.String },
 ) {
   override get message(): string {
-    return `Tailscale Serve can only proxy plain-HTTP local targets, and this dev server runs at ${this.devUrl}. Pair without --tailscale instead.`;
+    return `Tailscale Serve solo admite destinos HTTP locales y este servidor usa ${this.devUrl}. Empareja sin --tailscale.`;
   }
 }
 
@@ -181,14 +181,14 @@ export const formatPairOutput = (input: {
   readonly notes: ReadonlyArray<string>;
 }): string =>
   [
-    `Pairing with ${input.serverLabel} (${input.origin}).`,
+    `Emparejamiento con ${input.serverLabel} (${input.origin}).`,
     "",
     renderTerminalQrCode(input.pairingUrl),
     "",
-    `Pairing URL: ${input.pairingUrl}`,
+    `URL de emparejamiento: ${input.pairingUrl}`,
     `Token: ${input.token}`,
-    `Expires: ${DateTime.formatIso(input.expiresAt)}`,
-    ...input.notes.flatMap((note) => ["", `Note: ${note}`]),
+    `Caduca: ${DateTime.formatIso(input.expiresAt)}`,
+    ...input.notes.flatMap((note) => ["", `Nota: ${note}`]),
     "",
   ].join("\n");
 
@@ -415,7 +415,7 @@ const resolveTailscalePairingBase = Effect.fn("pair.resolveTailscalePairingBase"
       ),
     );
     notes.push(
-      `Tailscale Serve now maps ${baseUrl} to this server and persists across restarts. Remove it with \`tailscale serve --https=${String(input.servePort)} off\`.`,
+      `Tailscale Serve publica ahora ${baseUrl} y conserva la configuración tras reinicios. Elimínala con \`tailscale serve --https=${String(input.servePort)} off\`.`,
     );
 
     const probed = yield* awaitEnvironmentDescriptor(baseUrl);
@@ -425,7 +425,7 @@ const resolveTailscalePairingBase = Effect.fn("pair.resolveTailscalePairingBase"
       }
     } else {
       notes.push(
-        "The HTTPS endpoint has not answered yet. First use can take a moment while Tailscale provisions certificates.",
+        "El endpoint HTTPS todavía no responde. El primer uso puede tardar mientras Tailscale prepara los certificados.",
       );
     }
     return { baseUrl, notes };
@@ -442,7 +442,7 @@ const mintPairingLink = Effect.fn("pair.mintPairingLink")(function* (input: {
     return yield* environmentAuth.createPairingLink({
       scopes: AuthStandardClientScopes,
       subject: "one-time-token",
-      label: Option.getOrElse(input.label, () => "t3 pair"),
+      label: Option.getOrElse(input.label, () => "Emparejamiento Fenix Code"),
       ...(Option.isSome(input.ttl) ? { ttl: input.ttl.value } : {}),
     });
   }).pipe(
@@ -458,26 +458,26 @@ const mintPairingLink = Effect.fn("pair.mintPairingLink")(function* (input: {
 const ttlFlag = Flag.string("ttl").pipe(
   Flag.withSchema(DurationFromString),
   Flag.withDescription(
-    "Token TTL, for example `5m`, `1h`, or `15 minutes`. Defaults to 5 minutes.",
+    "Duración del token, por ejemplo `5m`, `1h` o `15 minutes`. Por defecto: 5 minutos.",
   ),
   Flag.optional,
 );
 
 const labelFlag = Flag.string("label").pipe(
-  Flag.withDescription("Optional label shown in the server's connections list."),
+  Flag.withDescription("Etiqueta opcional visible en la lista de conexiones."),
   Flag.optional,
 );
 
 const tailscaleFlag = Flag.boolean("tailscale").pipe(
   Flag.withDescription(
-    "Publish the server over Tailscale Serve HTTPS and pair through the tailnet URL.",
+    "Publica el servidor mediante Tailscale Serve HTTPS y empareja usando la URL de la tailnet.",
   ),
   Flag.withDefault(false),
 );
 
 const tailscaleServePortFlag = Flag.integer("tailscale-serve-port").pipe(
   Flag.withSchema(PortSchema),
-  Flag.withDescription("HTTPS port for Tailscale Serve when --tailscale is enabled."),
+  Flag.withDescription("Puerto HTTPS de Tailscale Serve cuando --tailscale está activo."),
   Flag.withDefault(DEFAULT_TAILSCALE_SERVE_PORT),
 );
 
@@ -489,7 +489,7 @@ export const pairCommand = Command.make("pair", {
   tailscaleServePort: tailscaleServePortFlag,
 }).pipe(
   Command.withDescription(
-    "Mint a pairing token for a running Fenix Code server and print it as a QR code.",
+    "Genera un token de emparejamiento para un servidor Fenix Code y muestra su código QR.",
   ),
   Command.withHandler((flags) =>
     Effect.gen(function* () {
@@ -513,12 +513,12 @@ export const pairCommand = Command.make("pair", {
         pairingBaseUrl = resolveDirectPairingBaseUrl(target.state);
         if (isLoopbackHost(new URL(pairingBaseUrl).hostname)) {
           notes.push(
-            "This URL is only reachable from this machine. Re-run with --tailscale, or restart the server with a reachable --host.",
+            "Esta URL solo es accesible desde este equipo. Usa --tailscale o reinicia el servidor con un --host accesible.",
           );
         }
         if (target.variant === "dev" && target.state.devUrl === undefined) {
           notes.push(
-            "This dev server did not record its web URL; restart it so pairing can go through the web origin.",
+            "Este servidor de desarrollo no registró su URL web; reinícialo para emparejar desde el origen web.",
           );
         }
       }

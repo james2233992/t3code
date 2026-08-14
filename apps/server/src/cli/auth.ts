@@ -52,32 +52,32 @@ const runWithEnvironmentAuth = <A, E>(
 
 const ttlFlag = Flag.string("ttl").pipe(
   Flag.withSchema(DurationFromString),
-  Flag.withDescription("TTL, for example `5m`, `1h`, `30d`, or `15 minutes`."),
+  Flag.withDescription("Duración, por ejemplo `5m`, `1h`, `30d` o `15 minutes`."),
   Flag.optional,
 );
 
 const jsonFlag = Flag.boolean("json").pipe(
-  Flag.withDescription("Emit JSON instead of human-readable output."),
+  Flag.withDescription("Devuelve JSON en lugar de texto legible."),
   Flag.withDefault(false),
 );
 
 const labelFlag = Flag.string("label").pipe(
-  Flag.withDescription("Optional human-readable label."),
+  Flag.withDescription("Etiqueta descriptiva opcional."),
   Flag.optional,
 );
 
 const subjectFlag = Flag.string("subject").pipe(
-  Flag.withDescription("Optional session subject."),
+  Flag.withDescription("Sujeto opcional del token de sesión."),
   Flag.optional,
 );
 
 const baseUrlFlag = Flag.string("base-url").pipe(
-  Flag.withDescription("Optional public base URL used to print a ready `/pair#token=...` link."),
+  Flag.withDescription("URL pública opcional para generar un enlace `/pair#token=...` listo."),
   Flag.optional,
 );
 
 const tokenOnlyFlag = Flag.boolean("token-only").pipe(
-  Flag.withDescription("Print only the issued bearer token."),
+  Flag.withDescription("Muestra solo el token de acceso emitido."),
   Flag.withDefault(false),
 );
 
@@ -88,7 +88,7 @@ const pairingCreateCommand = Command.make("create", {
   baseUrl: baseUrlFlag,
   json: jsonFlag,
 }).pipe(
-  Command.withDescription("Issue a new client pairing token."),
+  Command.withDescription("Emite un nuevo token de emparejamiento para un cliente."),
   Command.withHandler((flags) =>
     runWithEnvironmentAuth(
       flags,
@@ -117,7 +117,7 @@ const pairingListCommand = Command.make("list", {
   ...authLocationFlags,
   json: jsonFlag,
 }).pipe(
-  Command.withDescription("List active client pairing tokens without revealing their secrets."),
+  Command.withDescription("Lista los emparejamientos activos sin revelar sus secretos."),
   Command.withHandler((flags) =>
     runWithEnvironmentAuth(
       flags,
@@ -137,17 +137,19 @@ const pairingListCommand = Command.make("list", {
 
 const pairingRevokeCommand = Command.make("revoke", {
   ...authLocationFlags,
-  id: Argument.string("id").pipe(Argument.withDescription("Pairing credential id to revoke.")),
+  id: Argument.string("id").pipe(
+    Argument.withDescription("ID del emparejamiento que se revocará."),
+  ),
 }).pipe(
-  Command.withDescription("Revoke an active client pairing token."),
+  Command.withDescription("Revoca un token de emparejamiento activo."),
   Command.withHandler((flags) =>
     runWithEnvironmentAuth(flags, (environmentAuth) =>
       Effect.gen(function* () {
         const revoked = yield* environmentAuth.revokePairingLink(flags.id);
         yield* Console.log(
           revoked
-            ? `Revoked pairing credential ${flags.id}.\n`
-            : `No active pairing credential found for ${flags.id}.\n`,
+            ? `Emparejamiento ${flags.id} revocado.\n`
+            : `No se encontró un emparejamiento activo para ${flags.id}.\n`,
         );
       }),
     ),
@@ -155,7 +157,7 @@ const pairingRevokeCommand = Command.make("revoke", {
 );
 
 const pairingCommand = Command.make("pairing").pipe(
-  Command.withDescription("Manage one-time client pairing tokens."),
+  Command.withDescription("Gestiona tokens de emparejamiento de un solo uso."),
   Command.withSubcommands([pairingCreateCommand, pairingListCommand, pairingRevokeCommand]),
 );
 
@@ -167,7 +169,9 @@ const sessionIssueCommand = Command.make("issue", {
   tokenOnly: tokenOnlyFlag,
   json: jsonFlag,
 }).pipe(
-  Command.withDescription("Issue a scoped bearer access token for headless or remote clients."),
+  Command.withDescription(
+    "Emite un token de acceso limitado para clientes remotos o sin interfaz.",
+  ),
   Command.withHandler((flags) =>
     runWithEnvironmentAuth(
       flags,
@@ -197,7 +201,7 @@ const sessionListCommand = Command.make("list", {
   ...authLocationFlags,
   json: jsonFlag,
 }).pipe(
-  Command.withDescription("List active sessions without revealing bearer tokens."),
+  Command.withDescription("Lista las sesiones activas sin revelar sus tokens."),
   Command.withHandler((flags) =>
     runWithEnvironmentAuth(
       flags,
@@ -216,19 +220,19 @@ const sessionListCommand = Command.make("list", {
 const sessionRevokeCommand = Command.make("revoke", {
   ...authLocationFlags,
   sessionId: Argument.string("session-id").pipe(
-    Argument.withDescription("Session id to revoke."),
+    Argument.withDescription("ID de la sesión que se revocará."),
     Argument.withSchema(AuthSessionId),
   ),
 }).pipe(
-  Command.withDescription("Revoke an active session."),
+  Command.withDescription("Revoca una sesión activa."),
   Command.withHandler((flags) =>
     runWithEnvironmentAuth(flags, (environmentAuth) =>
       Effect.gen(function* () {
         const revoked = yield* environmentAuth.revokeSession(flags.sessionId);
         yield* Console.log(
           revoked
-            ? `Revoked session ${flags.sessionId}.\n`
-            : `No active session found for ${flags.sessionId}.\n`,
+            ? `Sesión ${flags.sessionId} revocada.\n`
+            : `No se encontró una sesión activa para ${flags.sessionId}.\n`,
         );
       }),
     ),
@@ -236,11 +240,11 @@ const sessionRevokeCommand = Command.make("revoke", {
 );
 
 const sessionCommand = Command.make("session").pipe(
-  Command.withDescription("Manage bearer sessions."),
+  Command.withDescription("Gestiona las sesiones de acceso."),
   Command.withSubcommands([sessionIssueCommand, sessionListCommand, sessionRevokeCommand]),
 );
 
 export const authCommand = Command.make("auth").pipe(
-  Command.withDescription("Manage the local auth control plane for headless deployments."),
+  Command.withDescription("Gestiona la autenticación local para instalaciones sin interfaz."),
   Command.withSubcommands([pairingCommand, sessionCommand]),
 );

@@ -127,5 +127,5 @@ export function companionArtifactForPlatform(
 
 export function companionDownloadHref(baseUrl: string, artifact: FenixCompanionArtifact): string {
   const normalizedBase = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
-  return `${normalizedBase}downloads/${encodeURIComponent(artifact.fileName)}`;
+  return `${normalizedBase}downloads/${encodeURIComponent(artifact.fileName)}?sha256=${artifact.sha256}`;
 }

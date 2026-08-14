@@ -18,60 +18,62 @@ import * as ServerConfig from "../config.ts";
 import { expandHomePath, resolveBaseDir } from "../os-jank.ts";
 
 export const modeFlag = Flag.choice("mode", ServerConfig.RuntimeMode.literals).pipe(
-  Flag.withDescription("Runtime mode. `desktop` keeps loopback defaults unless overridden."),
+  Flag.withDescription(
+    "Modo de ejecución. `desktop` mantiene la conexión local salvo configuración explícita.",
+  ),
   Flag.optional,
 );
 export const portFlag = Flag.integer("port").pipe(
   Flag.withSchema(PortSchema),
-  Flag.withDescription("Port for the HTTP/WebSocket server."),
+  Flag.withDescription("Puerto del servidor HTTP/WebSocket."),
   Flag.optional,
 );
 export const hostFlag = Flag.string("host").pipe(
-  Flag.withDescription("Host/interface to bind (for example 127.0.0.1, 0.0.0.0, or a Tailnet IP)."),
+  Flag.withDescription(
+    "Host o interfaz de escucha (por ejemplo 127.0.0.1, 0.0.0.0 o una IP de Tailnet).",
+  ),
   Flag.optional,
 );
 export const baseDirFlag = Flag.string("base-dir").pipe(
   Flag.withDescription(
-    "Explicit Fenix Code data directory; runtime state is stored under userdata (equivalent to T3CODE_HOME).",
+    "Directorio de datos de Fenix Code; el estado de ejecución se guarda en userdata.",
   ),
   Flag.optional,
 );
 export const devUrlFlag = Flag.string("dev-url").pipe(
   Flag.withSchema(Schema.URLFromString),
-  Flag.withDescription("Dev web URL to proxy/redirect to (equivalent to VITE_DEV_SERVER_URL)."),
+  Flag.withDescription("URL web de desarrollo que se usará como proxy o destino."),
   Flag.optional,
 );
 export const noBrowserFlag = Flag.boolean("no-browser").pipe(
-  Flag.withDescription("Disable automatic browser opening."),
+  Flag.withDescription("Desactiva la apertura automática del navegador."),
   Flag.optional,
 );
 export const bootstrapFdFlag = Flag.integer("bootstrap-fd").pipe(
   Flag.withSchema(Schema.Int),
-  Flag.withDescription("Read one-time bootstrap secrets from the given file descriptor."),
+  Flag.withDescription("Lee credenciales de arranque de un solo uso desde el descriptor indicado."),
   Flag.optional,
 );
 export const autoBootstrapProjectFromCwdFlag = Flag.boolean("auto-bootstrap-project-from-cwd").pipe(
   Flag.withDescription(
-    "Create a project for the current working directory on startup when missing.",
+    "Crea al iniciar un proyecto para la carpeta de trabajo actual si todavía no existe.",
   ),
   Flag.optional,
 );
 export const logWebSocketEventsFlag = Flag.boolean("log-websocket-events").pipe(
-  Flag.withDescription(
-    "Emit server-side logs for outbound WebSocket push traffic (equivalent to T3CODE_LOG_WS_EVENTS).",
-  ),
+  Flag.withDescription("Registra en el servidor el tráfico WebSocket saliente."),
   Flag.withAlias("log-ws-events"),
   Flag.optional,
 );
 export const tailscaleServeFlag = Flag.boolean("tailscale-serve").pipe(
   Flag.withDescription(
-    "Configure Tailscale Serve to expose this backend over HTTPS on the Tailnet.",
+    "Configura Tailscale Serve para exponer este backend por HTTPS en la Tailnet.",
   ),
   Flag.optional,
 );
 export const tailscaleServePortFlag = Flag.integer("tailscale-serve-port").pipe(
   Flag.withSchema(PortSchema),
-  Flag.withDescription("HTTPS port for Tailscale Serve when --tailscale-serve is enabled."),
+  Flag.withDescription("Puerto HTTPS de Tailscale Serve cuando --tailscale-serve está activo."),
   Flag.optional,
 );
 
@@ -177,7 +179,7 @@ export const sharedServerCommandFlags = {
   baseDir: baseDirFlag,
   cwd: Argument.string("cwd").pipe(
     Argument.withDescription(
-      "Working directory for provider sessions (defaults to the current directory).",
+      "Carpeta de trabajo de las sesiones (por defecto, la carpeta actual).",
     ),
     Argument.optional,
   ),

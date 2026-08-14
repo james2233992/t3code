@@ -12,7 +12,7 @@ import {
 
 const validManifest = {
   schemaVersion: 1,
-  releaseVersion: "0.0.32-pilot.20260813",
+  releaseVersion: "0.0.32-pilot.20260814",
   artifacts: [
     {
       platform: "macos",
@@ -66,7 +66,7 @@ describe("Fenix setup", () => {
     expect(companionArtifactForPlatform(manifest, "macos", "arm64")?.architecture).toBe("arm64");
     expect(companionArtifactForPlatform(manifest, "macos", "x64")).toBeNull();
     expect(companionDownloadHref("/code-lab/", manifest!.artifacts[0]!)).toBe(
-      "/code-lab/downloads/Fenix-Code-Companion-0.0.32-macos-arm64.tar.gz",
+      `/code-lab/downloads/Fenix-Code-Companion-0.0.32-macos-arm64.tar.gz?sha256=${"a".repeat(64)}`,
     );
   });
 

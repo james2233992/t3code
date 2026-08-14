@@ -135,7 +135,7 @@ const withDescriptorServer = <A, E, R>(run: (origin: string) => Effect.Effect<A,
     (server) => Effect.sync(() => server.close()),
   );
 
-describe("t3 pair", () => {
+describe("Fenix Code pair", () => {
   it.effect("mints a token and prints a QR pairing URL for a live server", () =>
     withDescriptorServer((origin) =>
       Effect.gen(function* () {
@@ -152,11 +152,11 @@ describe("t3 pair", () => {
 
         const output = yield* captureStdout(runCli(["pair", "--base-dir", baseDir]));
 
-        assert.include(output, `Pairing with pair-test (${origin})`);
-        assert.include(output, `Pairing URL: ${origin}/pair#token=`);
+        assert.include(output, `Emparejamiento con pair-test (${origin})`);
+        assert.include(output, `URL de emparejamiento: ${origin}/pair#token=`);
         assert.isTrue(output.includes("█") || output.includes("▀") || output.includes("▄"));
         // Loopback origins are not reachable from a phone; the output must say so.
-        assert.include(output, "only reachable from this machine");
+        assert.include(output, "solo es accesible desde este equipo");
 
         const token = /#token=([A-Z2-9]+)/.exec(output)?.[1];
         assert.isString(token);
@@ -168,7 +168,7 @@ describe("t3 pair", () => {
         // @effect-diagnostics-next-line preferSchemaOverJson:off - CLI JSON output is decoded as a presentation DTO.
         const credentials = JSON.parse(listed) as ReadonlyArray<{ readonly label?: string }>;
         assert.equal(credentials.length, 1);
-        assert.equal(credentials[0]?.label, "t3 pair");
+        assert.equal(credentials[0]?.label, "Emparejamiento Fenix Code");
       }),
     ).pipe(Effect.provide(NodeServices.layer)),
   );
@@ -189,7 +189,7 @@ describe("t3 pair", () => {
 
         const output = yield* captureStdout(runCli(["pair", "--base-dir", baseDir]));
 
-        assert.include(output, "Pairing URL: http://localhost:5733/pair#token=");
+        assert.include(output, "URL de emparejamiento: http://localhost:5733/pair#token=");
       }),
     ).pipe(Effect.provide(NodeServices.layer)),
   );
@@ -205,7 +205,7 @@ describe("t3 pair", () => {
       const rendered = String(
         typeof error === "object" && error !== null && "cause" in error ? error.cause : error,
       );
-      assert.include(rendered, "No running Fenix Code server found.");
+      assert.include(rendered, "No se encontró un servidor Fenix Code en ejecución.");
       assert.include(rendered, "fenix-code serve");
       assert.include(rendered, "fenix-code connect");
     }).pipe(Effect.provide(NodeServices.layer)),
@@ -236,7 +236,7 @@ describe("t3 pair", () => {
         const rendered = String(
           typeof error === "object" && error !== null && "cause" in error ? error.cause : error,
         );
-        assert.include(rendered, "No running Fenix Code server found.");
+        assert.include(rendered, "No se encontró un servidor Fenix Code en ejecución.");
       }),
     ).pipe(Effect.provide(NodeServices.layer)),
   );
@@ -262,7 +262,7 @@ describe("t3 pair", () => {
       const rendered = String(
         typeof error === "object" && error !== null && "cause" in error ? error.cause : error,
       );
-      assert.include(rendered, "No running Fenix Code server found.");
+      assert.include(rendered, "No se encontró un servidor Fenix Code en ejecución.");
     }).pipe(Effect.provide(NodeServices.layer)),
   );
 });

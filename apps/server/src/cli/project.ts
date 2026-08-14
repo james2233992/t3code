@@ -60,7 +60,7 @@ export class ProjectCommandIdGenerationError extends Schema.TaggedErrorClass<Pro
   },
 ) {
   override get message(): string {
-    return "Failed to generate a project command identifier.";
+    return "No se pudo generar el identificador de la operación del proyecto.";
   }
 }
 
@@ -74,7 +74,7 @@ export class ProjectLiveServerDeclaredResponseError extends Schema.TaggedErrorCl
   },
 ) {
   override get message(): string {
-    return `Server request failed (${this.code}, trace ${this.traceId}).`;
+    return `Falló la petición al servidor (${this.code}, traza ${this.traceId}).`;
   }
 }
 
@@ -87,7 +87,7 @@ export class ProjectLiveServerUndeclaredStatusError extends Schema.TaggedErrorCl
   },
 ) {
   override get message(): string {
-    return `Server request failed with undeclared status ${this.status}.`;
+    return `El servidor devolvió un estado no esperado: ${this.status}.`;
   }
 }
 
@@ -99,7 +99,7 @@ export class ProjectLiveServerRequestError extends Schema.TaggedErrorClass<Proje
   },
 ) {
   override get message(): string {
-    return "Failed to call the running server.";
+    return "No se pudo contactar con el servidor en ejecución.";
   }
 }
 
@@ -111,7 +111,7 @@ export class ProjectTitleEmptyError extends Schema.TaggedErrorClass<ProjectTitle
   },
 ) {
   override get message(): string {
-    return "Project title cannot be empty.";
+    return "El nombre del proyecto no puede estar vacío.";
   }
 }
 
@@ -123,7 +123,7 @@ export class ProjectIdentifierEmptyError extends Schema.TaggedErrorClass<Project
   },
 ) {
   override get message(): string {
-    return "Project identifier cannot be empty.";
+    return "El identificador del proyecto no puede estar vacío.";
   }
 }
 
@@ -138,7 +138,7 @@ export class ProjectNotFoundError extends Schema.TaggedErrorClass<ProjectNotFoun
   },
 ) {
   override get message(): string {
-    return `No active project found for '${this.identifier}'.`;
+    return `No se encontró un proyecto activo para '${this.identifier}'.`;
   }
 }
 
@@ -151,7 +151,7 @@ export class ProjectAlreadyExistsError extends Schema.TaggedErrorClass<ProjectAl
   },
 ) {
   override get message(): string {
-    return `An active project already exists for '${this.workspaceRoot}'.`;
+    return `Ya existe un proyecto activo para '${this.workspaceRoot}'.`;
   }
 }
 
@@ -444,11 +444,14 @@ const runProjectMutation = Effect.fn("runProjectMutation")(function* (
 const projectAddCommand = Command.make("add", {
   ...projectLocationFlags,
   workspaceRoot: Argument.string("path").pipe(
-    Argument.withDescription("Workspace root to add as a project."),
+    Argument.withDescription("Carpeta local que se añadirá como proyecto."),
   ),
-  title: Flag.string("title").pipe(Flag.withDescription("Optional project title."), Flag.optional),
+  title: Flag.string("title").pipe(
+    Flag.withDescription("Nombre opcional del proyecto."),
+    Flag.optional,
+  ),
 }).pipe(
-  Command.withDescription("Add a project."),
+  Command.withDescription("Añade un proyecto."),
   Command.withHandler((flags) =>
     runProjectMutation(
       flags,
@@ -484,7 +487,7 @@ const projectAddCommand = Command.make("add", {
           defaultModelSelection: ServerRuntimeStartup.getAutoBootstrapDefaultModelSelection(),
           createdAt: DateTime.formatIso(yield* DateTime.now),
         });
-        return `Added project ${projectId} (${title}) at ${workspaceRoot}.`;
+        return `Proyecto ${projectId} (${title}) añadido en ${workspaceRoot}.`;
       }),
     ),
   ),
@@ -493,14 +496,14 @@ const projectAddCommand = Command.make("add", {
 const projectRemoveCommand = Command.make("remove", {
   ...projectLocationFlags,
   project: Argument.string("project").pipe(
-    Argument.withDescription("Project id or workspace root to remove."),
+    Argument.withDescription("ID del proyecto o carpeta local que se eliminará."),
   ),
   force: Flag.boolean("force").pipe(
-    Flag.withDescription("Delete the project and all of its threads."),
+    Flag.withDescription("Elimina el proyecto y todos sus hilos."),
     Flag.withDefault(false),
   ),
 }).pipe(
-  Command.withDescription("Remove a project."),
+  Command.withDescription("Elimina un proyecto."),
   Command.withHandler((flags) =>
     runProjectMutation(
       flags,
@@ -523,7 +526,7 @@ const projectRemoveCommand = Command.make("remove", {
           projectId: project.id,
           force: flags.force,
         });
-        return `Removed project ${project.id} (${project.title}).`;
+        return `Proyecto ${project.id} (${project.title}) eliminado.`;
       }),
     ),
   ),
@@ -532,11 +535,11 @@ const projectRemoveCommand = Command.make("remove", {
 const projectRenameCommand = Command.make("rename", {
   ...projectLocationFlags,
   project: Argument.string("project").pipe(
-    Argument.withDescription("Project id or workspace root to rename."),
+    Argument.withDescription("ID del proyecto o carpeta local que se renombrará."),
   ),
-  title: Argument.string("title").pipe(Argument.withDescription("New project title.")),
+  title: Argument.string("title").pipe(Argument.withDescription("Nuevo nombre del proyecto.")),
 }).pipe(
-  Command.withDescription("Rename a project."),
+  Command.withDescription("Renombra un proyecto."),
   Command.withHandler((flags) =>
     runProjectMutation(
       flags,
@@ -555,7 +558,7 @@ const projectRenameCommand = Command.make("rename", {
         });
         const nextTitle = yield* resolveProjectTitle(project.workspaceRoot, flags.title);
         if (nextTitle === project.title) {
-          return `Project ${project.id} is already named ${nextTitle}.`;
+          return `El proyecto ${project.id} ya se llama ${nextTitle}.`;
         }
 
         yield* dispatch({
@@ -564,13 +567,13 @@ const projectRenameCommand = Command.make("rename", {
           projectId: project.id,
           title: nextTitle,
         });
-        return `Renamed project ${project.id} to ${nextTitle}.`;
+        return `Proyecto ${project.id} renombrado como ${nextTitle}.`;
       }),
     ),
   ),
 );
 
 export const projectCommand = Command.make("project").pipe(
-  Command.withDescription("Manage projects."),
+  Command.withDescription("Gestiona proyectos locales."),
   Command.withSubcommands([projectAddCommand, projectRemoveCommand, projectRenameCommand]),
 );
