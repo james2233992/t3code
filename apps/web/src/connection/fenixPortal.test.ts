@@ -155,7 +155,7 @@ describe("Fenix portal companion API", () => {
     const fetchImpl = vi
       .fn<typeof fetch>()
       .mockResolvedValueOnce(
-        new Response(JSON.stringify({ data: { token: "csrf-token" } }), {
+        new Response(JSON.stringify({ headerName: "X-CSRF-TOKEN", token: "csrf-token" }), {
           status: 200,
           headers: { "Content-Type": "application/json" },
         }),
@@ -286,6 +286,84 @@ describe("Fenix portal companion API", () => {
       ].join("\n"),
     );
     expect(installCommand).not.toMatch(/\bt3\b/i);
+  });
+
+  it("keeps compatibility with a wrapped CSRF token envelope", async () => {
+    const fetchImpl = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ data: { token: "wrapped-csrf-token" } }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            attemptId: "a".repeat(32),
+            pairingToken: "p".repeat(43),
+            expiresAt: "2026-08-12T20:00:00Z",
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        ),
+      );
+
+    await issueFenixPortalPairing({
+      agentId: 9,
+      deviceName: "Mac de prueba",
+      fetchImpl,
+      url: PORTAL_URL,
+    });
+
+    expect(fetchImpl).toHaveBeenNthCalledWith(
+      2,
+      "https://iaonline.io/api/v1/code-lab/pairings",
+      expect.objectContaining({
+        headers: expect.objectContaining({ "X-CSRF-TOKEN": "wrapped-csrf-token" }),
+      }),
+    );
+  });
+
+  it("uses a wrapped CSRF token when a direct token field is malformed", async () => {
+    const fetchImpl = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            token: { malformed: true },
+            data: { token: "wrapped-csrf-token" },
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            attemptId: "a".repeat(32),
+            pairingToken: "p".repeat(43),
+            expiresAt: "2026-08-12T20:00:00Z",
+          }),
+          { status: 200, headers: { "Content-Type": "application/json" } },
+        ),
+      );
+
+    await issueFenixPortalPairing({
+      agentId: 9,
+      deviceName: "Mac de prueba",
+      fetchImpl,
+      url: PORTAL_URL,
+    });
+
+    expect(fetchImpl).toHaveBeenNthCalledWith(
+      2,
+      "https://iaonline.io/api/v1/code-lab/pairings",
+      expect.objectContaining({
+        headers: expect.objectContaining({ "X-CSRF-TOKEN": "wrapped-csrf-token" }),
+      }),
+    );
   });
 
   it("rejects an unsafe package name in the login-bound install command", () => {

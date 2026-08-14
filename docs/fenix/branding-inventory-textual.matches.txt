@@ -3034,11 +3034,11 @@
 ./apps/web/src/connection/desktopLocal.ts:1:40:@t3tools
 ./apps/web/src/connection/desktopLocal.ts:6:9:@t3tools
 ./apps/web/src/connection/fenixPortal.ts:118:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:140:39:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:142:39:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:17:28:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:220:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:259:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:309:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:222:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:261:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:311:22:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:5:9:@t3tools
 ./apps/web/src/connection/fenixPortal.ts:6:32:@t3tools
 ./apps/web/src/connection/onboarding.ts:1:39:@t3tools
