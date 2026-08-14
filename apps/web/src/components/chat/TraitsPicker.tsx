@@ -50,17 +50,17 @@ const ULTRATHINK_PROMPT_PREFIX = "Ultrathink:\n";
 
 const SPANISH_PROVIDER_OPTION_LABELS: Readonly<Record<string, string>> = {
   Reasoning: "Razonamiento",
-  "Fast Mode": "Modo rapido",
+  "Fast Mode": "Modo rápido",
   "Context Window": "Ventana de contexto",
   Thinking: "Pensamiento",
   "Service Tier": "Nivel de servicio",
-  Standard: "Estandar",
-  Fast: "Rapido",
+  Standard: "Estándar",
+  Fast: "Rápido",
   Low: "Bajo",
   Medium: "Medio",
   High: "Alto",
   "Extra High": "Muy alto",
-  Max: "Maximo",
+  Max: "Máximo",
 };
 
 function localizeProviderOptionLabel(label: string): string {
@@ -448,7 +448,7 @@ export function buildTraitsTriggerDisplay(input: {
   // off an empty label list alone would also catch descriptors that resolved to
   // no label at all, printing a bogus "Normal" for a model without fast mode.
   if (labels.length === 0 && hasFastMode) {
-    return { label: fastModeEnabled ? "Rapido" : "Normal", showFastModeIcon: false };
+    return { label: fastModeEnabled ? "Rápido" : "Normal", showFastModeIcon: false };
   }
   return { label: labels.join(" · "), showFastModeIcon: fastModeEnabled };
 }

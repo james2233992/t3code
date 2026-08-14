@@ -39,7 +39,7 @@ describe("ComposerPendingApprovalPanel", () => {
       />,
     );
 
-    expect(markup).toContain("Se solicita aprobacion para modificar el archivo");
+    expect(markup).toContain("Se solicita aprobación para modificar el archivo");
     expect(markup).toContain('aria-label="Cambio de archivo"');
   });
 });

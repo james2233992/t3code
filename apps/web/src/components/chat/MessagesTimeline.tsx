@@ -1394,6 +1394,7 @@ function WorkGroupToggleTimelineRow({
     : row.hiddenCount === 1
       ? "entrada de registro"
       : "entradas de registro";
+  const previousLabel = row.hiddenCount === 1 ? "anterior" : "anteriores";
 
   return (
     <button
@@ -1416,7 +1417,7 @@ function WorkGroupToggleTimelineRow({
         </span>
       ) : (
         <span className="font-medium text-foreground">
-          +{row.hiddenCount} {labelNoun} anteriores
+          +{row.hiddenCount} {labelNoun} {previousLabel}
         </span>
       )}
     </button>

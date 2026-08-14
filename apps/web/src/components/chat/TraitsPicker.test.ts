@@ -94,7 +94,7 @@ describe("buildTraitsTriggerDisplay", () => {
 
   it("falls back to a text label when fast mode is the only trait", () => {
     expect(display([fastModeDescriptor(true)])).toEqual({
-      label: "Rapido",
+      label: "Rápido",
       showFastModeIcon: false,
     });
     expect(display([fastModeDescriptor(false)])).toEqual({
