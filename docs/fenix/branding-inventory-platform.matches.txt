@@ -3023,6 +3023,10 @@
 ./docs/fenix/qa-f1-report-20260810.md:26:75:t3code
 ./docs/fenix/qa-f1-report-20260810.md:50:3:t3code
 ./docs/fenix/qa-f1-report-20260810.md:9:3:t3code
+./docs/fenix/upstream-parity-audit-20260814.md:11:54:t3code
+./docs/fenix/upstream-parity-audit-20260814.md:12:49:t3code
+./docs/fenix/upstream-parity-audit-20260814.md:13:55:t3code
+./docs/fenix/upstream-parity-audit-20260814.md:14:63:t3code
 ./docs/internals/remote.md:100:39:@t3tools
 ./docs/internals/resource-telemetry.md:228:5:T3CODE
 ./docs/internals/scripts.md:110:13:T3CODE

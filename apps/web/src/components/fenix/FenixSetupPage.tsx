@@ -2,12 +2,17 @@ import { Link } from "@tanstack/react-router";
 import {
   AppleIcon,
   ArrowRightIcon,
+  BotIcon,
   CheckIcon,
   ClipboardIcon,
   DownloadIcon,
+  ExternalLinkIcon,
   FolderLockIcon,
+  GitPullRequestIcon,
   LaptopIcon,
+  MessagesSquareIcon,
   MonitorIcon,
+  RotateCcwIcon,
   ShieldCheckIcon,
   SmartphoneIcon,
   TerminalSquareIcon,
@@ -54,13 +59,13 @@ const platformDetails: Record<
   windows: {
     label: "Windows",
     shortLabel: "Windows",
-    description: "Windows 11 · paquete nativo en validación",
+    description: "Windows 11",
     Icon: MonitorIcon,
   },
   linux: {
     label: "Linux",
     shortLabel: "Linux",
-    description: "Distribuciones con systemd · paquete en validación",
+    description: "Distribuciones con systemd",
     Icon: TerminalSquareIcon,
   },
 };
@@ -89,6 +94,43 @@ const privacyItems: ReadonlyArray<{
     Icon: TerminalSquareIcon,
     title: "Herramientas en tu máquina",
     body: "Las credenciales BYOS y los procesos de desarrollo permanecen en el ordenador del usuario.",
+  },
+];
+
+const capabilityItems: ReadonlyArray<{
+  readonly Icon: LucideIcon;
+  readonly title: string;
+  readonly body: string;
+}> = [
+  {
+    Icon: FolderLockIcon,
+    title: "Carpetas locales y repositorios",
+    body: "Trabaja con una carpeta de tu equipo o incorpora repositorios por URL Git, GitHub, GitLab, Bitbucket y Azure DevOps.",
+  },
+  {
+    Icon: BotIcon,
+    title: "Tus agentes de programación",
+    body: "Reúne Codex, Claude, Cursor, Grok, OpenCode y el carril Fenix sin mover sus credenciales fuera de tu máquina.",
+  },
+  {
+    Icon: MessagesSquareIcon,
+    title: "Hilos y tareas en paralelo",
+    body: "Mantén cada encargo separado, revisa el avance y retoma el contexto del proyecto desde una única interfaz.",
+  },
+  {
+    Icon: RotateCcwIcon,
+    title: "Diffs, checkpoints y revert",
+    body: "Inspecciona los cambios antes de aceptarlos, crea puntos de control y vuelve atrás sin perder el historial del trabajo.",
+  },
+  {
+    Icon: GitPullRequestIcon,
+    title: "Flujo Git completo",
+    body: "Revisa archivos, prepara commits y continúa hacia push o pull request desde el mismo ciclo de desarrollo.",
+  },
+  {
+    Icon: SmartphoneIcon,
+    title: "Continuidad móvil privada",
+    body: "El cliente móvil ya comparte el contrato de pairing Fenix; la distribución firmada sigue en validación antes del piloto.",
   },
 ];
 
@@ -155,6 +197,16 @@ export function FenixSetupPage() {
   const [mobilePairingError, setMobilePairingError] = useState<string | null>(null);
   const { failed: manifestFailed, manifest } = useCompanionManifest();
   const artifact = companionArtifactForPlatform(manifest, platform, architecture);
+  const publishedCompanionTargets = useMemo(
+    () =>
+      manifest?.artifacts
+        .filter((candidate) => candidate.available)
+        .map((candidate) => {
+          const architectureLabel = candidate.architecture === "arm64" ? "Apple Silicon" : "x64";
+          return `${platformDetails[candidate.platform].label} ${architectureLabel}`;
+        }) ?? [],
+    [manifest],
+  );
   const agentId = readFenixPortalAgentId();
   const installCommand = useMemo(
     () =>
@@ -266,8 +318,19 @@ export function FenixSetupPage() {
 
   return (
     <main className="min-h-dvh overflow-x-hidden bg-[#070707] text-white">
-      <section className="relative flex min-h-[min(860px,88svh)] flex-col border-b border-white/10">
-        <header className="mx-auto flex w-full max-w-[1240px] items-center justify-between px-5 py-5 sm:px-8">
+      <section className="relative flex flex-col overflow-hidden border-b border-white/10">
+        <img
+          src={`${baseUrl}fenix-code-workspace-hero.jpg`}
+          alt=""
+          aria-hidden="true"
+          className="absolute inset-0 size-full object-cover object-center opacity-48"
+          loading="eager"
+          decoding="async"
+        />
+        <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(5,5,5,0.98)_0%,rgba(5,5,5,0.82)_38%,rgba(5,5,5,0.28)_72%,rgba(5,5,5,0.64)_100%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(5,5,5,0.25)_0%,rgba(5,5,5,0.14)_55%,rgba(5,5,5,0.98)_100%)]" />
+
+        <header className="relative z-10 mx-auto flex w-full max-w-[1240px] items-center justify-between px-5 py-5 sm:px-8">
           <Link to="/" className="flex items-center gap-2.5 text-sm font-semibold text-white">
             <img src={`${baseUrl}favicon-32x32.png`} alt="" className="size-7" />
             <span>Fenix Code</span>
@@ -281,8 +344,8 @@ export function FenixSetupPage() {
           </Link>
         </header>
 
-        <div className="mx-auto grid w-full max-w-[1240px] flex-1 items-center gap-8 px-5 pb-10 pt-6 sm:gap-12 sm:px-8 sm:pb-12 sm:pt-8 lg:grid-cols-[0.86fr_1.14fr] lg:gap-16 lg:pb-16 lg:pt-10">
-          <div className="max-w-xl">
+        <div className="relative z-10 mx-auto flex w-full max-w-[1240px] items-center px-5 pb-10 pt-12 sm:px-8 sm:pb-12 sm:pt-16 lg:pb-14 lg:pt-20">
+          <div className="max-w-2xl">
             <div className="mb-6 inline-flex items-center gap-2 border-l-2 border-[#3b82f6] pl-3 text-xs font-semibold uppercase text-white/62">
               <ShieldCheckIcon className="size-4 text-[#60a5fa]" />
               Acceso privado desde Fenix
@@ -290,9 +353,9 @@ export function FenixSetupPage() {
             <h1 className="text-5xl font-semibold leading-[1.02] tracking-[0] text-white sm:text-6xl lg:text-7xl">
               Fenix Code
             </h1>
-            <p className="mt-6 max-w-lg text-lg leading-8 text-white/66">
-              Tu entorno local de programación, conectado de forma privada a Fenix. Tus carpetas,
-              credenciales y herramientas permanecen en tu equipo.
+            <p className="mt-6 max-w-xl text-lg leading-8 text-white/72 sm:text-xl sm:leading-9">
+              El centro de trabajo privado para tus agentes de programación. Usa proyectos locales,
+              coordina tareas y revisa cada cambio sin sacar tus credenciales de tu equipo.
             </p>
 
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
@@ -325,7 +388,7 @@ export function FenixSetupPage() {
               </a>
             </div>
 
-            <div className="mt-8 hidden gap-3 text-sm text-white/58 sm:grid sm:grid-cols-3">
+            <div className="mt-8 hidden gap-3 text-sm text-white/66 sm:grid sm:grid-cols-3">
               <span className="flex items-center gap-2">
                 <CheckIcon className="size-4 text-[#34d399]" /> Solo usuarios asignados
               </span>
@@ -337,21 +400,98 @@ export function FenixSetupPage() {
               </span>
             </div>
           </div>
+        </div>
 
-          <figure className="relative overflow-hidden rounded-lg border border-white/14 bg-[#101010] p-2 shadow-2xl shadow-black/60">
+        <div className="relative z-10 mx-auto w-full max-w-[1240px] px-5 sm:px-8">
+          <figure className="overflow-hidden rounded-lg border border-white/14 bg-[#101010] p-1.5 shadow-2xl shadow-black/70 sm:p-2">
             <img
-              src={`${baseUrl}fenix-code-setup-preview.png`}
-              alt="Interfaz real de Fenix Code con un proyecto local preparado para trabajar"
-              width="1280"
-              height="720"
-              className="aspect-video w-full rounded-md object-cover object-left-top"
+              src={`${baseUrl}fenix-code-empty-real.jpg`}
+              alt="Interfaz real de Fenix Code, lista para añadir un proyecto local"
+              width="1440"
+              height="900"
+              className="aspect-[16/8.8] w-full rounded-md object-cover object-top"
               loading="eager"
               decoding="async"
             />
             <figcaption className="sr-only">
-              La aplicación Fenix Code conserva el flujo completo del editor de escritorio.
+              Captura real de Fenix Code ejecutándose con la marca Fenix.
             </figcaption>
           </figure>
+        </div>
+      </section>
+
+      <section className="border-b border-white/10 bg-[#0b0b0b] py-20">
+        <div className="mx-auto w-full max-w-[1080px] px-5 sm:px-8">
+          <div className="grid gap-10 lg:grid-cols-[0.72fr_1.28fr] lg:items-end">
+            <div>
+              <p className="text-xs font-semibold uppercase text-[#60a5fa]">Producto real</p>
+              <h2 className="mt-3 text-3xl font-semibold tracking-[0] sm:text-4xl">
+                Local cuando lo necesitas. Remoto cuando lo eliges.
+              </h2>
+            </div>
+            <p className="max-w-2xl text-base leading-7 text-white/60">
+              Fenix Code no te obliga a subir el proyecto a un servicio externo. Puedes abrir una
+              carpeta autorizada en tu ordenador o conectar una URL Git y mantener el control del
+              repositorio desde la misma experiencia.
+            </p>
+          </div>
+
+          <figure className="mt-12 overflow-hidden rounded-lg border border-white/12 bg-black p-1.5 shadow-xl shadow-black/40 sm:p-2">
+            <img
+              src={`${baseUrl}fenix-code-project-sources-real.jpg`}
+              alt="Selector real de Fenix Code con carpeta local, URL Git, Azure DevOps, GitHub, Bitbucket y GitLab"
+              width="1440"
+              height="900"
+              className="aspect-[16/9] w-full rounded-md object-cover object-top"
+              loading="lazy"
+              decoding="async"
+            />
+            <figcaption className="mt-3 px-2 pb-1 text-xs leading-5 text-white/42">
+              Captura real del selector de proyectos. Cada raíz local se valida y queda vinculada al
+              dispositivo del usuario.
+            </figcaption>
+          </figure>
+
+          <div className="mt-16 grid border-y border-white/10 sm:grid-cols-2 lg:grid-cols-3">
+            {capabilityItems.map(({ Icon, title, body }, index) => (
+              <article
+                key={title}
+                className={cn(
+                  "border-white/10 py-7 sm:px-6",
+                  index % 2 === 0 ? "sm:border-r" : "",
+                  index % 3 !== 2 ? "lg:border-r" : "lg:border-r-0",
+                  index >= 3 ? "border-t" : "",
+                  index === 2 ? "sm:border-t lg:border-t-0" : "",
+                )}
+              >
+                <Icon className="size-5 text-white/70" />
+                <h3 className="mt-4 text-sm font-semibold text-white">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-white/50">{body}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className="mt-12 flex flex-col gap-5 border-l-2 border-[#34d399] pl-5 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p className="text-sm font-semibold text-white">Piloto privado en curso</p>
+              <p className="mt-1 text-sm leading-6 text-white/52">
+                {manifestFailed
+                  ? "La información de descarga no está disponible."
+                  : manifest === null
+                    ? "Consultando los paquetes publicados para este piloto."
+                    : publishedCompanionTargets.length === 0
+                      ? "Todavía no hay paquetes de companion publicados para descarga."
+                      : `Companion publicado: ${publishedCompanionTargets.join(", ")}. La distribución móvil se comunica por el canal privado del piloto.`}
+              </p>
+            </div>
+            <a
+              href="#instalacion"
+              className="inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-md border border-white/16 px-4 text-sm font-semibold text-white hover:bg-white/8"
+            >
+              Ver instalación
+              <ExternalLinkIcon className="size-4" />
+            </a>
+          </div>
         </div>
       </section>
 
