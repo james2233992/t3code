@@ -157,6 +157,13 @@ cp scripts/fenix/companion-package/README.txt "$package_dir/README.txt"
 sed -i '' "s/__FENIX_CODE_VERSION__/${version}/g" "$package_dir/install.sh" "$package_dir/bin/fenix-code"
 chmod 0755 "$package_dir/install.sh" "$package_dir/bin/fenix-code" "$package_dir/payload/node/bin/node"
 
+(
+  cd "$package_dir"
+  find bin payload -type f -print0 |
+    sort -z |
+    xargs -0 shasum -a 256 > PAYLOAD-SHA256SUMS
+)
+
 smoke_version="$(
   HOME="${work_dir}/smoke-home" \
     FENIX_CODE_HOME="${work_dir}/smoke-home/.fenix-code" \

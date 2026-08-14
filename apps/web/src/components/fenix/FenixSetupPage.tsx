@@ -215,6 +215,7 @@ export function FenixSetupPage() {
         ? null
         : buildFenixCompanionInstallCommand({
             artifactFileName: artifact.fileName,
+            artifactSha256: artifact.sha256,
             portalOrigin: window.location.origin,
             pairing,
           }),

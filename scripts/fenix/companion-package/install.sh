@@ -79,12 +79,18 @@ for required in \
   "${package_dir}/payload/runtime/node_modules/t3/dist/service-launcher.mjs" \
   "${package_dir}/payload/runtime/.fenix-portal-auth-required" \
   "${package_dir}/payload/node/bin/node" \
-  "${package_dir}/bin/fenix-code"; do
+  "${package_dir}/bin/fenix-code" \
+  "${package_dir}/PAYLOAD-SHA256SUMS"; do
   if [[ ! -f "$required" ]]; then
     echo "Paquete incompleto: falta ${required#${package_dir}/}." >&2
     exit 65
   fi
 done
+
+if ! (cd "$package_dir" && shasum -a 256 -c PAYLOAD-SHA256SUMS >/dev/null 2>&1); then
+  echo "El paquete no supera la verificación interna de integridad." >&2
+  exit 65
+fi
 
 cleanup() {
   status=$?

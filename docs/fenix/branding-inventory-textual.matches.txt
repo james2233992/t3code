@@ -2832,20 +2832,20 @@
 ./apps/web/src/components/desktopUpdate.toast.test.tsx:3:42:@t3tools
 ./apps/web/src/components/desktopUpdate.toast.tsx:1:57:@t3tools
 ./apps/web/src/components/diffs/AnnotatableCodeView.tsx:10:39:@t3tools
-./apps/web/src/components/fenix/FenixSetupPage.tsx:260:55:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:284:61:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:293:24:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:337:19:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:355:15:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:410:37:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:418:31:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:434:15:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:443:37:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:575:59:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:686:55:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:736:52:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:778:57:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:827:15:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:261:55:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:285:61:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:294:24:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:338:19:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:356:15:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:411:37:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:419:31:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:435:15:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:444:37:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:576:59:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:687:55:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:737:52:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:779:57:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:828:15:Fenix Code
 ./apps/web/src/components/files/FileBrowserPanel.tsx:5:51:@t3tools
 ./apps/web/src/components/files/FileBrowserPanel.tsx:7:44:@t3tools
 ./apps/web/src/components/files/FilePreviewPanel.tsx:14:9:@t3tools
@@ -3033,12 +3033,15 @@
 ./apps/web/src/connection/desktopLocal.test.ts:5:62:@t3tools
 ./apps/web/src/connection/desktopLocal.ts:1:40:@t3tools
 ./apps/web/src/connection/desktopLocal.ts:6:9:@t3tools
+./apps/web/src/connection/fenixPortal.test.ts:312:46:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:137:22:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:161:39:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:17:28:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:241:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:280:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:330:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:281:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:284:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:295:42:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:345:22:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:39:21:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:40:4:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:5:9:@t3tools
@@ -4537,9 +4540,9 @@
 ./scripts/fenix/companion-package/README.txt:4:69:Fenix Code
 ./scripts/fenix/companion-package/fenix-code:10:9:Fenix Code
 ./scripts/fenix/companion-package/fenix-code:14:8:T3CODE
-./scripts/fenix/companion-package/install.sh:153:59:Fenix Code
-./scripts/fenix/companion-package/install.sh:222:11:Fenix Code
-./scripts/fenix/companion-package/install.test.sh:138:71:Fenix Code
+./scripts/fenix/companion-package/install.sh:159:59:Fenix Code
+./scripts/fenix/companion-package/install.sh:228:11:Fenix Code
+./scripts/fenix/companion-package/install.test.sh:156:71:Fenix Code
 ./scripts/fenix/f1-2c-bridge-e2e.mjs:171:52:Fenix Code
 ./scripts/fenix/f1-2c-bridge-e2e.mjs:293:40:Fenix Code
 ./scripts/fenix/f1-2c-bridge-e2e.mjs:305:25:Fenix Code
