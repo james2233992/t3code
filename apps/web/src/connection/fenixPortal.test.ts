@@ -5,6 +5,7 @@ import {
   buildFenixCompanionInstallCommand,
   buildFenixMobilePairingUrl,
   classifyFenixPortalFailure,
+  describeFenixPortalPairingFailure,
   fenixPortalDeviceRegistration,
   fenixPortalConnectedDeviceRegistrations,
   fenixPortalSocket,
@@ -20,6 +21,31 @@ const PORTAL_URL = new URL("https://iaonline.io/code-lab/?agentId=9");
 const TICKET = "t".repeat(43);
 
 describe("Fenix portal companion API", () => {
+  it("describes pairing failures without exposing arbitrary exception content", async () => {
+    const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status: 403 }));
+    let httpFailure: unknown;
+    try {
+      await issueFenixPortalPairing({
+        agentId: 9,
+        deviceName: "Mac de prueba",
+        fetchImpl,
+        url: PORTAL_URL,
+      });
+    } catch (error) {
+      httpFailure = error;
+    }
+
+    expect(describeFenixPortalPairingFailure(httpFailure)).toBe(
+      "La API de Fenix ha respondido con HTTP 403.",
+    );
+    expect(describeFenixPortalPairingFailure(new Error("unexpected internal diagnostic"))).toBe(
+      "Fenix ha devuelto una respuesta de emparejamiento no válida.",
+    );
+    expect(describeFenixPortalPairingFailure(new TypeError("Failed to fetch"))).toBe(
+      "No se ha podido completar la conexión con Fenix.",
+    );
+  });
+
   it("builds a mobile QR bound to the authenticated portal pairing", () => {
     const url = new URL(
       buildFenixMobilePairingUrl({

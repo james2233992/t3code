@@ -23,6 +23,7 @@ import { useEffect, useMemo, useState } from "react";
 import {
   buildFenixCompanionInstallCommand,
   buildFenixMobilePairingUrl,
+  describeFenixPortalPairingFailure,
   issueFenixPortalPairing,
   readFenixPortalAgentId,
   type FenixPortalPairing,
@@ -269,9 +270,9 @@ export function FenixSetupPage() {
           deviceName,
         }),
       );
-    } catch {
+    } catch (cause) {
       setPairingError(
-        "No se pudo generar el emparejamiento. Comprueba que tu sesión Fenix sigue activa.",
+        `No se pudo generar el emparejamiento. ${describeFenixPortalPairingFailure(cause)}`,
       );
     } finally {
       setPairingBusy(false);
@@ -292,9 +293,9 @@ export function FenixSetupPage() {
           deviceName: "Fenix Code Mobile",
         }),
       );
-    } catch {
+    } catch (cause) {
       setMobilePairingError(
-        "No se pudo generar el QR. Comprueba que tu sesión Fenix sigue activa.",
+        `No se pudo generar el QR. ${describeFenixPortalPairingFailure(cause)}`,
       );
     } finally {
       setMobilePairingBusy(false);

@@ -35,6 +35,25 @@ export function classifyFenixPortalFailure(cause: unknown): FenixPortalFailureKi
   return "configuration";
 }
 
+const SAFE_PORTAL_ERROR_MESSAGES = new Set([
+  "El token CSRF de Fenix Code Lab no está disponible.",
+  "Fenix Code Lab returned an invalid pairing envelope.",
+  "Introduce un nombre de entorno local de 1 a 80 caracteres.",
+]);
+
+export function describeFenixPortalPairingFailure(cause: unknown): string {
+  if (cause instanceof FenixPortalHttpError) {
+    return `La API de Fenix ha respondido con HTTP ${cause.status}.`;
+  }
+  if (cause instanceof Error && SAFE_PORTAL_ERROR_MESSAGES.has(cause.message)) {
+    return cause.message;
+  }
+  if (classifyFenixPortalFailure(cause) === "network") {
+    return "No se ha podido completar la conexión con Fenix.";
+  }
+  return "Fenix ha devuelto una respuesta de emparejamiento no válida.";
+}
+
 function portalRequestSignal(): AbortSignal {
   return AbortSignal.timeout(PORTAL_REQUEST_TIMEOUT_MS);
 }
