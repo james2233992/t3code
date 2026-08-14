@@ -58,6 +58,7 @@ run_checks() {
       -e '>Connecting |Couldn.t connect' \
       -e 'Open in (integrated|system) browser|Copy Link|Sign in|Create link|Fenix Connect enabled' \
       -e 'Initializing repository|Pulling latest changes|Publishing repository|Preparing pull request' \
+      -e 'Enter Git clone URL|Initialize Git|Initializing\.\.\.|(GitHub|GitLab|Bitbucket|Azure DevOps) repository|Clone (GitHub|GitLab|Bitbucket|Azure DevOps)' \
       -e 'Idle . resumable|Direct spawns|Updating providers?|Running provider update' \
       -e 'label: "(Repository conventions|Unpin thread|Pin thread|Settle thread|Wake thread|Snooze)' \
       -e 'aria-label="(Decrease|Increase) (idle|active) host|>seconds<' \
@@ -110,7 +111,18 @@ selftest() {
 
   trap 'rm -f "$test_file"' RETURN
   scan_paths+=("$test_file")
-  printf 'export function Regression() { return <p>What should we work on?</p>; }\n' > "$test_file"
+  cat > "$test_file" <<'EOF'
+export function Regression() {
+  return (
+    <>
+      <p>What should we work on?</p>
+      <p>Azure DevOps repository</p>
+      <button>Initialize Git</button>
+      <input placeholder="Enter Git clone URL" />
+    </>
+  );
+}
+EOF
 
   set +e
   red_output="$(run_checks 2>&1)"
@@ -126,6 +138,13 @@ selftest() {
     echo "$red_output" >&2
     return 1
   fi
+  for expected_hit in "Azure DevOps repository" "Initialize Git" "Enter Git clone URL"; do
+    if [[ "$red_output" != *"$expected_hit"* ]]; then
+      echo "selftest failed: English UI fixture was not detected: $expected_hit" >&2
+      echo "$red_output" >&2
+      return 1
+    fi
+  done
 
   rm -f "$test_file"
   scan_paths=("${scan_paths[@]:0:${#scan_paths[@]}-1}")

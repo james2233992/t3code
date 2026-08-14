@@ -1681,7 +1681,7 @@ export default function GitActionsControl({
         >
           <GitBranchPlusIcon className="size-3.5" aria-hidden />
           <span className="ml-0.5">
-            {initAction.isPending ? "Initializing..." : "Initialize Git"}
+            {initAction.isPending ? "Inicializando…" : "Inicializar Git"}
           </span>
         </Button>
       ) : (

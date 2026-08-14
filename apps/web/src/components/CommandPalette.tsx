@@ -239,13 +239,13 @@ function remoteProjectSourceLabel(source: AddProjectRemoteSource): string {
 function remoteProjectSourcePathHint(source: AddProjectRemoteSource): string {
   switch (source) {
     case "github":
-      return "owner/repo";
+      return "propietario/repositorio";
     case "gitlab":
-      return "group/project";
+      return "grupo/proyecto";
     case "bitbucket":
-      return "workspace/repository";
+      return "espacio/repositorio";
     case "azure-devops":
-      return "project/repository";
+      return "proyecto/repositorio";
     case "url":
       return "URL";
   }
@@ -276,9 +276,9 @@ function remoteProjectInputPlaceholder(flow: AddProjectCloneFlow | null): string
   if (!flow) return null;
   if (flow.step === "confirm") return null;
   if (flow.source === "url") {
-    return "Enter Git clone URL";
+    return "Introduce la URL de clonación Git";
   }
-  return `Enter ${remoteProjectSourceLabel(flow.source)} repository (${remoteProjectSourcePathHint(flow.source)})`;
+  return `Introduce el repositorio de ${remoteProjectSourceLabel(flow.source)} (${remoteProjectSourcePathHint(flow.source)})`;
 }
 
 function sourceProviderKind(source: AddProjectRemoteSource): AddProjectRemoteProviderKind | null {
@@ -1155,11 +1155,11 @@ function OpenCommandPaletteDialog(props: {
 
       for (const source of orderedSources) {
         const label = remoteProjectSourceLabel(source);
-        const title = source === "url" ? "Git URL" : `${label} repository`;
+        const title = source === "url" ? "URL Git" : `Repositorio de ${label}`;
         const description =
           source === "url"
             ? "Clonar desde una URL remota"
-            : `Clone ${label} ${remoteProjectSourcePathHint(source)}`;
+            : `Clonar ${remoteProjectSourcePathHint(source)} desde ${label}`;
         const readiness = readinessBySource[source];
         const disabledHint = readiness.hint;
 

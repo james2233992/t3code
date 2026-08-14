@@ -4523,7 +4523,7 @@
 ./scripts/fenix/check-mobile-release-config.mjs:25:42:T3CODE
 ./scripts/fenix/check-mobile-release-config.mjs:84:27:Fenix Code
 ./scripts/fenix/check-spanish-ui.sh:59:77:Fenix Connect
-./scripts/fenix/check-spanish-ui.sh:69:57:Fenix Code
+./scripts/fenix/check-spanish-ui.sh:70:57:Fenix Code
 ./scripts/fenix/check-visible-branding.sh:185:20:T3 Tools
 ./scripts/fenix/check-visible-branding.sh:201:23:T3CODE
 ./scripts/fenix/check-visible-branding.sh:201:43:T3CODE
