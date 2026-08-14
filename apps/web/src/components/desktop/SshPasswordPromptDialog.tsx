@@ -22,9 +22,9 @@ function formatRemainingSeconds(seconds: number): string {
 }
 
 function getPromptErrorMessage(error: unknown): string {
-  const message = error instanceof Error ? error.message : "SSH password prompt failed.";
+  const message = error instanceof Error ? error.message : "Falló la solicitud de contraseña SSH.";
   return message.includes("expired") || message.includes("no longer pending")
-    ? "This SSH password prompt expired. Try connecting again."
+    ? "La solicitud de contraseña SSH ha caducado. Intenta conectarte de nuevo."
     : message;
 }
 
@@ -101,7 +101,7 @@ function ActiveSshPasswordPrompt({
   const remainingLabel =
     remainingSeconds === null ? null : formatRemainingSeconds(remainingSeconds);
   const visibleResponseError = isExpired
-    ? "This SSH password prompt expired. Try connecting again."
+    ? "La solicitud de contraseña SSH ha caducado. Intenta conectarte de nuevo."
     : responseError;
 
   const respond = async (nextPassword: string | null) => {
@@ -111,7 +111,7 @@ function ActiveSshPasswordPrompt({
 
     const requestId = request.requestId;
     if (nextPassword !== null && isExpired) {
-      setResponseError("This SSH password prompt expired. Try connecting again.");
+      setResponseError("La solicitud de contraseña SSH ha caducado. Intenta conectarte de nuevo.");
       return;
     }
 
@@ -158,10 +158,11 @@ function ActiveSshPasswordPrompt({
     >
       <DialogPopup className="max-w-md" showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>SSH Password Required</DialogTitle>
+          <DialogTitle>Se necesita la contraseña SSH</DialogTitle>
           <DialogDescription>
-            T3 needs your SSH password to connect to <code>{target}</code>. The password is passed
-            to the local SSH process for this connection attempt and is not saved by Fenix Code.
+            Fenix Code necesita tu contraseña SSH para conectarse a <code>{target}</code>. La
+            contraseña se envía al proceso SSH local para este intento de conexión y Fenix Code no
+            la guarda.
           </DialogDescription>
         </DialogHeader>
         <DialogPanel className="space-y-3" scrollFade={false}>
@@ -202,17 +203,18 @@ function ActiveSshPasswordPrompt({
               <p className="text-sm text-destructive">{visibleResponseError}</p>
             ) : (
               <p className="text-sm text-muted-foreground">
-                Use SSH keys to avoid repeated password prompts on new SSH sessions.
+                Usa claves SSH para evitar solicitudes repetidas de contraseña en nuevas sesiones
+                SSH.
               </p>
             )}
           </form>
         </DialogPanel>
         <DialogFooter>
           <Button disabled={isResponding} type="button" variant="outline" onClick={cancelPrompt}>
-            {isExpired ? "Dismiss" : "Cancel"}
+            {isExpired ? "Cerrar" : "Cancelar"}
           </Button>
           <Button disabled={isResponding || isExpired} form={formId} type="submit">
-            Continue
+            Continuar
           </Button>
         </DialogFooter>
       </DialogPopup>

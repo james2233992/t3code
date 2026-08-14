@@ -26,12 +26,15 @@ function ReleaseNotesLink({
           } catch {
             // Surface rejected IPC calls through the same user-visible fallback.
           }
-          toastManager.add({ type: "error", title: "Unable to open release notes" });
+          toastManager.add({
+            type: "error",
+            title: "No se pudieron abrir las notas de la versión",
+          });
         })();
       }}
       type="button"
     >
-      Read more
+      Más información
       <ArrowRightIcon aria-hidden className="size-3 -rotate-45" strokeWidth={2.25} />
     </button>
   );
@@ -44,10 +47,10 @@ export function showDesktopUpdateDownloadedToast(
   const releaseUrl = getDesktopUpdateReleaseUrl(getDesktopUpdateDownloadedVersion(state));
   toastManager.add({
     type: "success",
-    title: "Update downloaded",
+    title: "Actualización descargada",
     description: (
       <>
-        Restart the app from the update button to install it.
+        Reinicia la aplicación desde el botón de actualización para instalarla.
         {releaseUrl ? <ReleaseNotesLink releaseUrl={releaseUrl} shell={shell} /> : null}
       </>
     ),

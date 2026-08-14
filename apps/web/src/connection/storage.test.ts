@@ -70,7 +70,7 @@ describe("makeCatalogBackend", () => {
       const error = yield* backend.write("{}").pipe(Effect.flip);
 
       expect(error).toBeInstanceOf(ConnectionTransientError);
-      expect(error.message).toContain("Desktop secure storage is unavailable");
+      expect(error.message).toContain("El almacenamiento seguro del escritorio no está disponible");
       expect(setConnectionCatalog).toHaveBeenCalledWith("{}");
     }),
   );

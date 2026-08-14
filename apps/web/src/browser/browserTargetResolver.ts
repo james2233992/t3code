@@ -64,7 +64,7 @@ const resolveEnvironmentPortTarget = (
 ): PreviewUrlResolution => {
   if (!isPrivateNetworkHost(environmentUrl.hostname)) {
     throw new Error(
-      "This environment port needs the planned authenticated preview gateway; its server address is not directly private-network reachable.",
+      "Este puerto del entorno necesita la pasarela de previsualización autenticada; la dirección del servidor no es accesible directamente desde la red privada.",
     );
   }
   const protocol = target.protocol ?? "http";

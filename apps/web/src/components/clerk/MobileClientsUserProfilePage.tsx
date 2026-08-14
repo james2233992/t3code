@@ -49,11 +49,11 @@ function MobileClientRow({ device }: { readonly device: RelayClientDeviceRecord 
           <div className="mt-3 flex flex-wrap gap-1.5">
             <MobileClientStatusBadge
               enabled={device.notifications.enabled}
-              label="Push notifications"
+              label="Notificaciones push"
             />
             <MobileClientStatusBadge
               enabled={device.liveActivities.enabled}
-              label="Live Activities"
+              label="Actividades en directo"
             />
           </div>
           <p className="mt-2 text-xs leading-relaxed text-muted-foreground/80">
@@ -67,7 +67,7 @@ function MobileClientRow({ device }: { readonly device: RelayClientDeviceRecord 
 
 function MobileClientsSkeleton() {
   return (
-    <div aria-label="Loading mobile clients" className="space-y-3" role="status">
+    <div aria-label="Cargando clientes móviles" className="space-y-3" role="status">
       {MOBILE_CLIENT_SKELETON_ROWS.map((row) => (
         <div key={row} className="rounded-xl border p-4">
           <div className="flex gap-3">
@@ -94,10 +94,10 @@ function EmptyMobileClients() {
         <SmartphoneIcon />
       </EmptyMedia>
       <EmptyHeader>
-        <EmptyTitle>No mobile clients</EmptyTitle>
+        <EmptyTitle>No hay clientes móviles</EmptyTitle>
         <EmptyDescription>
-          Sign in to Fenix Code on your iPhone to register it for push notifications and Live
-          Activities.
+          Inicia sesión en Fenix Code desde tu iPhone para registrarlo para notificaciones push y
+          Actividades en directo.
         </EmptyDescription>
       </EmptyHeader>
     </Empty>
@@ -115,9 +115,9 @@ export function MobileClientsUserProfilePage() {
     <div className="flex min-h-[30rem] w-full flex-col bg-background text-foreground">
       <header className="flex flex-col gap-4 border-b px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-base font-semibold tracking-[-0.01em]">Mobile clients</h2>
+          <h2 className="text-base font-semibold tracking-[-0.01em]">Clientes móviles</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Devices registered to receive Fenix Connect activity from your environments.
+            Dispositivos registrados para recibir actividad de Fenix Connect de tus entornos.
           </p>
         </div>
         <Button
@@ -127,7 +127,7 @@ export function MobileClientsUserProfilePage() {
           onClick={devicesState.refresh}
         >
           <RefreshCwIcon className={cn("size-3.5", devicesState.isPending && "animate-spin")} />
-          Refresh
+          Actualizar
         </Button>
       </header>
 
@@ -139,12 +139,12 @@ export function MobileClientsUserProfilePage() {
           >
             <div>
               <p className="font-medium text-destructive-foreground">
-                Could not load mobile clients
+                No se pudieron cargar los clientes móviles
               </p>
               <p className="mt-0.5 text-xs text-muted-foreground">{devicesState.error}</p>
             </div>
             <Button size="xs" variant="outline" onClick={devicesState.refresh}>
-              Try again
+              Reintentar
             </Button>
           </div>
         ) : null}

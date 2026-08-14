@@ -54,6 +54,8 @@ jobs:
           bash scripts/fenix/generate-branding-inventory.sh check
           bash scripts/fenix/check-visible-branding.sh selftest
           bash scripts/fenix/check-visible-branding.sh
+          bash scripts/fenix/check-spanish-ui.sh selftest
+          bash scripts/fenix/check-spanish-ui.sh
 
       - name: Verify login-bound companion installer
         run: bash scripts/fenix/companion-package/install.test.sh

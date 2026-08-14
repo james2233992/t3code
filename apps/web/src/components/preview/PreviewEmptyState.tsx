@@ -38,10 +38,10 @@ export function PreviewEmptyState({
         <EmptyMedia variant="icon">
           <Globe className="size-4.5 text-muted-foreground" />
         </EmptyMedia>
-        <EmptyTitle>No preview yet</EmptyTitle>
+        <EmptyTitle>Todavía no hay previsualización</EmptyTitle>
         <EmptyDescription>
-          Type a URL above, or run a dev script. Listening localhost ports will show up here
-          automatically.
+          Escribe una URL arriba o ejecuta un script de desarrollo. Los puertos locales activos
+          aparecerán aquí automáticamente.
         </EmptyDescription>
       </Empty>
     );
@@ -54,7 +54,7 @@ export function PreviewEmptyState({
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <History className="size-4 shrink-0" />
-              <h2 className="font-medium">Recently used</h2>
+              <h2 className="font-medium">Usados recientemente</h2>
             </div>
             <div className="flex flex-col divide-y divide-border/60 overflow-hidden rounded-xl border border-border/70 bg-background">
               {recents.map((entry) => (
@@ -72,7 +72,7 @@ export function PreviewEmptyState({
           <div className="flex flex-col gap-3">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <RadioTower className="size-4 shrink-0" />
-              <h2 className="font-medium">Local servers</h2>
+              <h2 className="font-medium">Servidores locales</h2>
             </div>
             <div className="flex flex-col divide-y divide-border/60 overflow-hidden rounded-xl border border-border/70 bg-background">
               {servers.map((server) => (
@@ -84,7 +84,7 @@ export function PreviewEmptyState({
               ))}
             </div>
             <p className="px-1 text-xs text-muted-foreground">
-              Select a listening port to open it in this browser tab.
+              Selecciona un puerto activo para abrirlo en esta pestaña del navegador.
             </p>
           </div>
         ) : null}

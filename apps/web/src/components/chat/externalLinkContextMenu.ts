@@ -15,9 +15,9 @@ const FAILURE_OPERATION_BY_ACTION = {
 } as const satisfies Record<ExternalLinkContextMenuAction, ExternalLinkContextMenuFailureOperation>;
 
 const EXTERNAL_LINK_CONTEXT_MENU_ITEMS = [
-  { id: "open-in-preview", label: "Open in integrated browser" },
-  { id: "open-external", label: "Open in system browser" },
-  { id: "copy-link", label: "Copy Link" },
+  { id: "open-in-preview", label: "Abrir en el navegador integrado" },
+  { id: "open-external", label: "Abrir en el navegador del sistema" },
+  { id: "copy-link", label: "Copiar enlace" },
 ] as const satisfies readonly ContextMenuItem<ExternalLinkContextMenuAction>[];
 
 interface ShowExternalLinkContextMenuOptions {

@@ -23,7 +23,7 @@ describe("versionSkew", () => {
     expect(resolveVersionMismatch("9.9.9")).toEqual({
       clientVersion: APP_VERSION,
       serverVersion: "9.9.9",
-      hint: "Version mismatch. Try syncing the client and server to the same Fenix Code version.",
+      hint: "Las versiones no coinciden. Sincroniza el cliente y el servidor con la misma versión de Fenix Code.",
     });
   });
 
@@ -75,7 +75,7 @@ describe("versionSkew", () => {
     const mismatch = resolveVersionMismatch("9.9.9");
 
     expect(appendVersionMismatchHint("Socket closed.", mismatch)).toBe(
-      "Socket closed. Hint: Version mismatch. Try syncing the client and server to the same Fenix Code version.",
+      "Socket closed. Sugerencia: Las versiones no coinciden. Sincroniza el cliente y el servidor con la misma versión de Fenix Code.",
     );
   });
 
@@ -98,14 +98,14 @@ describe("versionSkew", () => {
   });
 
   it("matches version-drift guidance to the advertised update path", () => {
-    expect(serverUpdateGuidance("respawn", "Remote server")).toBe(
-      "Update the Remote server so they stay in sync.",
+    expect(serverUpdateGuidance("respawn", "Servidor remoto")).toBe(
+      "Actualiza Servidor remoto para mantener las versiones sincronizadas.",
     );
-    expect(serverUpdateGuidance("desktop-managed", "Desktop server")).toBe(
-      "The Desktop server is run by the Fenix Code desktop app on its machine — update the desktop app there to sync them.",
+    expect(serverUpdateGuidance("desktop-managed", "Servidor de escritorio")).toBe(
+      "Servidor de escritorio se ejecuta mediante la aplicación de escritorio Fenix Code de ese equipo. Actualízala allí para sincronizar las versiones.",
     );
-    expect(serverUpdateGuidance(null, "Local server")).toBe(
-      "Relaunch the Local server with the copied command to sync them.",
+    expect(serverUpdateGuidance(null, "Servidor local")).toBe(
+      "Reinicia Servidor local con el comando copiado para sincronizar las versiones.",
     );
   });
 

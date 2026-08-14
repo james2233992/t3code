@@ -60,7 +60,7 @@ describe("clientPersistenceStorage", () => {
 
     expect(readBrowserClientSettings()).toBeNull();
     expect(consoleError).toHaveBeenCalledWith(
-      "Could not read persisted client settings.",
+      "No se pudieron leer los ajustes guardados del cliente.",
       expect.objectContaining({
         _tag: "LocalStorageOperationError",
         operation: "decode",

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "@effect/vitest";
 
+import setupPageSource from "./components/fenix/FenixSetupPage.tsx?raw";
 import {
   companionArtifactForPlatform,
   companionDownloadHref,
@@ -25,6 +26,12 @@ const validManifest = {
 };
 
 describe("Fenix setup", () => {
+  it("keeps the long setup landing scrollable inside the fixed app shell", () => {
+    expect(setupPageSource).toContain(
+      '<main className="h-full min-h-dvh overflow-x-hidden overflow-y-auto overscroll-y-auto',
+    );
+  });
+
   it("detects the three supported instruction lanes", () => {
     expect(detectFenixSetupPlatform("MacIntel")).toBe("macos");
     expect(detectFenixSetupPlatform("Win32")).toBe("windows");

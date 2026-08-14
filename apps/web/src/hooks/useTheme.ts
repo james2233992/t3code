@@ -74,7 +74,7 @@ export class ThemeStorageError extends Schema.TaggedErrorClass<ThemeStorageError
   },
 ) {
   override get message(): string {
-    return `Failed to ${this.operation} theme preference for ${this.storageKey}.`;
+    return `No se pudo ${this.operation === "read" ? "leer" : "guardar"} la preferencia de tema en ${this.storageKey}.`;
   }
 }
 
@@ -88,7 +88,7 @@ export class DesktopThemeSyncError extends Schema.TaggedErrorClass<DesktopThemeS
   },
 ) {
   override get message(): string {
-    return `Failed to sync the ${this.theme} theme to the desktop shell.`;
+    return `No se pudo sincronizar el tema ${this.theme} con la aplicación de escritorio.`;
   }
 }
 

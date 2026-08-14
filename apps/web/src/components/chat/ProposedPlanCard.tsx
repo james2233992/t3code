@@ -59,8 +59,8 @@ export const ProposedPlanCard = memo(function ProposedPlanCard({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Could not copy plan",
-          description: error instanceof Error ? error.message : "An error occurred while copying.",
+          title: "No se pudo copiar el plan",
+          description: error instanceof Error ? error.message : "Se produjo un error al copiar.",
         }),
       );
     },
@@ -89,8 +89,8 @@ export const ProposedPlanCard = memo(function ProposedPlanCard({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Workspace path is unavailable",
-          description: "This thread does not have a workspace path to save into.",
+          title: "La ruta del espacio de trabajo no está disponible",
+          description: "Esta conversación no tiene una ruta de espacio de trabajo donde guardar.",
         }),
       );
       return;
@@ -107,7 +107,7 @@ export const ProposedPlanCard = memo(function ProposedPlanCard({
     if (!relativePath) {
       toastManager.add({
         type: "warning",
-        title: "Enter a workspace path",
+        title: "Introduce una ruta del espacio de trabajo",
       });
       return;
     }
@@ -127,7 +127,7 @@ export const ProposedPlanCard = memo(function ProposedPlanCard({
         setIsSaveDialogOpen(false);
         toastManager.add({
           type: "success",
-          title: "Plan saved to workspace",
+          title: "Plan guardado en el espacio de trabajo",
           description: result.value.relativePath,
         });
         return;
@@ -137,8 +137,8 @@ export const ProposedPlanCard = memo(function ProposedPlanCard({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Could not save plan",
-            description: error instanceof Error ? error.message : "An error occurred while saving.",
+            title: "No se pudo guardar el plan",
+            description: error instanceof Error ? error.message : "Se produjo un error al guardar.",
           }),
         );
       }
@@ -154,17 +154,17 @@ export const ProposedPlanCard = memo(function ProposedPlanCard({
         </div>
         <Menu>
           <MenuTrigger
-            render={<Button aria-label="Plan actions" size="icon-xs" variant="outline" />}
+            render={<Button aria-label="Acciones del plan" size="icon-xs" variant="outline" />}
           >
             <EllipsisIcon aria-hidden="true" className="size-4" />
           </MenuTrigger>
           <MenuPopup align="end">
             <MenuItem onClick={handleCopyPlan}>
-              {isCopied ? "Copied!" : "Copy to clipboard"}
+              {isCopied ? "¡Copiado!" : "Copiar al portapapeles"}
             </MenuItem>
-            <MenuItem onClick={handleDownload}>Download as markdown</MenuItem>
+            <MenuItem onClick={handleDownload}>Descargar como Markdown</MenuItem>
             <MenuItem onClick={openSaveDialog} disabled={!workspaceRoot || isSavingToWorkspace}>
-              Save to workspace
+              Guardar en el espacio de trabajo
             </MenuItem>
           </MenuPopup>
         </Menu>
@@ -214,14 +214,16 @@ export const ProposedPlanCard = memo(function ProposedPlanCard({
       >
         <DialogPopup className="max-w-xl">
           <DialogHeader>
-            <DialogTitle>Save plan to workspace</DialogTitle>
+            <DialogTitle>Guardar plan en el espacio de trabajo</DialogTitle>
             <DialogDescription>
-              Enter a path relative to <code>{workspaceRoot ?? "the workspace"}</code>.
+              Introduce una ruta relativa a <code>{workspaceRoot ?? "el espacio de trabajo"}</code>.
             </DialogDescription>
           </DialogHeader>
           <DialogPanel className="space-y-3">
             <label htmlFor={savePathInputId} className="grid gap-1.5">
-              <span className="text-xs font-medium text-foreground">Workspace path</span>
+              <span className="text-xs font-medium text-foreground">
+                Ruta del espacio de trabajo
+              </span>
               <Input
                 id={savePathInputId}
                 value={savePath}
@@ -239,14 +241,14 @@ export const ProposedPlanCard = memo(function ProposedPlanCard({
               onClick={() => setIsSaveDialogOpen(false)}
               disabled={isSavingToWorkspace}
             >
-              Cancel
+              Cancelar
             </Button>
             <Button
               size="sm"
               onClick={() => void handleSaveToWorkspace()}
               disabled={isSavingToWorkspace}
             >
-              {isSavingToWorkspace ? "Saving..." : "Save"}
+              {isSavingToWorkspace ? "Guardando..." : "Guardar"}
             </Button>
           </DialogFooter>
         </DialogPopup>

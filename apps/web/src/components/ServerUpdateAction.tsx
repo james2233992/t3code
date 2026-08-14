@@ -16,9 +16,9 @@ import { toastManager } from "./ui/toast";
 // folds it into the download phase; everything after the handoff is the
 // restart the user is actually waiting through.
 const UPDATE_STAGE_LABELS: Record<ServerUpdateStage, string> = {
-  downloading: "Downloading…",
-  installing: "Downloading…",
-  resuming: "Restarting…",
+  downloading: "Descargando…",
+  installing: "Descargando…",
+  resuming: "Reiniciando…",
 };
 const pendingUpdateEnvironmentIds = new Set<EnvironmentId>();
 
@@ -27,7 +27,7 @@ export function serverUpdateStageLabel(stage: ServerUpdateStage): string {
 }
 
 function updateFailureMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "Server update failed.";
+  return error instanceof Error ? error.message : "Falló la actualización del servidor.";
 }
 
 /**
@@ -72,7 +72,7 @@ export function ServerUpdateAction({
   serverLabel,
   selfUpdate,
   targetVersion,
-  label = "Update",
+  label = "Actualizar",
 }: {
   readonly environmentId: EnvironmentId;
   readonly serverLabel: string;
@@ -88,14 +88,14 @@ export function ServerUpdateAction({
     onCopy: ({ command }) => {
       toastManager.add({
         type: "success",
-        title: "Update command copied",
-        description: `Run \`${command}\` on ${serverLabel} to update it.`,
+        title: "Comando de actualización copiado",
+        description: `Ejecuta \`${command}\` en ${serverLabel} para actualizarlo.`,
       });
     },
     onError: (error) => {
       toastManager.add({
         type: "error",
-        title: "Could not copy update command",
+        title: "No se pudo copiar el comando de actualización",
         description: error.message,
       });
     },
@@ -117,15 +117,15 @@ export function ServerUpdateAction({
         }
         toastManager.add({
           type: "error",
-          title: "Server update failed",
+          title: "Falló la actualización del servidor",
           description: updateFailureMessage(squashAtomCommandFailure(result)),
         });
         return;
       }
       toastManager.add({
         type: "success",
-        title: `${serverLabel} updated`,
-        description: `Reconnected on Fenix Code v${result.value.targetVersion}.`,
+        title: `${serverLabel} actualizado`,
+        description: `Reconectado con Fenix Code v${result.value.targetVersion}.`,
       });
     } finally {
       pendingUpdateEnvironmentIds.delete(environmentId);
@@ -135,7 +135,7 @@ export function ServerUpdateAction({
   if (selfUpdate === "desktop-managed") {
     return (
       <span className="text-muted-foreground text-xs">
-        Update the desktop app on that machine to update this server.
+        Actualiza la aplicación de escritorio de ese equipo para actualizar este servidor.
       </span>
     );
   }
@@ -144,7 +144,7 @@ export function ServerUpdateAction({
     const command = manualServerUpdateCommand(targetVersion);
     return (
       <Button size="xs" variant="outline" onClick={() => copyToClipboard(command, { command })}>
-        Copy update command
+        Copiar comando de actualización
       </Button>
     );
   }

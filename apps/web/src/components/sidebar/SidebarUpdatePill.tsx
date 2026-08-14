@@ -72,7 +72,7 @@ export function SidebarUpdatePill() {
   const [dismissed, setDismissed] = useState(false);
 
   const visible = isElectron && shouldShowDesktopUpdateButton(state) && !dismissed;
-  const tooltip = state ? getDesktopUpdateButtonTooltip(state) : "Update available";
+  const tooltip = state ? getDesktopUpdateButtonTooltip(state) : "Actualización disponible";
   const disabled = isDesktopUpdateButtonDisabled(state);
   const action = state ? resolveDesktopUpdateButtonAction(state) : "none";
 
@@ -98,7 +98,7 @@ export function SidebarUpdatePill() {
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: "Could not download update",
+              title: "No se pudo descargar la actualización",
               description: actionError,
             }),
           );
@@ -107,7 +107,7 @@ export function SidebarUpdatePill() {
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: "Could not start update download",
+              title: "No se pudo iniciar la descarga de la actualización",
               description: error instanceof Error ? error.message : "An unexpected error occurred.",
             }),
           );
@@ -129,7 +129,7 @@ export function SidebarUpdatePill() {
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: "Could not install update",
+              title: "No se pudo instalar la actualización",
               description: actionError,
             }),
           );
@@ -138,7 +138,7 @@ export function SidebarUpdatePill() {
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: "Could not install update",
+              title: "No se pudo instalar la actualización",
               description: error instanceof Error ? error.message : "An unexpected error occurred.",
             }),
           );
@@ -153,7 +153,7 @@ export function SidebarUpdatePill() {
       {showArm64Warning && arm64Description && (
         <Alert variant="warning" className="rounded-2xl border-warning/40 bg-warning/8 text-xs">
           <TriangleAlertIcon />
-          <AlertTitle>Intel build on Apple Silicon</AlertTitle>
+          <AlertTitle>Versión Intel en Apple Silicon</AlertTitle>
           <AlertDescription>{arm64Description}</AlertDescription>
         </Alert>
       )}
@@ -178,7 +178,7 @@ export function SidebarUpdatePill() {
                   {action === "install" ? (
                     <>
                       <RotateCwIcon className="size-3.5" />
-                      <span>Restart to update</span>
+                      <span>Reiniciar para actualizar</span>
                     </>
                   ) : state?.status === "downloading" ? (
                     <>
@@ -193,7 +193,7 @@ export function SidebarUpdatePill() {
                   ) : (
                     <>
                       <DownloadIcon className="size-3.5" />
-                      <span>Update available</span>
+                      <span>Actualización disponible</span>
                     </>
                   )}
                 </button>
@@ -223,7 +223,7 @@ export function SidebarUpdatePill() {
                 render={
                   <button
                     type="button"
-                    aria-label="Dismiss update"
+                    aria-label="Descartar actualización"
                     className="mr-1 inline-flex size-5 items-center justify-center rounded-md text-update/60 transition-colors hover:text-update"
                     onClick={() => setDismissed(true)}
                   >
@@ -231,7 +231,7 @@ export function SidebarUpdatePill() {
                   </button>
                 }
               />
-              <TooltipPopup side="top">Dismiss until next launch</TooltipPopup>
+              <TooltipPopup side="top">Ocultar hasta el próximo inicio</TooltipPopup>
             </Tooltip>
           )}
         </div>

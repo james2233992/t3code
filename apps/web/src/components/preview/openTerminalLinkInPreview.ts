@@ -20,7 +20,7 @@ export class TerminalLinkContextMenuShowError extends Schema.TaggedErrorClass<Te
   terminalLinkErrorContext,
 ) {
   override get message(): string {
-    return `Failed to show the context menu for terminal link ${this.targetOrigin}.`;
+    return `No se pudo mostrar el menú contextual del enlace de terminal ${this.targetOrigin}.`;
   }
 }
 
@@ -29,7 +29,7 @@ export class TerminalLinkPreviewOpenError extends Schema.TaggedErrorClass<Termin
   terminalLinkErrorContext,
 ) {
   override get message(): string {
-    return `Failed to open terminal link ${this.targetOrigin} in preview for thread ${this.threadId}.`;
+    return `No se pudo abrir el enlace de terminal ${this.targetOrigin} en la vista previa de la conversación ${this.threadId}.`;
   }
 }
 
@@ -65,8 +65,8 @@ export async function openTerminalLinkInPreview<E>(
   try {
     choice = await input.localApi.contextMenu.show(
       [
-        { id: "open-in-preview", label: "Open in preview" },
-        { id: "open-in-browser", label: "Open in browser" },
+        { id: "open-in-preview", label: "Abrir en vista previa" },
+        { id: "open-in-browser", label: "Abrir en el navegador" },
       ],
       input.position,
     );

@@ -91,7 +91,7 @@ export class PreviewAutomationTargetUnavailableError extends Schema.TaggedErrorC
   }
 
   override get message(): string {
-    return `Preview automation target for ${this.operation} request ${this.requestId} is unavailable on environment ${this.environmentId} thread ${this.threadId} (tab ${this.tabId ?? "unassigned"}, bridge ${this.bridgeAvailable ? "available" : "unavailable"}).`;
+    return `El destino de automatización de previsualización para la operación ${this.operation}, solicitud ${this.requestId}, no está disponible en el entorno ${this.environmentId}, conversación ${this.threadId} (pestaña ${this.tabId ?? "sin asignar"}, puente ${this.bridgeAvailable ? "disponible" : "no disponible"}).`;
   }
 }
 

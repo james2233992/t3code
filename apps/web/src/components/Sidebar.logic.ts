@@ -92,10 +92,10 @@ export function buildMultiSelectThreadContextMenuItems(input: {
     { id: "mark-unread", label: `Mark unread (${input.count})` },
     {
       id: "archive",
-      label: `Archive (${input.count})`,
+      label: `Archivar (${input.count})`,
       disabled: input.hasRunningThread,
     },
-    { id: "delete", label: `Delete (${input.count})`, destructive: true },
+    { id: "delete", label: `Eliminar (${input.count})`, destructive: true },
   ];
 }
 
@@ -107,13 +107,13 @@ export function buildBulkTitleRegenerationContextMenuItem(input: {
   if (input.actionableCount === 0) {
     return {
       id: "regenerate-title",
-      label: `Regenerating… (${input.supportedCount})`,
+      label: `Regenerando… (${input.supportedCount})`,
       disabled: true,
     };
   }
   return {
     id: "regenerate-title",
-    label: `Regenerate titles (${input.actionableCount})`,
+    label: `Regenerar títulos (${input.actionableCount})`,
   };
 }
 

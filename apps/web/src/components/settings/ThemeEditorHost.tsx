@@ -31,8 +31,9 @@ export function ThemeEditorHost() {
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: "Could not save your theme",
-              description: "Browser storage is unavailable, so the change was not kept.",
+              title: "No se pudo guardar el tema",
+              description:
+                "El almacenamiento del navegador no está disponible, por lo que el cambio no se conservó.",
             }),
           );
           return false;
@@ -40,7 +41,7 @@ export function ThemeEditorHost() {
         toastManager.add(
           stackedThreadToast({
             type: "success",
-            title: `${savedTheme.label} updated`,
+            title: `Tema «${savedTheme.label}» actualizado`,
             description: `Its ${mergedAppearance} palette was added.`,
           }),
         );
@@ -58,8 +59,10 @@ export function ThemeEditorHost() {
         toastManager.add(
           stackedThreadToast({
             type: "success",
-            title: `${savedTheme.label} saved`,
-            description: wasActive ? "Your changes are now active." : "Your changes are saved.",
+            title: `Tema «${savedTheme.label}» guardado`,
+            description: wasActive
+              ? "Los cambios ya están activos."
+              : "Los cambios se han guardado.",
           }),
         );
         return true;
@@ -69,8 +72,9 @@ export function ThemeEditorHost() {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Could not save your theme",
-            description: "Browser storage is unavailable, so the change was not kept.",
+            title: "No se pudo guardar el tema",
+            description:
+              "El almacenamiento del navegador no está disponible, por lo que el cambio no se conservó.",
           }),
         );
         return false;
@@ -78,7 +82,7 @@ export function ThemeEditorHost() {
       toastManager.add(
         stackedThreadToast({
           type: "success",
-          title: `${savedTheme.label} created`,
+          title: `Tema «${savedTheme.label}» creado`,
           description: "It’s now active.",
         }),
       );

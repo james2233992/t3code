@@ -39,7 +39,7 @@ export function resolveVersionMismatch(
   return {
     clientVersion: normalizedClientVersion,
     serverVersion: normalizedServerVersion,
-    hint: "Version mismatch. Try syncing the client and server to the same Fenix Code version.",
+    hint: "Las versiones no coinciden. Sincroniza el cliente y el servidor con la misma versión de Fenix Code.",
   };
 }
 
@@ -72,11 +72,11 @@ export function serverUpdateGuidance(
   switch (capability) {
     case "boot-service":
     case "respawn":
-      return `Update the ${serverLabel} so they stay in sync.`;
+      return `Actualiza ${serverLabel} para mantener las versiones sincronizadas.`;
     case "desktop-managed":
-      return `The ${serverLabel} is run by the Fenix Code desktop app on its machine — update the desktop app there to sync them.`;
+      return `${serverLabel} se ejecuta mediante la aplicación de escritorio Fenix Code de ese equipo. Actualízala allí para sincronizar las versiones.`;
     default:
-      return `Relaunch the ${serverLabel} with the copied command to sync them.`;
+      return `Reinicia ${serverLabel} con el comando copiado para sincronizar las versiones.`;
   }
 }
 
@@ -96,7 +96,7 @@ function readVersionMismatchDismissals(): VersionMismatchDismissals {
       ) ?? { keys: [] }
     );
   } catch (error) {
-    console.error("Could not read version-mismatch dismissals.", error);
+    console.error("No se pudieron leer los avisos de versiones descartados.", error);
     return { keys: [] };
   }
 }
@@ -109,7 +109,7 @@ function writeVersionMismatchDismissals(document: VersionMismatchDismissals): vo
       VersionMismatchDismissalsSchema,
     );
   } catch (error) {
-    console.error("Could not persist version-mismatch dismissals.", error);
+    console.error("No se pudieron guardar los avisos de versiones descartados.", error);
   }
 }
 
@@ -144,5 +144,5 @@ export function appendVersionMismatchHint(
   if (!mismatch) {
     return normalizedMessage;
   }
-  return `${normalizedMessage} Hint: ${mismatch.hint}`;
+  return `${normalizedMessage} Sugerencia: ${mismatch.hint}`;
 }

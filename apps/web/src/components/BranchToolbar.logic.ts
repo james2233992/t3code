@@ -37,7 +37,7 @@ export function resolveEnvironmentOptionLabel(input: {
       if (!label) return false;
       return !GENERIC_LOCAL_ENVIRONMENT_LABELS.has(label.toLowerCase());
     });
-    return preferredLocalLabel ?? "This device";
+    return preferredLocalLabel ?? "Este dispositivo";
   }
 
   return runtimeLabel ?? savedLabel ?? input.environmentId;
@@ -63,15 +63,15 @@ export function shouldShowComposerContextStrip(input: {
 }
 
 export function resolveEnvModeLabel(mode: EnvMode): string {
-  return mode === "worktree" ? "New worktree" : "Current checkout";
+  return mode === "worktree" ? "Nueva copia de trabajo" : "Checkout actual";
 }
 
 export function resolveCurrentWorkspaceLabel(activeWorktreePath: string | null): string {
-  return activeWorktreePath ? "Current worktree" : resolveEnvModeLabel("local");
+  return activeWorktreePath ? "Copia de trabajo actual" : resolveEnvModeLabel("local");
 }
 
 export function resolveLockedWorkspaceLabel(activeWorktreePath: string | null): string {
-  return activeWorktreePath ? "Worktree" : "Local checkout";
+  return activeWorktreePath ? "Copia de trabajo" : "Checkout local";
 }
 
 export interface PreviousWorktreeSeed {
@@ -118,7 +118,7 @@ export function resolvePreviousWorktreeSeed(input: {
 }
 
 export function resolvePreviousWorktreeLabel(seed: PreviousWorktreeSeed): string {
-  return seed.branch ? `Previous worktree (${seed.branch})` : "Previous worktree";
+  return seed.branch ? `Copia de trabajo anterior (${seed.branch})` : "Copia de trabajo anterior";
 }
 
 export function resolveEffectiveEnvMode(input: {
@@ -179,7 +179,7 @@ export function resolveBranchTriggerLabel(input: {
     startFromOrigin,
   } = input;
   if (!resolvedActiveBranch) {
-    return "Select ref";
+    return "Seleccionar referencia";
   }
   if (effectiveEnvMode === "worktree" && !activeWorktreePath) {
     const baseRef =

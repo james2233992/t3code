@@ -19,9 +19,9 @@ const EMPTY_SKILLS: ReadonlyArray<never> = [];
 // markdown-style file links render as chips, so the preview shows prompt
 // text and pills exactly as the real composer draws them.
 const PROMPT_PREVIEW_TEXT =
-  "Use $frontend-design to fix the flaky test in " +
-  "[surface.test.ts](apps/web/src/terminal/ghostty/surface.test.ts) and align the header with " +
-  "[SettingsPanels.tsx](apps/web/src/components/settings/SettingsPanels.tsx) before shipping.";
+  "Usa $frontend-design para corregir el test inestable de " +
+  "[surface.test.ts](apps/web/src/terminal/ghostty/surface.test.ts) y alinea la cabecera con " +
+  "[SettingsPanels.tsx](apps/web/src/components/settings/SettingsPanels.tsx) antes de publicar.";
 
 function noop() {}
 
@@ -43,7 +43,7 @@ export function PromptFontPreview() {
         terminalContexts={EMPTY_TERMINAL_CONTEXTS}
         skills={EMPTY_SKILLS}
         disabled={false}
-        placeholder="Ask for follow-up changes or attach images"
+        placeholder="Pide cambios adicionales o adjunta imágenes"
         className="max-h-40 min-h-12"
         onRemoveTerminalContext={noop}
         onChange={onChange}
@@ -146,7 +146,7 @@ export function CodeFontPreview() {
 // A zsh-style prompt: green arrow, cyan project, blue/red git segment,
 // yellow dirty marker. It doubles as the echo loop's fresh-line prompt.
 const TERMINAL_PROMPT =
-  "\x1b[1;32m→\x1b[0m \x1b[1;36mt3code\x1b[0m \x1b[1;34mgit:(\x1b[1;31mmain\x1b[1;34m)\x1b[0m \x1b[1;33m✗\x1b[0m ";
+  "\x1b[1;32m→\x1b[0m \x1b[1;36mfenix-code\x1b[0m \x1b[1;34mgit:(\x1b[1;31mmain\x1b[1;34m)\x1b[0m \x1b[1;33m✗\x1b[0m ";
 // A dev-server startup: brand line, addresses, a test summary, and a READY
 // badge. Together the lines cover bold, dim, underline, the six accent
 // colors, and a background cell, so a font choice shows every SGR the
@@ -154,14 +154,14 @@ const TERMINAL_PROMPT =
 const TERMINAL_PREVIEW_TRANSCRIPT =
   `${TERMINAL_PROMPT}vpr dev\r\n` +
   "\r\n" +
-  "  \x1b[1;32mVITE\x1b[0m \x1b[32mv7.1.1\x1b[0m  \x1b[2mready in\x1b[0m \x1b[1m1.24s\x1b[0m\r\n" +
+  "  \x1b[1;32mVITE\x1b[0m \x1b[32mv7.1.1\x1b[0m  \x1b[2mlisto en\x1b[0m \x1b[1m1.24s\x1b[0m\r\n" +
   "\r\n" +
   "  \x1b[32m→\x1b[0m  \x1b[2mLocal:\x1b[0m    \x1b[4;36mhttp://127.0.0.1:5173/\x1b[0m\r\n" +
-  "  \x1b[32m→\x1b[0m  \x1b[2mNetwork:\x1b[0m  \x1b[4;36mhttp://192.168.1.24:5173/\x1b[0m\r\n" +
+  "  \x1b[32m→\x1b[0m  \x1b[2mRed:\x1b[0m      \x1b[4;36mhttp://192.168.1.24:5173/\x1b[0m\r\n" +
   "\r\n" +
-  "  \x1b[32m✓ 85 passed\x1b[0m   \x1b[33m△ 2 warnings\x1b[0m   \x1b[31m✗ 0 failed\x1b[0m\r\n" +
+  "  \x1b[32m✓ 85 superados\x1b[0m   \x1b[33m△ 2 avisos\x1b[0m   \x1b[31m✗ 0 fallidos\x1b[0m\r\n" +
   "\r\n" +
-  "  \x1b[42;30m READY \x1b[0m \x1b[2mwatching for changes — press\x1b[0m \x1b[1mq\x1b[0m \x1b[2mto quit\x1b[0m\r\n" +
+  "  \x1b[42;30m LISTO \x1b[0m \x1b[2mvigilando cambios — pulsa\x1b[0m \x1b[1mq\x1b[0m \x1b[2mpara salir\x1b[0m\r\n" +
   "\r\n" +
   TERMINAL_PROMPT;
 
@@ -266,7 +266,7 @@ export function TerminalFontPreview({ family, size }: { family: string; size: nu
     <div
       ref={mountRef}
       className="relative mt-1 mb-2 h-52 overflow-hidden rounded-lg border border-border"
-      aria-label="Terminal font preview"
+      aria-label="Previsualización de la fuente del terminal"
     />
   );
 }

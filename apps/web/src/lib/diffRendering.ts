@@ -138,7 +138,7 @@ export function getRenderablePatch(
     return {
       kind: "raw",
       text: normalizedPatch,
-      reason: "Failed to parse patch. Showing raw patch.",
+      reason: "No se pudo interpretar el parche. Se muestra el parche sin procesar.",
     };
   }
 }

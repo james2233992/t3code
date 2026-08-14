@@ -128,7 +128,7 @@ function ThemeJsonEditor({
         </pre>
       )}
       <textarea
-        aria-label="Theme JSON"
+        aria-label="JSON del tema"
         className={cn(
           "relative z-10 block min-h-72 w-full resize-y overflow-auto bg-transparent p-3 font-mono text-[12px] leading-5 caret-foreground outline-none placeholder:text-muted-foreground selection:bg-accent/30",
           isPlainText ? "text-foreground" : "text-transparent selection:text-transparent",
@@ -204,7 +204,7 @@ export function ThemeImportDialog({
       setError(null);
     } catch {
       if (requestId !== importRequestRef.current) return;
-      setError("Could not read that file. Paste the JSON below instead.");
+      setError("No se pudo leer el archivo. Pega el JSON abajo.");
     } finally {
       if (requestId === importRequestRef.current) setIsReading(false);
     }
@@ -223,7 +223,7 @@ export function ThemeImportDialog({
         for (const file of files) {
           const oversized = describeOversizedThemeFile(file.size);
           if (oversized) {
-            failures.push(`${file.name}: too large`);
+            failures.push(`${file.name}: demasiado grande`);
             continue;
           }
           try {
@@ -234,7 +234,7 @@ export function ThemeImportDialog({
             });
           } catch (cause) {
             failures.push(
-              `${file.name}: ${cause instanceof Error ? cause.message : "not a theme file"}`,
+              `${file.name}: ${cause instanceof Error ? cause.message : "no es un archivo de tema"}`,
             );
           }
         }
@@ -250,7 +250,7 @@ export function ThemeImportDialog({
             installed.push(installCustomTheme(theme));
           } catch (cause) {
             failures.push(
-              `${theme.label}: ${cause instanceof Error ? cause.message : "could not install"}`,
+              `${theme.label}: ${cause instanceof Error ? cause.message : "no se pudo instalar"}`,
             );
           }
         }
@@ -346,7 +346,7 @@ export function ThemeImportDialog({
       if (getCustomThemes().some((existing) => existing.id === candidate.id)) continue;
       return candidate;
     }
-    throw new Error(`Too many copies of "${theme.label}".`);
+    throw new Error(`Hay demasiadas copias de "${theme.label}".`);
   };
 
   const resolveConflicts = useCallback(
@@ -366,7 +366,7 @@ export function ThemeImportDialog({
               : installCustomTheme(versionedCopy(theme, preferredName)),
           );
         } catch (cause) {
-          failures.push(`${theme.label}: ${cause instanceof Error ? cause.message : "failed"}`);
+          failures.push(`${theme.label}: ${cause instanceof Error ? cause.message : "falló"}`);
         }
       }
       if (resolved.length > 0) onImportedMany(resolved, { updated: mode === "update" });
@@ -405,12 +405,12 @@ export function ThemeImportDialog({
         } catch {
           // Storage is failing wholesale; the error below covers it.
         }
-        setError("Theme added, but it could not be selected. Try again.");
+        setError("El tema se añadió, pero no se pudo seleccionar. Inténtalo de nuevo.");
         return;
       }
       onOpenChange(false);
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "That theme file is invalid.");
+      setError(cause instanceof Error ? cause.message : "El archivo de tema no es válido.");
     }
   }, [json, onImported, onOpenChange]);
 
@@ -424,7 +424,7 @@ export function ThemeImportDialog({
     >
       <DialogPopup className="max-w-3xl overflow-hidden">
         <DialogHeader>
-          <DialogTitle>Add a theme</DialogTitle>
+          <DialogTitle>Añadir un tema</DialogTitle>
         </DialogHeader>
         <DialogPanel className="space-y-4">
           {(() => {
@@ -454,17 +454,17 @@ export function ThemeImportDialog({
                 type="file"
               />
             );
-            const chooseButton = (label = "Choose files") => (
+            const chooseButton = (label = "Elegir archivos") => (
               <Button disabled={isReading} size="sm" variant="outline" onClick={openFilePicker}>
                 <UploadIcon />
-                {isReading ? "Reading…" : label}
+                {isReading ? "Leyendo…" : label}
               </Button>
             );
             const editorSection = () => (
               <div className="space-y-2">
                 <div className="flex items-baseline justify-between gap-3">
                   <label className="text-sm font-medium" htmlFor="theme-json-editor">
-                    Theme JSON
+                    JSON del tema
                   </label>
                 </div>
                 <ThemeJsonEditor id="theme-json-editor" onChange={setJson} value={json} />
@@ -474,14 +474,14 @@ export function ThemeImportDialog({
               return (
                 <div className="space-y-3">
                   <div className="rounded-xl border border-border/70 bg-muted/20 p-3">
-                    <p className="text-sm font-medium">Already installed</p>
+                    <p className="text-sm font-medium">Ya está instalado</p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       {conflicts.map((theme) => theme.label).join(", ")}
                     </p>
                   </div>
                   <div className="flex flex-wrap items-center gap-2">
                     <Button size="sm" onClick={() => resolveConflicts("update")}>
-                      Update existing
+                      Actualizar existente
                     </Button>
                     <Button size="sm" variant="outline" onClick={() => resolveConflicts("copy")}>
                       Keep both
@@ -503,9 +503,9 @@ export function ThemeImportDialog({
                   {...dropHandlers}
                 >
                   <div className="min-w-0">
-                    <p className="text-sm font-medium">Theme file</p>
+                    <p className="text-sm font-medium">Archivo del tema</p>
                     <p className="truncate text-xs text-muted-foreground">
-                      {fileName ?? "Drop Fenix Code or VS Code .json files"}
+                      {fileName ?? "Suelta archivos .json de Fenix Code o VS Code"}
                     </p>
                   </div>
                   {chooseButton()}
@@ -524,11 +524,11 @@ export function ThemeImportDialog({
         </DialogPanel>
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>
-            Cancel
+            Cancelar
           </Button>
           <Button disabled={!json.trim() || isReading} onClick={handleSubmit}>
             <PlusIcon />
-            Add theme
+            Añadir tema
           </Button>
         </DialogFooter>
       </DialogPopup>

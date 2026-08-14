@@ -39,7 +39,7 @@ describe("resolveSnoozePresets", () => {
     const tomorrow = presets.find((preset) => preset.id === "tomorrow");
     expect(tomorrow!.whenLabel).toMatch(/9/);
     const nextWeek = presets.find((preset) => preset.id === "next-week");
-    expect(nextWeek!.whenLabel).toMatch(/Mon/);
+    expect(nextWeek!.whenLabel).toMatch(/lun/i);
   });
 
   it("drops the evening preset once evening is near or past", () => {
@@ -62,7 +62,7 @@ describe("resolveSnoozePresets", () => {
     const twelveHour = resolveSnoozePresets(localDate(2026, 4, 8, 10), "12-hour");
     const twentyFourHour = resolveSnoozePresets(localDate(2026, 4, 8, 10), "24-hour");
 
-    expect(twelveHour.find((preset) => preset.id === "evening")!.whenLabel).toMatch(/PM/i);
+    expect(twelveHour.find((preset) => preset.id === "evening")!.whenLabel).toMatch(/p\.\s*m\./i);
     expect(twentyFourHour.find((preset) => preset.id === "evening")!.whenLabel).toBe("18:00");
   });
 });
@@ -70,21 +70,21 @@ describe("resolveSnoozePresets", () => {
 describe("snoozeWakeDescription", () => {
   const now = localDate(2026, 4, 8, 10);
 
-  it("uses bare time today, 'tomorrow' next day, weekday within the week", () => {
+  it("uses bare time today, 'mañana' next day, weekday within the week", () => {
     expect(
       snoozeWakeDescription(localDate(2026, 4, 8, 18).toISOString(), now, "locale"),
-    ).not.toContain("tomorrow");
+    ).not.toContain("mañana");
     expect(snoozeWakeDescription(localDate(2026, 4, 9, 9).toISOString(), now, "locale")).toContain(
-      "tomorrow",
+      "mañana",
     );
     expect(snoozeWakeDescription(localDate(2026, 4, 13, 9).toISOString(), now, "locale")).toMatch(
-      /Mon/,
+      /lun/i,
     );
   });
 
   it("formats wake descriptions with the selected clock preference", () => {
     expect(snoozeWakeDescription(localDate(2026, 4, 8, 18).toISOString(), now, "12-hour")).toMatch(
-      /PM/i,
+      /p\.\s*m\./i,
     );
     expect(snoozeWakeDescription(localDate(2026, 4, 8, 18).toISOString(), now, "24-hour")).toBe(
       "18:00",

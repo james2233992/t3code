@@ -56,7 +56,7 @@ export function useResizableWidth(options: UseResizableWidthOptions): {
       const stored = getLocalStorageItem(storageKey, WidthSchema);
       return clamp(stored ?? defaultWidth);
     } catch (error) {
-      console.error("Could not read persisted panel width.", error);
+      console.error("No se pudo leer el ancho guardado del panel.", error);
       return defaultWidth;
     }
   });
@@ -143,7 +143,7 @@ export function useResizableWidth(options: UseResizableWidthOptions): {
       try {
         setLocalStorageItem(storageKey, finalWidth, WidthSchema);
       } catch (error) {
-        console.error("Could not persist panel width.", error);
+        console.error("No se pudo guardar el ancho del panel.", error);
       }
       setWidth(finalWidth);
     },

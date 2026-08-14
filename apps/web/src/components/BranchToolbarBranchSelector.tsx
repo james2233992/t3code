@@ -80,7 +80,7 @@ interface BranchToolbarBranchSelectorProps {
 }
 
 function toBranchActionErrorMessage(error: unknown): string {
-  return error instanceof Error ? error.message : "An error occurred.";
+  return error instanceof Error ? error.message : "Se ha producido un error.";
 }
 
 export function BranchToolbarBranchSelector({
@@ -321,9 +321,9 @@ export function BranchToolbarBranchSelector({
   const [isBranchActionPending, startBranchActionTransition] = useTransition();
   const totalBranchCount = branchRefState.data?.totalCount ?? 0;
   const branchStatusText = isInitialBranchesLoadPending
-    ? "Loading refs..."
+    ? "Cargando referencias..."
     : isFetchingNextPage
-      ? "Loading more refs..."
+      ? "Cargando más referencias..."
       : hasNextPage
         ? `Showing ${refs.length} of ${totalBranchCount} refs`
         : null;
@@ -337,7 +337,7 @@ export function BranchToolbarBranchSelector({
         if (!didCopy) return;
         toastManager.add({
           type: "success",
-          title: "Branch name copied",
+          title: "Nombre de rama copiado",
           description: branchName,
         });
       },
@@ -345,7 +345,7 @@ export function BranchToolbarBranchSelector({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Failed to copy branch name",
+            title: "No se pudo copiar el nombre de la rama",
             description: toBranchActionErrorMessage(error),
           }),
         );
@@ -361,7 +361,7 @@ export function BranchToolbarBranchSelector({
       event.preventDefault();
       event.stopPropagation();
       const items: ContextMenuItem<"copy-branch-name">[] = [
-        { id: "copy-branch-name", label: "Copy branch name", icon: "copy" },
+        { id: "copy-branch-name", label: "Copiar nombre de rama", icon: "copy" },
       ];
       void api.contextMenu.show(items, { x: event.clientX, y: event.clientY }).then((action) => {
         if (action === "copy-branch-name") copyBranchName(branchName);
@@ -431,7 +431,7 @@ export function BranchToolbarBranchSelector({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Failed to switch ref.",
+            title: "No se pudo cambiar de referencia.",
             description: toBranchActionErrorMessage(squashAtomCommandFailure(checkoutResult)),
           }),
         );
@@ -467,7 +467,7 @@ export function BranchToolbarBranchSelector({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Failed to create and switch ref.",
+            title: "No se pudo crear y cambiar la referencia.",
             description: toBranchActionErrorMessage(squashAtomCommandFailure(createBranchResult)),
           }),
         );
@@ -613,7 +613,7 @@ export function BranchToolbarBranchSelector({
   // Action-oriented tooltip (the pill opens the PR), distinct from the sidebar's
   // state-description tooltip.
   const branchPrTooltip = branchPr
-    ? `Open ${sourceControlPresentation.terminology.singular} #${branchPr.number} (${branchPr.state}) in browser`
+    ? `Abrir ${sourceControlPresentation.terminology.singular} #${branchPr.number} (${branchPr.state}) en el navegador`
     : "";
   const openPrLink = useOpenPrLink();
 
@@ -640,7 +640,7 @@ export function BranchToolbarBranchSelector({
             <SourceControlIcon className="size-3.5 shrink-0 text-muted-foreground" />
             <span className="flex min-w-0 flex-col items-start">
               <span className="truncate font-medium">
-                Checkout {sourceControlPresentation.terminology.singular}
+                Abrir {sourceControlPresentation.terminology.singular}
               </span>
               <span className="truncate text-muted-foreground text-xs">{prReference}</span>
             </span>
@@ -658,7 +658,7 @@ export function BranchToolbarBranchSelector({
           className="pe-1.5"
           onClick={() => createRef(trimmedBranchQuery)}
         >
-          <span className="truncate">Create new ref &quot;{trimmedBranchQuery}&quot;</span>
+          <span className="truncate">Crear nueva referencia &quot;{trimmedBranchQuery}&quot;</span>
         </ComboboxItem>
       );
     }
@@ -669,13 +669,13 @@ export function BranchToolbarBranchSelector({
     const hasSecondaryWorktree =
       refName.worktreePath && activeProjectCwd && refName.worktreePath !== activeProjectCwd;
     const badge = refName.current
-      ? "current"
+      ? "actual"
       : hasSecondaryWorktree
-        ? "worktree"
+        ? "copia de trabajo"
         : refName.isRemote
-          ? "remote"
+          ? "remota"
           : refName.isDefault
-            ? "default"
+            ? "predeterminada"
             : null;
     return (
       <ComboboxItem
@@ -769,7 +769,7 @@ export function BranchToolbarBranchSelector({
             <ComboboxInput
               className="[&_input]:h-6.5 [&_input]:ps-5 [&_input]:font-sans [&_input]:leading-6.5"
               inputClassName="rounded-none bg-transparent text-sm"
-              placeholder="Search refs..."
+              placeholder="Buscar referencias..."
               showTrigger={false}
               size="sm"
               unstyled
@@ -779,7 +779,7 @@ export function BranchToolbarBranchSelector({
           </div>
         </div>
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-          <ComboboxEmpty>No refs found.</ComboboxEmpty>
+          <ComboboxEmpty>No se encontraron referencias.</ComboboxEmpty>
           <div className="relative min-h-0 w-full max-h-56 flex-1 overflow-hidden">
             <ComboboxListVirtualized className="size-full min-w-0 p-0">
               <LegendList<string>
@@ -824,21 +824,21 @@ export function BranchToolbarBranchSelector({
                   >
                     <span className="flex min-w-0 items-center gap-1.5 font-medium text-muted-foreground">
                       <RefreshCwIcon aria-hidden="true" className="size-3 shrink-0 opacity-70" />
-                      <span className="truncate">Start from origin</span>
+                      <span className="truncate">Empezar desde el origen</span>
                     </span>
                     <Switch
                       id={startFromOriginSwitchId}
                       checked={startFromOrigin}
                       className="[--thumb-size:--spacing(3.5)]"
-                      aria-label="Start worktree from origin"
+                      aria-label="Iniciar directorio de trabajo desde el origen"
                       onCheckedChange={(checked) => onStartFromOriginChange(Boolean(checked))}
                     />
                   </label>
                 }
               />
               <TooltipPopup side="top" className="max-w-72 whitespace-normal leading-tight">
-                Creates the worktree from the latest matching branch on origin instead of your local
-                branch.
+                Crea el árbol de trabajo desde la última rama coincidente del origen en lugar de
+                usar tu rama local.
               </TooltipPopup>
             </Tooltip>
           ) : null}

@@ -24,8 +24,8 @@ export class PullRequestLinkOpenError extends Schema.TaggedErrorClass<PullReques
 
   override get message(): string {
     return this.targetOrigin === null
-      ? "Unable to open pull request link."
-      : `Unable to open pull request link at ${this.targetOrigin}.`;
+      ? "No se pudo abrir el enlace de la solicitud de cambios."
+      : `No se pudo abrir el enlace de la solicitud de cambios en ${this.targetOrigin}.`;
   }
 }
 
@@ -56,7 +56,7 @@ export function useOpenPrLink() {
     if (!api) {
       toastManager.add({
         type: "error",
-        title: "Link opening is unavailable.",
+        title: "No se puede abrir el enlace.",
       });
       return;
     }
@@ -66,8 +66,8 @@ export function useOpenPrLink() {
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Unable to open pull request link",
-          description: error instanceof Error ? error.message : "An error occurred.",
+          title: "No se pudo abrir el enlace de la solicitud de cambios",
+          description: error instanceof Error ? error.message : "Se ha producido un error.",
         }),
       );
     });

@@ -124,7 +124,7 @@ function BackgroundPolicyTooltip({ children }: { readonly children: string }) {
           <button
             type="button"
             className="inline-flex size-5 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
-            aria-label="Background policy details"
+            aria-label="Detalles de la política en segundo plano"
           >
             <InfoIcon className="size-3.5" />
           </button>
@@ -161,16 +161,16 @@ function authPresentation(auth: SourceControlProviderAuth): {
   if (auth.status === "unauthenticated") {
     return { label: "Not authenticated", badge: "warning" };
   }
-  return { label: "Status unknown", badge: null };
+  return { label: "Estado desconocido", badge: null };
 }
 
 function RedactedAccount(props: { readonly account: string | null }) {
   return (
     <RedactedSensitiveText
       value={props.account}
-      ariaLabel="Toggle source control account visibility"
-      revealTooltip="Click to reveal account"
-      hideTooltip="Click to hide account"
+      ariaLabel="Mostrar u ocultar la cuenta de control de versiones"
+      revealTooltip="Pulsa para mostrar la cuenta"
+      hideTooltip="Pulsa para ocultar la cuenta"
     />
   );
 }
@@ -220,18 +220,18 @@ function itemSummary({
   readonly authAccount: string | null;
 }) {
   if (isVcsNotReady(item)) {
-    return <span>Support for {item.label} is coming soon.</span>;
+    return <span>La compatibilidad con {item.label} estará disponible próximamente.</span>;
   }
 
   if (item.status !== "available") {
-    return <span>Not available on this server: {item.installHint}</span>;
+    return <span>No disponible en este servidor: {item.installHint}</span>;
   }
 
   if (auth) {
     if (auth.status === "authenticated") {
       return (
         <>
-          <span>Authenticated</span>
+          <span>Autenticado</span>
           {authAccount ? (
             <>
               <span aria-hidden>as</span>
@@ -243,26 +243,27 @@ function itemSummary({
     }
 
     if (!item.executable) {
-      return <span>Available. {item.installHint}</span>;
+      return <span>Disponible. {item.installHint}</span>;
     }
 
     if (auth.status === "unauthenticated") {
       return (
         <span>
-          {item.label} is not authenticated on this server. Sign in or configure credentials using
-          the <code className="rounded bg-muted px-1 py-px text-[11px]">{item.executable}</code>{" "}
-          tool on the server host to enable change request features.
+          {item.label} no está autenticado en este servidor. Inicia sesión o configura las
+          credenciales con la herramienta{" "}
+          <code className="rounded bg-muted px-1 py-px text-[11px]">{item.executable}</code> en el
+          host del servidor para activar las funciones de solicitudes de cambios.
         </span>
       );
     }
     return (
       <span>
-        Could not verify {item.label}. {item.installHint}
+        No se pudo verificar {item.label}. {item.installHint}
       </span>
     );
   }
 
-  return <span>Available</span>;
+  return <span>Disponible</span>;
 }
 
 function DiscoveryItemRow({
@@ -366,11 +367,11 @@ function GitFetchIntervalSettings() {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 space-y-1">
           <div className="flex min-w-0 items-center gap-1">
-            <span className="text-xs font-medium text-foreground">Fetch interval</span>
+            <span className="text-xs font-medium text-foreground">Intervalo de actualización</span>
             <BackgroundPolicyTooltip>
-              This interval is configured for Git only. The shared Background activity policy still
-              decides whether Git refreshes may run when the timer fires. Custom intervals appear as
-              Advanced in General settings.
+              Este intervalo se configura solo para Git. La política compartida de actividad en
+              segundo plano decide si se actualiza Git. Los intervalos personalizados aparecen como
+              Avanzado en los ajustes generales.
             </BackgroundPolicyTooltip>
             <span
               className={cn(
@@ -394,8 +395,8 @@ function GitFetchIntervalSettings() {
             </span>
           </div>
           <p className="max-w-2xl text-xs leading-relaxed text-muted-foreground">
-            Refresh remote branch status in the background. Set this to 0 seconds if Git credentials
-            or security keys should only be prompted by explicit Git actions.
+            Actualiza en segundo plano el estado de las ramas remotas. Usa 0 segundos si las
+            credenciales o claves de seguridad solo deben solicitarse en acciones Git explícitas.
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
@@ -414,12 +415,12 @@ function GitFetchIntervalSettings() {
             }
           >
             <NumberFieldGroup>
-              <NumberFieldDecrement aria-label="Decrease fetch interval" />
-              <NumberFieldInput aria-label="Automatic Git fetch interval in seconds" />
-              <NumberFieldIncrement aria-label="Increase fetch interval" />
+              <NumberFieldDecrement aria-label="Reducir intervalo de descarga" />
+              <NumberFieldInput aria-label="Intervalo de descarga automática de Git en segundos" />
+              <NumberFieldIncrement aria-label="Aumentar intervalo de descarga" />
             </NumberFieldGroup>
           </NumberField>
-          <span className="text-xs text-muted-foreground">seconds</span>
+          <span className="text-xs text-muted-foreground">segundos</span>
         </div>
       </div>
     </div>
@@ -475,19 +476,21 @@ function EmptySourceControlDiscovery({
   const hasError = error !== null;
 
   return (
-    <SettingsSection id={searchableSetting("source-control").id} title="Server environment">
+    <SettingsSection id={searchableSetting("source-control").id} title="Entorno del servidor">
       <Empty className="min-h-88">
         <EmptyMedia variant="icon">
           <GitPullRequestIcon />
         </EmptyMedia>
         <EmptyHeader>
           <EmptyTitle>
-            {hasError ? "Could not scan the server environment" : "Nothing detected yet"}
+            {hasError
+              ? "No se pudo explorar el entorno del servidor"
+              : "Todavía no se detectó nada"}
           </EmptyTitle>
           <EmptyDescription>
             {hasError
               ? error
-              : "Install Git on the server, add optional hosting integrations or credentials your workspace needs, then rescan."}
+              : "Instala Git en el servidor, añade las integraciones o credenciales que necesite el espacio de trabajo y vuelve a analizar."}
           </EmptyDescription>
         </EmptyHeader>
         <EmptyContent>
@@ -534,13 +537,13 @@ export function SourceControlSettingsPanel() {
             className="size-5 rounded-sm p-0 text-muted-foreground hover:text-foreground"
             onClick={handleScan}
             disabled={discovery.isPending}
-            aria-label="Rescan server environment"
+            aria-label="Volver a explorar el entorno del servidor"
           >
             <RefreshCwIcon className={cn("size-3", discovery.isPending && "animate-spin")} />
           </Button>
         }
       />
-      <TooltipPopup side="top">Rescan Git and hosting integrations</TooltipPopup>
+      <TooltipPopup side="top">Volver a buscar integraciones de Git y alojamiento</TooltipPopup>
     </Tooltip>
   );
 

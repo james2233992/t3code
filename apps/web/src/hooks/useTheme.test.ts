@@ -102,7 +102,7 @@ describe("theme failure handling", () => {
     await expect(import("./useTheme")).resolves.toBeDefined();
 
     expect(errorLog).toHaveBeenCalledWith(
-      "Failed to read theme preference for t3code:theme.",
+      "No se pudo leer la preferencia de tema en t3code:theme.",
       expect.objectContaining({
         operation: "read",
         storageKey: "t3code:theme",
@@ -192,7 +192,7 @@ describe("theme failure handling", () => {
 
     expect(setTheme).toHaveBeenCalledTimes(2);
     expect(errorLog).toHaveBeenCalledWith(
-      "Failed to sync the dark theme to the desktop shell.",
+      "No se pudo sincronizar el tema dark con la aplicación de escritorio.",
       expect.objectContaining({
         theme: "dark",
         errorTag: "DesktopThemeSyncError",

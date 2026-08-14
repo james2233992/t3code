@@ -1,7 +1,4 @@
-import {
-  connectionStatusText,
-  type EnvironmentConnectionPresentation,
-} from "@t3tools/client-runtime/connection";
+import type { EnvironmentConnectionPresentation } from "@t3tools/client-runtime/connection";
 
 export interface SavedCloudEnvironmentConnectionPresentation {
   readonly buttonLabel: string;
@@ -20,38 +17,42 @@ export function presentSavedCloudEnvironmentConnection(
   switch (connection.phase) {
     case "connected":
       return {
-        buttonLabel: "Connected",
-        statusText: connectionStatusText(connection),
+        buttonLabel: "Conectado",
+        statusText: "Conectado",
         tone: "connected",
       };
     case "connecting":
       return {
-        buttonLabel: "Connecting…",
-        statusText: connectionStatusText(connection),
+        buttonLabel: "Conectando…",
+        statusText: "Conectando...",
         tone: "connecting",
       };
     case "reconnecting":
       return {
-        buttonLabel: "Reconnecting…",
-        statusText: connectionStatusText(connection),
+        buttonLabel: "Reconectando…",
+        statusText: connection.error
+          ? `No se pudo conectar. Reconectando... Motivo: ${connection.error}`
+          : "No se pudo conectar. Reconectando...",
         tone: "connecting",
       };
     case "error":
       return {
-        buttonLabel: "Connection failed",
-        statusText: connectionStatusText(connection),
+        buttonLabel: "Falló la conexión",
+        statusText: connection.error
+          ? `Falló la conexión. Motivo: ${connection.error}`
+          : "Falló la conexión",
         tone: "error",
       };
     case "offline":
       return {
-        buttonLabel: "Offline",
-        statusText: connectionStatusText(connection),
+        buttonLabel: "Sin conexión",
+        statusText: "Sin conexión",
         tone: "idle",
       };
     case "available":
       return {
-        buttonLabel: "Not connected",
-        statusText: connectionStatusText(connection),
+        buttonLabel: "No conectado",
+        statusText: "Disponible",
         tone: "idle",
       };
   }

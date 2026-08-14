@@ -232,8 +232,8 @@ export function PreviewView({
         const error = squashAtomCommandFailure(result);
         toastManager.add({
           type: "error",
-          title: "Unable to resize browser viewport",
-          description: error instanceof Error ? error.message : "An error occurred.",
+          title: "No se pudo redimensionar el área del navegador",
+          description: error instanceof Error ? error.message : "Se ha producido un error.",
         });
         throw error;
       }
@@ -293,8 +293,8 @@ export function PreviewView({
     void operation(runtimeTabId).catch((error) => {
       toastManager.add({
         type: "error",
-        title: "Unable to update popped-out preview",
-        description: error instanceof Error ? error.message : "An error occurred.",
+        title: "No se pudo actualizar la previsualización independiente",
+        description: error instanceof Error ? error.message : "Se ha producido un error.",
       });
     });
   }, [desktopOverlay?.pictureInPicture, runtimeTabId]);
@@ -316,8 +316,8 @@ export function PreviewView({
                   toastId,
                   stackedThreadToast({
                     type: "error",
-                    title: "Unable to copy recording path",
-                    description: "Clipboard API unavailable.",
+                    title: "No se pudo copiar la ruta de la grabación",
+                    description: "La API del portapapeles no está disponible.",
                     actionProps: revealAction,
                   }),
                 );
@@ -338,8 +338,9 @@ export function PreviewView({
                     toastId,
                     stackedThreadToast({
                       type: "error",
-                      title: "Unable to copy recording path",
-                      description: error instanceof Error ? error.message : "An error occurred.",
+                      title: "No se pudo copiar la ruta de la grabación",
+                      description:
+                        error instanceof Error ? error.message : "Se ha producido un error.",
                       actionProps: revealAction,
                     }),
                   );
@@ -356,11 +357,11 @@ export function PreviewView({
                 toastId,
                 stackedThreadToast({
                   type: "success",
-                  title: "Recording saved",
+                  title: "Grabación guardada",
                   actionProps: revealAction,
                   data: {
                     secondaryActionProps: {
-                      children: pathCopied ? "Copied!" : "Copy path",
+                      children: pathCopied ? "Copiada" : "Copiar ruta",
                       disabled: pathCopied,
                       onClick: copyPath,
                     },
@@ -373,11 +374,11 @@ export function PreviewView({
             toastId = toastManager.add(
               stackedThreadToast({
                 type: "success",
-                title: "Recording saved",
+                title: "Grabación guardada",
                 actionProps: revealAction,
                 data: {
                   secondaryActionProps: {
-                    children: "Copy path",
+                    children: "Copiar ruta",
                     onClick: copyPath,
                   },
                   secondaryActionVariant: "outline",
@@ -388,8 +389,8 @@ export function PreviewView({
           (error) => {
             toastManager.add({
               type: "error",
-              title: "Unable to stop recording",
-              description: error instanceof Error ? error.message : "An error occurred.",
+              title: "No se pudo detener la grabación",
+              description: error instanceof Error ? error.message : "Se ha producido un error.",
             });
           },
         );
@@ -399,8 +400,8 @@ export function PreviewView({
         void startBrowserRecording(runtimeTabId, threadRef, tabId).catch((error) => {
           toastManager.add({
             type: "error",
-            title: "Unable to start recording",
-            description: error instanceof Error ? error.message : "An error occurred.",
+            title: "No se pudo iniciar la grabación",
+            description: error instanceof Error ? error.message : "Se ha producido un error.",
           });
         });
         return;
@@ -417,7 +418,7 @@ export function PreviewView({
 
           const updateScreenshotToast = (
             type: "success" | "error" = "success",
-            title = "Screenshot saved",
+            title = "Captura guardada",
             description?: string,
           ) => {
             toastManager.update(
@@ -427,7 +428,7 @@ export function PreviewView({
                 title,
                 description,
                 actionProps: {
-                  children: imageCopied ? "Copied!" : "Copy image",
+                  children: imageCopied ? "Copiada" : "Copiar imagen",
                   disabled: imageCopied,
                   onClick: copyImage,
                 },
@@ -436,7 +437,7 @@ export function PreviewView({
                     {
                       id: "copy-path",
                       props: {
-                        children: pathCopied ? "Copied!" : "Copy path",
+                        children: pathCopied ? "Copiada" : "Copiar ruta",
                         disabled: pathCopied,
                         onClick: copyPath,
                       },
@@ -455,8 +456,8 @@ export function PreviewView({
             if (!navigator.clipboard?.writeText) {
               updateScreenshotToast(
                 "error",
-                "Unable to copy screenshot path",
-                "Clipboard API unavailable.",
+                "No se pudo copiar la ruta de la captura",
+                "La API del portapapeles no está disponible.",
               );
               return;
             }
@@ -473,8 +474,8 @@ export function PreviewView({
               (error) => {
                 updateScreenshotToast(
                   "error",
-                  "Unable to copy screenshot path",
-                  error instanceof Error ? error.message : "An error occurred.",
+                  "No se pudo copiar la ruta de la captura",
+                  error instanceof Error ? error.message : "Se ha producido un error.",
                 );
               },
             );
@@ -493,8 +494,8 @@ export function PreviewView({
               (error) => {
                 updateScreenshotToast(
                   "error",
-                  "Unable to copy screenshot",
-                  error instanceof Error ? error.message : "An error occurred.",
+                  "No se pudo copiar la captura",
+                  error instanceof Error ? error.message : "Se ha producido un error.",
                 );
               },
             );
@@ -503,9 +504,9 @@ export function PreviewView({
           toastId = toastManager.add(
             stackedThreadToast({
               type: "success",
-              title: "Screenshot saved",
+              title: "Captura guardada",
               actionProps: {
-                children: "Copy image",
+                children: "Copiar imagen",
                 onClick: copyImage,
               },
               data: {
@@ -513,7 +514,7 @@ export function PreviewView({
                   {
                     id: "copy-path",
                     props: {
-                      children: "Copy path",
+                      children: "Copiar ruta",
                       onClick: copyPath,
                     },
                   },
@@ -529,8 +530,8 @@ export function PreviewView({
         (error) => {
           toastManager.add({
             type: "error",
-            title: "Unable to capture screenshot",
-            description: error instanceof Error ? error.message : "An error occurred.",
+            title: "No se pudo capturar la pantalla",
+            description: error instanceof Error ? error.message : "Se ha producido un error.",
           });
         },
       );
@@ -681,7 +682,9 @@ export function PreviewView({
         // user wouldn't be able to actually click anything underneath).
         pickDisabled={!tabId || isUnreachable}
         pickDisabledReason={
-          isUnreachable ? "Page didn't load — pick unavailable until the page renders" : undefined
+          isUnreachable
+            ? "La página no se cargó; la selección no estará disponible hasta que se renderice"
+            : undefined
         }
         trailingActions={
           previewBridge ? (

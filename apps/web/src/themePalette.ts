@@ -1436,7 +1436,7 @@ export class ThemeLibraryStorageError extends Schema.TaggedErrorClass<ThemeLibra
   { storageKey: Schema.String, cause: Schema.Defect() },
 ) {
   override get message(): string {
-    return `Failed to write the theme library to ${this.storageKey}.`;
+    return `No se pudo guardar la biblioteca de temas en ${this.storageKey}.`;
   }
 }
 
@@ -1492,7 +1492,7 @@ export function removeCustomTheme(themeId: string): void {
 }
 
 function parseThemeColorOverrides(value: unknown): ThemeColorOverrides {
-  if (!isRecord(value)) throw new Error("Theme colors must be objects.");
+  if (!isRecord(value)) throw new Error("Los colores del tema deben ser objetos.");
 
   const overrides: Partial<Record<ThemeColorRole, string>> = {};
   for (const [role, color] of Object.entries(value)) {
@@ -1505,14 +1505,14 @@ function parseThemeColorOverrides(value: unknown): ThemeColorOverrides {
     overrides[role as ThemeColorRole] = color;
   }
   if (Object.keys(overrides).length === 0) {
-    throw new Error("Add at least one color role to the theme file.");
+    throw new Error("Añade al menos un rol de color al archivo del tema.");
   }
   return overrides;
 }
 
 export function parseThemeFile(value: unknown): ThemeDefinition {
   if (!isRecord(value)) {
-    throw new Error("Theme files must contain a JSON object.");
+    throw new Error("Los archivos de tema deben contener un objeto JSON.");
   }
   if (value.version !== THEME_FILE_VERSION) {
     throw new Error(`This theme file uses an unsupported version. Expected ${THEME_FILE_VERSION}.`);
@@ -1521,15 +1521,16 @@ export function parseThemeFile(value: unknown): ThemeDefinition {
   const name = value.name;
   const appearance = value.appearance;
   const rawColors = value.colors;
-  if (!isThemeLabel(name)) throw new Error("Theme files need a name (48 characters or fewer).");
+  if (!isThemeLabel(name))
+    throw new Error("Los archivos de tema necesitan un nombre de 48 caracteres como máximo.");
   if (!isThemeAppearance(appearance)) {
-    throw new Error('Theme files need an appearance of "light" or "dark".');
+    throw new Error('Los archivos de tema necesitan una apariencia "light" o "dark".');
   }
-  if (!isRecord(rawColors)) throw new Error("Theme files need a colors object.");
+  if (!isRecord(rawColors)) throw new Error("Los archivos de tema necesitan un objeto de colores.");
 
   const id = value.id === undefined ? themeIdFromName(name) : value.id;
   if (!isThemeId(id)) {
-    throw new Error("Theme ids may only contain lowercase letters, numbers, and hyphens.");
+    throw new Error("Los ID de tema solo pueden contener minúsculas, números y guiones.");
   }
   if (RESERVED_THEME_IDS.has(id)) {
     throw new Error(`The theme id "${id}" is reserved.`);
@@ -1540,13 +1541,15 @@ export function parseThemeFile(value: unknown): ThemeDefinition {
   const fallback = getDefaultThemeColors(appearance);
   const variants: Partial<Record<ThemeAppearance, ThemeColors>> = {};
   if (value.variants !== undefined) {
-    if (!isRecord(value.variants)) throw new Error("Theme variants must be an object.");
+    if (!isRecord(value.variants)) throw new Error("Las variantes del tema deben ser un objeto.");
     for (const [variantAppearance, variantColors] of Object.entries(value.variants)) {
       if (!isThemeAppearance(variantAppearance)) {
-        throw new Error('Theme variants may only be named "light" or "dark".');
+        throw new Error('Las variantes de tema solo pueden llamarse "light" o "dark".');
       }
       if (variantAppearance === appearance) {
-        throw new Error(`Theme variants must not repeat the base appearance "${appearance}".`);
+        throw new Error(
+          `Las variantes de tema no pueden repetir la apariencia base "${appearance}".`,
+        );
       }
       const variantFallback = getDefaultThemeColors(variantAppearance);
       variants[variantAppearance] = {

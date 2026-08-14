@@ -70,9 +70,9 @@ export const ModelListRow = memo(function ModelListRow(props: {
           {props.showNewBadge ? (
             <span
               className="shrink-0 rounded border border-update/35 bg-update/15 px-0.5 py-px text-[10px] font-bold uppercase leading-none tracking-wide text-update-foreground"
-              aria-label="New model"
+              aria-label="Modelo nuevo"
             >
-              New
+              Nuevo
             </span>
           ) : null}
         </div>
@@ -108,7 +108,7 @@ export const ModelListRow = memo(function ModelListRow(props: {
                   event.stopPropagation();
                 }}
                 disabled={Boolean(props.disabledReason)}
-                aria-label={props.isFavorite ? "Remove from favorites" : "Add to favorites"}
+                aria-label={props.isFavorite ? "Eliminar de favoritos" : "Añadir a favoritos"}
               >
                 <StarIcon
                   className={cn(
@@ -120,7 +120,7 @@ export const ModelListRow = memo(function ModelListRow(props: {
             }
           />
           <TooltipPopup side="top" align="center">
-            {props.isFavorite ? "Remove from favorites" : "Add to favorites"}
+            {props.isFavorite ? "Eliminar de favoritos" : "Añadir a favoritos"}
           </TooltipPopup>
         </Tooltip>
       </div>

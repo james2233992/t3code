@@ -52,18 +52,22 @@ export function useCloudLinkController() {
 
   const reportUpdateFailure = (cause: unknown) => {
     const message =
-      cause instanceof Error ? cause.message : "Could not update Fenix Connect access.";
+      cause instanceof Error ? cause.message : "No se pudo actualizar el acceso a Fenix Connect.";
     const traceId = findErrorTraceId(cause);
-    console.error("[t3-connect] Could not update Fenix Connect", { message, traceId, cause });
+    console.error("[fenix-connect] No se pudo actualizar Fenix Connect", {
+      message,
+      traceId,
+      cause,
+    });
     setOperationError(traceId ? `${message} Trace ID: ${traceId}` : message);
     toastManager.add({
       type: "error",
-      title: "Could not update Fenix Connect",
+      title: "No se pudo actualizar Fenix Connect",
       description: message,
       data: traceId
         ? {
             secondaryActionProps: {
-              children: "Copy trace ID",
+              children: "Copiar ID de traza",
               onClick: () => void navigator.clipboard?.writeText(traceId),
             },
           }
@@ -82,7 +86,7 @@ export function useCloudLinkController() {
     setOperationError(null);
     const target = primaryCloudLinkState.target;
     if (!target) {
-      reportUpdateFailure(new Error("Local environment is not ready yet."));
+      reportUpdateFailure(new Error("El entorno local todavía no está listo."));
       return false;
     }
     const tokenResult = await settlePromise(() => getToken(resolveRelayClerkTokenOptions()));
@@ -113,7 +117,9 @@ export function useCloudLinkController() {
       }
       const clerkToken = tokenResult.value;
       if (!clerkToken) {
-        reportUpdateFailure(new Error("Sign in to Fenix Connect before enabling this."));
+        reportUpdateFailure(
+          new Error("Inicia sesión en Fenix Connect antes de activar esta opción."),
+        );
         return false;
       }
       if (!linked || managedTunnelActive !== desired.managedTunnel) {

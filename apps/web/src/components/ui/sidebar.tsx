@@ -80,7 +80,7 @@ const SidebarInstanceContext = React.createContext<SidebarInstanceContextProps |
 function useSidebar() {
   const context = React.use(SidebarContext);
   if (!context) {
-    throw new Error("useSidebar must be used within a SidebarProvider.");
+    throw new Error("useSidebar debe usarse dentro de un SidebarProvider.");
   }
 
   return context;
@@ -249,8 +249,8 @@ function Sidebar({
             }
           >
             <SheetHeader className="sr-only">
-              <SheetTitle>Sidebar</SheetTitle>
-              <SheetDescription>Displays the mobile sidebar.</SheetDescription>
+              <SheetTitle>Barra lateral</SheetTitle>
+              <SheetDescription>Muestra la barra lateral móvil.</SheetDescription>
             </SheetHeader>
             <div
               className={cn(
@@ -338,7 +338,7 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
       {...props}
     >
       {isOpen ? <PanelLeftCloseIcon /> : <PanelLeftIcon />}
-      <span className="sr-only">Toggle Sidebar</span>
+      <span className="sr-only">Mostrar u ocultar la barra lateral</span>
     </Button>
   );
 }
@@ -377,7 +377,9 @@ function SidebarRail({
   const resolvedResizable = sidebarInstance?.resizable ?? null;
   const canResize = resolvedResizable !== null && open;
   const railLabel = canResize ? "Resize Sidebar" : "Toggle Sidebar";
-  const railTitle = canResize ? "Drag to resize sidebar" : "Toggle Sidebar";
+  const railTitle = canResize
+    ? "Arrastra para cambiar el tamaño de la barra lateral"
+    : "Alternar barra lateral";
 
   const stopResize = React.useCallback(
     (pointerId: number) => {
@@ -566,7 +568,7 @@ function SidebarRail({
     try {
       storedWidth = getLocalStorageItem(resolvedResizable.storageKey, Schema.Finite);
     } catch (error) {
-      console.error("Could not restore persisted sidebar width.", error);
+      console.error("No se pudo restaurar el ancho guardado de la barra lateral.", error);
       return;
     }
     if (storedWidth === null) return;

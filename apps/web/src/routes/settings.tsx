@@ -32,7 +32,7 @@ function RestoreDefaultsButton({ onRestored }: { onRestored: () => void }) {
   );
 }
 
-function SettingsContentLayout() {
+function AjustesContentLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const canGoBack = useCanGoBack();
@@ -79,7 +79,7 @@ function SettingsContentLayout() {
             )}
           >
             <div className="flex w-full items-center gap-2">
-              <span className="text-sm font-medium text-foreground">Settings</span>
+              <span className="text-sm font-medium text-foreground">Ajustes</span>
               {showRestoreDefaults ? (
                 <div className="ms-auto flex items-center gap-2">
                   <RestoreDefaultsButton onRestored={handleRestored} />
@@ -97,7 +97,7 @@ function SettingsContentLayout() {
             )}
           >
             <span className="text-xs font-medium tracking-wide text-muted-foreground/70">
-              Settings
+              Ajustes
             </span>
             {showRestoreDefaults ? (
               <div className="ms-auto flex items-center gap-2">
@@ -115,8 +115,8 @@ function SettingsContentLayout() {
   );
 }
 
-function SettingsRouteLayout() {
-  return <SettingsContentLayout />;
+function AjustesRouteLayout() {
+  return <AjustesContentLayout />;
 }
 
 export const Route = createFileRoute("/settings")({
@@ -132,5 +132,5 @@ export const Route = createFileRoute("/settings")({
       throw redirect({ to: "/settings/general", replace: true });
     }
   },
-  component: SettingsRouteLayout,
+  component: AjustesRouteLayout,
 });

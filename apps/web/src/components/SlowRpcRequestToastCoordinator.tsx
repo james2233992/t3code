@@ -48,11 +48,11 @@ export function SlowRpcRequestToastCoordinator() {
       data: {
         expandableContent: <SlowRequestDetails requests={slowRequests} />,
         expandableDescriptionTrigger: true,
-        expandableLabels: { collapse: "Hide requests", expand: "Show requests" },
+        expandableLabels: { collapse: "Ocultar solicitudes", expand: "Mostrar solicitudes" },
       },
       description: describeSlowRequests(slowRequests),
       timeout: 0,
-      title: "Some requests are slow",
+      title: "Algunas solicitudes tardan más de lo esperado",
       type: "warning" as const,
     };
 

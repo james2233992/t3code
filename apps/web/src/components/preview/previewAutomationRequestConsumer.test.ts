@@ -234,7 +234,7 @@ describe("previewAutomationRequestConsumer", () => {
     ).toEqual({
       _tag: "PreviewAutomationTabNotFoundError",
       message:
-        "Preview automation target for click request request-1 is unavailable on environment environment-1 thread thread-1 (tab tab-1, bridge unavailable).",
+        "El destino de automatización de previsualización para la operación click, solicitud request-1, no está disponible en el entorno environment-1, conversación thread-1 (pestaña tab-1, puente no disponible).",
       detail: {
         requestId: "request-1",
         operation: "click",

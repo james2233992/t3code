@@ -10,7 +10,7 @@ class DesktopSshDiscoveryUnavailableError extends Schema.TaggedErrorClass<Deskto
   {},
 ) {
   override get message(): string {
-    return "Desktop SSH host discovery is unavailable.";
+    return "La detección de hosts SSH del escritorio no está disponible.";
   }
 }
 
@@ -19,7 +19,7 @@ class DesktopSshDiscoveryError extends Schema.TaggedErrorClass<DesktopSshDiscove
   { cause: Schema.Defect() },
 ) {
   override get message(): string {
-    return "Failed to discover SSH hosts.";
+    return "No se pudieron detectar los hosts SSH.";
   }
 }
 

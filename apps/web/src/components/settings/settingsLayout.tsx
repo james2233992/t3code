@@ -92,7 +92,7 @@ export function PolicyTooltip({ children }: { readonly children: string }) {
           <button
             type="button"
             className="inline-flex size-5 items-center justify-center rounded-sm text-muted-foreground hover:text-foreground"
-            aria-label="Background policy details"
+            aria-label="Detalles de la política en segundo plano"
           >
             <InfoIcon className="size-3.5" />
           </button>
@@ -218,7 +218,7 @@ export function SettingResetButton({ label, onClick }: { label: string; onClick:
           </Button>
         }
       />
-      <TooltipPopup side="top">Reset to default</TooltipPopup>
+      <TooltipPopup side="top">Restablecer valor predeterminado</TooltipPopup>
     </Tooltip>
   );
 }

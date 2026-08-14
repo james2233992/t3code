@@ -192,7 +192,7 @@ export function buildThreadActionItems<TThread extends BuildThreadActionItemsThr
       descriptionParts.push(`#${thread.branch}`);
     }
     if (thread.id === input.activeThreadId) {
-      descriptionParts.push("Current thread");
+      descriptionParts.push("Conversación actual");
     }
 
     const leadingContent = input.renderLeadingContent?.(thread);
@@ -291,14 +291,14 @@ export function filterCommandPaletteGroups(input: {
     if (input.projectSearchItems.length > 0) {
       searchableGroups.push({
         value: "projects-search",
-        label: "Projects",
+        label: "Proyectos",
         items: input.projectSearchItems,
       });
     }
     if (input.threadSearchItems.length > 0) {
       searchableGroups.push({
         value: "threads-search",
-        label: "Threads",
+        label: "Conversaciones",
         items: input.threadSearchItems,
       });
     }
@@ -401,12 +401,12 @@ export function buildRootGroups(input: {
 export function getCommandPaletteInputPlaceholder(mode: CommandPaletteMode): string {
   switch (mode) {
     case "root":
-      return "Search commands, projects, and threads...";
+      return "Buscar comandos, proyectos y conversaciones...";
     case "root-browse":
-      return "Enter project path (e.g. ~/projects/my-app)";
+      return "Introduce la ruta del proyecto (p. ej., ~/proyectos/mi-app)";
     case "submenu":
-      return "Search...";
+      return "Buscar...";
     case "submenu-browse":
-      return "Enter path (e.g. ~/projects/my-app)";
+      return "Introduce la ruta (p. ej., ~/proyectos/mi-app)";
   }
 }

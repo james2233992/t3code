@@ -22,10 +22,10 @@ const installSteps: ReadonlyArray<{
   readonly stage: RelayClientInstallProgressStage;
   readonly label: string;
 }> = [
-  { stage: "checking", label: "Checking current installation" },
-  { stage: "waiting_for_lock", label: "Waiting for installer" },
+  { stage: "checking", label: "Comprobando la instalación actual" },
+  { stage: "waiting_for_lock", label: "Esperando al instalador" },
   { stage: "downloading", label: "Downloading relay client" },
-  { stage: "verifying", label: "Verifying download" },
+  { stage: "verifying", label: "Verificando la descarga" },
   { stage: "installing", label: "Installing relay client" },
   { stage: "validating", label: "Validating executable" },
   { stage: "activating", label: "Activating installation" },
@@ -65,12 +65,14 @@ export function RelayClientInstallDialog() {
             <DownloadIcon aria-hidden className="size-4.5 text-muted-foreground" />
           </div>
           <DialogTitle>
-            {isInstalling ? "Installing relay client" : "Install relay client?"}
+            {isInstalling
+              ? "Instalando el cliente de retransmisión"
+              : "¿Instalar el cliente de retransmisión?"}
           </DialogTitle>
           <DialogDescription>
             {isInstalling
-              ? "Fenix Code is preparing this environment for secure access through Fenix Connect."
-              : "Fenix Code needs the relay client to make this environment available through Fenix Connect."}
+              ? "Fenix Code está preparando este entorno para el acceso seguro mediante Fenix Connect."
+              : "Fenix Code necesita el cliente de retransmisión para publicar este entorno mediante Fenix Connect."}
           </DialogDescription>
         </DialogHeader>
         <DialogPanel scrollFade={false}>
@@ -85,20 +87,22 @@ export function RelayClientInstallDialog() {
                 </p>
               </div>
               <progress
-                aria-label="Relay client installation progress"
+                aria-label="Progreso de instalación del cliente de retransmisión"
                 className="h-2 w-full appearance-none overflow-hidden rounded-full bg-muted [&::-moz-progress-bar]:rounded-full [&::-moz-progress-bar]:bg-primary [&::-webkit-progress-bar]:rounded-full [&::-webkit-progress-bar]:bg-muted [&::-webkit-progress-value]:rounded-full [&::-webkit-progress-value]:bg-primary"
                 max={installSteps.length}
                 value={activeStepIndex + 1}
               />
               <p className="text-xs leading-relaxed text-muted-foreground">
-                Keep Fenix Code open while the relay client is installed.
+                Mantén Fenix Code abierto mientras se instala el cliente de retransmisión.
               </p>
             </div>
           ) : (
             <div className="rounded-xl border border-border/70 bg-muted/35 p-3">
-              <p className="text-sm font-medium text-foreground">Managed relay client</p>
+              <p className="text-sm font-medium text-foreground">
+                Cliente de retransmisión gestionado
+              </p>
               <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                Fenix Code will download and install version{" "}
+                Fenix Code descargará e instalará la versión{" "}
                 {view.status === "confirming" ? view.version : ""} locally.
               </p>
             </div>
@@ -110,10 +114,10 @@ export function RelayClientInstallDialog() {
               variant="outline"
               onClick={() => respondToRelayClientInstallConfirmation(false)}
             >
-              Cancel
+              Cancelar
             </Button>
             <Button onClick={() => respondToRelayClientInstallConfirmation(true)}>
-              Download and install
+              Descargar e instalar
             </Button>
           </DialogFooter>
         ) : null}

@@ -367,7 +367,7 @@ function ComboboxChip({ children, ...props }: ComboboxPrimitive.Chip.Props) {
 function ComboboxChipRemove(props: ComboboxPrimitive.ChipRemove.Props) {
   return (
     <ComboboxPrimitive.ChipRemove
-      aria-label="Remove"
+      aria-label="Eliminar"
       className="h-full shrink-0 cursor-pointer px-1.5 opacity-80 hover:opacity-100 [&_svg:not([class*='size-'])]:size-4 sm:[&_svg:not([class*='size-'])]:size-3.5"
       data-slot="combobox-chip-remove"
       {...props}

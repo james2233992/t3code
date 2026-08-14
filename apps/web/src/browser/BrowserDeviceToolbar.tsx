@@ -175,7 +175,7 @@ export function BrowserDeviceToolbar({
       className="sticky left-0 top-0 z-50 flex items-center gap-0.5 overflow-x-auto border-b border-border/70 bg-background/95 px-1.5 shadow-xs backdrop-blur-md [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       style={{ width, height: BROWSER_DEVICE_TOOLBAR_HEIGHT }}
       role="toolbar"
-      aria-label="Browser device toolbar"
+      aria-label="Barra de dispositivos del navegador"
       data-browser-device-toolbar
       onBlur={(event) => {
         const nextTarget = event.relatedTarget;
@@ -211,7 +211,7 @@ export function BrowserDeviceToolbar({
             "shrink-0 justify-between px-1.5 font-medium",
             width >= 440 ? "w-36" : "w-24",
           )}
-          aria-label="Browser device preset"
+          aria-label="Dispositivo predefinido del navegador"
         >
           <SelectValue />
         </SelectTrigger>
@@ -260,7 +260,7 @@ export function BrowserDeviceToolbar({
             )
           }
           onChange={(event) => updateCustomDimension("width", event.target.value)}
-          aria-label="Viewport width"
+          aria-label="Anchura de la vista"
           aria-invalid={!customValid}
           className={cn(
             "h-6 rounded-md text-center tabular-nums [&_[data-slot=input]]:h-full [&_[data-slot=input]]:px-1 [&_[data-slot=input]]:text-xs [&_[data-slot=input]]:leading-none [&_[data-slot=input]::-webkit-inner-spin-button]:appearance-none [&_[data-slot=input]]:[appearance:textfield]",
@@ -287,7 +287,7 @@ export function BrowserDeviceToolbar({
             )
           }
           onChange={(event) => updateCustomDimension("height", event.target.value)}
-          aria-label="Viewport height"
+          aria-label="Altura de la vista"
           aria-invalid={!customValid}
           className={cn(
             "h-6 rounded-md text-center tabular-nums [&_[data-slot=input]]:h-full [&_[data-slot=input]]:px-1 [&_[data-slot=input]]:text-xs [&_[data-slot=input]]:leading-none [&_[data-slot=input]::-webkit-inner-spin-button]:appearance-none [&_[data-slot=input]]:[appearance:textfield]",
@@ -326,7 +326,7 @@ export function BrowserDeviceToolbar({
         variant="ghost"
         size="icon-xs"
         type="button"
-        aria-label="Close device toolbar"
+        aria-label="Cerrar barra de dispositivos"
         className="sticky right-0 ml-auto bg-background/95"
         disabled={pending}
         onClick={() => {

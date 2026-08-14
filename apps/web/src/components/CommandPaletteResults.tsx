@@ -72,7 +72,7 @@ function ThreadContentMatch(props: {
   return (
     <span className="truncate text-xs text-muted-foreground/85">
       <span className={isUser ? "text-blue-400" : "text-emerald-400"}>
-        {isUser ? "You:" : "Agent:"}
+        {isUser ? "Tú:" : "Agente:"}
       </span>{" "}
       <HighlightedSearchText text={props.match.snippet} query={props.match.query} />
     </span>
@@ -94,8 +94,8 @@ export function CommandPaletteResults(props: CommandPaletteResultsProps) {
       <div className="py-10 text-center text-sm text-muted-foreground">
         {props.emptyStateMessage ??
           (props.isActionsOnly
-            ? "No matching actions."
-            : "No matching commands, projects, or threads.")}
+            ? "No hay acciones coincidentes."
+            : "No hay comandos, proyectos ni conversaciones coincidentes.")}
       </div>
     );
   }

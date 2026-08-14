@@ -22,7 +22,7 @@ function readProviderUpdateDismissals(): ProviderUpdateDismissals {
       }
     );
   } catch (error) {
-    console.error("Could not read provider-update dismissals.", error);
+    console.error("No se pudieron leer los avisos de actualización descartados.", error);
     return { keys: [] };
   }
 }
@@ -35,7 +35,7 @@ function writeProviderUpdateDismissals(document: ProviderUpdateDismissals): void
       ProviderUpdateDismissalsSchema,
     );
   } catch (error) {
-    console.error("Could not persist provider-update dismissals.", error);
+    console.error("No se pudieron guardar los avisos de actualización descartados.", error);
   }
 }
 

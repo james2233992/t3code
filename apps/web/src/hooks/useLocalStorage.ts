@@ -11,7 +11,7 @@ export class LocalStorageOperationError extends Schema.TaggedErrorClass<LocalSto
   },
 ) {
   override get message(): string {
-    return `Failed to ${this.operation} local storage item ${this.storageKey}.`;
+    return `No se pudo completar la operación ${this.operation} en el almacenamiento local (${this.storageKey}).`;
   }
 }
 
@@ -106,7 +106,7 @@ export function useLocalStorage<T, E>(
     try {
       return read(key);
     } catch (error) {
-      console.error("[LOCALSTORAGE] Could not read stored value.", error);
+      console.error("[ALMACENAMIENTO LOCAL] No se pudo leer el valor guardado.", error);
       return null;
     }
   }, [key]);
@@ -142,7 +142,7 @@ export function useLocalStorage<T, E>(
     try {
       return decode(key, schema, serializedValue);
     } catch (error) {
-      console.error("[LOCALSTORAGE] Could not decode stored value.", error);
+      console.error("[ALMACENAMIENTO LOCAL] No se pudo interpretar el valor guardado.", error);
       return initialValue;
     }
   }, [initialValue, key, schema, serializedValue]);
@@ -172,7 +172,7 @@ export function useLocalStorage<T, E>(
         }
         dispatchLocalStorageChange(key);
       } catch (error) {
-        console.error("[LOCALSTORAGE] Could not update stored value.", error);
+        console.error("[ALMACENAMIENTO LOCAL] No se pudo actualizar el valor guardado.", error);
       }
     },
     [initialValue, key, schema],

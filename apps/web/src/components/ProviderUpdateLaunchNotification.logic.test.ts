@@ -286,8 +286,8 @@ describe("provider update launch notification logic", () => {
     expect(view).toMatchObject({
       phase: "initial",
       type: "warning",
-      title: "Update Available: Codex v1.1.0",
-      description: "Install the update now or review provider settings.",
+      title: "Actualización disponible: Codex v1.1.0",
+      description: "Instala la actualización ahora o revisa los ajustes del proveedor.",
     });
   });
 
@@ -300,7 +300,9 @@ describe("provider update launch notification logic", () => {
       oneClickProviders: [],
     });
 
-    expect(view.description).toBe("Codex and Cursor can be updated from provider settings.");
+    expect(view.description).toBe(
+      "Codex y Cursor pueden actualizarse desde los ajustes del proveedor.",
+    );
   });
 
   it("uses server update state for running progress", () => {
@@ -323,7 +325,7 @@ describe("provider update launch notification logic", () => {
     expect(view).toMatchObject({
       phase: "running",
       type: "loading",
-      title: "Updating provider",
+      title: "Actualizando proveedor",
     });
   });
 
@@ -347,7 +349,7 @@ describe("provider update launch notification logic", () => {
     expect(view).toMatchObject({
       phase: "failed",
       type: "error",
-      title: "Provider update failed",
+      title: "Falló la actualización del proveedor",
       description: "command failed",
     });
   });
@@ -369,7 +371,7 @@ describe("provider update launch notification logic", () => {
     expect(view).toMatchObject({
       phase: "failed",
       type: "error",
-      title: "Codex v1.1.0 update failed",
+      title: "Falló la actualización de Codex v1.1.0",
       description: "command failed",
     });
   });
@@ -394,8 +396,9 @@ describe("provider update launch notification logic", () => {
     expect(view).toMatchObject({
       phase: "unchanged",
       type: "warning",
-      title: "Provider still needs an update",
-      description: "Cursor still appears outdated. Check provider settings for details.",
+      title: "El proveedor todavía necesita una actualización",
+      description:
+        "Cursor sigue apareciendo desactualizado. Consulta los ajustes de proveedores para ver los detalles.",
     });
   });
 
@@ -422,8 +425,8 @@ describe("provider update launch notification logic", () => {
     expect(view).toMatchObject({
       phase: "succeeded",
       type: "success",
-      title: "Provider updated",
-      description: "New sessions will use the updated provider.",
+      title: "Proveedor actualizado",
+      description: "Las sesiones nuevas usarán el proveedor actualizado.",
       dismissAfterVisibleMs: 3_000,
     });
   });
@@ -448,8 +451,8 @@ describe("provider update launch notification logic", () => {
     expect(view).toMatchObject({
       phase: "succeeded",
       type: "success",
-      title: "Codex updated: v1.1.0",
-      description: "New sessions will use the updated provider.",
+      title: "Codex actualizado: v1.1.0",
+      description: "Las sesiones nuevas usarán el proveedor actualizado.",
     });
   });
 
@@ -459,7 +462,7 @@ describe("provider update launch notification logic", () => {
     expect(firstFailedProviderUpdateMessage(results)).toBe("WebSocket closed");
     expect(getProviderUpdateRejectedToastView(2, "WebSocket closed")).toMatchObject({
       phase: "failed",
-      title: "Provider updates failed",
+      title: "Fallaron las actualizaciones de proveedores",
       description: "WebSocket closed",
     });
   });
@@ -503,8 +506,8 @@ describe("provider update launch notification logic", () => {
 
     expect(view).toMatchObject({
       tone: "loading",
-      title: "Updating 2 providers",
-      description: "Codex and Cursor updates are in progress.",
+      title: "Actualizando 2 proveedores",
+      description: "Actualizaciones de Codex y Cursor en curso.",
     });
   });
 
@@ -525,8 +528,8 @@ describe("provider update launch notification logic", () => {
     expect(view).toMatchObject({
       key: "loading:codex:running",
       tone: "loading",
-      title: "Updating Codex",
-      description: "Codex update in progress.",
+      title: "Actualizando Codex",
+      description: "Actualización de Codex en curso.",
     });
   });
 
@@ -550,7 +553,7 @@ describe("provider update launch notification logic", () => {
     expect(view).toMatchObject({
       key: "failed:claudeAgent:2026-04-23T10:00:00.000Z:Update command exited with code 1.",
       tone: "error",
-      title: "Claude v1.1.0 update failed",
+      title: "Falló la actualización de Claude v1.1.0",
       description: "Update command exited with code 1.",
       dismissible: true,
     });
@@ -579,8 +582,8 @@ describe("provider update launch notification logic", () => {
     expect(view).toMatchObject({
       key: "succeeded:codex:2026-04-23T10:00:00.000Z:Provider updated.",
       tone: "success",
-      title: "Codex updated: v1.1.0",
-      description: "New sessions will use the updated provider.",
+      title: "Codex actualizado: v1.1.0",
+      description: "Las sesiones nuevas usarán el proveedor actualizado.",
       dismissAfterVisibleMs: 3_000,
     });
   });
@@ -605,7 +608,7 @@ describe("provider update launch notification logic", () => {
     expect(view).toMatchObject({
       key: "unchanged:cursor:2026-04-23T10:00:00.000Z:still old",
       tone: "warning",
-      title: "Cursor still needs an update",
+      title: "Cursor todavía necesita una actualización",
       dismissible: true,
     });
   });
@@ -663,7 +666,7 @@ describe("provider update launch notification logic", () => {
     expect(successView).toMatchObject({
       key: "succeeded:codex:2026-04-23T10:01:00.000Z:Provider updated.",
       tone: "success",
-      title: "Codex updated: v1.2.0",
+      title: "Codex actualizado: v1.2.0",
     });
 
     const failureView = getProviderUpdateSidebarPillView(providers, {
@@ -673,7 +676,7 @@ describe("provider update launch notification logic", () => {
     expect(failureView).toMatchObject({
       key: "failed:claudeAgent:2026-04-23T10:00:00.000Z:Update command exited with code 1.",
       tone: "error",
-      title: "Claude v1.1.0 update failed",
+      title: "Falló la actualización de Claude v1.1.0",
     });
   });
 

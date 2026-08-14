@@ -99,7 +99,7 @@ async function applyClientTracingConfig(config: ClientTracingConfig): Promise<vo
     if (generation === configurationGeneration) {
       const error = squashAtomCommandFailure(delegateResult);
       const tracesUrl = new URL(otlpTracesUrl);
-      console.warn("Failed to configure client tracing exporter", {
+      console.warn("No se pudo configurar el exportador de trazas del cliente", {
         scheme: tracesUrl.protocol.replace(/:$/, ""),
         host: tracesUrl.hostname,
         port: tracesUrl.port || undefined,

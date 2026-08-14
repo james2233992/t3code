@@ -275,23 +275,23 @@ function RootRouteErrorView({ error, reset }: ErrorComponentProps) {
           {APP_DISPLAY_NAME}
         </p>
         <h1 className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">
-          Something went wrong.
+          Se ha producido un error.
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{message}</p>
 
         <div className="mt-5 flex flex-wrap gap-2">
           <Button size="sm" onClick={() => reset()}>
-            Try again
+            Reintentar
           </Button>
           <Button size="sm" variant="outline" onClick={() => window.location.reload()}>
-            Reload app
+            Recargar la aplicación
           </Button>
         </div>
 
         <details className="group mt-5 overflow-hidden rounded-lg border border-border/70 bg-background/55">
           <summary className="cursor-pointer list-none px-3 py-2 text-xs font-medium text-muted-foreground">
-            <span className="group-open:hidden">Show error details</span>
-            <span className="hidden group-open:inline">Hide error details</span>
+            <span className="group-open:hidden">Mostrar detalles del error</span>
+            <span className="hidden group-open:inline">Ocultar detalles del error</span>
           </summary>
           <pre className="max-h-56 overflow-auto border-t border-border/70 bg-background/80 px-3 py-2 text-xs text-foreground/85">
             {details}
@@ -326,7 +326,7 @@ function errorDetails(error: unknown): string {
   try {
     return JSON.stringify(error, null, 2);
   } catch {
-    return "No additional error details are available.";
+    return "No hay más detalles disponibles sobre el error.";
   }
 }
 
@@ -419,7 +419,7 @@ function EventRouter() {
         description: decision.message,
         actionVariant: "outline",
         actionProps: {
-          children: "Open keybindings.json",
+          children: "Abrir keybindings.json",
           onClick: () => {
             if (!serverConfig || !primaryEnvironment) {
               return;
@@ -444,9 +444,11 @@ function EventRouter() {
               toastManager.add(
                 stackedThreadToast({
                   type: "error",
-                  title: "Unable to open keybindings file",
+                  title: "No se pudo abrir el archivo de atajos",
                   description:
-                    error instanceof Error ? error.message : "Unknown error opening file.",
+                    error instanceof Error
+                      ? error.message
+                      : "Error desconocido al abrir el archivo.",
                 }),
               );
             })();

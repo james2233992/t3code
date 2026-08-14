@@ -31,53 +31,54 @@ export type ProviderStatusKey = keyof typeof PROVIDER_STATUS_STYLES;
 export function getProviderSummary(provider: ServerProvider | undefined) {
   if (!provider) {
     return {
-      headline: "Checking provider status",
-      detail: "Waiting for the server to report installation and authentication details.",
+      headline: "Comprobando el estado del proveedor",
+      detail: "Esperando a que el servidor informe de la instalación y la autenticación.",
     };
   }
   if (!provider.enabled) {
     return {
-      headline: "Disabled",
+      headline: "Desactivado",
       detail:
         provider.message ??
-        "This provider is installed but disabled for new sessions in Fenix Code.",
+        "Este proveedor está instalado, pero desactivado para sesiones nuevas en Fenix Code.",
     };
   }
   if (!provider.installed) {
     return {
-      headline: "Not found",
-      detail: provider.message ?? "CLI not detected on PATH.",
+      headline: "No encontrado",
+      detail: provider.message ?? "No se detectó la CLI en PATH.",
     };
   }
   if (provider.auth.status === "authenticated") {
     const authLabel = provider.auth.label ?? provider.auth.type;
     return {
-      headline: authLabel ? `Authenticated · ${authLabel}` : "Authenticated",
+      headline: authLabel ? `Autenticado · ${authLabel}` : "Autenticado",
       detail: provider.message ?? null,
     };
   }
   if (provider.auth.status === "unauthenticated") {
     return {
-      headline: "Not authenticated",
+      headline: "Sin autenticar",
       detail: provider.message ?? null,
     };
   }
   if (provider.status === "warning") {
     return {
-      headline: "Needs attention",
+      headline: "Requiere atención",
       detail:
-        provider.message ?? "The provider is installed, but the server could not fully verify it.",
+        provider.message ??
+        "El proveedor está instalado, pero el servidor no pudo verificarlo por completo.",
     };
   }
   if (provider.status === "error") {
     return {
-      headline: "Unavailable",
-      detail: provider.message ?? "The provider failed its startup checks.",
+      headline: "No disponible",
+      detail: provider.message ?? "El proveedor no superó las comprobaciones de inicio.",
     };
   }
   return {
-    headline: "Available",
-    detail: provider.message ?? "Installed and ready, but authentication could not be verified.",
+    headline: "Disponible",
+    detail: provider.message ?? "Instalado y listo, pero no se pudo verificar la autenticación.",
   };
 }
 
@@ -102,7 +103,7 @@ export function getProviderVersionAdvisoryPresentation(
     return null;
   }
 
-  const label = "Update available";
+  const label = "Actualización disponible";
   const version = advisory.latestVersion;
   const versionLabel = getProviderVersionLabel(version);
 

@@ -171,9 +171,9 @@ export function PullRequestThreadDialog({
   const validationMessage = !referenceDirty
     ? null
     : reference.trim().length === 0
-      ? `Paste a ${terminology.singular} URL, checkout command, or enter 123 / #123.`
+      ? `Pega una URL de ${terminology.singular}, un comando de checkout o escribe 123 / #123.`
       : parsedReference === null
-        ? `Use a ${terminology.singular} URL, checkout command, 123, or #123.`
+        ? `Usa una URL de ${terminology.singular}, un comando de checkout, 123 o #123.`
         : null;
   const errorMessage =
     validationMessage ??
@@ -182,7 +182,7 @@ export function PullRequestThreadDialog({
       : preparePullRequestThreadAction.error instanceof Error
         ? preparePullRequestThreadAction.error.message
         : preparePullRequestThreadAction.error
-          ? `Failed to prepare ${terminology.singular} thread.`
+          ? `No se pudo preparar la conversación de ${terminology.singular}.`
           : null);
 
   return (
@@ -198,11 +198,11 @@ export function PullRequestThreadDialog({
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <SourceControlIcon className="size-4" />
-            Checkout {terminology.singular}
+            Preparar {terminology.singular}
           </DialogTitle>
           <DialogDescription>
-            Resolve a {sourceControlPresentation.providerName} {terminology.singular}, then create
-            the draft thread in the main repo or in a dedicated worktree.
+            Resuelve una {terminology.singular} de {sourceControlPresentation.providerName} y crea
+            el borrador de conversación en el repositorio principal o en un worktree dedicado.
           </DialogDescription>
         </DialogHeader>
         <DialogPanel className="space-y-4">
@@ -212,7 +212,7 @@ export function PullRequestThreadDialog({
             </span>
             <Input
               ref={referenceInputRef}
-              placeholder={`${terminology.shortLabel} URL, checkout command, or #42`}
+              placeholder={`URL de ${terminology.shortLabel}, comando de checkout o #42`}
               value={reference}
               onChange={(event) => {
                 setReferenceDirty(true);
@@ -236,12 +236,18 @@ export function PullRequestThreadDialog({
                 <div className="min-w-0">
                   <p className="truncate font-medium text-sm">{resolvedPullRequest.title}</p>
                   <p className="truncate text-muted-foreground text-xs">
-                    #{resolvedPullRequest.number} · {resolvedPullRequest.headBranch} to{" "}
+                    #{resolvedPullRequest.number} · {resolvedPullRequest.headBranch} hacia{" "}
                     {resolvedPullRequest.baseBranch}
                   </p>
                 </div>
                 <span className={cn("shrink-0 text-xs capitalize", statusTone)}>
-                  {resolvedPullRequest.state}
+                  {resolvedPullRequest.state === "open"
+                    ? "abierta"
+                    : resolvedPullRequest.state === "closed"
+                      ? "cerrada"
+                      : resolvedPullRequest.state === "merged"
+                        ? "fusionada"
+                        : resolvedPullRequest.state}
                 </span>
               </div>
             </div>
@@ -250,7 +256,7 @@ export function PullRequestThreadDialog({
           {isResolving ? (
             <div className="flex items-center gap-2 text-muted-foreground text-xs">
               <Spinner className="size-3.5" />
-              Resolving {terminology.singular}...
+              Resolviendo {terminology.singular}...
             </div>
           ) : null}
 
@@ -264,7 +270,7 @@ export function PullRequestThreadDialog({
             onClick={() => onOpenChange(false)}
             disabled={preparePullRequestThreadAction.isPending}
           >
-            Cancel
+            Cancelar
           </Button>
           <Button
             type="button"

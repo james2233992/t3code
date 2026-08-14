@@ -583,7 +583,7 @@ export class GhosttyTerminalSurface {
 
     const input = document.createElement("textarea");
     input.className = "t3-ghostty-input";
-    input.setAttribute("aria-label", "Terminal input");
+    input.setAttribute("aria-label", "Entrada del terminal");
     input.autocapitalize = "off";
     input.autocomplete = "off";
     input.spellcheck = false;
@@ -593,7 +593,7 @@ export class GhosttyTerminalSurface {
     const scrollbar = document.createElement("div");
     scrollbar.className = "t3-ghostty-scrollbar";
     scrollbar.setAttribute("role", "scrollbar");
-    scrollbar.setAttribute("aria-label", "Terminal scrollback");
+    scrollbar.setAttribute("aria-label", "Historial del terminal");
     scrollbar.setAttribute("aria-orientation", "vertical");
     scrollbar.tabIndex = 0;
     scrollbar.hidden = true;
@@ -603,7 +603,7 @@ export class GhosttyTerminalSurface {
     mount.replaceChildren(canvas, input, scrollbar);
 
     const context = canvas.getContext("2d", { alpha: false });
-    if (!context) throw new Error("Canvas 2D is unavailable");
+    if (!context) throw new Error("Canvas 2D no está disponible");
     // An opaque canvas backing store initializes to solid black, and the font
     // and WASM loads below leave it on screen for the whole setup window; paint
     // the theme background first so the mount never flashes a black box.

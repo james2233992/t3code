@@ -95,10 +95,10 @@ function groupCommandItems(
 
   const groups: ComposerCommandGroup[] = [];
   if (builtInItems.length > 0) {
-    groups.push({ id: "built-in", label: "Built-in", items: builtInItems });
+    groups.push({ id: "built-in", label: "Integrado", items: builtInItems });
   }
   if (providerItems.length > 0) {
-    groups.push({ id: "provider", label: "Provider", items: providerItems });
+    groups.push({ id: "provider", label: "Proveedor", items: providerItems });
   }
   return groups;
 }
@@ -173,23 +173,23 @@ export const ComposerCommandMenu = memo(function ComposerCommandMenu(props: {
             {props.triggerKind === "skill" ? (
               <CommandGroup>
                 <CommandGroupLabel className="px-0 pt-0 pb-1 text-[10px] font-semibold uppercase tracking-[0.08em] text-secondary-label">
-                  Skills
+                  Capacidades
                 </CommandGroupLabel>
                 <p className="text-secondary-label text-xs">
                   {props.isLoading
-                    ? "Searching workspace skills..."
+                    ? "Buscando capacidades del espacio de trabajo..."
                     : (props.emptyStateText ??
-                      "No skills found. Try / to browse provider commands.")}
+                      "No se encontraron capacidades. Usa / para explorar los comandos del proveedor.")}
                 </p>
               </CommandGroup>
             ) : (
               <p className="text-secondary-label text-xs">
                 {props.isLoading
-                  ? "Searching workspace files..."
+                  ? "Buscando archivos del espacio de trabajo..."
                   : (props.emptyStateText ??
                     (props.triggerKind === "path"
-                      ? "No matching files or folders."
-                      : "No matching command."))}
+                      ? "No hay archivos ni carpetas coincidentes."
+                      : "No hay ningún comando coincidente."))}
               </p>
             )}
           </div>

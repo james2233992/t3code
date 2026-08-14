@@ -75,7 +75,7 @@ export const BranchToolbarEnvironmentSelector = memo(function BranchToolbarEnvir
         variant="ghost"
         size="xs"
         className="min-w-0 max-w-full font-medium"
-        aria-label="Run on"
+        aria-label="Ejecutar en"
       >
         {activeEnvironment?.isPrimary ? (
           <MonitorIcon className="size-3 shrink-0" />
@@ -91,7 +91,7 @@ export const BranchToolbarEnvironmentSelector = memo(function BranchToolbarEnvir
       </SelectTrigger>
       <SelectPopup>
         <SelectGroup>
-          <SelectGroupLabel>Run on</SelectGroupLabel>
+          <SelectGroupLabel>Ejecutar en</SelectGroupLabel>
           {availableEnvironments.map((env) => (
             <SelectItem key={env.environmentId} value={env.environmentId}>
               <span className="inline-flex items-center gap-1.5">

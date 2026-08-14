@@ -194,11 +194,11 @@ export default function ProjectScriptsControl({
     const trimmedName = name.trim();
     const trimmedCommand = command.trim();
     if (trimmedName.length === 0) {
-      setValidationError("Name is required.");
+      setValidationError("El nombre es obligatorio.");
       return;
     }
     if (trimmedCommand.length === 0) {
-      setValidationError("Command is required.");
+      setValidationError("El comando es obligatorio.");
       return;
     }
 
@@ -226,7 +226,7 @@ export default function ProjectScriptsControl({
         autoOpenPreview: trimmedPreviewUrl.length > 0 ? autoOpenPreview : false,
       } satisfies NewProjectScriptInput;
     } catch (error) {
-      setValidationError(error instanceof Error ? error.message : "Failed to save action.");
+      setValidationError(error instanceof Error ? error.message : "No se pudo guardar la acción.");
       return;
     }
 
@@ -236,7 +236,9 @@ export default function ProjectScriptsControl({
     if (result._tag === "Failure") {
       if (!isAtomCommandInterrupted(result)) {
         const error = squashAtomCommandFailure(result);
-        setValidationError(error instanceof Error ? error.message : "Failed to save action.");
+        setValidationError(
+          error instanceof Error ? error.message : "No se pudo guardar la acción.",
+        );
       }
       return;
     }
@@ -304,7 +306,7 @@ export default function ProjectScriptsControl({
       setKeybinding("");
       setPreviewUrl(payload.previewUrl ?? "");
       setAutoOpenPreview(payload.autoOpenPreview);
-      setValidationError(error instanceof Error ? error.message : "Failed to import action.");
+      setValidationError(error instanceof Error ? error.message : "No se pudo importar la acción.");
       setDialogOpen(true);
     }
   };
@@ -313,7 +315,7 @@ export default function ProjectScriptsControl({
     <>
       {primaryScript && <MenuSeparator />}
       <MenuGroup>
-        <MenuGroupLabel>From t3.json</MenuGroupLabel>
+        <MenuGroupLabel>Desde la configuración del proyecto</MenuGroupLabel>
         {importableScripts.map((fileScript) => (
           <MenuItem
             key={`${fileScript.name} ${fileScript.command}`}
@@ -323,7 +325,7 @@ export default function ProjectScriptsControl({
             <ScriptIcon icon={fileScript.icon ?? "play"} className="size-4" />
             <span className="truncate">{fileScript.name}</span>
             <MenuShortcut className="ms-auto">
-              <DownloadIcon className="size-3.5" aria-label="Import" />
+              <DownloadIcon className="size-3.5" aria-label="Importar" />
             </MenuShortcut>
           </MenuItem>
         ))}
@@ -334,7 +336,7 @@ export default function ProjectScriptsControl({
   return (
     <>
       {primaryScript ? (
-        <Group aria-label="Project scripts">
+        <Group aria-label="Scripts del proyecto">
           <Tooltip>
             <TooltipTrigger
               render={
@@ -364,7 +366,7 @@ export default function ProjectScriptsControl({
             onOpenChange={(open) => setActionsMenuOpen({ scripts: open, imports: false })}
           >
             <MenuTrigger
-              render={<Button size="icon-xs" variant="outline" aria-label="Script actions" />}
+              render={<Button size="icon-xs" variant="outline" aria-label="Acciones del script" />}
             >
               <ChevronDownIcon className="size-4" />
             </MenuTrigger>
@@ -415,7 +417,7 @@ export default function ProjectScriptsControl({
               {importMenuItems}
               <MenuItem className={dropdownItemClassName} onClick={openAddDialog}>
                 <PlusIcon className="size-4" />
-                Add action
+                Añadir acción
               </MenuItem>
             </MenuPopup>
           </Menu>
@@ -426,10 +428,12 @@ export default function ProjectScriptsControl({
           open={actionsMenuOpen.imports}
           onOpenChange={(open) => setActionsMenuOpen({ scripts: false, imports: open })}
         >
-          <MenuTrigger render={<Button size="xs" variant="outline" aria-label="Project actions" />}>
+          <MenuTrigger
+            render={<Button size="xs" variant="outline" aria-label="Acciones del proyecto" />}
+          >
             <PlusIcon className="size-3.5" />
             <span className="sr-only @3xl/header-actions:not-sr-only @3xl/header-actions:ml-0.5">
-              Add action
+              Añadir acción
             </span>
             <ChevronDownIcon className="size-3.5" />
           </MenuTrigger>
@@ -437,7 +441,7 @@ export default function ProjectScriptsControl({
             {importMenuItems}
             <MenuItem className={dropdownItemClassName} onClick={openAddDialog}>
               <PlusIcon className="size-4" />
-              Add action
+              Añadir acción
             </MenuItem>
           </MenuPopup>
         </Menu>
@@ -449,7 +453,7 @@ export default function ProjectScriptsControl({
                 size="xs"
                 variant="outline"
                 className="w-7 px-0 sm:w-6 @3xl/header-actions:w-auto! @3xl/header-actions:px-[calc(--spacing(2)-1px)]"
-                aria-label="Add action"
+                aria-label="Añadir acción"
                 // The tooltip wrapper replaces data-slot="button", so themed
                 // toolbar styling needs its own hook.
                 data-toolbar-control=""
@@ -459,10 +463,10 @@ export default function ProjectScriptsControl({
           >
             <PlusIcon className="size-3.5" />
             <span className="sr-only @3xl/header-actions:not-sr-only @3xl/header-actions:ml-0.5">
-              Add action
+              Añadir acción
             </span>
           </TooltipTrigger>
-          <TooltipPopup side="top">Add action</TooltipPopup>
+          <TooltipPopup side="top">Añadir acción</TooltipPopup>
         </Tooltip>
       )}
 
@@ -489,15 +493,16 @@ export default function ProjectScriptsControl({
       >
         <DialogPopup>
           <DialogHeader>
-            <DialogTitle>{isEditing ? "Edit Action" : "Add Action"}</DialogTitle>
+            <DialogTitle>{isEditing ? "Editar acción" : "Añadir acción"}</DialogTitle>
             <DialogDescription>
-              Actions are project-scoped commands you can run from the top bar or keybindings.
+              Las acciones son comandos del proyecto que puedes ejecutar desde la barra superior o
+              mediante atajos de teclado.
             </DialogDescription>
           </DialogHeader>
           <DialogPanel>
             <form id={addScriptFormId} className="space-y-4" onSubmit={submitAddScript}>
               <div className="space-y-1.5">
-                <Label htmlFor="script-name">Name</Label>
+                <Label htmlFor="script-name">Nombre</Label>
                 <div className="flex items-center gap-2">
                   <Popover onOpenChange={setIconPickerOpen} open={iconPickerOpen}>
                     <PopoverTrigger
@@ -506,7 +511,7 @@ export default function ProjectScriptsControl({
                           type="button"
                           variant="outline"
                           className="size-9 shrink-0 hover:bg-popover active:bg-popover data-pressed:bg-popover data-pressed:shadow-xs/5 data-pressed:before:shadow-[0_1px_--theme(--color-black/4%)] dark:border-transparent dark:bg-white/[0.035] dark:data-pressed:before:shadow-none"
-                          aria-label="Choose icon"
+                          aria-label="Elegir icono"
                         />
                       }
                     >
@@ -548,20 +553,20 @@ export default function ProjectScriptsControl({
                 </div>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="script-keybinding">Keybinding</Label>
+                <Label htmlFor="script-keybinding">Atajo de teclado</Label>
                 <Input
                   id="script-keybinding"
-                  placeholder="Press shortcut"
+                  placeholder="Pulsa un atajo"
                   value={keybinding}
                   readOnly
                   onKeyDown={captureKeybinding}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Press a shortcut. Use <code>Backspace</code> to clear.
+                  Pulsa un atajo. Usa <code>Retroceso</code> para borrarlo.
                 </p>
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="script-command">Command</Label>
+                <Label htmlFor="script-command">Comando</Label>
                 <Textarea
                   id="script-command"
                   placeholder="bun test"
@@ -570,7 +575,7 @@ export default function ProjectScriptsControl({
                 />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="script-preview-url">Preview URL (optional)</Label>
+                <Label htmlFor="script-preview-url">URL de previsualización (opcional)</Label>
                 <Input
                   id="script-preview-url"
                   placeholder="http://localhost:5173"
@@ -578,11 +583,11 @@ export default function ProjectScriptsControl({
                   onChange={(event) => setPreviewUrl(event.target.value)}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Open this URL in the in-app preview when this action runs.
+                  Abre esta URL en la previsualización integrada cuando se ejecute la acción.
                 </p>
               </div>
               <label className="flex items-center justify-between gap-3 rounded-md border border-border/70 px-3 py-2 text-sm dark:border-transparent dark:bg-white/[0.035]">
-                <span>Run automatically on worktree creation</span>
+                <span>Ejecutar automáticamente al crear el directorio de trabajo</span>
                 <Switch
                   checked={runOnWorktreeCreate}
                   onCheckedChange={(checked) => setRunOnWorktreeCreate(Boolean(checked))}
@@ -593,7 +598,7 @@ export default function ProjectScriptsControl({
                   previewUrl.trim().length === 0 ? "opacity-60" : ""
                 }`}
               >
-                <span>Open preview automatically when this action runs</span>
+                <span>Abrir la previsualización automáticamente al ejecutar esta acción</span>
                 <Switch
                   checked={autoOpenPreview}
                   disabled={previewUrl.trim().length === 0}
@@ -611,7 +616,7 @@ export default function ProjectScriptsControl({
                 className="mr-auto"
                 onClick={() => setDeleteConfirmOpen(true)}
               >
-                Delete
+                Eliminar
               </Button>
             )}
             <Button
@@ -621,10 +626,10 @@ export default function ProjectScriptsControl({
                 setDialogOpen(false);
               }}
             >
-              Cancel
+              Cancelar
             </Button>
             <Button form={addScriptFormId} type="submit">
-              {isEditing ? "Save changes" : "Save action"}
+              {isEditing ? "Guardar cambios" : "Guardar acción"}
             </Button>
           </DialogFooter>
         </DialogPopup>
@@ -633,13 +638,13 @@ export default function ProjectScriptsControl({
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
         <AlertDialogPopup>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete action "{name}"?</AlertDialogTitle>
-            <AlertDialogDescription>This action cannot be undone.</AlertDialogDescription>
+            <AlertDialogTitle>¿Eliminar la acción "{name}"?</AlertDialogTitle>
+            <AlertDialogDescription>Esta acción no se puede deshacer.</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
+            <AlertDialogClose render={<Button variant="outline" />}>Cancelar</AlertDialogClose>
             <Button variant="destructive" onClick={confirmDeleteScript}>
-              Delete action
+              Eliminar acción
             </Button>
           </AlertDialogFooter>
         </AlertDialogPopup>

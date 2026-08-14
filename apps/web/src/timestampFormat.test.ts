@@ -51,19 +51,19 @@ describe("formatRelativeTimeUntilLabel", () => {
   });
 
   it("returns Expired when the instant is in the past", () => {
-    expect(formatRelativeTimeUntilLabel("2026-04-07T11:59:00.000Z")).toBe("Expired");
+    expect(formatRelativeTimeUntilLabel("2026-04-07T11:59:00.000Z")).toBe("Caducado");
   });
 
   it("formats seconds remaining", () => {
-    expect(formatRelativeTimeUntilLabel("2026-04-07T12:00:45.000Z")).toBe("45s left");
+    expect(formatRelativeTimeUntilLabel("2026-04-07T12:00:45.000Z")).toBe("45s restantes");
   });
 
   it("formats minutes remaining", () => {
-    expect(formatRelativeTimeUntilLabel("2026-04-07T12:15:00.000Z")).toBe("15m left");
+    expect(formatRelativeTimeUntilLabel("2026-04-07T12:15:00.000Z")).toBe("15m restantes");
   });
 
   it("formats hours remaining", () => {
-    expect(formatRelativeTimeUntilLabel("2026-04-07T18:00:00.000Z")).toBe("6h left");
+    expect(formatRelativeTimeUntilLabel("2026-04-07T18:00:00.000Z")).toBe("6h restantes");
   });
 });
 
@@ -78,21 +78,21 @@ describe("formatExpiresInLabel", () => {
   });
 
   it("returns Expired when the instant is in the past", () => {
-    expect(formatExpiresInLabel("2026-04-07T11:59:00.000Z")).toBe("Expired");
+    expect(formatExpiresInLabel("2026-04-07T11:59:00.000Z")).toBe("Caducado");
   });
 
   it("uses sub-minute second count", () => {
-    expect(formatExpiresInLabel("2026-04-07T12:00:45.000Z")).toBe("Expires in 45s");
+    expect(formatExpiresInLabel("2026-04-07T12:00:45.000Z")).toBe("Caduca en 45s");
   });
 
   it("uses minutes and seconds under one hour", () => {
-    expect(formatExpiresInLabel("2026-04-07T12:04:12.000Z")).toBe("Expires in 4m 12s");
-    expect(formatExpiresInLabel("2026-04-07T12:15:00.000Z")).toBe("Expires in 15m");
+    expect(formatExpiresInLabel("2026-04-07T12:04:12.000Z")).toBe("Caduca en 4m 12s");
+    expect(formatExpiresInLabel("2026-04-07T12:15:00.000Z")).toBe("Caduca en 15m");
   });
 
   it("uses hours with minute and second remainder", () => {
-    expect(formatExpiresInLabel("2026-04-07T14:02:03.000Z")).toBe("Expires in 2h 2m 3s");
-    expect(formatExpiresInLabel("2026-04-07T18:00:00.000Z")).toBe("Expires in 6h");
+    expect(formatExpiresInLabel("2026-04-07T14:02:03.000Z")).toBe("Caduca en 2h 2m 3s");
+    expect(formatExpiresInLabel("2026-04-07T18:00:00.000Z")).toBe("Caduca en 6h");
   });
 });
 
@@ -145,7 +145,7 @@ describe("getRelativeTimeState", () => {
     expect(getRelativeTimeState("2026-04-07T11:45:00.000Z")).toEqual({
       status: "relative",
       value: "15m",
-      suffix: "ago",
+      suffix: "atrás",
     });
   });
 });
@@ -161,8 +161,8 @@ describe("formatElapsedDurationLabel", () => {
   });
 
   it("returns just now when the instant is current or in the future", () => {
-    expect(formatElapsedDurationLabel("2026-04-07T12:00:00.000Z")).toBe("just now");
-    expect(formatElapsedDurationLabel("2026-04-07T12:01:00.000Z")).toBe("just now");
+    expect(formatElapsedDurationLabel("2026-04-07T12:00:00.000Z")).toBe("ahora");
+    expect(formatElapsedDurationLabel("2026-04-07T12:01:00.000Z")).toBe("ahora");
   });
 
   it("formats seconds, minutes, hours, and days", () => {

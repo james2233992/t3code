@@ -232,23 +232,23 @@ const runtimeModeConfig: Record<
   { label: string; description: string; icon: LucideIcon }
 > = {
   "approval-required": {
-    label: "Supervised",
-    description: "Ask before commands and file changes.",
+    label: "Supervisado",
+    description: "Pide permiso antes de ejecutar comandos o cambiar archivos.",
     icon: LockIcon,
   },
   "auto-accept-edits": {
-    label: "Auto-accept edits",
-    description: "Auto-approve edits, ask before other actions.",
+    label: "Aceptar ediciones automáticamente",
+    description: "Aprueba las ediciones y pregunta antes de otras acciones.",
     icon: PenLineIcon,
   },
   auto: {
-    label: "Auto",
-    description: "Supported providers approve routine actions; others still ask.",
+    label: "Automático",
+    description: "Los proveedores compatibles aprueban acciones rutinarias; los demás preguntan.",
     icon: SparklesIcon,
   },
   "full-access": {
-    label: "Full access",
-    description: "Allow commands and edits without prompts.",
+    label: "Acceso completo",
+    description: "Permite comandos y ediciones sin pedir confirmación.",
     icon: LockOpenIcon,
   },
 };
@@ -305,8 +305,8 @@ const ComposerFooterModeControls = memo(function ComposerFooterModeControls(prop
   const RuntimeModeIcon = runtimeModeOption.icon;
   const interactionModeTooltip =
     props.interactionMode === "plan"
-      ? "Plan mode — click to return to normal build mode"
-      : "Default mode — click to enter plan mode";
+      ? "Modo de planificación: pulsa para volver al modo de construcción"
+      : "Modo predeterminado: pulsa para entrar en planificación";
 
   const interactionModeToggle = props.showInteractionModeToggle ? (
     <>
@@ -333,7 +333,7 @@ const ComposerFooterModeControls = memo(function ComposerFooterModeControls(prop
             <ComposerControlIcon icon={BotIcon} opticalSize="large" />
           )}
           <span className="sr-only sm:not-sr-only">
-            {props.interactionMode === "plan" ? "Plan" : "Build"}
+            {props.interactionMode === "plan" ? "Planificar" : "Construir"}
           </span>
         </TooltipTrigger>
         <TooltipPopup side="top">{interactionModeTooltip}</TooltipPopup>
@@ -351,7 +351,9 @@ const ComposerFooterModeControls = memo(function ComposerFooterModeControls(prop
           onValueChange={(value) => props.onRuntimeModeChange(value!)}
         >
           <TooltipTrigger
-            render={<ComposerSelectControl className="font-medium" aria-label="Runtime mode" />}
+            render={
+              <ComposerSelectControl className="font-medium" aria-label="Modo de ejecución" />
+            }
           >
             <ComposerControlIcon icon={RuntimeModeIcon} />
             <SelectValue>{runtimeModeOption.label}</SelectValue>
@@ -420,7 +422,7 @@ const ComposerFooterPrimaryActions = memo(function ComposerFooterPrimaryActions(
         />
       ) : null}
       {props.isPreparingWorktree ? (
-        <span className="text-secondary-label text-xs">Preparing worktree...</span>
+        <span className="text-secondary-label text-xs">Preparando el directorio de trabajo…</span>
       ) : null}
       <ComposerPrimaryActions
         compact={props.compact}
@@ -1043,7 +1045,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
           type: "slash-command",
           command: "model",
           label: "/model",
-          description: "Switch response model for this thread",
+          description: "Cambiar el modelo de respuesta de esta conversación",
         },
         ...(planModeUiEnabled
           ? ([
@@ -1052,14 +1054,14 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                 type: "slash-command",
                 command: "plan",
                 label: "/plan",
-                description: "Switch this thread into plan mode",
+                description: "Cambiar esta conversación al modo de planificación",
               },
               {
                 id: "slash:default",
                 type: "slash-command",
                 command: "default",
                 label: "/default",
-                description: "Switch this thread back to normal build mode",
+                description: "Volver esta conversación al modo normal de construcción",
               },
             ] as const)
           : []),
@@ -1092,7 +1094,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
           description:
             skill.shortDescription ??
             skill.description ??
-            (skill.scope ? `${skill.scope} skill` : "Run provider skill"),
+            (skill.scope ? `habilidad ${skill.scope}` : "Ejecutar habilidad del proveedor"),
         }),
       );
     }
@@ -1170,11 +1172,11 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
     composerTriggerKind === "path" && pathTriggerQuery.length > 0 && workspaceEntries.isPending;
   const composerMenuEmptyState = useMemo(() => {
     if (composerTriggerKind === "skill") {
-      return "No skills found. Try / to browse provider commands.";
+      return "No se encontraron capacidades. Usa / para explorar los comandos del proveedor.";
     }
     return composerTriggerKind === "path"
-      ? "No matching files or folders."
-      : "No matching command.";
+      ? "No hay archivos ni carpetas coincidentes."
+      : "No hay ningún comando coincidente.";
   }, [composerTriggerKind]);
 
   // ------------------------------------------------------------------
@@ -1240,7 +1242,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
     projectSelectionRequired ||
     environmentUnavailable !== null ||
     !composerSendState.hasSendableContent;
-  const collapsedComposerPrimaryActionLabel = "Send message";
+  const collapsedComposerPrimaryActionLabel = "Enviar mensaje";
   const showMobilePendingAnswerActions =
     isMobileViewport && !isComposerCollapsedMobile && pendingPrimaryAction !== null;
 
@@ -1819,8 +1821,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
         event?.preventDefault();
         toastManager.add({
           type: "info",
-          title: "Still compressing a pasted image.",
-          description: "Send again once its thumbnail appears.",
+          title: "Todavía se está comprimiendo una imagen pegada.",
+          description: "Vuelve a enviarlo cuando aparezca su miniatura.",
         });
         return;
       }
@@ -1941,9 +1943,9 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       if (!durable) {
         toastManager.add({
           type: "warning",
-          title: "Restored prompt may reappear in the stash",
+          title: "El prompt restaurado puede reaparecer en el guardado temporal",
           description:
-            "Browser storage rejected the update, so this entry could still be there after a reload.",
+            "El almacenamiento del navegador rechazó la actualización; esta entrada podría seguir ahí tras recargar.",
           data: { hideCopyButton: true },
         });
       }
@@ -2009,23 +2011,23 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       const missingImageReasons: string[] = [];
       if (entry.droppedImageNames.length > 0) {
         missingImageReasons.push(
-          `${entry.droppedImageNames.join(", ")} exceeded the stash size limit when this prompt was saved.`,
+          `${entry.droppedImageNames.join(", ")} superó el límite del guardado temporal al guardar este prompt.`,
         );
       }
       if (entry.unreadableImageNames && entry.unreadableImageNames.length > 0) {
         missingImageReasons.push(
-          `${entry.unreadableImageNames.join(", ")} could not be read when this prompt was saved.`,
+          `No se pudo leer ${entry.unreadableImageNames.join(", ")} al guardar este prompt.`,
         );
       }
       if (unrestoredImageNames.length > 0) {
         missingImageReasons.push(
-          `${unrestoredImageNames.join(", ")} could not be restored: the composer is at its ${PROVIDER_SEND_TURN_MAX_ATTACHMENTS}-image limit.`,
+          `No se pudo restaurar ${unrestoredImageNames.join(", ")}: el editor ha alcanzado el límite de ${PROVIDER_SEND_TURN_MAX_ATTACHMENTS} imágenes.`,
         );
       }
       if (missingImageReasons.length > 0) {
         toastManager.add({
           type: "warning",
-          title: "Some images were not restored",
+          title: "Algunas imágenes no se han restaurado",
           description: missingImageReasons.join(" "),
         });
       }
@@ -2054,9 +2056,9 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       if (!durable) {
         toastManager.add({
           type: "warning",
-          title: "Stash entry may come back",
+          title: "La entrada guardada puede reaparecer",
           description:
-            "Browser storage rejected the delete, so this prompt could reappear after a reload.",
+            "El almacenamiento del navegador rechazó la eliminación; este mensaje podría reaparecer tras recargar.",
           data: { hideCopyButton: true },
         });
       }
@@ -2109,9 +2111,9 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       if (!written) {
         toastManager.add({
           type: "error",
-          title: "Could not stash this prompt",
+          title: "No se pudo guardar temporalmente este prompt",
           description:
-            "Browser storage rejected the write, so the composer was left as-is. Free up site data and try again.",
+            "El almacenamiento del navegador rechazó la escritura y el editor no se modificó. Libera datos del sitio y vuelve a intentarlo.",
           data: { hideCopyButton: true },
         });
         return;
@@ -2122,9 +2124,9 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       if (!durable) {
         toastManager.add({
           type: "warning",
-          title: "Stashed prompt will not survive a reload",
+          title: "El prompt guardado temporalmente se perderá al recargar",
           description:
-            "Browser storage is unavailable, so this stash is kept in memory only for this session.",
+            "El almacenamiento del navegador no está disponible; este contenido solo se conserva en memoria durante la sesión.",
           data: { hideCopyButton: true },
         });
       }
@@ -2141,8 +2143,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       if (evicted) {
         toastManager.add({
           type: "warning",
-          title: "Oldest stashed prompt discarded",
-          description: `The stash holds ${MAX_STASH_ENTRIES} prompts; the oldest was removed to make room.`,
+          title: "Se ha descartado el prompt guardado más antiguo",
+          description: `El guardado admite ${MAX_STASH_ENTRIES} prompts; se eliminó el más antiguo para liberar espacio.`,
           data: { hideCopyButton: true },
         });
       }
@@ -2189,9 +2191,9 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
         if (!imagesDurable && durable && images.length > 0) {
           toastManager.add({
             type: "warning",
-            title: "Stashed images were not saved",
+            title: "Las imágenes guardadas temporalmente no se han conservado",
             description:
-              "The prompt was stashed, but browser storage rejected its images. They will be missing if you reload.",
+              "El prompt se guardó temporalmente, pero el navegador rechazó sus imágenes. Se perderán si recargas.",
             data: { hideCopyButton: true },
           });
         }
@@ -2201,8 +2203,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
         // them evaporate.
         toastManager.add({
           type: "warning",
-          title: "Stashed images did not attach",
-          description: `That prompt was restored or deleted before ${kept.length} image${kept.length === 1 ? "" : "s"} finished saving. Re-attach ${kept.length === 1 ? "it" : "them"} if you still need ${kept.length === 1 ? "it" : "them"}.`,
+          title: "Las imágenes guardadas no se adjuntaron",
+          description: `El prompt se restauró o eliminó antes de que terminaran de guardarse ${kept.length} ${kept.length === 1 ? "imagen" : "imágenes"}. Vuelve a adjuntarlas si todavía las necesitas.`,
           data: { hideCopyButton: true },
         });
       }
@@ -2283,7 +2285,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
     if (pendingUserInputs.length > 0) {
       toastManager.add({
         type: "error",
-        title: "Attach images after answering plan questions.",
+        title: "Adjunta imágenes después de responder a las preguntas del plan.",
       });
       return;
     }
@@ -2447,8 +2449,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
     onInsertRejected: () => {
       toastManager.add({
         type: "error",
-        title: "Unable to add to chat",
-        description: "The composer is busy; try again once it is ready.",
+        title: "No se pudo añadir al chat",
+        description: "El editor está ocupado; vuelve a intentarlo cuando esté disponible.",
       });
     },
   });
@@ -2820,9 +2822,11 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
               >
                 {activePendingProgress
                   ? activePendingProgress.customAnswer ||
-                    "Type your own answer, or leave this blank to use the selected option"
+                    "Escribe tu respuesta o deja el campo vacío para usar la opción seleccionada"
                   : prompt.trim() ||
-                    (noProviderAvailable ? "Enable a provider in Settings" : "Ask anything...")}
+                    (noProviderAvailable
+                      ? "Activa un proveedor en Ajustes"
+                      : "Pregunta lo que necesites…")}
               </button>
               <button
                 type="button"
@@ -2962,7 +2966,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                           <button
                             type="button"
                             className="h-full w-full cursor-zoom-in"
-                            aria-label={`Preview ${image.name}`}
+                            aria-label={`Previsualizar ${image.name}`}
                             onClick={() => {
                               const preview = buildExpandedImagePreview(composerImages, image.id);
                               if (!preview) return;
@@ -2986,7 +2990,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                               render={
                                 <span
                                   role="img"
-                                  aria-label="Draft attachment may not persist"
+                                  aria-label="Es posible que el adjunto del borrador no se conserve"
                                   className="absolute left-1 top-1 inline-flex items-center justify-center rounded bg-background/85 p-0.5 text-amber-600"
                                 >
                                   <CircleAlertIcon className="size-3" />
@@ -2997,8 +3001,8 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                               side="top"
                               className="max-w-64 whitespace-normal leading-tight"
                             >
-                              Draft attachment could not be saved locally and may be lost on
-                              navigation.
+                              El adjunto del borrador no se pudo guardar en local y puede perderse
+                              al navegar.
                             </TooltipPopup>
                           </Tooltip>
                         )}
@@ -3007,7 +3011,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                           size="icon-xs"
                           className="absolute right-1 top-1 bg-background/80 hover:bg-background/90"
                           onClick={() => removeComposerImage(image.id)}
-                          aria-label={`Remove ${image.name}`}
+                          aria-label={`Eliminar ${image.name}`}
                         >
                           <XIcon />
                         </Button>
@@ -3040,18 +3044,19 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                 onPaste={onComposerPaste}
                 placeholder={
                   isComposerApprovalState
-                    ? (activePendingApproval?.detail ?? "Resolve this approval request to continue")
+                    ? (activePendingApproval?.detail ??
+                      "Resuelve esta solicitud de aprobación para continuar")
                     : activePendingProgress
-                      ? "Type your own answer, or leave this blank to use the selected option"
+                      ? "Escribe tu respuesta o deja el campo vacío para usar la opción seleccionada"
                       : showPlanFollowUpPrompt && activeProposedPlan
-                        ? "Add feedback to refine the plan, or leave this blank to implement it"
+                        ? "Añade comentarios para ajustar el plan o deja el campo vacío para aplicarlo"
                         : projectSelectionRequired
-                          ? "Choose a project above to start a thread"
+                          ? "Elige un proyecto arriba para iniciar una conversación"
                           : noProviderAvailable
-                            ? "Enable a provider in Settings to send a message"
+                            ? "Activa un proveedor en Ajustes para enviar un mensaje"
                             : phase === "disconnected"
-                              ? "Ask for follow-up changes or attach images"
-                              : "Ask anything, @tag files/folders, $use skills, or / for commands"
+                              ? "Solicita cambios adicionales o adjunta imágenes"
+                              : "Pregunta lo que necesites, usa @ para archivos/carpetas, $ para habilidades o / para comandos"
                 }
                 disabled={isConnecting || isComposerApprovalState || projectSelectionRequired}
               />
@@ -3117,7 +3122,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
                     className="shrink-0 gap-2 px-2 text-secondary-label sm:px-3"
                   >
                     <CircleAlertIcon className="size-4" />
-                    No provider available
+                    No hay ningún proveedor disponible
                   </Button>
                 ) : (
                   <ProviderModelPicker

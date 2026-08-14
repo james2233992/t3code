@@ -163,7 +163,7 @@ describe("buildBulkTitleRegenerationContextMenuItem", () => {
       }),
     ).toEqual({
       id: "regenerate-title",
-      label: "Regenerate titles (3)",
+      label: "Regenerar títulos (3)",
     });
   });
 
@@ -175,7 +175,7 @@ describe("buildBulkTitleRegenerationContextMenuItem", () => {
       }),
     ).toEqual({
       id: "regenerate-title",
-      label: "Regenerating… (2)",
+      label: "Regenerando… (2)",
       disabled: true,
     });
   });
@@ -194,24 +194,24 @@ describe("buildMultiSelectThreadContextMenuItems", () => {
   it("offers bulk archive with the selected count", () => {
     expect(
       buildMultiSelectThreadContextMenuItems({ count: 3, hasRunningThread: false }),
-    ).toContainEqual({ id: "archive", label: "Archive (3)", disabled: false });
+    ).toContainEqual({ id: "archive", label: "Archivar (3)", disabled: false });
   });
 
   it("disables bulk archive when a selected thread is running", () => {
     expect(
       buildMultiSelectThreadContextMenuItems({ count: 2, hasRunningThread: true }),
-    ).toContainEqual({ id: "archive", label: "Archive (2)", disabled: true });
+    ).toContainEqual({ id: "archive", label: "Archivar (2)", disabled: true });
   });
 });
 
 describe("resolveSidebarStageBadgeLabel", () => {
-  it("returns Nightly for nightly primary server versions", () => {
+  it("returns the Spanish nightly label for nightly primary server versions", () => {
     expect(
       resolveSidebarStageBadgeLabel({
         primaryServerVersion: "0.0.28-nightly.20260616.12",
         fallbackStageLabel: "Alpha",
       }),
-    ).toBe("Nightly");
+    ).toBe("Nocturna");
   });
 
   it("returns the fallback label for stable primary server versions", () => {

@@ -161,7 +161,7 @@ export const provisionDesktopSshEnvironment = Effect.fn(
   if (pairingToken === null) {
     return yield* new ConnectionBlockedError({
       reason: "authentication",
-      detail: "The SSH environment did not issue a pairing credential.",
+      detail: "El entorno SSH no emitió una credencial de emparejamiento.",
     });
   }
   const descriptor = yield* Effect.tryPromise({
@@ -192,7 +192,7 @@ const capabilitiesLayer = Layer.effectContext(
         if (session === null) {
           return yield* new ConnectionBlockedError({
             reason: "authentication",
-            detail: "Sign in to Fenix Connect to connect this environment.",
+            detail: "Inicia sesión en Fenix Connect para conectar este entorno.",
           });
         }
         const token = yield* session.readClerkToken().pipe(
@@ -207,7 +207,7 @@ const capabilitiesLayer = Layer.effectContext(
         if (token === null) {
           return yield* new ConnectionBlockedError({
             reason: "authentication",
-            detail: "The Fenix Connect session is unavailable.",
+            detail: "La sesión de Fenix Connect no está disponible.",
           });
         }
         return token;
@@ -232,7 +232,7 @@ const capabilitiesLayer = Layer.effectContext(
         if (bridge === undefined) {
           return yield* new ConnectionBlockedError({
             reason: "unsupported",
-            detail: "SSH environments are only available in the desktop app.",
+            detail: "Los entornos SSH solo están disponibles en la aplicación de escritorio.",
           });
         }
         return yield* provisionDesktopSshEnvironment(bridge, target);
@@ -242,7 +242,7 @@ const capabilitiesLayer = Layer.effectContext(
         if (bridge === undefined) {
           return yield* new ConnectionBlockedError({
             reason: "unsupported",
-            detail: "SSH environments are only available in the desktop app.",
+            detail: "Los entornos SSH solo están disponibles en la aplicación de escritorio.",
           });
         }
         const bootstrap = yield* Effect.tryPromise({
@@ -255,7 +255,7 @@ const capabilitiesLayer = Layer.effectContext(
         if (bootstrap.pairingToken === null) {
           return yield* new ConnectionBlockedError({
             reason: "authentication",
-            detail: "The SSH environment did not issue a pairing credential.",
+            detail: "El entorno SSH no emitió una credencial de emparejamiento.",
           });
         }
         const access = yield* Effect.tryPromise({
@@ -300,7 +300,7 @@ const fenixCompanionGatewayLayer = Layer.succeed(
       if (agentId === null) {
         return yield* new ConnectionBlockedError({
           reason: "unsupported",
-          detail: "Fenix companion connections require the Code Lab portal.",
+          detail: "Las conexiones del companion Fenix requieren el portal Code Lab.",
         });
       }
       const ticket = yield* Effect.tryPromise({
@@ -504,7 +504,9 @@ const platformConnectionSourceLayer = Layer.effect(
             }),
         }).pipe(
           Effect.tapError((error) =>
-            Effect.logWarning("Could not list paired Fenix Code companions.", { error }),
+            Effect.logWarning("No se pudieron listar los companions de Fenix Code emparejados.", {
+              error,
+            }),
           ),
           Effect.orElseSucceed(() => []),
         );
@@ -546,7 +548,7 @@ const platformConnectionSourceLayer = Layer.effect(
       }
 
       if (primaryTopologyRead._tag === "Failure") {
-        yield* Effect.logWarning("Could not read the primary environment topology.", {
+        yield* Effect.logWarning("No se pudo leer la topología del entorno principal.", {
           cause: primaryTopologyRead.cause,
         });
       } else if (primaryTopologyRead.target !== null) {
@@ -562,7 +564,7 @@ const platformConnectionSourceLayer = Layer.effect(
         } else {
           const built = yield* loadPrimaryConnectionRegistration(primaryTarget).pipe(
             Effect.tapError((error) =>
-              Effect.logWarning("Could not discover the primary environment.", { error }),
+              Effect.logWarning("No se pudo detectar el entorno principal.", { error }),
             ),
             Effect.option,
           );
@@ -585,7 +587,7 @@ const platformConnectionSourceLayer = Layer.effect(
       }
 
       if (topologyRead._tag === "Failure") {
-        yield* Effect.logWarning("Could not read the desktop-local backend topology.", {
+        yield* Effect.logWarning("No se pudo leer la topología del backend local de escritorio.", {
           cause: topologyRead.cause,
         });
       } else {
@@ -602,7 +604,7 @@ const platformConnectionSourceLayer = Layer.effect(
           }
           const built = yield* loadSecondaryConnectionRegistration(bootstrap).pipe(
             Effect.tapError((error) =>
-              Effect.logWarning("Could not connect a desktop-local backend.", {
+              Effect.logWarning("No se pudo conectar un backend local de escritorio.", {
                 id: bootstrap.id,
                 error,
               }),

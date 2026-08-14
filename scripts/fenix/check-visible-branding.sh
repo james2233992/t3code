@@ -77,6 +77,43 @@ verify_nonlegacy_favicon() {
   fi
 }
 
+verify_base_scoped_web_branding() {
+  local html_file="$1"
+  local required_literals=(
+    '<html lang="es">'
+    '<title>Fenix Code</title>'
+    'href="%BASE_URL%fenix-code.ico"'
+    'href="%BASE_URL%fenix-code-32x32.png"'
+    'href="%BASE_URL%fenix-code-16x16.png"'
+    'href="%BASE_URL%fenix-code-touch.png"'
+    'src="%BASE_URL%fenix-code-touch.png"'
+  )
+  local forbidden_literals=(
+    'href="/favicon.ico"'
+    'href="/apple-touch-icon.png"'
+    'src="/apple-touch-icon.png"'
+    '<title>Fenix Code (Alpha)</title>'
+  )
+  local literal
+  local matches
+
+  for literal in "${required_literals[@]}"; do
+    matches="$(run_rg_allow_no_matches --fixed-strings -- "$literal" "$html_file")"
+    if [[ -z "$matches" ]]; then
+      echo "Required base-scoped Fenix web branding is missing from $html_file: $literal" >&2
+      return 1
+    fi
+  done
+
+  for literal in "${forbidden_literals[@]}"; do
+    matches="$(run_rg_allow_no_matches --fixed-strings -- "$literal" "$html_file")"
+    if [[ -n "$matches" ]]; then
+      echo "Root-scoped or legacy web branding remains in $html_file: $literal" >&2
+      return 1
+    fi
+  done
+}
+
 run_rg_allow_no_matches() {
   local output
   local status
@@ -119,6 +156,12 @@ run_checks() {
     "apps/web/public/favicon-32x32.png"
     "apps/web/public/apple-touch-icon.png"
   )
+  local routed_icons=(
+    "apps/web/public/fenix-code.ico"
+    "apps/web/public/fenix-code-16x16.png"
+    "apps/web/public/fenix-code-32x32.png"
+    "apps/web/public/fenix-code-touch.png"
+  )
   local index
   for index in "${!source_icons[@]}"; do
     verify_nonlegacy_favicon "${source_icons[$index]}" "${legacy_web_icon_sha256[$index]}"
@@ -127,7 +170,13 @@ run_checks() {
       echo "The public icon does not match its Fenix production source: ${public_icons[$index]}" >&2
       return 1
     fi
+    if [[ "$(sha256_file "${source_icons[$index]}")" != "$(sha256_file "${routed_icons[$index]}")" ]]; then
+      echo "The routed icon does not match its Fenix production source: ${routed_icons[$index]}" >&2
+      return 1
+    fi
   done
+
+  verify_base_scoped_web_branding "apps/web/index.html"
 
   local raw_visible_hits
   local visible_brand_hits
@@ -167,10 +216,12 @@ selftest() {
   local test_file="apps/web/src/__fenix_visible_branding_guard_red_test__.$$.ts"
   local binary_test_file
   binary_test_file="$(mktemp "${TMPDIR:-/tmp}/fenix-branding-binary.XXXXXX")"
+  local html_test_file
+  html_test_file="$(mktemp "${TMPDIR:-/tmp}/fenix-branding-html.XXXXXX")"
   local red_output
   local red_status
 
-  trap 'rm -f "$test_file" "$binary_test_file"' RETURN
+  trap 'rm -f "$test_file" "$binary_test_file" "$html_test_file"' RETURN
   printf 'export const visibleBrandRegression = "T3 Code";\n' > "$test_file"
 
   set +e
@@ -209,6 +260,17 @@ selftest() {
   set -e
   if [[ "$red_status" -eq 0 || "$red_output" != *"Legacy T3 favicon remains"* ]]; then
     echo "selftest failed: legacy binary fixture was not detected." >&2
+    echo "$red_output" >&2
+    return 1
+  fi
+
+  printf '<html lang="es"><head><title>Fenix Code</title><link rel="icon" href="/favicon.ico"></head></html>\n' > "$html_test_file"
+  set +e
+  red_output="$(verify_base_scoped_web_branding "$html_test_file" 2>&1)"
+  red_status=$?
+  set -e
+  if [[ "$red_status" -eq 0 || "$red_output" != *"base-scoped Fenix web branding"* ]]; then
+    echo "selftest failed: root-scoped favicon fixture was not detected." >&2
     echo "$red_output" >&2
     return 1
   fi

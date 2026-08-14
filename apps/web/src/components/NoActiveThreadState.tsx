@@ -17,12 +17,12 @@ export function NoActiveThreadState() {
         >
           {isElectron ? (
             <span className="text-xs text-muted-foreground/50 wco:pr-[var(--workspace-native-controls-inset)]">
-              No active thread
+              No hay ninguna conversación activa
             </span>
           ) : (
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-foreground md:text-muted-foreground/60">
-                No active thread
+                No hay ninguna conversación activa
               </span>
             </div>
           )}
@@ -31,9 +31,11 @@ export function NoActiveThreadState() {
         <Empty className="flex-1">
           <div className="w-full max-w-lg px-8 py-12">
             <EmptyHeader className="max-w-none">
-              <EmptyTitle className="text-foreground text-xl">Pick a thread to continue</EmptyTitle>
+              <EmptyTitle className="text-foreground text-xl">
+                Elige una conversación para continuar
+              </EmptyTitle>
               <EmptyDescription className="mt-2 text-sm text-muted-foreground/78">
-                Select an existing thread or create a new one to get started.
+                Selecciona una conversación existente o crea una nueva para empezar.
               </EmptyDescription>
             </EmptyHeader>
           </div>

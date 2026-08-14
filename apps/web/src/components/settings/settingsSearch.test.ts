@@ -65,20 +65,23 @@ describe("searchSettings", () => {
   });
 
   it("serves anchor props to panels from the catalog", () => {
-    expect(searchableSetting("word-wrap")).toEqual({ id: "word-wrap", title: "Word wrap" });
-    expect(searchableSetting("archive")).toEqual({ id: "archive", title: "Archived threads" });
+    expect(searchableSetting("word-wrap")).toEqual({ id: "word-wrap", title: "Ajuste de línea" });
+    expect(searchableSetting("archive")).toEqual({
+      id: "archive",
+      title: "Conversaciones archivadas",
+    });
   });
 
   it("routes appearance settings to their current section", () => {
-    expect(searchSettings("theme")[0]).toMatchObject({
+    expect(searchSettings("temas")[0]).toMatchObject({
       id: "theme",
       to: "/settings/appearance",
     });
-    expect(searchSettings("word wrap")[0]).toMatchObject({
+    expect(searchSettings("ajuste de línea")[0]).toMatchObject({
       id: "word-wrap",
       to: "/settings/appearance",
     });
-    expect(searchSettings("environment identification")[0]).toMatchObject({
+    expect(searchSettings("identificación del entorno")[0]).toMatchObject({
       id: "environment-identification",
       to: "/settings/appearance",
       targetId: "appearance",

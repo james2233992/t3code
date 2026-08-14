@@ -20,7 +20,11 @@ function describeUnavailableInstance(entry: ProviderInstanceEntry): string {
     return label;
   }
   const kind =
-    entry.status === "error" ? "Unavailable" : entry.status === "warning" ? "Limited" : "Not ready";
+    entry.status === "error"
+      ? "No disponible"
+      : entry.status === "warning"
+        ? "Limitado"
+        : "No está listo";
   const msg = entry.snapshot.message?.trim();
   return msg ? `${label} — ${kind}. ${msg}` : `${label} — ${kind}.`;
 }
@@ -115,7 +119,7 @@ export const ModelPickerSidebar = memo(function ModelPickerSidebar(props: {
                         )}
                         onClick={() => handleSelect("favorites")}
                         type="button"
-                        aria-label="Favorites"
+                        aria-label="Favoritos"
                       >
                         <StarIcon className="size-5 fill-current shrink-0" aria-hidden />
                       </button>

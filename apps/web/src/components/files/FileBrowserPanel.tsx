@@ -58,14 +58,14 @@ function RefreshFilesButton(props: { isPending: boolean; onRefresh: () => void }
             type="button"
             variant="ghost"
             size="icon-xs"
-            aria-label="Refresh workspace files"
+            aria-label="Actualizar archivos del espacio de trabajo"
             onClick={props.onRefresh}
           />
         }
       >
         <RotateCw className={cn(props.isPending && "animate-spin")} />
       </TooltipTrigger>
-      <TooltipPopup>{props.isPending ? "Refreshing…" : "Refresh files"}</TooltipPopup>
+      <TooltipPopup>{props.isPending ? "Actualizando…" : "Actualizar archivos"}</TooltipPopup>
     </Tooltip>
   );
 }
@@ -85,7 +85,7 @@ function FileSearchField(props: {
         size="sm"
         value={props.value}
         aria-label={props.ariaLabel}
-        placeholder="Search files"
+        placeholder="Buscar archivos"
         spellCheck={false}
         onChange={(event) => props.onValueChange(event.target.value)}
         onKeyDown={(event) => {
@@ -153,8 +153,8 @@ export default function FileBrowserPanel({
     try {
       const clicked = await api.contextMenu.show(
         [
-          { id: "copy-mention", label: "Copy mention" },
-          { id: "add-to-chat", label: "Add to chat" },
+          { id: "copy-mention", label: "Copiar mención" },
+          { id: "add-to-chat", label: "Añadir al chat" },
         ],
         position,
       );
@@ -165,8 +165,8 @@ export default function FileBrowserPanel({
         } catch (error) {
           toastManager.add({
             type: "error",
-            title: "Failed to copy mention",
-            description: error instanceof Error ? error.message : "An error occurred.",
+            title: "No se pudo copiar la mención",
+            description: error instanceof Error ? error.message : "Se ha producido un error.",
           });
         }
         return;
@@ -176,8 +176,8 @@ export default function FileBrowserPanel({
         if (!composer) {
           toastManager.add({
             type: "error",
-            title: "Unable to add to chat",
-            description: "Open a chat for this project and try again.",
+            title: "No se pudo añadir al chat",
+            description: "Abre un chat para este proyecto e inténtalo de nuevo.",
           });
           return;
         }
@@ -185,8 +185,8 @@ export default function FileBrowserPanel({
         if (!inserted) {
           toastManager.add({
             type: "error",
-            title: "Unable to add to chat",
-            description: "The chat isn't ready to accept input right now.",
+            title: "No se pudo añadir al chat",
+            description: "El chat no está listo para aceptar entradas ahora mismo.",
           });
         }
       }
@@ -354,7 +354,7 @@ export default function FileBrowserPanel({
         <RefreshFilesButton isPending={entriesQuery.isPending} onRefresh={entriesQuery.refresh} />
         <FileSearchField
           name="project-files-search"
-          ariaLabel={`Search ${projectName} files`}
+          ariaLabel={`Buscar archivos de ${projectName}`}
           value={search.value}
           onValueChange={handleSearchValueChange}
           onClose={search.close}

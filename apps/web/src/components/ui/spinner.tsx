@@ -4,7 +4,7 @@ import { cn } from "~/lib/utils";
 function Spinner({ className, ...props }: React.ComponentProps<typeof Loader2Icon>) {
   return (
     <Loader2Icon
-      aria-label="Loading"
+      aria-label="Cargando"
       className={cn("animate-spin", className)}
       role="status"
       {...props}

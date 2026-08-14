@@ -386,7 +386,10 @@ export function TerminalViewport({
         hasHandledExitRef.current = false;
       } else if (shouldHandleTerminalExit(status, synchronized, hasHandledExitRef.current)) {
         hasHandledExitRef.current = true;
-        writeSystemMessage(terminal, status === "closed" ? "Terminal closed" : "Process exited");
+        writeSystemMessage(
+          terminal,
+          status === "closed" ? "Terminal cerrado" : "Proceso finalizado",
+        );
         window.setTimeout(() => {
           if (hasHandledExitRef.current) {
             handleSessionExited();
@@ -536,8 +539,8 @@ export function TerminalViewport({
         const clicked = await localApi.contextMenu
           .show(
             [
-              { id: "add-to-chat", label: "Add to chat" },
-              { id: "copy", label: "Copy" },
+              { id: "add-to-chat", label: "Añadir al chat" },
+              { id: "copy", label: "Copiar" },
             ],
             nextAction.position,
           )
@@ -564,7 +567,9 @@ export function TerminalViewport({
               if (activeTerminal) {
                 writeSystemMessage(
                   activeTerminal,
-                  error instanceof Error ? error.message : "Unable to copy terminal selection",
+                  error instanceof Error
+                    ? error.message
+                    : "No se pudo copiar la selección del terminal",
                 );
               }
             }
@@ -608,7 +613,7 @@ export function TerminalViewport({
         if (navigationData !== null) {
           event.preventDefault();
           event.stopPropagation();
-          void sendTerminalInput(navigationData, "Failed to move cursor");
+          void sendTerminalInput(navigationData, "No se pudo mover el cursor");
           return false;
         }
 
@@ -616,14 +621,14 @@ export function TerminalViewport({
         if (deleteData !== null) {
           event.preventDefault();
           event.stopPropagation();
-          void sendTerminalInput(deleteData, "Failed to delete terminal input");
+          void sendTerminalInput(deleteData, "No se pudo eliminar la entrada del terminal");
           return false;
         }
 
         if (!isTerminalClearShortcut(event)) return true;
         event.preventDefault();
         event.stopPropagation();
-        void sendTerminalInput("\u000c", "Failed to clear terminal");
+        void sendTerminalInput("\u000c", "No se pudo limpiar el terminal");
         return false;
       }
 
@@ -633,14 +638,14 @@ export function TerminalViewport({
         if (!latestTerminal) return;
         if (/^https?:\/\//u.test(text)) {
           if (!localApi) {
-            writeSystemMessage(latestTerminal, "Opening links is unavailable in this browser.");
+            writeSystemMessage(latestTerminal, "No se pueden abrir enlaces en este navegador.");
             return;
           }
           const fallbackToBrowser = () => {
             void localApi.shell.openExternal(text).catch((error: unknown) => {
               writeSystemMessage(
                 latestTerminal,
-                error instanceof Error ? error.message : "Unable to open link",
+                error instanceof Error ? error.message : "No se pudo abrir el enlace",
               );
             });
           };
@@ -663,7 +668,7 @@ export function TerminalViewport({
           const error = squashAtomCommandFailure(result);
           writeSystemMessage(
             latestTerminal,
-            error instanceof Error ? error.message : "Unable to open path",
+            error instanceof Error ? error.message : "No se pudo abrir la ruta",
           );
         })();
       }
@@ -674,7 +679,7 @@ export function TerminalViewport({
           if (!activeTerminal) return;
           writeSystemMessage(
             activeTerminal,
-            error instanceof Error ? error.message : "Unable to copy terminal selection",
+            error instanceof Error ? error.message : "No se pudo copiar la selección del terminal",
           );
         });
       }
@@ -686,7 +691,7 @@ export function TerminalViewport({
           const error = squashAtomCommandFailure(result);
           writeSystemMessage(
             terminal,
-            error instanceof Error ? error.message : "Terminal write failed",
+            error instanceof Error ? error.message : "Falló la escritura en el terminal",
           );
         })();
       }
@@ -775,8 +780,8 @@ export function TerminalViewport({
         setupTerminal = null;
         if (cancelled) return;
         const message =
-          error instanceof Error ? error.message : "Unable to initialize libghostty-vt";
-        mount.textContent = `${message} — close and reopen the terminal to retry.`;
+          error instanceof Error ? error.message : "No se pudo inicializar libghostty-vt";
+        mount.textContent = `${message} — cierra y vuelve a abrir el terminal para reintentarlo.`;
       });
 
     return () => {
@@ -1129,21 +1134,21 @@ export default function ThreadTerminalDrawer({
     [cwd, runtimeEnv, terminalLaunchLocationsById, worktreePath],
   );
   const splitTerminalActionLabel = hasReachedSplitLimit
-    ? `Split Terminal Horizontally (max ${MAX_TERMINALS_PER_GROUP} per group)`
+    ? `Dividir terminal horizontalmente (máximo ${MAX_TERMINALS_PER_GROUP} por grupo)`
     : splitShortcutLabel
-      ? `Split Terminal Horizontally (${splitShortcutLabel})`
-      : "Split Terminal Horizontally";
+      ? `Dividir terminal horizontalmente (${splitShortcutLabel})`
+      : "Dividir terminal horizontalmente";
   const splitTerminalVerticalActionLabel = hasReachedSplitLimit
-    ? `Split Terminal Vertically (max ${MAX_TERMINALS_PER_GROUP} per group)`
+    ? `Dividir terminal verticalmente (máximo ${MAX_TERMINALS_PER_GROUP} por grupo)`
     : splitVerticalShortcutLabel
-      ? `Split Terminal Vertically (${splitVerticalShortcutLabel})`
-      : "Split Terminal Vertically";
+      ? `Dividir terminal verticalmente (${splitVerticalShortcutLabel})`
+      : "Dividir terminal verticalmente";
   const newTerminalActionLabel = newShortcutLabel
-    ? `New Terminal (${newShortcutLabel})`
-    : "New Terminal";
+    ? `Nuevo terminal (${newShortcutLabel})`
+    : "Nuevo terminal";
   const closeTerminalActionLabel = closeShortcutLabel
-    ? `Close Terminal (${closeShortcutLabel})`
-    : "Close Terminal";
+    ? `Cerrar terminal (${closeShortcutLabel})`
+    : "Cerrar terminal";
   const onSplitTerminalAction = useCallback(() => {
     if (hasReachedSplitLimit) return;
     onSplitTerminal();
@@ -1278,7 +1283,7 @@ export default function ThreadTerminalDrawer({
           />
         ) : null}
         <div className="flex min-h-0 flex-1 flex-col items-center justify-center gap-3 px-4 py-6 text-center text-sm text-muted-foreground">
-          <p>No terminal sessions for this thread yet.</p>
+          <p>Todavía no hay sesiones de terminal para esta conversación.</p>
           <button
             type="button"
             className="rounded-md border border-border/80 bg-background px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-accent"
@@ -1512,7 +1517,7 @@ export default function ThreadTerminalDrawer({
                           }`}
                           onClick={() => onActiveTerminalChange(groupActiveTerminalId)}
                         >
-                          Group {groupIndex + 1}
+                          Grupo {groupIndex + 1}
                         </button>
                       )}
 
@@ -1521,7 +1526,7 @@ export default function ThreadTerminalDrawer({
                       >
                         {terminalGroup.terminalIds.map((terminalId) => {
                           const isActive = terminalId === resolvedActiveTerminalId;
-                          const closeTerminalLabel = `Close ${
+                          const closeTerminalLabel = `Cerrar ${
                             terminalLabelById.get(terminalId) ?? "terminal"
                           }${isActive && closeShortcutLabel ? ` (${closeShortcutLabel})` : ""}`;
                           return (

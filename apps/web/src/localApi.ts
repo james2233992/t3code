@@ -25,7 +25,7 @@ function createBrowserLocalApi(): LocalApi {
         if (window.desktopBridge) {
           const opened = await window.desktopBridge.openExternal(url);
           if (!opened) {
-            throw new Error("Unable to open link.");
+            throw new Error("No se pudo abrir el enlace.");
           }
           return;
         }
@@ -76,7 +76,7 @@ export function readLocalApi(): LocalApi | undefined {
 export function ensureLocalApi(): LocalApi {
   const api = readLocalApi();
   if (!api) {
-    throw new Error("Local API not found");
+    throw new Error("No se encontró la API local");
   }
   return api;
 }

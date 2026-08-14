@@ -115,7 +115,7 @@ function ThemeLibraryCard({
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5">
                   <button
-                    aria-label={`Use ${theme.label} theme${isActive ? ", currently active" : ""}`}
+                    aria-label={`Usar el tema ${theme.label}${isActive ? ", activo actualmente" : ""}`}
                     aria-pressed={isActive}
                     className="min-w-0 cursor-pointer truncate rounded-sm text-left text-sm font-medium text-foreground outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-card"
                     type="button"
@@ -147,7 +147,7 @@ function ThemeLibraryCard({
                           </Button>
                         }
                       />
-                      <TooltipPopup>Duplicate theme</TooltipPopup>
+                      <TooltipPopup>Duplicar tema</TooltipPopup>
                     </Tooltip>
                   ) : null}
                   {onEdit ? (
@@ -167,7 +167,7 @@ function ThemeLibraryCard({
                           </Button>
                         }
                       />
-                      <TooltipPopup>Edit theme</TooltipPopup>
+                      <TooltipPopup>Editar tema</TooltipPopup>
                     </Tooltip>
                   ) : null}
                   {onDownload ? (
@@ -187,7 +187,7 @@ function ThemeLibraryCard({
                           </Button>
                         }
                       />
-                      <TooltipPopup>Export theme file</TooltipPopup>
+                      <TooltipPopup>Exportar archivo del tema</TooltipPopup>
                     </Tooltip>
                   ) : null}
                   {onRemove ? (
@@ -195,7 +195,7 @@ function ThemeLibraryCard({
                       <TooltipTrigger
                         render={
                           <Button
-                            aria-label={`Remove ${theme.label}`}
+                            aria-label={`Eliminar ${theme.label}`}
                             size="icon-xs"
                             variant="ghost"
                             className="text-muted-foreground hover:text-destructive"
@@ -208,7 +208,7 @@ function ThemeLibraryCard({
                           </Button>
                         }
                       />
-                      <TooltipPopup>Remove theme</TooltipPopup>
+                      <TooltipPopup>Eliminar tema</TooltipPopup>
                     </Tooltip>
                   ) : null}
                 </div>
@@ -218,7 +218,9 @@ function ThemeLibraryCard({
         }
       />
       <TooltipPopup>
-        {cardModes.length > 1 ? "Use for both light and dark" : `Use for ${cardModes[0]} mode only`}
+        {cardModes.length > 1
+          ? "Usar en los modos claro y oscuro"
+          : `Usar solo en el modo ${cardModes[0] === "light" ? "claro" : "oscuro"}`}
       </TooltipPopup>
     </Tooltip>
   );
@@ -263,8 +265,8 @@ export function ThemeLibrary({
     toastManager.add(
       stackedThreadToast({
         type: "error",
-        title: "Couldn’t save theme selection",
-        description: "Try again.",
+        title: "No se pudo guardar la selección del tema",
+        description: "Inténtalo de nuevo.",
       }),
     );
   }, []);
@@ -273,8 +275,8 @@ export function ThemeLibrary({
     toastManager.add(
       stackedThreadToast({
         type: "error",
-        title: "Couldn’t remove theme",
-        description: "Try again.",
+        title: "No se pudo eliminar el tema",
+        description: "Inténtalo de nuevo.",
       }),
     );
   }, []);
@@ -369,7 +371,7 @@ export function ThemeLibrary({
     ],
   );
 
-  // "Create theme" starts from whatever is on screen for the appearance being
+  // "Crear tema" starts from whatever is on screen for the appearance being
   // edited, so tuning the theme you already use never means rebuilding it.
   const activeThemeForAppearance =
     getThemeDefinition((initialAppearance === "light" ? lightOwner : darkOwner) ?? "") ?? null;
@@ -424,7 +426,7 @@ export function ThemeLibrary({
 
   const renderModeTiles = () => (
     <div
-      aria-label="Appearance mode"
+      aria-label="Modo de apariencia"
       className="mx-auto grid w-full max-w-[56rem] grid-cols-3 gap-3 px-3 sm:px-4"
       role="group"
     >
@@ -432,7 +434,13 @@ export function ThemeLibrary({
         const isActive = appearanceMode === mode;
         return (
           <button
-            aria-label={mode === "system" ? "Follow the system appearance" : `Use ${mode} mode`}
+            aria-label={
+              mode === "system"
+                ? "Seguir la apariencia del sistema"
+                : mode === "light"
+                  ? "Usar modo claro"
+                  : "Usar modo oscuro"
+            }
             aria-pressed={isActive}
             className={cn(
               "flex cursor-pointer flex-col items-stretch gap-1.5 rounded-xl border p-2 outline-none transition-colors focus-visible:ring-2 focus-visible:ring-ring",
@@ -452,7 +460,7 @@ export function ThemeLibrary({
                 isActive ? "text-foreground" : "text-muted-foreground",
               )}
             >
-              {mode === "system" ? "System" : mode === "light" ? "Light" : "Dark"}
+              {mode === "system" ? "Sistema" : mode === "light" ? "Claro" : "Oscuro"}
             </span>
           </button>
         );
@@ -545,14 +553,14 @@ export function ThemeLibrary({
   return (
     <div className="space-y-3">
       <p className="px-3 text-[13px] leading-[1.45] text-muted-foreground/80 sm:px-4">
-        Choose how Fenix Code looks. Use a built-in theme or make your own.
+        Elige el aspecto de Fenix Code. Usa un tema incluido o crea el tuyo.
       </p>
       <h3 className="px-3 text-sm font-medium tracking-[-0.005em] text-foreground sm:px-4">
         Color scheme
       </h3>
       {renderModeTiles()}
       <div className="flex min-h-8 flex-wrap items-center justify-between gap-3 px-3 pt-2 sm:px-4">
-        <h3 className="text-sm font-medium tracking-[-0.005em] text-foreground">Themes</h3>
+        <h3 className="text-sm font-medium tracking-[-0.005em] text-foreground">Temas</h3>
         <div className="flex flex-wrap items-center justify-end gap-3">
           <Button
             className="h-7 rounded-md border border-border/70 bg-muted/30 px-2 text-xs font-medium text-foreground shadow-none hover:bg-accent/40"
@@ -568,11 +576,11 @@ export function ThemeLibrary({
             }
           >
             <PlusIcon />
-            Create theme
+            Crear tema
           </Button>
           <Button size="xs" variant="ghost" onClick={() => onImportOpenChange(true)}>
             <UploadIcon />
-            Import theme
+            Importar tema
           </Button>
         </div>
       </div>
@@ -613,7 +621,7 @@ export function ThemeLibrary({
             toastManager.add(
               stackedThreadToast({
                 type: "success",
-                title: `${importedTheme.label} added`,
+                title: `Tema «${importedTheme.label}» añadido`,
                 description: `It’s now your ${modes[0]!} theme.`,
               }),
             );
@@ -623,7 +631,7 @@ export function ThemeLibrary({
           toastManager.add(
             stackedThreadToast({
               type: "success",
-              title: `${importedTheme.label} added`,
+              title: `Tema «${importedTheme.label}» añadido`,
               description: "It’s now active.",
             }),
           );
@@ -640,15 +648,15 @@ export function ThemeLibrary({
       >
         <AlertDialogPopup>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove “{removeDialogTheme?.label}”?</AlertDialogTitle>
+            <AlertDialogTitle>¿Eliminar «{removeDialogTheme?.label}»?</AlertDialogTitle>
             <AlertDialogDescription>
-              You can bring it back anytime by importing its JSON file.
+              Puedes recuperarlo en cualquier momento importando su archivo JSON.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogClose render={<Button variant="outline" />}>Cancel</AlertDialogClose>
+            <AlertDialogClose render={<Button variant="outline" />}>Cancelar</AlertDialogClose>
             <Button variant="destructive" onClick={handleConfirmRemoveTheme}>
-              Remove theme
+              Eliminar tema
             </Button>
           </AlertDialogFooter>
         </AlertDialogPopup>

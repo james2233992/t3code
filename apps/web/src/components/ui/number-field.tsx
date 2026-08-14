@@ -116,7 +116,7 @@ export function NumberFieldScrubArea({
 
   if (!context) {
     throw new Error(
-      "NumberFieldScrubArea must be used within a NumberField component for accessibility.",
+      "NumberFieldScrubArea debe usarse dentro de un componente NumberField por accesibilidad.",
     );
   }
 
