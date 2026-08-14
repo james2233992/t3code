@@ -12,10 +12,10 @@ REQUISITOS
 
 INSTALACIÓN
 1. Abre Terminal.
-2. Entra en esta carpeta extraída.
-3. Abre https://iaonline.io/code-lab/setup e inicia sesión.
-4. Genera el comando seguro de instalación para tu equipo.
-5. En Terminal, entra en la carpeta local que quieras autorizar y ejecuta el comando.
+2. Abre https://iaonline.io/code-lab/setup e inicia sesión.
+3. Genera el comando seguro de instalación para tu equipo.
+4. Ejecuta el comando. Si moviste la descarga, el instalador te pedirá su ruta absoluta.
+5. Indica la carpeta local que quieras autorizar cuando se solicite.
 6. Ejecuta: fenix-code service install
 7. Comprueba: fenix-code service status
 8. Comprueba: fenix-code fenix status

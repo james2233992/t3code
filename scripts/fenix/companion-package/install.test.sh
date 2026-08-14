@@ -94,6 +94,10 @@ chmod 0755 \
 printf 'native fixture\n' > "${package_dir}/payload/runtime/native-addon.node"
 printf 'private executable fixture\n' > "${package_dir}/payload/runtime/private-helper"
 chmod 0700 "${package_dir}/payload/runtime/private-helper"
+(
+  cd "$package_dir"
+  find bin payload -type f -print0 | sort -z | xargs -0 shasum -a 256 > PAYLOAD-SHA256SUMS
+)
 touch \
   "${package_dir}/payload/runtime/native-addon.node.fenix-test-quarantined" \
   "${package_dir}/payload/runtime/private-helper.fenix-test-quarantined" \
@@ -123,6 +127,20 @@ if run_install \
   exit 1
 fi
 test ! -e "${test_root}/home/.fenix-code"
+
+printf 'tampered\n' >> "${package_dir}/payload/runtime/node_modules/t3/dist/service-launcher.mjs"
+if integrity_output="$(
+  run_install \
+    --portal https://iaonline.io \
+    --attempt-id attempt-integrity \
+    --pairing-token valid-token \
+    --allow-root "$test_root" 2>&1
+)"; then
+  echo "installer accepted a modified payload" >&2
+  exit 1
+fi
+test "$integrity_output" = "El paquete no supera la verificación interna de integridad."
+printf 'export {};\n' > "${package_dir}/payload/runtime/node_modules/t3/dist/service-launcher.mjs"
 
 if failure_output="$(
   FENIX_INSTALL_TEST_XATTR_FAIL_MATCH=private-helper \

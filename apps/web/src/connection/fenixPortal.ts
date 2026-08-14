@@ -35,6 +35,25 @@ export function classifyFenixPortalFailure(cause: unknown): FenixPortalFailureKi
   return "configuration";
 }
 
+const SAFE_PORTAL_ERROR_MESSAGES = new Set([
+  "El token CSRF de Fenix Code Lab no está disponible.",
+  "Fenix Code Lab returned an invalid pairing envelope.",
+  "Introduce un nombre de entorno local de 1 a 80 caracteres.",
+]);
+
+export function describeFenixPortalPairingFailure(cause: unknown): string {
+  if (cause instanceof FenixPortalHttpError) {
+    return `La API de Fenix ha respondido con HTTP ${cause.status}.`;
+  }
+  if (cause instanceof Error && SAFE_PORTAL_ERROR_MESSAGES.has(cause.message)) {
+    return cause.message;
+  }
+  if (classifyFenixPortalFailure(cause) === "network") {
+    return "No se ha podido completar la conexión con Fenix.";
+  }
+  return "Fenix ha devuelto una respuesta de emparejamiento no válida.";
+}
+
 function portalRequestSignal(): AbortSignal {
   return AbortSignal.timeout(PORTAL_REQUEST_TIMEOUT_MS);
 }
@@ -254,21 +273,36 @@ export function buildFenixMobilePairingUrl(input: {
 
 export function buildFenixCompanionInstallCommand(input: {
   readonly artifactFileName: string;
+  readonly artifactSha256: string;
   readonly portalOrigin: string;
   readonly pairing: FenixPortalPairing;
 }): string {
   if (!/^Fenix-Code-Companion-[A-Za-z0-9._-]+\.tar\.gz$/u.test(input.artifactFileName)) {
     throw new Error("Fenix Code returned an invalid companion archive name.");
   }
+  if (!/^[a-f0-9]{64}$/u.test(input.artifactSha256)) {
+    throw new Error("Fenix Code returned an invalid companion archive checksum.");
+  }
   const directoryName = input.artifactFileName.replace(/\.tar\.gz$/u, "");
   return [
+    "set -e",
     "printf 'Ruta absoluta de la carpeta local que autorizas: '",
     "IFS= read -r FENIX_CODE_ROOT",
     'case "$FENIX_CODE_ROOT" in /*) ;; *) echo "Debes indicar una ruta absoluta." >&2; exit 1 ;; esac',
     'test -d "$FENIX_CODE_ROOT" || { echo "La carpeta indicada no existe." >&2; exit 1; }',
-    "cd ~/Downloads",
-    `tar -xzf ${shellQuote(input.artifactFileName)}`,
-    `cd ${shellQuote(directoryName)}`,
+    `FENIX_CODE_ARCHIVE="$HOME/Downloads/${input.artifactFileName}"`,
+    'if [ ! -f "$FENIX_CODE_ARCHIVE" ]; then',
+    "  printf 'Ruta absoluta del paquete Fenix Code descargado: '",
+    "  IFS= read -r FENIX_CODE_ARCHIVE",
+    "fi",
+    'case "$FENIX_CODE_ARCHIVE" in /*) ;; *) echo "Debes indicar una ruta absoluta al paquete." >&2; exit 1 ;; esac',
+    'test -f "$FENIX_CODE_ARCHIVE" || { echo "No se encuentra el paquete descargado." >&2; exit 1; }',
+    `test "$(shasum -a 256 "$FENIX_CODE_ARCHIVE" | awk '{print $1}')" = ${shellQuote(input.artifactSha256)} || { echo "El paquete no supera la verificacion de integridad." >&2; exit 1; }`,
+    'xattr -d com.apple.quarantine "$FENIX_CODE_ARCHIVE" 2>/dev/null || true',
+    'FENIX_CODE_INSTALL_DIR="$(mktemp -d "${TMPDIR:-/tmp}/fenix-code-install.XXXXXX")"',
+    "trap 'rm -rf \"$FENIX_CODE_INSTALL_DIR\"' EXIT",
+    'tar -xzf "$FENIX_CODE_ARCHIVE" -C "$FENIX_CODE_INSTALL_DIR"',
+    `cd "$FENIX_CODE_INSTALL_DIR"/${shellQuote(directoryName)}`,
     [
       "./install.sh",
       `--portal ${shellQuote(new URL(input.portalOrigin).origin)}`,

@@ -5,6 +5,7 @@ import {
   buildFenixCompanionInstallCommand,
   buildFenixMobilePairingUrl,
   classifyFenixPortalFailure,
+  describeFenixPortalPairingFailure,
   fenixPortalDeviceRegistration,
   fenixPortalConnectedDeviceRegistrations,
   fenixPortalSocket,
@@ -20,6 +21,31 @@ const PORTAL_URL = new URL("https://iaonline.io/code-lab/?agentId=9");
 const TICKET = "t".repeat(43);
 
 describe("Fenix portal companion API", () => {
+  it("describes pairing failures without exposing arbitrary exception content", async () => {
+    const fetchImpl = vi.fn<typeof fetch>().mockResolvedValue(new Response(null, { status: 403 }));
+    let httpFailure: unknown;
+    try {
+      await issueFenixPortalPairing({
+        agentId: 9,
+        deviceName: "Mac de prueba",
+        fetchImpl,
+        url: PORTAL_URL,
+      });
+    } catch (error) {
+      httpFailure = error;
+    }
+
+    expect(describeFenixPortalPairingFailure(httpFailure)).toBe(
+      "La API de Fenix ha respondido con HTTP 403.",
+    );
+    expect(describeFenixPortalPairingFailure(new Error("unexpected internal diagnostic"))).toBe(
+      "Fenix ha devuelto una respuesta de emparejamiento no válida.",
+    );
+    expect(describeFenixPortalPairingFailure(new TypeError("Failed to fetch"))).toBe(
+      "No se ha podido completar la conexión con Fenix.",
+    );
+  });
+
   it("builds a mobile QR bound to the authenticated portal pairing", () => {
     const url = new URL(
       buildFenixMobilePairingUrl({
@@ -270,18 +296,30 @@ describe("Fenix portal companion API", () => {
 
     const installCommand = buildFenixCompanionInstallCommand({
       artifactFileName: "Fenix-Code-Companion-0.0.32-macos-arm64.tar.gz",
+      artifactSha256: "f".repeat(64),
       portalOrigin: PORTAL_URL.origin,
       pairing,
     });
     expect(installCommand).toBe(
       [
+        "set -e",
         "printf 'Ruta absoluta de la carpeta local que autorizas: '",
         "IFS= read -r FENIX_CODE_ROOT",
         'case "$FENIX_CODE_ROOT" in /*) ;; *) echo "Debes indicar una ruta absoluta." >&2; exit 1 ;; esac',
         'test -d "$FENIX_CODE_ROOT" || { echo "La carpeta indicada no existe." >&2; exit 1; }',
-        "cd ~/Downloads",
-        "tar -xzf 'Fenix-Code-Companion-0.0.32-macos-arm64.tar.gz'",
-        "cd 'Fenix-Code-Companion-0.0.32-macos-arm64'",
+        'FENIX_CODE_ARCHIVE="$HOME/Downloads/Fenix-Code-Companion-0.0.32-macos-arm64.tar.gz"',
+        'if [ ! -f "$FENIX_CODE_ARCHIVE" ]; then',
+        "  printf 'Ruta absoluta del paquete Fenix Code descargado: '",
+        "  IFS= read -r FENIX_CODE_ARCHIVE",
+        "fi",
+        'case "$FENIX_CODE_ARCHIVE" in /*) ;; *) echo "Debes indicar una ruta absoluta al paquete." >&2; exit 1 ;; esac',
+        'test -f "$FENIX_CODE_ARCHIVE" || { echo "No se encuentra el paquete descargado." >&2; exit 1; }',
+        `test "$(shasum -a 256 "$FENIX_CODE_ARCHIVE" | awk '{print $1}')" = '${"f".repeat(64)}' || { echo "El paquete no supera la verificacion de integridad." >&2; exit 1; }`,
+        'xattr -d com.apple.quarantine "$FENIX_CODE_ARCHIVE" 2>/dev/null || true',
+        'FENIX_CODE_INSTALL_DIR="$(mktemp -d "${TMPDIR:-/tmp}/fenix-code-install.XXXXXX")"',
+        "trap 'rm -rf \"$FENIX_CODE_INSTALL_DIR\"' EXIT",
+        'tar -xzf "$FENIX_CODE_ARCHIVE" -C "$FENIX_CODE_INSTALL_DIR"',
+        "cd \"$FENIX_CODE_INSTALL_DIR\"/'Fenix-Code-Companion-0.0.32-macos-arm64'",
         `./install.sh --portal 'https://iaonline.io' --attempt-id '${"a".repeat(32)}' --pairing-token '${"p".repeat(43)}' --allow-root "$FENIX_CODE_ROOT"`,
       ].join("\n"),
     );
@@ -370,6 +408,7 @@ describe("Fenix portal companion API", () => {
     expect(() =>
       buildFenixCompanionInstallCommand({
         artifactFileName: "../companion.tar.gz",
+        artifactSha256: "f".repeat(64),
         portalOrigin: PORTAL_URL.origin,
         pairing: {
           attemptId: "a".repeat(32),
@@ -378,5 +417,20 @@ describe("Fenix portal companion API", () => {
         },
       }),
     ).toThrow("invalid companion archive name");
+  });
+
+  it("rejects an unsafe package checksum in the login-bound install command", () => {
+    expect(() =>
+      buildFenixCompanionInstallCommand({
+        artifactFileName: "Fenix-Code-Companion-0.0.32-macos-arm64.tar.gz",
+        artifactSha256: "not-a-checksum",
+        portalOrigin: PORTAL_URL.origin,
+        pairing: {
+          attemptId: "a".repeat(32),
+          pairingToken: "p".repeat(43),
+          expiresAt: "2026-08-12T20:00:00Z",
+        },
+      }),
+    ).toThrow("invalid companion archive checksum");
   });
 });
