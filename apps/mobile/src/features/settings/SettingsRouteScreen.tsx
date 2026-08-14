@@ -466,7 +466,8 @@ function ConfiguredSettingsRouteScreen() {
             />
           </SettingsSection>
           <Text className="px-2 text-sm text-foreground-muted">
-            Fenix Code works locally without signing in. Cloud features are optional.
+            Fenix Code requires an active device authorization issued from your Fenix session.
+            Access remains scoped to your company, user, and paired computers.
           </Text>
         </View>
 

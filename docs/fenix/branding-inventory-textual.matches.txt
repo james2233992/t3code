@@ -3518,6 +3518,8 @@
 ./docs/fenix/login-bound-activation-report-20260813.md:9:162:Fenix Code
 ./docs/fenix/mobile-controller-report-20260813.md:1:3:Fenix Code
 ./docs/fenix/mobile-controller-report-20260813.md:5:71:Fenix Code
+./docs/fenix/mobile-login-gate-report-20260814.md:11:17:Fenix Code
+./docs/fenix/mobile-login-gate-report-20260814.md:1:3:Fenix Code
 ./docs/fenix/onboarding-downloads-report-20260813.md:15:12:Fenix Code
 ./docs/fenix/onboarding-downloads-report-20260813.md:1:3:Fenix Code
 ./docs/fenix/qa-f1-report-20260810.md:23:98:Fenix Code

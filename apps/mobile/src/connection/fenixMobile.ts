@@ -48,6 +48,11 @@ export interface FenixMobileBrowserTicket {
   readonly protocol: "fenix-code-lab-v1";
 }
 
+export interface FenixMobileAccessAuthorization {
+  readonly controller: FenixMobileControllerRecord;
+  readonly targets: ReadonlyArray<FenixMobileTarget>;
+}
+
 interface MobileCredentialStorage {
   readonly getItemAsync: (key: string) => Promise<string | null>;
   readonly setItemAsync: (
@@ -209,6 +214,31 @@ export async function clearFenixMobileController(
   storage: MobileCredentialStorage = SecureStore,
 ): Promise<void> {
   await storage.deleteItemAsync(MOBILE_CONTROLLER_STORAGE_KEY);
+}
+
+export async function authorizeFenixMobileController(
+  input: {
+    readonly fetchImpl?: typeof fetch;
+    readonly storage?: MobileCredentialStorage;
+  } = {},
+): Promise<FenixMobileAccessAuthorization | null> {
+  const storage = input.storage ?? SecureStore;
+  const controller = await loadFenixMobileController(storage);
+  if (controller === null) return null;
+
+  try {
+    const targets = await listFenixMobileTargets({
+      controller,
+      fetchImpl: input.fetchImpl,
+    });
+    return { controller, targets };
+  } catch (error) {
+    if (error instanceof FenixMobileHttpError && [401, 403].includes(error.status)) {
+      await clearFenixMobileController(storage);
+      return null;
+    }
+    throw error;
+  }
 }
 
 export async function pairFenixMobileController(input: {
