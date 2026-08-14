@@ -14,6 +14,7 @@ import {
   issueFenixPortalPairing,
   listFenixPortalDevices,
   readFenixPortalAgentId,
+  revokeFenixPortalDevice,
   verifyFenixPortalSession,
 } from "./fenixPortal.ts";
 
@@ -102,6 +103,13 @@ describe("Fenix portal companion API", () => {
                 revoked: false,
                 connected: true,
               },
+              {
+                deviceId: "c".repeat(16),
+                deviceName: "short identifier",
+                capabilities: ["rpc"],
+                revoked: false,
+                connected: true,
+              },
             ],
           }),
           { status: 200, headers: { "Content-Type": "application/json" } },
@@ -127,6 +135,49 @@ describe("Fenix portal companion API", () => {
     expect(fenixPortalConnectedDeviceRegistrations(devices)[0]).toMatchObject({
       target: { deviceId: "a".repeat(32) },
     });
+  });
+
+  it("revokes only the authenticated owner's selected device with a fresh CSRF token", async () => {
+    const fetchImpl = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ token: "csrf-token" }), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      )
+      .mockResolvedValueOnce(new Response(null, { status: 204 }));
+
+    await revokeFenixPortalDevice({
+      agentId: 9,
+      deviceId: "a".repeat(32),
+      fetchImpl,
+      url: PORTAL_URL,
+    });
+
+    expect(fetchImpl).toHaveBeenNthCalledWith(
+      2,
+      new URL(`https://iaonline.io/api/v1/code-lab/devices/${"a".repeat(32)}?agentId=9`),
+      expect.objectContaining({
+        method: "DELETE",
+        credentials: "include",
+        headers: expect.objectContaining({ "X-CSRF-TOKEN": "csrf-token" }),
+      }),
+    );
+  });
+
+  it("fails closed before CSRF or network access for a malformed device identifier", async () => {
+    const fetchImpl = vi.fn<typeof fetch>();
+
+    await expect(
+      revokeFenixPortalDevice({
+        agentId: 9,
+        deviceId: "../otro-equipo",
+        fetchImpl,
+        url: PORTAL_URL,
+      }),
+    ).rejects.toThrow("invalid device identifier");
+    expect(fetchImpl).not.toHaveBeenCalled();
   });
 
   it("requires an authenticated Fenix owner envelope before rendering the embedded app", async () => {

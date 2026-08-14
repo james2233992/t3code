@@ -16,16 +16,20 @@ import {
   ShieldCheckIcon,
   SmartphoneIcon,
   TerminalSquareIcon,
+  Trash2Icon,
   type LucideIcon,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 import {
   buildFenixCompanionInstallCommand,
   buildFenixMobilePairingUrl,
   describeFenixPortalPairingFailure,
   issueFenixPortalPairing,
+  listFenixPortalDevices,
   readFenixPortalAgentId,
+  revokeFenixPortalDevice,
+  type FenixPortalDevice,
   type FenixPortalPairing,
 } from "~/connection/fenixPortal";
 import {
@@ -192,6 +196,10 @@ export function FenixSetupPage() {
   const [pairing, setPairing] = useState<FenixPortalPairing | null>(null);
   const [pairingBusy, setPairingBusy] = useState(false);
   const [pairingError, setPairingError] = useState<string | null>(null);
+  const [devices, setDevices] = useState<ReadonlyArray<FenixPortalDevice>>([]);
+  const [devicesBusy, setDevicesBusy] = useState(false);
+  const [devicesError, setDevicesError] = useState<string | null>(null);
+  const [revokingDeviceId, setRevokingDeviceId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [mobilePairing, setMobilePairing] = useState<FenixPortalPairing | null>(null);
   const [mobilePairingBusy, setMobilePairingBusy] = useState(false);
@@ -244,6 +252,19 @@ export function FenixSetupPage() {
         }
       : platformDetails[platform];
 
+  const refreshDevices = useCallback(async () => {
+    if (agentId === null) return;
+    setDevicesBusy(true);
+    setDevicesError(null);
+    try {
+      setDevices(await listFenixPortalDevices({ agentId }));
+    } catch (cause) {
+      setDevicesError(describeFenixPortalPairingFailure(cause));
+    } finally {
+      setDevicesBusy(false);
+    }
+  }, [agentId]);
+
   useEffect(() => {
     let active = true;
     void detectFenixSetupArchitectureFromNavigator(navigator).then((detected) => {
@@ -255,6 +276,26 @@ export function FenixSetupPage() {
       active = false;
     };
   }, []);
+
+  useEffect(() => {
+    void refreshDevices();
+  }, [refreshDevices]);
+
+  const revokeDevice = async (device: FenixPortalDevice) => {
+    if (agentId === null || device.revoked) return;
+    if (!window.confirm(`¿Revocar el acceso de “${device.deviceName}”?`)) return;
+    setRevokingDeviceId(device.deviceId);
+    setDevicesError(null);
+    try {
+      await revokeFenixPortalDevice({ agentId, deviceId: device.deviceId });
+      await refreshDevices();
+      setPairingError(null);
+    } catch (cause) {
+      setDevicesError(describeFenixPortalPairingFailure(cause));
+    } finally {
+      setRevokingDeviceId(null);
+    }
+  };
 
   const generatePairing = async () => {
     if (agentId === null) {
@@ -655,6 +696,71 @@ export function FenixSetupPage() {
                     Sin esta autorización la instalación se cancela sin dejar una copia utilizable.
                   </p>
                 </div>
+              </div>
+
+              <div className="mt-6 border-t border-white/10 pt-5">
+                <div className="flex items-center justify-between gap-3">
+                  <div>
+                    <h4 className="text-sm font-semibold text-white">Equipos autorizados</h4>
+                    <p className="mt-1 text-xs leading-5 text-white/46">
+                      Revoca los equipos que ya no uses antes de generar una instalación nueva.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => void refreshDevices()}
+                    disabled={devicesBusy || revokingDeviceId !== null}
+                    className="h-8 rounded-md border border-white/14 px-3 text-xs font-semibold text-white hover:bg-white/8 disabled:opacity-50"
+                  >
+                    {devicesBusy ? "Actualizando…" : "Actualizar"}
+                  </button>
+                </div>
+
+                {devicesError !== null ? (
+                  <p role="alert" className="mt-3 text-sm text-[#fca5a5]">
+                    No se pudieron cargar los equipos. {devicesError}
+                  </p>
+                ) : null}
+
+                {!devicesBusy && devices.length === 0 && devicesError === null ? (
+                  <p className="mt-3 text-sm text-white/46">Todavía no hay equipos autorizados.</p>
+                ) : null}
+
+                {devices.length > 0 ? (
+                  <ul className="mt-3 space-y-2" aria-label="Equipos autorizados">
+                    {devices.map((device) => (
+                      <li
+                        key={device.deviceId}
+                        className="flex min-h-11 items-center justify-between gap-3 rounded-md border border-white/10 bg-[#0b0b0b] px-3 py-2"
+                      >
+                        <div className="min-w-0">
+                          <p className="truncate text-sm font-medium text-white">
+                            {device.deviceName}
+                          </p>
+                          <p className="mt-0.5 text-xs text-white/42">
+                            {device.revoked
+                              ? "Revocado"
+                              : device.connected
+                                ? "Conectado ahora"
+                                : "Sin conexión"}
+                          </p>
+                        </div>
+                        {!device.revoked ? (
+                          <button
+                            type="button"
+                            onClick={() => void revokeDevice(device)}
+                            disabled={devicesBusy || revokingDeviceId !== null}
+                            className="inline-flex h-8 shrink-0 items-center gap-2 rounded-md border border-[#7f1d1d] px-3 text-xs font-semibold text-[#fca5a5] hover:bg-[#450a0a] disabled:opacity-50"
+                            aria-label={`Revocar ${device.deviceName}`}
+                          >
+                            <Trash2Icon className="size-3.5" />
+                            {revokingDeviceId === device.deviceId ? "Revocando…" : "Revocar"}
+                          </button>
+                        ) : null}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
               </div>
 
               <label

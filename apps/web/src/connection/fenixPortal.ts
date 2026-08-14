@@ -88,6 +88,10 @@ export interface FenixPortalSession {
   };
 }
 
+function isFenixPortalDeviceId(value: unknown): value is string {
+  return typeof value === "string" && /^[a-f0-9]{32}$/iu.test(value);
+}
+
 function positiveAgentId(value: string | null): number | null {
   if (value === null || !/^\d+$/.test(value)) return null;
   const parsed = Number(value);
@@ -182,8 +186,7 @@ export async function listFenixPortalDevices(input: {
 
   return (envelope.devices ?? []).flatMap((device) => {
     if (
-      typeof device.deviceId !== "string" ||
-      device.deviceId.length < 16 ||
+      !isFenixPortalDeviceId(device.deviceId) ||
       typeof device.deviceName !== "string" ||
       !Array.isArray(device.capabilities) ||
       device.capabilities.some((value) => typeof value !== "string") ||
@@ -202,6 +205,33 @@ export async function listFenixPortalDevices(input: {
       },
     ];
   });
+}
+
+export async function revokeFenixPortalDevice(input: {
+  readonly agentId: number;
+  readonly deviceId: string;
+  readonly fetchImpl?: typeof fetch;
+  readonly url?: URL;
+}): Promise<void> {
+  const fetchImpl = input.fetchImpl ?? fetch;
+  const url = input.url ?? new URL(window.location.href);
+  if (!isFenixPortalDeviceId(input.deviceId)) {
+    throw new Error("Fenix Code Lab returned an invalid device identifier.");
+  }
+  const endpoint = new URL(apiUrl(`/devices/${encodeURIComponent(input.deviceId)}`, url));
+  endpoint.searchParams.set("agentId", String(input.agentId));
+  const response = await fetchImpl(endpoint, {
+    method: "DELETE",
+    credentials: "include",
+    headers: {
+      ...(await csrfHeader(fetchImpl, url)),
+      Accept: "application/json",
+    },
+    signal: portalRequestSignal(),
+  });
+  if (!response.ok) {
+    throw new FenixPortalHttpError(response.status);
+  }
 }
 
 export async function issueFenixPortalPairing(input: {
