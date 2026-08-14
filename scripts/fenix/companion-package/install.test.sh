@@ -69,6 +69,10 @@ case "$1" in
   -p) test -e "$marker" ;;
   -d)
     test -e "$marker"
+    if [[ -n "${FENIX_INSTALL_TEST_XATTR_FAIL_MATCH:-}" &&
+      "$3" == *"${FENIX_INSTALL_TEST_XATTR_FAIL_MATCH}"* ]]; then
+      exit 80
+    fi
     printf '%s\n' "$3" >> "${FENIX_INSTALL_TEST_XATTR_STATE}"
     unlink "$marker"
     ;;
@@ -119,6 +123,21 @@ if run_install \
   exit 1
 fi
 test ! -e "${test_root}/home/.fenix-code"
+
+if failure_output="$(
+  FENIX_INSTALL_TEST_XATTR_FAIL_MATCH=private-helper \
+    run_install \
+      --portal https://iaonline.io \
+      --attempt-id attempt-xattr-failure \
+      --pairing-token valid-token \
+      --allow-root "$test_root" 2>&1
+)"; then
+  echo "installer ignored an xattr authorization failure" >&2
+  exit 1
+fi
+test "$failure_output" = "macOS no pudo autorizar el runtime local de Fenix Code (private-helper)."
+test ! -e "${test_root}/home/.fenix-code/runtime/versions/1.2.3"
+rm -f "$xattr_state"
 
 run_install \
   --portal https://iaonline.io \

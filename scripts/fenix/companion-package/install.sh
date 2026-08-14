@@ -146,7 +146,11 @@ if command -v xattr >/dev/null 2>&1; then
     fi
     if xattr -p com.apple.quarantine "$runtime_file" >/dev/null 2>&1; then
       if ! xattr -d com.apple.quarantine "$runtime_file"; then
-        echo "macOS no pudo autorizar el runtime local de Fenix Code." >&2
+        runtime_label="${runtime_file#${version_staging}/}"
+        if [[ "$runtime_label" == "$runtime_file" ]]; then
+          runtime_label="node/${runtime_file#${node_staging}/}"
+        fi
+        echo "macOS no pudo autorizar el runtime local de Fenix Code (${runtime_label})." >&2
         exit 65
       fi
     fi

@@ -4535,8 +4535,9 @@
 ./scripts/fenix/companion-package/README.txt:4:69:Fenix Code
 ./scripts/fenix/companion-package/fenix-code:10:9:Fenix Code
 ./scripts/fenix/companion-package/fenix-code:14:8:T3CODE
-./scripts/fenix/companion-package/install.sh:149:59:Fenix Code
-./scripts/fenix/companion-package/install.sh:218:11:Fenix Code
+./scripts/fenix/companion-package/install.sh:153:59:Fenix Code
+./scripts/fenix/companion-package/install.sh:222:11:Fenix Code
+./scripts/fenix/companion-package/install.test.sh:138:71:Fenix Code
 ./scripts/fenix/f1-2c-bridge-e2e.mjs:171:52:Fenix Code
 ./scripts/fenix/f1-2c-bridge-e2e.mjs:293:40:Fenix Code
 ./scripts/fenix/f1-2c-bridge-e2e.mjs:305:25:Fenix Code
