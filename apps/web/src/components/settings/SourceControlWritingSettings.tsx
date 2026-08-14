@@ -25,18 +25,19 @@ import { SettingResetButton, SettingsRow, SettingsSection } from "./settingsLayo
 const MODE_OPTIONS: Record<SourceControlWritingStyleMode, { label: string; description: string }> =
   {
     repo_conventions: {
-      label: "Repository conventions",
-      description: "In each project, matches recent change descriptions and change request titles.",
+      label: "Convenciones del repositorio",
+      description:
+        "En cada proyecto, imita las descripciones de cambios y títulos de solicitudes recientes.",
     },
     conventional_commits: {
       label: "Conventional Commits",
       description:
-        "Uses Conventional Commit prefixes for change descriptions; change request titles and descriptions stay concise.",
+        "Usa prefijos de Conventional Commits para las descripciones; los títulos y descripciones de solicitudes se mantienen concisos.",
     },
     custom: {
       label: "Custom instructions",
       description:
-        "Applies your instructions to change descriptions and change request titles and descriptions in every project.",
+        "Aplica tus instrucciones a las descripciones de cambios y a los títulos y descripciones de solicitudes de cambios en todos los proyectos.",
     },
   };
 
@@ -71,9 +72,9 @@ export function SourceControlWritingSettingsSection() {
   );
 
   return (
-    <SettingsSection title="Text generation">
+    <SettingsSection title="Generación de texto">
       <SettingsRow
-        title="Source control writing style"
+        title="Estilo de redacción del control de versiones"
         description={MODE_OPTIONS[style.mode].description}
         resetAction={
           isSourceControlWritingStyleDirty ? (
@@ -103,7 +104,10 @@ export function SourceControlWritingSettingsSection() {
               });
             }}
           >
-            <SelectTrigger className="w-full sm:w-56" aria-label="Source control writing style">
+            <SelectTrigger
+              className="w-full sm:w-56"
+              aria-label="Estilo de redacción del control de versiones"
+            >
               <SelectValue>{MODE_OPTIONS[style.mode].label}</SelectValue>
             </SelectTrigger>
             <SelectPopup align="end" alignItemWithTrigger={false}>
@@ -129,16 +133,16 @@ export function SourceControlWritingSettingsSection() {
                 }
               }}
               rows={4}
-              placeholder="Keep titles concise. Use short bullet points in descriptions."
-              aria-label="Custom source control writing instructions"
+              placeholder="Mantén los títulos concisos. Usa viñetas breves en las descripciones."
+              aria-label="Instrucciones personalizadas de redacción para el control de versiones"
             />
           </div>
         ) : null}
       </SettingsRow>
 
       <SettingsRow
-        title="Follow change request templates"
-        description="Structures change request descriptions using the current repository's template when one is available."
+        title="Seguir las plantillas de solicitudes de cambio"
+        description="Estructura las descripciones de las solicitudes de cambio con la plantilla del repositorio actual cuando exista."
         resetAction={
           style.followChangeRequestTemplates !== defaults.followChangeRequestTemplates ? (
             <SettingResetButton
@@ -163,14 +167,14 @@ export function SourceControlWritingSettingsSection() {
                 },
               })
             }
-            aria-label="Follow change request templates"
+            aria-label="Seguir las plantillas de solicitudes de cambio"
           />
         }
       />
 
       <SettingsRow
-        title="Source control writer model"
-        description="Optional model override for change descriptions, change request titles and descriptions, and branch or bookmark names. Off uses the global text generation model."
+        title="Modelo de redacción del control de versiones"
+        description="Modelo opcional para las descripciones de cambios, títulos y descripciones de solicitudes, y nombres de ramas o marcadores. Si está desactivado se usa el modelo global de generación de texto."
         control={
           <div className="flex flex-wrap items-center justify-end gap-2">
             {usesDedicatedModel ? (
@@ -182,7 +186,7 @@ export function SourceControlWritingSettingsSection() {
                 modelOptionsByInstance={modelOptionsByInstance}
                 triggerVariant="outline"
                 triggerClassName="min-w-0 max-w-none shrink-0 text-foreground/90 hover:text-foreground"
-                triggerAriaLabel="Source control writer model"
+                triggerAriaLabel="Modelo de redacción del control de versiones"
                 onInstanceModelChange={(instanceId, model) => {
                   updateSettings({
                     sourceControlWriterModelSelection: createModelSelection(instanceId, model),
@@ -203,7 +207,7 @@ export function SourceControlWritingSettingsSection() {
                     : null,
                 })
               }
-              aria-label="Use a separate source control writer model"
+              aria-label="Usar un modelo distinto para redactar el control de versiones"
             />
           </div>
         }

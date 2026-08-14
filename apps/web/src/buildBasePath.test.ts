@@ -12,7 +12,7 @@ describe("Fenix Code web base path", () => {
   it.each(["code-lab/", "/code-lab", "//code-lab/", "/../code-lab/", "/code-lab/?x=1"])(
     "rejects a non-normalized or ambiguous base path: %s",
     (value) => {
-      expect(() => normalizeWebBasePath(value)).toThrow("normalized absolute path");
+      expect(() => normalizeWebBasePath(value)).toThrow("ruta absoluta normalizada");
     },
   );
 });

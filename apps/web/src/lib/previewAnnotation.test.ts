@@ -48,10 +48,10 @@ describe("preview annotations", () => {
   it("describes regions, drawings, styles, and screenshot context", () => {
     const result = buildPreviewAnnotationPrompt(annotation);
     expect(result).toContain("Make these cards feel related.");
-    expect(result).toContain("1 marked region");
-    expect(result).toContain("1 drawing");
+    expect(result).toContain("1 región marcada");
+    expect(result).toContain("1 dibujo");
     expect(result).toContain("border-radius: 4px → 16px");
-    expect(result).toContain("attached screenshot");
+    expect(result).toContain("captura adjunta");
   });
 
   it("appends to an existing composer prompt", () => {
@@ -69,7 +69,7 @@ describe("preview annotations", () => {
     expect(result.promptText).toBe("Fix this");
     expect(result.annotation).toMatchObject({
       title: "Example",
-      targetSummary: "1 marked region, 1 drawing.",
+      targetSummary: "1 región marcada, 1 dibujo.",
       hasScreenshot: true,
     });
   });

@@ -128,7 +128,7 @@ function ProviderLastChecked({ lastCheckedAt }: { lastCheckedAt: string | null }
   }
 
   if (lastCheckedRelative.status === "invalid") {
-    return <span className="text-[11px] text-muted-foreground/50">Checked unavailable</span>;
+    return <span className="text-[11px] text-muted-foreground/50">Comprobación no disponible</span>;
   }
 
   return (
@@ -154,11 +154,11 @@ function providerEnvironmentIcon(environment: EnvironmentPresentation) {
 }
 
 function providerEnvironmentDetail(environment: EnvironmentPresentation): string {
-  if (environment.entry.target._tag === "PrimaryConnectionTarget") return "Primary device";
+  if (environment.entry.target._tag === "PrimaryConnectionTarget") return "Dispositivo principal";
   if (environment.relayManaged) return "Fenix Connect";
   if (environment.entry.target._tag === "SshConnectionTarget") return "SSH";
-  if (isDesktopLocalConnectionTarget(environment.entry.target)) return "Local device";
-  return environment.displayUrl ?? "Remote device";
+  if (isDesktopLocalConnectionTarget(environment.entry.target)) return "Dispositivo local";
+  return environment.displayUrl ?? "Dispositivo remoto";
 }
 
 function EnvironmentUnavailableRow({
@@ -170,19 +170,19 @@ function EnvironmentUnavailableRow({
 }) {
   const isLoading = access.kind === "loading";
   const title = isLoading
-    ? "Loading provider settings"
+    ? "Cargando ajustes de proveedores"
     : access.kind === "error"
-      ? "Could not connect to this device"
-      : "Provider settings are unavailable";
+      ? "No se pudo conectar con este dispositivo"
+      : "Los ajustes de proveedores no están disponibles";
   const description = isLoading
     ? access.reason === "permissions"
-      ? "Checking what this session is allowed to change."
-      : `Waiting for ${environment.label}'s configuration.`
+      ? "Comprobando qué puede cambiar esta sesión."
+      : `Esperando la configuración de ${environment.label}.`
     : connectionStatusText(environment.connection);
   // No spinner: this state can persist indefinitely for a wedged device, and a
   // continuously repainting animation would run the whole time.
   return (
-    <SettingsSection title="Providers">
+    <SettingsSection title="Proveedores">
       <SettingsRow title={title} description={description} />
     </SettingsSection>
   );
@@ -214,16 +214,16 @@ export function ProviderSettingsPanel() {
   return (
     <SettingsPageContainer>
       {!onlyPrimaryDevice ? (
-        <SettingsSection title="Devices">
+        <SettingsSection title="Dispositivos">
           {options.length === 0 ? (
             // The catalog hydrates asynchronously, so an empty list before it is
             // ready means "not loaded yet", not "nothing is connected".
             <SettingsRow
-              title={isReady ? "No connected devices" : "Loading devices"}
+              title={isReady ? "No hay dispositivos conectados" : "Cargando dispositivos"}
               description={
                 isReady
-                  ? "Connect an execution environment before configuring providers."
-                  : "Reading connected execution environments."
+                  ? "Conecta un entorno de ejecución antes de configurar proveedores."
+                  : "Leyendo los entornos de ejecución conectados."
               }
             />
           ) : (
@@ -432,7 +432,7 @@ export function EnvironmentProviderSettings({
       refreshingRef.current = false;
       setIsRefreshingProviders(false);
       if (result._tag === "Failure" && !isAtomCommandInterrupted(result)) {
-        console.warn("Failed to refresh providers", {
+        console.warn("No se pudieron actualizar los proveedores", {
           operation: "refresh-providers",
           environmentId,
           ...safeErrorLogAttributes(squashAtomCommandFailure(result)),
@@ -463,11 +463,11 @@ export function EnvironmentProviderSettings({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: `Could not update ${PROVIDER_DISPLAY_NAMES[candidate.driver] ?? candidate.driver}`,
+            title: `No se pudo actualizar ${PROVIDER_DISPLAY_NAMES[candidate.driver] ?? candidate.driver}`,
             description:
               error instanceof Error
                 ? error.message
-                : "The provider update command could not be started.",
+                : "No se pudo iniciar el comando de actualización del proveedor.",
           }),
         );
       }
@@ -674,13 +674,13 @@ export function EnvironmentProviderSettings({
                         variant="ghost"
                         className="size-5 rounded-sm p-0 text-muted-foreground hover:text-foreground"
                         onClick={() => setIsAddInstanceDialogOpen(true)}
-                        aria-label="Add provider instance"
+                        aria-label="Añadir instancia de proveedor"
                       >
                         <PlusIcon className="size-3" />
                       </Button>
                     }
                   />
-                  <TooltipPopup side="top">Add provider instance</TooltipPopup>
+                  <TooltipPopup side="top">Añadir instancia de proveedor</TooltipPopup>
                 </Tooltip>
                 <Tooltip>
                   <TooltipTrigger
@@ -691,7 +691,7 @@ export function EnvironmentProviderSettings({
                         className="size-5 rounded-sm p-0 text-muted-foreground hover:text-foreground"
                         disabled={isRefreshingProviders}
                         onClick={() => void refreshProviders()}
-                        aria-label="Refresh provider status"
+                        aria-label="Actualizar estado del proveedor"
                       >
                         {isRefreshingProviders ? (
                           <LoaderIcon className="size-3 animate-spin" />
@@ -701,7 +701,7 @@ export function EnvironmentProviderSettings({
                       </Button>
                     }
                   />
-                  <TooltipPopup side="top">Refresh provider status</TooltipPopup>
+                  <TooltipPopup side="top">Actualizar estado del proveedor</TooltipPopup>
                 </Tooltip>
               </>
             ) : null}
@@ -727,18 +727,18 @@ export function EnvironmentProviderSettings({
               <span className="inline-flex items-center gap-1.5">
                 Health check interval
                 <PolicyTooltip>
-                  This interval is configured here, then the shared Background activity policy
-                  decides whether provider probes may run when the timer fires. Custom intervals
-                  appear as Advanced in General settings.
+                  Este intervalo se configura aquí; después, la política compartida de actividad en
+                  segundo plano decide si se ejecutan las comprobaciones. Los intervalos
+                  personalizados aparecen como Avanzado en los ajustes generales.
                 </PolicyTooltip>
               </span>
             }
-            description="Refresh provider availability, versions, auth state, and model metadata in the background. Set this to 0 seconds to rely on manual refreshes."
+            description="Actualiza en segundo plano la disponibilidad, las versiones, la autenticación y los metadatos de modelos del proveedor. Usa 0 segundos para actualizar manualmente."
             resetAction={
               providerHealthRefreshIntervalSeconds !==
               defaultProviderHealthRefreshIntervalSeconds ? (
                 <SettingResetButton
-                  label="provider health check interval"
+                  label="intervalo de comprobación del proveedor"
                   onClick={() =>
                     updateSettings(
                       backgroundActivityOverrideSettings(
@@ -776,12 +776,12 @@ export function EnvironmentProviderSettings({
                   }
                 >
                   <NumberFieldGroup>
-                    <NumberFieldDecrement aria-label="Decrease provider health check interval" />
-                    <NumberFieldInput aria-label="Provider health check interval in seconds" />
-                    <NumberFieldIncrement aria-label="Increase provider health check interval" />
+                    <NumberFieldDecrement aria-label="Reducir intervalo de comprobación del proveedor" />
+                    <NumberFieldInput aria-label="Intervalo de comprobación del proveedor en segundos" />
+                    <NumberFieldIncrement aria-label="Aumentar intervalo de comprobación del proveedor" />
                   </NumberFieldGroup>
                 </NumberField>
-                <span className="text-xs text-muted-foreground">seconds</span>
+                <span className="text-xs text-muted-foreground">segundos</span>
               </div>
             }
           />

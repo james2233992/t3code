@@ -47,14 +47,14 @@ function display(descriptors: ReadonlyArray<ProviderOptionDescriptor>) {
 describe("buildTraitsTriggerDisplay", () => {
   it("omits fast mode from the label entirely when it is off", () => {
     expect(display([EFFORT, fastModeDescriptor(false), CONTEXT_WINDOW])).toEqual({
-      label: "High · 1M",
+      label: "Alto · 1M",
       showFastModeIcon: false,
     });
   });
 
   it("shows the bolt instead of a text label when fast mode is on", () => {
     expect(display([EFFORT, fastModeDescriptor(true), CONTEXT_WINDOW])).toEqual({
-      label: "High · 1M",
+      label: "Alto · 1M",
       showFastModeIcon: true,
     });
   });
@@ -70,11 +70,11 @@ describe("buildTraitsTriggerDisplay", () => {
     );
 
     expect(display([EFFORT, serviceTier])).toEqual({
-      label: "High",
+      label: "Alto",
       showFastModeIcon: false,
     });
     expect(display([EFFORT, { ...serviceTier, currentValue: "priority" }])).toEqual({
-      label: "High",
+      label: "Alto",
       showFastModeIcon: true,
     });
   });
@@ -87,14 +87,14 @@ describe("buildTraitsTriggerDisplay", () => {
       currentValue: true,
     };
     expect(display([EFFORT, thinking])).toEqual({
-      label: "High · Thinking On",
+      label: "Alto · Pensamiento Activado",
       showFastModeIcon: false,
     });
   });
 
   it("falls back to a text label when fast mode is the only trait", () => {
     expect(display([fastModeDescriptor(true)])).toEqual({
-      label: "Fast",
+      label: "Rápido",
       showFastModeIcon: false,
     });
     expect(display([fastModeDescriptor(false)])).toEqual({

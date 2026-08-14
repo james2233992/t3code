@@ -18,9 +18,9 @@ import { UsageChartLegend, UsageProviderChart, type UsageChartMetric } from "./U
 import { PROVIDER_COLOR, PROVIDER_LABEL, PROVIDER_MARK, PROVIDER_ORDER } from "./usageProviders";
 
 const WINDOW_OPTIONS = [
-  { days: 7, label: "7 days" },
-  { days: 30, label: "30 days" },
-  { days: 90, label: "90 days" },
+  { days: 7, label: "7 días" },
+  { days: 30, label: "30 días" },
+  { days: 90, label: "90 días" },
 ] as const;
 
 export function UsagePage() {
@@ -58,9 +58,9 @@ export function UsagePage() {
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-6">
         <header className="flex flex-wrap items-start justify-between gap-4">
           <div className="flex flex-col gap-1">
-            <h1 className="text-2xl font-semibold text-foreground">Usage</h1>
+            <h1 className="text-2xl font-semibold text-foreground">Uso</h1>
             <p className="text-sm text-muted-foreground">
-              {formatDayShort(window.sinceDay)} to {formatDayShort(window.untilDay)}
+              {formatDayShort(window.sinceDay)} a {formatDayShort(window.untilDay)}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -84,7 +84,7 @@ export function UsagePage() {
             <button
               type="button"
               onClick={refresh}
-              aria-label="Refresh usage"
+              aria-label="Actualizar uso"
               className="rounded-md border border-border p-2 text-muted-foreground hover:text-foreground"
             >
               <RefreshCwIcon className="size-3.5" />
@@ -101,7 +101,7 @@ export function UsagePage() {
 
         {isPending ? (
           <p className="py-16 text-center text-sm text-muted-foreground">
-            Scanning provider transcripts…
+            Analizando las transcripciones de los proveedores…
           </p>
         ) : (
           <>
@@ -112,7 +112,7 @@ export function UsagePage() {
               <div className="flex flex-col gap-5">
                 <div className="flex flex-col gap-1">
                   <span className="text-xs tracking-wide text-muted-foreground uppercase">
-                    {metric === "cost" ? "Raw token cost" : "Processed tokens"}
+                    {metric === "cost" ? "Coste bruto de tokens" : "Tokens procesados"}
                   </span>
                   <span className="text-4xl font-semibold text-foreground tabular-nums">
                     {metric === "cost"
@@ -121,8 +121,8 @@ export function UsagePage() {
                   </span>
                   <span className="text-xs text-muted-foreground">
                     {metric === "cost"
-                      ? "* if billed at full API rate"
-                      : `Input, cache reads and output across ${formatCount(merged.sessions)} sessions.`}
+                      ? "* si se factura a la tarifa completa de la API"
+                      : `Entrada, lecturas de caché y salida en ${formatCount(merged.sessions)} sesiones.`}
                   </span>
                 </div>
 
@@ -152,8 +152,8 @@ export function UsagePage() {
                       </div>
                       <span className="text-xs text-muted-foreground">
                         {metric === "cost"
-                          ? `${formatPercent(share)} of cost · ${formatTokens(provider.totalTokens)} tokens`
-                          : `${formatPercent(share)} of tokens · ${formatUsd(provider.costUsd)}`}
+                          ? `${formatPercent(share)} del coste · ${formatTokens(provider.totalTokens)} tokens`
+                          : `${formatPercent(share)} de los tokens · ${formatUsd(provider.costUsd)}`}
                       </span>
                     </div>
                   );
@@ -163,7 +163,7 @@ export function UsagePage() {
               <div className="flex flex-col gap-3">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <h2 className="text-sm font-medium text-foreground">
-                    Daily {metric === "tokens" ? "processed tokens" : "cost"}
+                    {metric === "tokens" ? "Tokens procesados por día" : "Coste diario"}
                   </h2>
                   <div className="flex items-center gap-4">
                     <div className="flex overflow-hidden rounded-md border border-border">
@@ -179,7 +179,7 @@ export function UsagePage() {
                               : "text-muted-foreground hover:text-foreground",
                           )}
                         >
-                          {option}
+                          {option === "cost" ? "coste" : "tokens"}
                         </button>
                       ))}
                     </div>
@@ -192,32 +192,32 @@ export function UsagePage() {
 
             <section className="grid grid-cols-2 gap-px border-y border-border bg-border md:grid-cols-5">
               <Metric
-                label="Processed tokens"
+                label="Tokens procesados"
                 value={formatTokens(merged.totalTokens)}
-                detail={`${formatTokens(dailyAverage)} per active day`}
+                detail={`${formatTokens(dailyAverage)} por día activo`}
               />
               <Metric
-                label="Cached input"
+                label="Entrada en caché"
                 value={formatTokens(merged.cachedInputTokens)}
-                detail={`${formatPercent(cachedShare)} of observed input`}
+                detail={`${formatPercent(cachedShare)} de la entrada observada`}
               />
               <Metric
-                label="Uncached input"
+                label="Entrada sin caché"
                 value={formatTokens(merged.uncachedInputTokens)}
-                detail={`${formatTokens(merged.cacheCreationTokens)} cache writes`}
+                detail={`${formatTokens(merged.cacheCreationTokens)} escrituras en caché`}
               />
               <Metric
-                label="Output"
+                label="Salida"
                 value={formatTokens(merged.outputTokens)}
-                detail={`includes ${formatTokens(merged.reasoningTokens)} reasoning`}
+                detail={`incluye ${formatTokens(merged.reasoningTokens)} de razonamiento`}
               />
               <Metric
-                label="Cache savings"
+                label="Ahorro de caché"
                 value={formatUsd(merged.costQuality.cacheSavingsUsd)}
                 detail={
                   merged.costUsd > 0
-                    ? `${(merged.costQuality.cacheSavingsUsd / merged.costUsd).toFixed(1)}x the raw token cost`
-                    : "vs full input rates"
+                    ? `${(merged.costQuality.cacheSavingsUsd / merged.costUsd).toFixed(1)} veces el coste bruto de tokens`
+                    : "frente a las tarifas completas de entrada"
                 }
               />
             </section>
@@ -225,7 +225,7 @@ export function UsagePage() {
             <section className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,18rem)]">
               <div className="flex flex-col gap-3">
                 <div className="flex items-center justify-between gap-3">
-                  <h2 className="text-sm font-medium text-foreground">Breakdown</h2>
+                  <h2 className="text-sm font-medium text-foreground">Desglose</h2>
                   <div className="flex overflow-hidden rounded-md border border-border">
                     {(["model", "day"] as const).map((option) => (
                       <button
@@ -239,7 +239,7 @@ export function UsagePage() {
                             : "text-muted-foreground hover:text-foreground",
                         )}
                       >
-                        {option}
+                        {option === "model" ? "modelo" : "día"}
                       </button>
                     ))}
                   </div>
@@ -249,9 +249,9 @@ export function UsagePage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-border text-left text-xs text-muted-foreground">
-                        <th className="py-2 font-normal">Model</th>
-                        <th className="py-2 text-right font-normal">Cost</th>
-                        <th className="py-2 text-right font-normal">Share</th>
+                        <th className="py-2 font-normal">Modelo</th>
+                        <th className="py-2 text-right font-normal">Coste</th>
+                        <th className="py-2 text-right font-normal">Proporción</th>
                         <th className="py-2 text-right font-normal">Tokens</th>
                       </tr>
                     </thead>
@@ -259,7 +259,7 @@ export function UsagePage() {
                       {merged.models.length === 0 ? (
                         <tr>
                           <td colSpan={4} className="py-6 text-center text-muted-foreground">
-                            No activity in this window.
+                            No hay actividad en este periodo.
                           </td>
                         </tr>
                       ) : (
@@ -292,7 +292,7 @@ export function UsagePage() {
                   <table className="w-full text-sm">
                     <thead>
                       <tr className="border-b border-border text-left text-xs text-muted-foreground">
-                        <th className="py-2 font-normal">Day</th>
+                        <th className="py-2 font-normal">Día</th>
                         {PROVIDER_ORDER.map((provider) => (
                           <th key={provider} className="py-2 text-right font-normal">
                             {PROVIDER_LABEL[provider]}
@@ -306,7 +306,7 @@ export function UsagePage() {
                       {recentDays.length === 0 ? (
                         <tr>
                           <td colSpan={5} className="py-6 text-center text-muted-foreground">
-                            No activity in this window.
+                            No hay actividad en este periodo.
                           </td>
                         </tr>
                       ) : (
@@ -336,22 +336,22 @@ export function UsagePage() {
               </div>
 
               <div className="flex flex-col gap-3">
-                <h2 className="text-sm font-medium text-foreground">Cost quality</h2>
+                <h2 className="text-sm font-medium text-foreground">Calidad del coste</h2>
                 <dl className="flex flex-col">
                   <QualityRow
-                    label="Provider reported"
+                    label="Informado por el proveedor"
                     value={formatPercent(merged.costQuality.providerReportedShare)}
                   />
                   <QualityRow
-                    label="Model priced"
+                    label="Modelo con precio"
                     value={formatPercent(merged.costQuality.modelPricedShare)}
                   />
                   <QualityRow
-                    label="Unpriced"
+                    label="Sin precio"
                     value={formatPercent(merged.costQuality.unpricedShare)}
                   />
                   <QualityRow
-                    label="Cache savings"
+                    label="Ahorro de caché"
                     value={formatUsd(merged.costQuality.cacheSavingsUsd)}
                   />
                 </dl>
@@ -434,18 +434,20 @@ function UsageCoverageNotice({
 
   return (
     <div className="flex flex-col gap-1 border border-border px-3 py-2 text-xs text-muted-foreground">
-      {isPartial ? <span>Some environments are still reporting. Totals are partial.</span> : null}
+      {isPartial ? (
+        <span>Algunos entornos siguen informando. Los totales son parciales.</span>
+      ) : null}
       {failed.map((environment) => (
-        <span key={environment.label}>{environment.label} could not report usage.</span>
+        <span key={environment.label}>{environment.label} no pudo informar del uso.</span>
       ))}
       {stale.map((environment) => (
         <span key={environment.label}>
-          {environment.label} runs an older server version and is excluded from totals.
+          {environment.label} usa una versión antigua del servidor y se excluye de los totales.
         </span>
       ))}
       {duplicateSources.length > 0 ? (
         <span>
-          Counted once across environments sharing a transcript directory:{" "}
+          Se cuenta una sola vez entre entornos que comparten un directorio de transcripciones:{" "}
           {duplicateSources.join(", ")}
         </span>
       ) : null}

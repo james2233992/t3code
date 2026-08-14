@@ -52,9 +52,9 @@ describe("branding", () => {
     const branding = await import("./branding");
 
     expect(branding.HOSTED_APP_CHANNEL).toBe("nightly");
-    expect(branding.HOSTED_APP_CHANNEL_LABEL).toBe("Nightly");
-    expect(branding.APP_STAGE_LABEL).toBe("Nightly");
-    expect(branding.APP_DISPLAY_NAME).toBe("Fenix Code (Nightly)");
+    expect(branding.HOSTED_APP_CHANNEL_LABEL).toBe("Nocturna");
+    expect(branding.APP_STAGE_LABEL).toBe("Nocturna");
+    expect(branding.APP_DISPLAY_NAME).toBe("Fenix Code (Nocturna)");
   });
 
   it("does not label the latest hosted app channel", async () => {
@@ -79,13 +79,13 @@ describe("branding", () => {
 });
 
 describe("branding logic", () => {
-  it("returns Nightly for nightly primary server versions", () => {
+  it("returns the Spanish label for nightly primary server versions", () => {
     expect(
       resolveServerBackedAppStageLabel({
         primaryServerVersion: "0.0.28-nightly.20260616.12",
         fallbackStageLabel: "Alpha",
       }),
-    ).toBe("Nightly");
+    ).toBe("Nocturna");
   });
 
   it("updates the display name for nightly primary server versions", () => {
@@ -96,7 +96,7 @@ describe("branding logic", () => {
         fallbackStageLabel: "Alpha",
         primaryServerVersion: "0.0.28-nightly.20260616.12",
       }),
-    ).toBe("Fenix Code (Nightly)");
+    ).toBe("Fenix Code (Nocturna)");
   });
 
   it("keeps the fallback display name for stable primary server versions", () => {

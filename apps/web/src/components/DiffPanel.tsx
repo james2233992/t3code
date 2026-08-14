@@ -410,10 +410,10 @@ export default function DiffPanel({
   const selectedScopeLabel =
     selectedTurnId === null
       ? selectedGitScope === "unstaged"
-        ? "Working tree"
-        : "Branch changes"
+        ? "Directorio de trabajo"
+        : "Cambios de la rama"
       : selectedTurn?.turnId === latestTurn?.turnId
-        ? "Latest turn"
+        ? "Último turno"
         : `Turn ${selectedCheckpointTurnCount ?? "?"}`;
   const reviewSectionId = selectedTurn ? `turn:${selectedTurn.turnId}` : selectedGitScope;
   const collapseScopeKey = routeThreadRef
@@ -427,8 +427,8 @@ export default function DiffPanel({
   const reviewSectionTitle = selectedTurn
     ? `Turn ${selectedCheckpointTurnCount ?? "?"}`
     : selectedGitScope === "unstaged"
-      ? "Working tree"
-      : "Branch changes";
+      ? "Directorio de trabajo"
+      : "Cambios de la rama";
   const selectedCheckpointRange = useMemo(
     () =>
       typeof selectedCheckpointTurnCount === "number"
@@ -687,7 +687,7 @@ export default function DiffPanel({
           void (async () => {
             const result = await openInPreferredEditor(targetPath);
             if (result._tag === "Failure" && !isAtomCommandInterrupted(result)) {
-              console.warn("Failed to open diff file in editor.", {
+              console.warn("No se pudo abrir el archivo del diff en el editor.", {
                 operation: "open-diff-file",
                 ...(routeThreadRef
                   ? {
@@ -751,7 +751,7 @@ export default function DiffPanel({
         <DropdownMenu>
           <DropdownMenuTrigger
             className="inline-flex h-6 max-w-full items-center gap-1 rounded-md bg-accent px-2 text-xs font-medium text-accent-foreground outline-none transition-colors hover:bg-accent/80 focus-visible:ring-2 focus-visible:ring-ring"
-            aria-label={`Diff scope: ${selectedScopeLabel}`}
+            aria-label={`Ámbito de diferencias: ${selectedScopeLabel}`}
           >
             <span className="truncate">{selectedScopeLabel}</span>
             <ChevronDownIcon className="size-3.5 shrink-0 opacity-70" />
@@ -765,7 +765,7 @@ export default function DiffPanel({
               }
               onClick={() => selectGitScope("unstaged")}
             >
-              <span>Working tree</span>
+              <span>Directorio de trabajo</span>
             </DropdownMenuItem>
             <DropdownMenuItem
               className={
@@ -775,7 +775,7 @@ export default function DiffPanel({
               }
               onClick={() => selectGitScope("branch")}
             >
-              <span>Branch changes</span>
+              <span>Cambios de la rama</span>
             </DropdownMenuItem>
             <DropdownMenuItem
               className={
@@ -787,10 +787,10 @@ export default function DiffPanel({
                 if (latestTurn) selectTurn(latestTurn.turnId);
               }}
             >
-              <span>Latest turn</span>
+              <span>Último turno</span>
             </DropdownMenuItem>
             <DropdownMenuSub>
-              <DropdownMenuSubTrigger>Turn</DropdownMenuSubTrigger>
+              <DropdownMenuSubTrigger>Turno</DropdownMenuSubTrigger>
               <DropdownMenuSubContent className="w-64">
                 {orderedTurnDiffSummaries.map((summary) => {
                   const turnCount =
@@ -805,7 +805,7 @@ export default function DiffPanel({
                       }
                       onClick={() => selectTurn(summary.turnId)}
                     >
-                      <span>Turn {turnCount}</span>
+                      <span>Turno {turnCount}</span>
                       <span className="ml-auto text-xs tabular-nums text-muted-foreground">
                         {formatShortTimestamp(summary.completedAt, settings.timestampFormat)}
                       </span>
@@ -820,7 +820,7 @@ export default function DiffPanel({
           <div
             className="flex min-w-0 max-w-full items-center gap-2 overflow-hidden text-xs text-muted-foreground"
             title={`${selectedGitSource.headRef ?? "HEAD"} → ${selectedGitSource.baseRef}`}
-            aria-label={`Comparing ${selectedGitSource.headRef ?? "HEAD"} against ${selectedGitSource.baseRef}`}
+            aria-label={`Comparando ${selectedGitSource.headRef ?? "HEAD"} con ${selectedGitSource.baseRef}`}
           >
             <span className="min-w-0 max-w-48 truncate">{selectedGitSource.headRef ?? "HEAD"}</span>
             <ArrowRightIcon className="size-3.5 shrink-0 opacity-70" />
@@ -838,7 +838,7 @@ export default function DiffPanel({
             >
               <ComboboxTrigger
                 className="inline-flex min-w-0 max-w-48 items-center gap-1 overflow-hidden rounded-md px-1.5 py-1 outline-none transition-colors hover:bg-muted hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
-                aria-label={`Change comparison target. Currently ${selectedGitSource.baseRef}`}
+                aria-label={`Cambiar destino de comparación. Actual: ${selectedGitSource.baseRef}`}
               >
                 <span className="min-w-0 truncate">{selectedGitSource.baseRef}</span>
                 <ChevronDownIcon className="size-3.5 shrink-0 opacity-70" />
@@ -856,7 +856,7 @@ export default function DiffPanel({
                     <ComboboxInput
                       className="[&_input]:h-6.5 [&_input]:ps-5 [&_input]:font-sans [&_input]:leading-6.5"
                       inputClassName="rounded-none bg-transparent text-sm"
-                      placeholder="Search refs..."
+                      placeholder="Buscar referencias…"
                       showTrigger={false}
                       size="sm"
                       unstyled
@@ -868,18 +868,18 @@ export default function DiffPanel({
                 <div className="grid shrink-0 grid-cols-[1rem_minmax(0,1fr)] items-center gap-2 border-b border-border/70 ps-3 pe-6.5 pt-2 pb-1.5 font-medium text-[10px] text-muted-foreground uppercase tracking-wide">
                   <span aria-hidden="true" />
                   <div className="grid min-w-0 grid-cols-[minmax(0,1fr)_2rem] items-center">
-                    <span>Branch</span>
-                    <span className="text-right">Remote</span>
+                    <span>Rama</span>
+                    <span className="text-right">Remoto</span>
                   </div>
                 </div>
-                <ComboboxEmpty>No matching refs.</ComboboxEmpty>
+                <ComboboxEmpty>No hay referencias coincidentes.</ComboboxEmpty>
                 <ComboboxList className="max-h-64 min-w-0 overflow-x-hidden">
                   <ComboboxItem
                     className="h-8 w-full min-w-0 grid-cols-[1rem_minmax(0,1fr)] py-0"
                     contentClassName="w-full min-w-0 overflow-hidden"
                     value={AUTOMATIC_BASE_REF}
                   >
-                    <span className="block min-w-0 truncate">Automatic</span>
+                    <span className="block min-w-0 truncate">Automático</span>
                   </ComboboxItem>
                   {baseRefChoices.map((choice) => {
                     const item = valueForBaseRefChoice(choice);
@@ -901,7 +901,7 @@ export default function DiffPanel({
                               onPointerDown={(event) => event.stopPropagation()}
                             >
                               <Switch
-                                aria-label={`Use remote version of ${choice.label}`}
+                                aria-label={`Usar la versión remota de ${choice.label}`}
                                 checked={useRemote}
                                 className="[--thumb-size:--spacing(3)]"
                                 onCheckedChange={(checked) => {
@@ -915,7 +915,7 @@ export default function DiffPanel({
                           ) : choice.remote ? (
                             <span
                               className="flex justify-end text-muted-foreground"
-                              title="Remote only"
+                              title="Solo remoto"
                             >
                               <CheckIcon aria-hidden="true" className="size-3" />
                             </span>
@@ -947,7 +947,11 @@ export default function DiffPanel({
                   type="button"
                   size="icon-sm"
                   variant="ghost"
-                  aria-label={branchDiffPreview.isPending ? "Refreshing diff" : "Refresh diff"}
+                  aria-label={
+                    branchDiffPreview.isPending
+                      ? "Actualizando diferencias"
+                      : "Actualizar diferencias"
+                  }
                   onClick={refreshBranchDiffPreview}
                 />
               }
@@ -957,7 +961,7 @@ export default function DiffPanel({
               />
             </TooltipTrigger>
             <TooltipPopup side="top">
-              {branchDiffPreview.isPending ? "Refreshing diff…" : "Refresh diff"}
+              {branchDiffPreview.isPending ? "Actualizando diferencias…" : "Actualizar diferencias"}
             </TooltipPopup>
           </Tooltip>
         )}
@@ -969,7 +973,11 @@ export default function DiffPanel({
                   type="button"
                   size="icon-sm"
                   variant="ghost"
-                  aria-label={allDiffFilesCollapsed ? "Expand all files" : "Collapse all files"}
+                  aria-label={
+                    allDiffFilesCollapsed
+                      ? "Expandir todos los archivos"
+                      : "Contraer todos los archivos"
+                  }
                   onClick={toggleDiffFileCollapse}
                 />
               }
@@ -981,7 +989,9 @@ export default function DiffPanel({
               )}
             </TooltipTrigger>
             <TooltipPopup side="top">
-              {allDiffFilesCollapsed ? "Expand all files" : "Collapse all files"}
+              {allDiffFilesCollapsed
+                ? "Expandir todos los archivos"
+                : "Contraer todos los archivos"}
             </TooltipPopup>
           </Tooltip>
         )}
@@ -996,10 +1006,10 @@ export default function DiffPanel({
             }
           }}
         >
-          <Toggle aria-label="Stacked diff view" value="stacked" variant="ghost">
+          <Toggle aria-label="Vista de diferencias apilada" value="stacked" variant="ghost">
             <Rows3Icon className="size-3.5" />
           </Toggle>
-          <Toggle aria-label="Split diff view" value="split" variant="ghost">
+          <Toggle aria-label="Vista de diferencias dividida" value="split" variant="ghost">
             <Columns2Icon className="size-3.5" />
           </Toggle>
         </ToggleGroup>
@@ -1007,7 +1017,7 @@ export default function DiffPanel({
           <TooltipTrigger
             render={
               <Toggle
-                aria-label={wordWrap ? "Disable diff line wrapping" : "Enable diff line wrapping"}
+                aria-label={wordWrap ? "Desactivar ajuste de líneas" : "Activar ajuste de líneas"}
                 variant="ghost"
                 size="sm"
                 pressed={wordWrap}
@@ -1020,7 +1030,7 @@ export default function DiffPanel({
             <TextWrapIcon className="size-3.5" />
           </TooltipTrigger>
           <TooltipPopup side="top">
-            {wordWrap ? "Disable line wrapping" : "Enable line wrapping"}
+            {wordWrap ? "Desactivar ajuste de líneas" : "Activar ajuste de líneas"}
           </TooltipPopup>
         </Tooltip>
         <Tooltip>
@@ -1028,7 +1038,9 @@ export default function DiffPanel({
             render={
               <Toggle
                 aria-label={
-                  diffIgnoreWhitespace ? "Show whitespace changes" : "Hide whitespace changes"
+                  diffIgnoreWhitespace
+                    ? "Mostrar cambios de espacios"
+                    : "Ocultar cambios de espacios"
                 }
                 variant="ghost"
                 size="sm"
@@ -1042,7 +1054,7 @@ export default function DiffPanel({
             <PilcrowIcon className="size-3.5" />
           </TooltipTrigger>
           <TooltipPopup side="top">
-            {diffIgnoreWhitespace ? "Show whitespace changes" : "Hide whitespace changes"}
+            {diffIgnoreWhitespace ? "Mostrar cambios de espacios" : "Ocultar cambios de espacios"}
           </TooltipPopup>
         </Tooltip>
       </div>
@@ -1053,23 +1065,23 @@ export default function DiffPanel({
     <DiffPanelShell mode={mode} header={headerRow}>
       {!activeThread ? (
         <div className="flex flex-1 items-center justify-center px-5 text-center text-xs text-muted-foreground/70">
-          Select a thread to inspect turn diffs.
+          Selecciona una conversación para revisar las diferencias de sus turnos.
         </div>
       ) : !isGitRepo ? (
         <div className="flex flex-1 items-center justify-center px-5 text-center text-xs text-muted-foreground/70">
-          Turn diffs are unavailable because this project is not a git repository.
+          Las diferencias no están disponibles porque este proyecto no es un repositorio Git.
         </div>
       ) : selectedTurnId !== null && orderedTurnDiffSummaries.length === 0 ? (
         <div className="flex flex-1 items-center justify-center px-5 text-center text-xs text-muted-foreground/70">
-          No completed turns yet.
+          Aún no hay turnos completados.
         </div>
       ) : (
         <>
           <div className="diff-panel-viewport flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
             {isSelectedPatchTruncated && (
               <p className="shrink-0 border-b border-border/70 bg-muted/40 px-3 py-1.5 text-[11px] text-muted-foreground">
-                This diff was truncated because it exceeded the preview limit. The changes shown are
-                incomplete.
+                Esta diferencia se ha truncado porque superó el límite de vista previa. Los cambios
+                mostrados están incompletos.
               </p>
             )}
             {selectedPatchError && !renderablePatch && (
@@ -1082,18 +1094,18 @@ export default function DiffPanel({
                 <DiffPanelLoadingState
                   label={
                     selectedTurn
-                      ? "Loading checkpoint diff..."
+                      ? "Cargando diferencias del punto de control…"
                       : selectedGitScope === "unstaged"
-                        ? "Loading working tree diff..."
-                        : "Loading branch diff..."
+                        ? "Cargando diferencias del directorio de trabajo..."
+                        : "Cargando diferencias de la rama…"
                   }
                 />
               ) : (
                 <div className="flex h-full items-center justify-center px-3 py-2 text-xs text-muted-foreground/70">
                   <p>
                     {hasNoNetChanges
-                      ? "No net changes in this selection."
-                      : "No patch available for this selection."}
+                      ? "No hay cambios netos en esta selección."
+                      : "No hay ningún parche disponible para esta selección."}
                   </p>
                 </div>
               )

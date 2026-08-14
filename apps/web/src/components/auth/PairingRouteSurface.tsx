@@ -28,10 +28,10 @@ export function PairingPendingSurface() {
           {APP_DISPLAY_NAME}
         </p>
         <h1 className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">
-          Pairing with this environment
+          Emparejando con este entorno
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          Validating the pairing link and preparing your session.
+          Validando el enlace de emparejamiento y preparando tu sesión.
         </p>
       </section>
     </div>
@@ -109,7 +109,7 @@ export function PairingRouteSurface({
           {APP_DISPLAY_NAME}
         </p>
         <h1 className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">
-          Pair with this environment
+          Emparejar con este entorno
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
           {describeAuthGate(auth.bootstrapMethods)}
@@ -118,7 +118,7 @@ export function PairingRouteSurface({
         <form className="mt-6 space-y-4" onSubmit={(event) => void handleSubmit(event)}>
           <div className="space-y-2">
             <label className="text-sm font-medium" htmlFor="pairing-token">
-              Pairing token
+              Token de emparejamiento
             </label>
             <Input
               id="pairing-token"
@@ -128,7 +128,7 @@ export function PairingRouteSurface({
               disabled={isSubmitting}
               nativeInput
               onChange={(event) => setCredential(event.currentTarget.value)}
-              placeholder="Paste a one-time token or pairing secret"
+              placeholder="Pega un token de un solo uso o un secreto de emparejamiento"
               spellCheck={false}
               value={credential}
             />
@@ -142,7 +142,7 @@ export function PairingRouteSurface({
 
           <div className="flex flex-wrap gap-2">
             <Button disabled={isSubmitting} size="sm" type="submit">
-              {isSubmitting ? "Pairing..." : "Continue"}
+              {isSubmitting ? "Emparejando..." : "Continuar"}
             </Button>
             <Button
               disabled={isSubmitting}
@@ -150,7 +150,7 @@ export function PairingRouteSurface({
               size="sm"
               variant="outline"
             >
-              Reload app
+              Recargar aplicación
             </Button>
           </div>
         </form>
@@ -173,8 +173,8 @@ export function HostedPairingRouteSurface() {
   );
   const [message, setMessage] = useState(() =>
     hostedPairingRequestRef.current
-      ? "Connecting to this backend."
-      : "This pairing link is missing its backend host or token.",
+      ? "Conectando con este backend."
+      : "A este enlace de emparejamiento le falta el host o el token del backend.",
   );
   const [canRetry, setCanRetry] = useState(false);
   const submitAttemptedRef = useRef(false);
@@ -185,20 +185,22 @@ export function HostedPairingRouteSurface() {
 
     if (!request) {
       setStatus("error");
-      setMessage("This pairing link is missing its backend host or token.");
+      setMessage("A este enlace de emparejamiento le falta el host o el token del backend.");
       setCanRetry(false);
       return;
     }
 
     if (tokenSubmittedRef.current) {
       setStatus("error");
-      setMessage("This one-time pairing token was already submitted. Request a new pairing link.");
+      setMessage(
+        "Este token de emparejamiento de un solo uso ya se envió. Solicita un enlace nuevo.",
+      );
       setCanRetry(false);
       return;
     }
 
     setStatus("pairing");
-    setMessage("Connecting to this backend.");
+    setMessage("Conectando con este backend.");
     setCanRetry(false);
     tokenSubmittedRef.current = true;
 
@@ -208,7 +210,7 @@ export function HostedPairingRouteSurface() {
     });
     if (result._tag === "Success") {
       setStatus("paired");
-      setMessage(`${request.label || "The environment"} is saved in this browser.`);
+      setMessage(`${request.label || "El entorno"} se ha guardado en este navegador.`);
       return;
     }
 
@@ -216,7 +218,7 @@ export function HostedPairingRouteSurface() {
     setStatus("error");
     setCanRetry(true);
     setMessage(
-      `${errorMessageFromUnknown(squashAtomCommandFailure(result))} If the backend accepted this one-time token, request a new pairing link before retrying.`,
+      `${errorMessageFromUnknown(squashAtomCommandFailure(result))} Si el backend aceptó este token de un solo uso, solicita un enlace de emparejamiento nuevo antes de reintentar.`,
     );
   }, [connectPairingEnvironment]);
 
@@ -246,10 +248,10 @@ export function HostedPairingRouteSurface() {
         </p>
         <h1 className="mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">
           {status === "paired"
-            ? "Backend paired"
+            ? "Backend emparejado"
             : status === "error"
-              ? "Pairing failed"
-              : "Pairing backend"}
+              ? "Error de emparejamiento"
+              : "Emparejando backend"}
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{message}</p>
 
@@ -261,24 +263,24 @@ export function HostedPairingRouteSurface() {
 
         {status === "error" ? (
           <div className="mt-5 rounded-lg border border-destructive/30 bg-destructive/6 px-3 py-2 text-sm text-destructive">
-            Verify the backend is reachable from this browser, supports CORS for hosted clients, and
-            is served over HTTPS when opening this page from HTTPS.
+            Comprueba que el backend sea accesible desde este navegador, admita CORS para clientes
+            alojados y use HTTPS cuando esta página se abra mediante HTTPS.
           </div>
         ) : null}
 
         <div className="mt-6 flex flex-wrap gap-2">
           {status === "pairing" ? (
             <Button disabled size="sm">
-              Pairing...
+              Emparejando...
             </Button>
           ) : canRetry ? (
             <Button size="sm" onClick={() => void submitHostedPairingRequest()}>
-              Try again
+              Reintentar
             </Button>
           ) : null}
           {status === "paired" ? (
             <Button size="sm" variant="outline" onClick={() => (window.location.href = "/")}>
-              Open app
+              Abrir aplicación
             </Button>
           ) : null}
         </div>
@@ -296,15 +298,15 @@ function errorMessageFromUnknown(error: unknown): string {
     return error;
   }
 
-  return "Authentication failed.";
+  return "Error de autenticación.";
 }
 
 function describeAuthGate(bootstrapMethods: ReadonlyArray<string>): string {
   if (bootstrapMethods.includes("desktop-bootstrap")) {
-    return "This environment expects a trusted pairing credential before the app can connect.";
+    return "Este entorno necesita una credencial de emparejamiento de confianza antes de conectar la aplicación.";
   }
 
-  return "Enter a pairing token to start a session with this environment.";
+  return "Introduce un token de emparejamiento para iniciar una sesión con este entorno.";
 }
 
 function describeSupportedMethods(bootstrapMethods: ReadonlyArray<string>): string {
@@ -312,12 +314,12 @@ function describeSupportedMethods(bootstrapMethods: ReadonlyArray<string>): stri
     bootstrapMethods.includes("desktop-bootstrap") &&
     bootstrapMethods.includes("one-time-token")
   ) {
-    return "Desktop-managed pairing and one-time pairing tokens are both accepted for this environment.";
+    return "Este entorno acepta tanto el emparejamiento gestionado desde escritorio como tokens de un solo uso.";
   }
 
   if (bootstrapMethods.includes("desktop-bootstrap")) {
-    return "This environment is desktop-managed. Open it from the desktop app or paste a bootstrap credential if one was issued explicitly.";
+    return "Este entorno se gestiona desde el escritorio. Ábrelo en la aplicación de escritorio o pega una credencial de inicio si se emitió expresamente.";
   }
 
-  return "This environment accepts one-time pairing tokens. Pairing links can open this page directly, or you can paste the token here.";
+  return "Este entorno acepta tokens de emparejamiento de un solo uso. Los enlaces pueden abrir esta página directamente o puedes pegar aquí el token.";
 }

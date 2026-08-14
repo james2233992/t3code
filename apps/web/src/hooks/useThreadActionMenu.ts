@@ -41,7 +41,7 @@ function failureToast(title: string, error: unknown) {
     stackedThreadToast({
       type: "error",
       title,
-      description: error instanceof Error ? error.message : "An error occurred.",
+      description: error instanceof Error ? error.message : "Se ha producido un error.",
     }),
   );
 }
@@ -58,7 +58,7 @@ function failureToast(title: string, error: unknown) {
  */
 export function useThreadActionMenu(input: {
   readonly threadRef: ScopedThreadRef | null;
-  /** Fallback for "Copy path" when the thread has no worktree. */
+  /** Alternativa para «Copiar ruta» cuando la conversación no tiene árbol de trabajo. */
   readonly projectCwd: string | null;
   /** PR state feeding auto-settle classification, as resolved by the caller. */
   readonly changeRequestState: ChangeRequestStateLike | null;
@@ -84,16 +84,16 @@ export function useThreadActionMenu(input: {
   const timestampFormat = useClientSettings((s) => s.timestampFormat);
   const { copyToClipboard: copyPathToClipboard } = useCopyToClipboard<{ path: string }>({
     onCopy: ({ path }) => {
-      toastManager.add({ type: "success", title: "Path copied", description: path });
+      toastManager.add({ type: "success", title: "Ruta copiada", description: path });
     },
-    onError: (error) => failureToast("Failed to copy path", error),
+    onError: (error) => failureToast("No se pudo copiar la ruta", error),
   });
   const { copyToClipboard: copyBranchToClipboard } = useCopyToClipboard<{ branch: string }>({
     target: "branch name",
     onCopy: ({ branch }) => {
-      toastManager.add({ type: "success", title: "Branch copied", description: branch });
+      toastManager.add({ type: "success", title: "Rama copiada", description: branch });
     },
-    onError: (error) => failureToast("Failed to copy branch", error),
+    onError: (error) => failureToast("No se pudo copiar la rama", error),
   });
 
   const openMenu = useCallback(
@@ -143,21 +143,24 @@ export function useThreadActionMenu(input: {
           const result = await snoozeThread(threadRef, preset.snoozedUntil);
           if (result._tag === "Failure") {
             if (!isAtomCommandInterrupted(result)) {
-              failureToast("Failed to snooze thread", squashAtomCommandFailure(result));
+              failureToast("No se pudo posponer la conversación", squashAtomCommandFailure(result));
             }
             return;
           }
           toastManager.add(
             stackedThreadToast({
               type: "success",
-              title: `Snoozed until ${snoozeWakeDescription(preset.snoozedUntil, new Date(), timestampFormat)}`,
+              title: `Pospuesta hasta ${snoozeWakeDescription(preset.snoozedUntil, new Date(), timestampFormat)}`,
               timeout: 5_000,
               actionProps: {
                 children: "Undo",
                 onClick: () => {
                   void unsnoozeThread(threadRef).then((undone) => {
                     if (undone._tag === "Failure" && !isAtomCommandInterrupted(undone)) {
-                      failureToast("Failed to wake thread", squashAtomCommandFailure(undone));
+                      failureToast(
+                        "No se pudo reactivar la conversación",
+                        squashAtomCommandFailure(undone),
+                      );
                     }
                   });
                 },
@@ -188,31 +191,39 @@ export function useThreadActionMenu(input: {
               }),
             );
             if (result._tag === "Failure") {
-              failureToast("Could not create thread", squashAtomCommandFailure(result));
+              failureToast("No se pudo crear la conversación", squashAtomCommandFailure(result));
             }
             return;
           }
           case "settle":
-            await reportFailure("Failed to settle thread", () => settleThread(threadRef));
+            await reportFailure("No se pudo finalizar la conversación", () =>
+              settleThread(threadRef),
+            );
             return;
           case "unsettle":
-            await reportFailure("Failed to un-settle thread", () => unsettleThread(threadRef));
+            await reportFailure("No se pudo reabrir la conversación", () =>
+              unsettleThread(threadRef),
+            );
             return;
           case "unsnooze":
-            await reportFailure("Failed to wake thread", () => unsnoozeThread(threadRef));
+            await reportFailure("No se pudo reactivar la conversación", () =>
+              unsnoozeThread(threadRef),
+            );
             return;
           case "pin":
-            await reportFailure("Failed to pin thread", () => pinThread(threadRef));
+            await reportFailure("No se pudo fijar la conversación", () => pinThread(threadRef));
             return;
           case "unpin":
-            await reportFailure("Failed to unpin thread", () => unpinThread(threadRef));
+            await reportFailure("No se pudo desfijar la conversación", () =>
+              unpinThread(threadRef),
+            );
             return;
           case "rename":
             onStartRename();
             return;
           case "regenerate-title":
             if (isRegeneratingTitle) return;
-            await reportFailure("Failed to regenerate thread title", () =>
+            await reportFailure("No se pudo regenerar el título de la conversación", () =>
               updateThreadMetadata({
                 environmentId: threadRef.environmentId,
                 input: { threadId: threadRef.threadId, regenerateTitle: true },
@@ -228,8 +239,8 @@ export function useThreadActionMenu(input: {
               toastManager.add(
                 stackedThreadToast({
                   type: "error",
-                  title: "Path unavailable",
-                  description: "This thread does not have a workspace path to copy.",
+                  title: "Ruta no disponible",
+                  description: "Esta conversación no tiene una ruta de trabajo que copiar.",
                 }),
               );
               return;
@@ -247,8 +258,8 @@ export function useThreadActionMenu(input: {
               const confirmed = await settlePromise(() =>
                 api.dialogs.confirm(
                   [
-                    `Delete thread "${thread.title}"?`,
-                    "This permanently clears conversation history for this thread.",
+                    `¿Eliminar la conversación "${thread.title}"?`,
+                    "Esto borra permanentemente el historial de esta conversación.",
                   ].join("\n"),
                 ),
               );
@@ -260,10 +271,13 @@ export function useThreadActionMenu(input: {
               !isAtomCommandInterrupted(deleted) &&
               // A failure with the thread already gone is worktree cleanup
               // failing after a successful delete — deleteThread has toasted
-              // that itself, and "Failed to delete thread" would be a lie.
+              // por su cuenta; afirmar que no se pudo borrar la conversación sería incorrecto.
               readThreadShell(threadRef) !== null
             ) {
-              failureToast("Failed to delete thread", squashAtomCommandFailure(deleted));
+              failureToast(
+                "No se pudo eliminar la conversación",
+                squashAtomCommandFailure(deleted),
+              );
             }
             return;
           }

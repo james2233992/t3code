@@ -294,9 +294,9 @@ describe("MessagesTimeline", () => {
     expect(markup).toContain("whitespace-nowrap");
     expect(markup).toContain("!size-[22px]");
     expect(markup).toContain("size-3");
-    expect(markup).toContain('aria-label="Collapse all folders"');
-    expect(markup).toContain('aria-label="Open diff"');
-    expect(markup).toContain("1 changed file");
+    expect(markup).toContain('aria-label="Contraer todas las carpetas"');
+    expect(markup).toContain('aria-label="Abrir diferencias"');
+    expect(markup).toContain("1 archivo modificado");
   });
 
   it("treats only the strict list end as the live edge", async () => {
@@ -440,7 +440,7 @@ describe("MessagesTimeline", () => {
       />,
     );
 
-    expect(markup).toContain("Show full message");
+    expect(markup).toContain("Mostrar mensaje completo");
     expect(markup).toContain('data-maintain-scroll-at-end="enabled"');
     expect(markup).toContain('data-maintain-scroll-at-end-animated="false"');
     expect(markup).toContain('data-maintain-scroll-at-end-data-change="true"');
@@ -488,7 +488,7 @@ describe("MessagesTimeline", () => {
     expect(markup).toContain("lucide-terminal");
     expect(markup).toContain("yoo what&#x27;s</p>");
     expect(markup).toContain('<span aria-hidden="true"> </span>');
-    expect(markup).toContain("Show full message");
+    expect(markup).toContain("Mostrar mensaje completo");
   }, 20_000);
 
   it("renders chips for standalone element-pick context messages", () => {
@@ -525,7 +525,7 @@ describe("MessagesTimeline", () => {
       />,
     );
 
-    expect(markup).toContain('aria-label="Copy link"');
+    expect(markup).toContain('aria-label="Copiar enlace"');
     expect(markup).toContain('data-user-message-collapsed="true"');
     expect(markup).toContain('data-user-message-footer="true"');
   });
@@ -551,7 +551,7 @@ describe("MessagesTimeline", () => {
     );
 
     expect(markup).toContain("Context compacted");
-    expect(markup).toContain("Work Log");
+    expect(markup).toContain("Registro de trabajo");
   });
 
   it("formats changed file paths from the workspace root", () => {
@@ -680,6 +680,6 @@ describe("MessagesTimeline", () => {
     );
 
     expect(markup).toContain("lucide-x");
-    expect(markup).toContain('aria-label="Tool call failed"');
+    expect(markup).toContain('aria-label="La llamada a la herramienta ha fallado"');
   });
 });

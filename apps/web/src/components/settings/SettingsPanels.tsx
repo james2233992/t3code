@@ -149,33 +149,35 @@ const ENVIRONMENT_IDENTIFICATION_LABELS: Record<EnvironmentIdentificationMode, s
 };
 
 const TIMESTAMP_FORMAT_LABELS = {
-  locale: "System default",
-  "12-hour": "12-hour",
-  "24-hour": "24-hour",
+  locale: "Predeterminado del sistema",
+  "12-hour": "12 horas",
+  "24-hour": "24 horas",
 } as const;
 
 const BACKGROUND_ACTIVITY_PROFILE_LABELS: Record<BackgroundActivityProfile, string> = {
-  balanced: "Balanced",
-  performance: "Performance",
-  "battery-saver": "Battery saver",
+  balanced: "Equilibrado",
+  performance: "Rendimiento",
+  "battery-saver": "Ahorro de batería",
 };
 
 type BackgroundActivityProfileOption = BackgroundActivityProfile | "advanced";
 
 const BACKGROUND_ACTIVITY_PROFILE_OPTION_LABELS: Record<BackgroundActivityProfileOption, string> = {
   ...BACKGROUND_ACTIVITY_PROFILE_LABELS,
-  advanced: "Advanced",
+  advanced: "Avanzado",
 };
 
 const BACKGROUND_ACTIVITY_PROFILE_DESCRIPTIONS: Record<BackgroundActivityProfile, string> = {
   balanced:
-    "Pauses background probes when clients are idle, the host is locked, or low power mode is active.",
-  performance: "Allows scoped background probes while any subscribed client remains connected.",
-  "battery-saver": "Also pauses background probes when the host or client is on battery.",
+    "Pausa las comprobaciones en segundo plano cuando los clientes están inactivos, el equipo está bloqueado o está activo el modo de bajo consumo.",
+  performance:
+    "Permite comprobaciones acotadas en segundo plano mientras haya algún cliente suscrito conectado.",
+  "battery-saver":
+    "También pausa las comprobaciones cuando el equipo o el cliente usan la batería.",
 };
 
 const ADVANCED_BACKGROUND_ACTIVITY_DESCRIPTION =
-  "Uses custom background intervals with the selected shared power policy.";
+  "Usa intervalos personalizados en segundo plano con la política de energía compartida seleccionada.";
 
 const DEFAULT_DRIVER_KIND = ProviderDriverKind.make("codex");
 const BACKGROUND_ACTIVITY_BOOLEAN_OVERRIDES: ReadonlyArray<{
@@ -186,10 +188,10 @@ const BACKGROUND_ACTIVITY_BOOLEAN_OVERRIDES: ReadonlyArray<{
     | "pauseWhenOnBattery";
   readonly label: string;
 }> = [
-  { key: "pauseWhenHostLocked", label: "Pause when host is locked" },
-  { key: "pauseWhenHostLowPower", label: "Pause on host low power" },
-  { key: "pauseWhenClientLowPower", label: "Pause on client low power" },
-  { key: "pauseWhenOnBattery", label: "Pause on battery" },
+  { key: "pauseWhenHostLocked", label: "Pausar cuando el equipo esté bloqueado" },
+  { key: "pauseWhenHostLowPower", label: "Pausar con bajo consumo en el equipo" },
+  { key: "pauseWhenClientLowPower", label: "Pausar con bajo consumo en el cliente" },
+  { key: "pauseWhenOnBattery", label: "Pausar al usar batería" },
 ];
 
 function resetBackgroundActivitySettings() {
@@ -211,7 +213,7 @@ function backgroundActivityProfileSettings(profile: BackgroundActivityProfile) {
 function AboutVersionTitle() {
   return (
     <span className="inline-flex items-center gap-2">
-      <span>Version</span>
+      <span>Versión</span>
       <code className="text-[11px] font-medium text-muted-foreground">{APP_VERSION}</code>
     </span>
   );
@@ -243,8 +245,11 @@ function AboutVersionSection() {
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: "Could not change update track",
-              description: error instanceof Error ? error.message : "Update track change failed.",
+              title: "No se pudo cambiar el canal de actualizaciones",
+              description:
+                error instanceof Error
+                  ? error.message
+                  : "Falló el cambio del canal de actualizaciones.",
             }),
           );
         })
@@ -266,8 +271,8 @@ function AboutVersionSection() {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Could not download update",
-            description: error instanceof Error ? error.message : "Download failed.",
+            title: "No se pudo descargar la actualización",
+            description: error instanceof Error ? error.message : "La descarga ha fallado.",
           }),
         );
       });
@@ -286,8 +291,8 @@ function AboutVersionSection() {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Could not install update",
-            description: error instanceof Error ? error.message : "Install failed.",
+            title: "No se pudo instalar la actualización",
+            description: error instanceof Error ? error.message : "La instalación ha fallado.",
           }),
         );
       });
@@ -302,9 +307,10 @@ function AboutVersionSection() {
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: "Could not check for updates",
+              title: "No se pudieron buscar actualizaciones",
               description:
-                result.state.message ?? "Automatic updates are not available in this build.",
+                result.state.message ??
+                "Las actualizaciones automáticas no están disponibles en esta compilación.",
             }),
           );
         }
@@ -313,8 +319,9 @@ function AboutVersionSection() {
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Could not check for updates",
-            description: error instanceof Error ? error.message : "Update check failed.",
+            title: "No se pudieron buscar actualizaciones",
+            description:
+              error instanceof Error ? error.message : "Falló la comprobación de actualizaciones.",
           }),
         );
       });
@@ -327,18 +334,18 @@ function AboutVersionSection() {
       ? !canCheckForUpdate(updateState)
       : isDesktopUpdateButtonDisabled(updateState);
 
-  const actionLabel: Record<string, string> = { download: "Download", install: "Install" };
+  const actionLabel: Record<string, string> = { download: "Descargar", install: "Instalar" };
   const statusLabel: Record<string, string> = {
     checking: "Checking…",
     downloading: "Downloading…",
-    "up-to-date": "Up to Date",
+    "up-to-date": "Actualizado",
   };
   const buttonLabel =
-    actionLabel[action] ?? statusLabel[updateState?.status ?? ""] ?? "Check for Updates";
+    actionLabel[action] ?? statusLabel[updateState?.status ?? ""] ?? "Buscar actualizaciones";
   const description =
     action === "download" || action === "install"
-      ? "Update available."
-      : "Current version of the application.";
+      ? "Actualización disponible."
+      : "Versión actual de la aplicación.";
 
   return (
     <>
@@ -365,8 +372,8 @@ function AboutVersionSection() {
       />
       {hasDesktopBridge ? (
         <SettingsRow
-          title="Update track"
-          description="Stable follows full releases. Nightly follows the nightly desktop channel and can switch back to stable immediately."
+          title="Canal de actualizaciones"
+          description="Estable sigue las versiones completas. Nocturna sigue el canal nocturno de escritorio y puede volver a estable de inmediato."
           control={
             <Select
               value={selectedUpdateChannel}
@@ -376,7 +383,7 @@ function AboutVersionSection() {
             >
               <SelectTrigger
                 className="w-full sm:w-40"
-                aria-label="Update track"
+                aria-label="Canal de actualizaciones"
                 disabled={isChangingUpdateChannel}
               >
                 <SelectValue>
@@ -396,8 +403,8 @@ function AboutVersionSection() {
         />
       ) : selectedHostedAppChannel ? (
         <SettingsRow
-          title="Update track"
-          description="Switches the hosted app release channel."
+          title="Canal de actualizaciones"
+          description="Cambia el canal de publicación de la aplicación alojada."
           control={
             <Select
               value={selectedHostedAppChannel}
@@ -408,7 +415,7 @@ function AboutVersionSection() {
                 );
               }}
             >
-              <SelectTrigger className="w-full sm:w-40" aria-label="Update track">
+              <SelectTrigger className="w-full sm:w-40" aria-label="Canal de actualizaciones">
                 <SelectValue>{HOSTED_APP_CHANNEL_LABEL}</SelectValue>
               </SelectTrigger>
               <SelectPopup align="end" alignItemWithTrigger={false}>
@@ -448,13 +455,13 @@ export function useSettingsRestore(onRestored?: () => void) {
 
   const changedSettingLabels = useMemo(
     () => [
-      ...(theme !== "system" ? ["Theme"] : []),
+      ...(theme !== "system" ? ["Tema"] : []),
       ...(!followSystem ? ["Follow system"] : []),
-      ...(themeHalves !== null ? ["Theme mix"] : []),
+      ...(themeHalves !== null ? ["Mezcla de temas"] : []),
       ...(settings.glassOpacity !== DEFAULT_UNIFIED_SETTINGS.glassOpacity ? ["Glass opacity"] : []),
       ...(settings.environmentIdentificationMode !==
       DEFAULT_UNIFIED_SETTINGS.environmentIdentificationMode
-        ? ["Environment identification"]
+        ? ["Identificación del entorno"]
         : []),
       ...(settings.timestampFormat !== DEFAULT_UNIFIED_SETTINGS.timestampFormat
         ? ["Time format"]
@@ -464,7 +471,7 @@ export function useSettingsRestore(onRestored?: () => void) {
         : []),
       ...(settings.sidebarProjectGroupingMode !==
       DEFAULT_UNIFIED_SETTINGS.sidebarProjectGroupingMode
-        ? ["Project Grouping"]
+        ? ["Agrupación de proyectos"]
         : []),
       ...(settings.sidebarAutoSettleAfterDays !==
       DEFAULT_UNIFIED_SETTINGS.sidebarAutoSettleAfterDays
@@ -477,39 +484,41 @@ export function useSettingsRestore(onRestored?: () => void) {
       ...(settings.fontFamilyComposer !== DEFAULT_UNIFIED_SETTINGS.fontFamilyComposer
         ? ["Prompt font"]
         : []),
-      ...(settings.fontFamilyCode !== DEFAULT_UNIFIED_SETTINGS.fontFamilyCode ? ["Code font"] : []),
+      ...(settings.fontFamilyCode !== DEFAULT_UNIFIED_SETTINGS.fontFamilyCode
+        ? ["Fuente de código"]
+        : []),
       ...(settings.fontFamilyTerminal !== DEFAULT_UNIFIED_SETTINGS.fontFamilyTerminal
-        ? ["Terminal font"]
+        ? ["Fuente del terminal"]
         : []),
       ...(settings.diffIgnoreWhitespace !== DEFAULT_UNIFIED_SETTINGS.diffIgnoreWhitespace
-        ? ["Diff whitespace changes"]
+        ? ["Cambios de espacios en diferencias"]
         : []),
       ...(settings.enableLegacyTokenStreaming !==
       DEFAULT_UNIFIED_SETTINGS.enableLegacyTokenStreaming
-        ? ["Stream token by token"]
+        ? ["Transmitir token a token"]
         : []),
       ...(settings.enableProviderUpdateChecks !==
       DEFAULT_UNIFIED_SETTINGS.enableProviderUpdateChecks
-        ? ["Provider update checks"]
+        ? ["Comprobaciones de actualización de proveedores"]
         : []),
-      ...(isBackgroundActivityDirty ? ["Background activity"] : []),
+      ...(isBackgroundActivityDirty ? ["Actividad en segundo plano"] : []),
       ...(settings.defaultThreadEnvMode !== DEFAULT_UNIFIED_SETTINGS.defaultThreadEnvMode
-        ? ["New thread mode"]
+        ? ["Modo de nueva conversación"]
         : []),
       ...(settings.newWorktreesStartFromOrigin !==
       DEFAULT_UNIFIED_SETTINGS.newWorktreesStartFromOrigin
-        ? ["New worktrees start from origin"]
+        ? ["Los nuevos directorios de trabajo parten del origen"]
         : []),
       ...(settings.addProjectBaseDirectory !== DEFAULT_UNIFIED_SETTINGS.addProjectBaseDirectory
-        ? ["Add project base directory"]
+        ? ["Añadir directorio base de proyectos"]
         : []),
       ...(settings.confirmThreadArchive !== DEFAULT_UNIFIED_SETTINGS.confirmThreadArchive
-        ? ["Archive confirmation"]
+        ? ["Confirmación de archivado"]
         : []),
       ...(settings.confirmThreadDelete !== DEFAULT_UNIFIED_SETTINGS.confirmThreadDelete
-        ? ["Delete confirmation"]
+        ? ["Confirmación de eliminación"]
         : []),
-      ...(isTextGenerationModelDirty ? ["Text generation model"] : []),
+      ...(isTextGenerationModelDirty ? ["Modelo de generación de texto"] : []),
     ],
     [
       isTextGenerationModelDirty,
@@ -546,9 +555,10 @@ export function useSettingsRestore(onRestored?: () => void) {
     if (changedSettingLabels.length === 0) return;
     const api = readLocalApi();
     const confirmed = await (api ?? ensureLocalApi()).dialogs.confirm(
-      ["Restore default settings?", `This will reset: ${changedSettingLabels.join(", ")}.`].join(
-        "\n",
-      ),
+      [
+        "¿Restaurar los ajustes predeterminados?",
+        `Se restablecerá: ${changedSettingLabels.join(", ")}.`,
+      ].join("\n"),
     );
     if (!confirmed) return;
 
@@ -575,8 +585,8 @@ export function useSettingsRestore(onRestored?: () => void) {
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Couldn’t restore theme settings",
-          description: "Try again.",
+          title: "No se pudieron restaurar los ajustes del tema",
+          description: "Inténtalo de nuevo.",
         }),
       );
     };
@@ -676,18 +686,20 @@ function BackgroundActivityAdvancedDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogPopup className="max-w-xl">
         <DialogHeader>
-          <DialogTitle>Background Activity</DialogTitle>
+          <DialogTitle>Actividad en segundo plano</DialogTitle>
           <DialogDescription>
-            Tune the shared power policy and the background intervals that feed it.
+            Ajusta la política de energía compartida y los intervalos en segundo plano que la
+            alimentan.
           </DialogDescription>
         </DialogHeader>
         <DialogPanel className="space-y-0 px-6 pb-5">
           <div className="overflow-hidden rounded-xl border bg-card text-card-foreground">
             <div className="flex flex-col gap-3 border-b px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0 space-y-1">
-                <div className="text-sm font-medium">Shared policy</div>
+                <div className="text-sm font-medium">Política compartida</div>
                 <p className="text-xs leading-relaxed text-muted-foreground">
-                  Controls whether background work may run after a subscribed interval fires.
+                  Controla si el trabajo en segundo plano puede ejecutarse después de cumplirse un
+                  intervalo.
                 </p>
               </div>
               <Select
@@ -723,9 +735,9 @@ function BackgroundActivityAdvancedDialog({
 
             <div className="flex flex-col gap-3 border-b px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0 space-y-1">
-                <div className="text-sm font-medium">Git fetch interval</div>
+                <div className="text-sm font-medium">Intervalo de actualización de Git</div>
                 <p className="text-xs leading-relaxed text-muted-foreground">
-                  Refresh remote branch status in the background.
+                  Actualiza en segundo plano el estado de las ramas remotas.
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-2">
@@ -750,20 +762,21 @@ function BackgroundActivityAdvancedDialog({
                   }
                 >
                   <NumberFieldGroup>
-                    <NumberFieldDecrement aria-label="Decrease Git fetch interval" />
-                    <NumberFieldInput aria-label="Git fetch interval in seconds" />
-                    <NumberFieldIncrement aria-label="Increase Git fetch interval" />
+                    <NumberFieldDecrement aria-label="Reducir intervalo de descarga de Git" />
+                    <NumberFieldInput aria-label="Intervalo de descarga de Git en segundos" />
+                    <NumberFieldIncrement aria-label="Aumentar intervalo de descarga de Git" />
                   </NumberFieldGroup>
                 </NumberField>
-                <span className="text-xs text-muted-foreground">seconds</span>
+                <span className="text-xs text-muted-foreground">segundos</span>
               </div>
             </div>
 
             <div className="flex flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0 space-y-1">
-                <div className="text-sm font-medium">Provider health interval</div>
+                <div className="text-sm font-medium">Intervalo de comprobación de proveedores</div>
                 <p className="text-xs leading-relaxed text-muted-foreground">
-                  Refresh provider availability, versions, auth state, and model metadata.
+                  Actualiza la disponibilidad, versiones, autenticación y metadatos de modelos del
+                  proveedor.
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-2">
@@ -788,20 +801,20 @@ function BackgroundActivityAdvancedDialog({
                   }
                 >
                   <NumberFieldGroup>
-                    <NumberFieldDecrement aria-label="Decrease provider health interval" />
-                    <NumberFieldInput aria-label="Provider health interval in seconds" />
-                    <NumberFieldIncrement aria-label="Increase provider health interval" />
+                    <NumberFieldDecrement aria-label="Reducir intervalo de estado del proveedor" />
+                    <NumberFieldInput aria-label="Intervalo de estado del proveedor en segundos" />
+                    <NumberFieldIncrement aria-label="Aumentar intervalo de estado del proveedor" />
                   </NumberFieldGroup>
                 </NumberField>
-                <span className="text-xs text-muted-foreground">seconds</span>
+                <span className="text-xs text-muted-foreground">segundos</span>
               </div>
             </div>
 
             <div className="flex flex-col gap-3 border-t px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0 space-y-1">
-                <div className="text-sm font-medium">Host power monitor</div>
+                <div className="text-sm font-medium">Monitor de energía del equipo</div>
                 <p className="text-xs leading-relaxed text-muted-foreground">
-                  Poll host power state while clients are active.
+                  Consulta el estado de energía del equipo mientras hay clientes activos.
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-2">
@@ -826,20 +839,20 @@ function BackgroundActivityAdvancedDialog({
                   }
                 >
                   <NumberFieldGroup>
-                    <NumberFieldDecrement aria-label="Decrease active host power interval" />
-                    <NumberFieldInput aria-label="Active host power interval in seconds" />
-                    <NumberFieldIncrement aria-label="Increase active host power interval" />
+                    <NumberFieldDecrement aria-label="Reducir intervalo de energía del equipo activo" />
+                    <NumberFieldInput aria-label="Intervalo de energía del equipo activo en segundos" />
+                    <NumberFieldIncrement aria-label="Aumentar intervalo de energía del equipo activo" />
                   </NumberFieldGroup>
                 </NumberField>
-                <span className="text-xs text-muted-foreground">seconds</span>
+                <span className="text-xs text-muted-foreground">segundos</span>
               </div>
             </div>
 
             <div className="flex flex-col gap-3 border-t px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="min-w-0 space-y-1">
-                <div className="text-sm font-medium">Idle host monitor</div>
+                <div className="text-sm font-medium">Monitor del equipo inactivo</div>
                 <p className="text-xs leading-relaxed text-muted-foreground">
-                  Poll host power state when no foreground client is active.
+                  Consulta el estado de energía cuando no hay clientes activos en primer plano.
                 </p>
               </div>
               <div className="flex shrink-0 items-center gap-2">
@@ -864,12 +877,12 @@ function BackgroundActivityAdvancedDialog({
                   }
                 >
                   <NumberFieldGroup>
-                    <NumberFieldDecrement aria-label="Decrease idle host power interval" />
-                    <NumberFieldInput aria-label="Idle host power interval in seconds" />
-                    <NumberFieldIncrement aria-label="Increase idle host power interval" />
+                    <NumberFieldDecrement aria-label="Reducir el intervalo de reposo del equipo" />
+                    <NumberFieldInput aria-label="Intervalo de reposo del equipo en segundos" />
+                    <NumberFieldIncrement aria-label="Aumentar el intervalo de reposo del equipo" />
                   </NumberFieldGroup>
                 </NumberField>
-                <span className="text-xs text-muted-foreground">seconds</span>
+                <span className="text-xs text-muted-foreground">segundos</span>
               </div>
             </div>
 
@@ -907,7 +920,7 @@ function BackgroundActivityAdvancedDialog({
           >
             Reset all
           </Button>
-          <Button onClick={() => onOpenChange(false)}>Done</Button>
+          <Button onClick={() => onOpenChange(false)}>Listo</Button>
         </DialogFooter>
       </DialogPopup>
     </Dialog>
@@ -941,7 +954,7 @@ export function AppearanceSettingsPanel() {
 
   return (
     <SettingsPageContainer>
-      <SettingsSection id="appearance" title="Appearance">
+      <SettingsSection id="appearance" title="Apariencia">
         <div id={searchableSetting("theme").id}>
           <ThemeLibrary
             appearanceMode={appearanceMode}
@@ -960,7 +973,7 @@ export function AppearanceSettingsPanel() {
 
         <SettingsRow
           {...searchableSetting("setting-glass-opacity")}
-          description="Control how transparent glass surfaces are. Higher values make menus, dialogs, and the composer more solid."
+          description="Controla la transparencia de las superficies de cristal. Los valores altos hacen más sólidos los menús, diálogos y el editor."
           resetAction={
             settings.glassOpacity !== DEFAULT_UNIFIED_SETTINGS.glassOpacity ? (
               <SettingResetButton
@@ -1007,11 +1020,11 @@ export function AppearanceSettingsPanel() {
         {showEnvironmentIdentification ? (
           <SettingsRow
             {...searchableSetting("environment-identification")}
-            description="Choose how Dev and Nightly environments are identified."
+            description="Elige cómo se identifican los entornos de desarrollo y nocturnos."
             resetAction={
               settings.environmentIdentificationMode !== DEFAULT_ENVIRONMENT_IDENTIFICATION_MODE ? (
                 <SettingResetButton
-                  label="environment identification"
+                  label="identificación del entorno"
                   onClick={() =>
                     updateSettings({
                       environmentIdentificationMode: DEFAULT_ENVIRONMENT_IDENTIFICATION_MODE,
@@ -1029,7 +1042,7 @@ export function AppearanceSettingsPanel() {
                   }
                 }}
               >
-                <SelectTrigger className="w-full sm:w-40" aria-label="Environment identification">
+                <SelectTrigger className="w-full sm:w-40" aria-label="Identificación del entorno">
                   <SelectValue>
                     {ENVIRONMENT_IDENTIFICATION_LABELS[settings.environmentIdentificationMode]}
                   </SelectValue>
@@ -1059,7 +1072,7 @@ function useFontDefaultFamilies() {
   // hardcoded.
   const defaults = useMemo(
     () => ({
-      sans: resolveDefaultFamilyLabel(DEFAULT_SANS_FONT_STACK) ?? "System default",
+      sans: resolveDefaultFamilyLabel(DEFAULT_SANS_FONT_STACK) ?? "Predeterminada del sistema",
       code: resolveDefaultFamilyLabel(DEFAULT_CODE_FONT_STACK) ?? "System monospace",
     }),
     [],
@@ -1079,7 +1092,7 @@ function InterfaceFontRow({ preview }: { preview?: ReactNode }) {
   return (
     <FontFamilySettingsRow
       {...searchableSetting("interface-font")}
-      description="Everything outside code blocks and the terminal."
+      description="Todo lo que queda fuera de los bloques de código y del terminal."
       defaultFamily={defaults.sans}
       value={settings.fontFamilySans}
       onValueChange={(fontFamilySans) => updateSettings({ fontFamilySans })}
@@ -1102,7 +1115,7 @@ function PromptFontRow() {
   return (
     <FontFamilySettingsRow
       {...searchableSetting("prompt-font")}
-      description="Only the box you write prompts in. Mono works well here."
+      description="Solo el cuadro donde escribes instrucciones. Una fuente monoespaciada funciona bien aquí."
       defaultFamily={defaults.interfaceFamily}
       value={settings.fontFamilyComposer}
       onValueChange={(fontFamilyComposer) => updateSettings({ fontFamilyComposer })}
@@ -1120,7 +1133,7 @@ function PromptFontRow() {
 
 function CodeFontRow({
   title,
-  description = "Code blocks, diffs, and file previews.",
+  description = "Bloques de código, diffs y vistas previas de archivos.",
   preview,
 }: {
   title?: string;
@@ -1158,13 +1171,13 @@ function TerminalFontRow() {
   return (
     <FontFamilySettingsRow
       {...searchableSetting("terminal-font")}
-      description="Terminal output, independent from code blocks and diffs."
+      description="Salida del terminal, independiente de los bloques de código y las diferencias."
       defaultFamily={defaults.code}
       value={settings.fontFamilyTerminal}
       onValueChange={(fontFamilyTerminal) => updateSettings({ fontFamilyTerminal })}
       requireMonospace
       size={{
-        label: "Terminal font size",
+        label: "Tamaño de fuente del terminal",
         min: MIN_TERMINAL_FONT_SIZE,
         max: MAX_TERMINAL_FONT_SIZE,
         value: settings.fontSizeTerminal,
@@ -1191,7 +1204,7 @@ function FontSmoothingRow() {
   return (
     <SettingsRow
       {...searchableSetting("font-smoothing")}
-      description="Render text with thinner grayscale anti-aliasing instead of macOS's heavier default."
+      description="Muestra el texto con un suavizado en escala de grises más fino que el predeterminado de macOS."
       resetAction={
         settings.fontSmoothing !== DEFAULT_UNIFIED_SETTINGS.fontSmoothing ? (
           <SettingResetButton
@@ -1219,7 +1232,7 @@ function WordWrapRow() {
   return (
     <SettingsRow
       {...searchableSetting("word-wrap")}
-      description="Wrap long lines in code blocks, tables, diffs, and file previews by default."
+      description="Ajusta por defecto las líneas largas en código, tablas, diferencias y vistas previas."
       resetAction={
         settings.wordWrap !== DEFAULT_UNIFIED_SETTINGS.wordWrap ? (
           <SettingResetButton
@@ -1232,7 +1245,7 @@ function WordWrapRow() {
         <Switch
           checked={settings.wordWrap}
           onCheckedChange={(checked) => updateSettings({ wordWrap: Boolean(checked) })}
-          aria-label="Wrap code, tables, diffs, and file previews by default"
+          aria-label="Ajustar código, tablas, diferencias y vistas previas por defecto"
         />
       }
     />
@@ -1263,7 +1276,7 @@ function SimpleFontRows() {
       <InterfaceFontRow preview={<PromptFontPreview />} />
       <CodeFontRow
         title="Monospace font"
-        description="Code blocks, diffs, file previews, and the terminal."
+        description="Bloques de código, diferencias, vistas previas y terminal."
         preview={
           <>
             <CodeFontPreview />
@@ -1329,7 +1342,7 @@ function TypographySection() {
           <Switch
             checked={advanced}
             onCheckedChange={(checked) => setAdvanced(Boolean(checked))}
-            aria-label="Show advanced typography settings"
+            aria-label="Mostrar ajustes avanzados de tipografía"
           />
         </label>
       }
@@ -1557,7 +1570,7 @@ function AutoSettleDaysInput({
         }
       }}
       onBlur={() => setDraft(String(value))}
-      aria-label="Days of inactivity before auto-settle"
+      aria-label="Días de inactividad antes de finalizar automáticamente"
     />
   );
 }
@@ -1601,7 +1614,7 @@ function LegacyFeaturesSection() {
       <Collapsible open={open} onOpenChange={setOpen}>
         <CollapsibleTrigger className="group flex min-h-8 w-full items-center gap-2 px-3 sm:px-4">
           <h2 className="text-lg font-semibold tracking-[-0.025em] text-muted-foreground transition-colors group-hover:text-foreground">
-            Legacy features
+            Funciones heredadas
           </h2>
           <ChevronRightIcon className="size-4 text-muted-foreground transition-transform duration-200 group-data-panel-open:rotate-90" />
         </CollapsibleTrigger>
@@ -1609,20 +1622,20 @@ function LegacyFeaturesSection() {
           <div className="relative space-y-1 overflow-visible pt-3 text-foreground">
             <SettingsRow
               {...searchableSetting("legacy-plan-mode")}
-              description="Brings back the Build/Plan toggle in the composer along with the /plan and /default commands and the Shift+Tab shortcut. While off, every thread runs in build mode."
+              description="Recupera el selector Construir/Planificar, los comandos /plan y /default y el atajo Mayús+Tab. Desactivado, todas las conversaciones usan el modo de construcción."
               control={
                 <Switch
                   checked={settings.planModeEnabled}
                   onCheckedChange={(checked) =>
                     updateSettings({ planModeEnabled: Boolean(checked) })
                   }
-                  aria-label="Plan mode (legacy)"
+                  aria-label="Modo de planificación heredado"
                 />
               }
             />
             <SettingsRow
               {...searchableSetting("legacy-token-streaming")}
-              description="Paints assistant output token by token instead of in complete chunks. Not recommended: it is significantly slower, and long responses become harder to follow. Kept only for compatibility with the old behavior."
+              description="Muestra la salida del asistente token a token en vez de por bloques completos. No se recomienda: es más lento y dificulta seguir respuestas largas. Se conserva por compatibilidad."
               control={
                 <Switch
                   checked={settings.enableLegacyTokenStreaming}
@@ -1635,20 +1648,20 @@ function LegacyFeaturesSection() {
                       const api = readLocalApi();
                       const confirmed = await (api ?? ensureLocalApi()).dialogs.confirm(
                         [
-                          "Turn on token-by-token output?",
-                          "It is significantly slower than the default buffered output and hurts the reading experience. This switch exists only for backwards compatibility.",
+                          "¿Activar la salida token a token?",
+                          "Es mucho más lenta que la salida agrupada predeterminada y dificulta la lectura. Esta opción existe solo por compatibilidad con versiones anteriores.",
                         ].join("\n"),
                       );
                       if (confirmed) updateSettings({ enableLegacyTokenStreaming: true });
                     })();
                   }}
-                  aria-label="Stream token by token (legacy)"
+                  aria-label="Transmitir token a token (heredado)"
                 />
               }
             />
             <SettingsRow
               {...searchableSetting("legacy-sidebar")}
-              description="Brings back the original sidebar with per-project thread trees. The default sidebar shows one flat list: active work as rich cards, settled threads as compact rows."
+              description="Recupera la barra lateral original con conversaciones agrupadas por proyecto. La predeterminada usa una lista plana con trabajo activo y conversaciones archivadas."
               control={
                 <Switch
                   checked={settings.legacySidebarEnabled}
@@ -1724,12 +1737,12 @@ export function GeneralSettingsPanel() {
       <SettingsSection title="General">
         <SettingsRow
           {...searchableSetting("project-grouping")}
-          description="Combine matching repositories across environments."
+          description="Combina repositorios coincidentes entre entornos."
           resetAction={
             settings.sidebarProjectGroupingMode !==
             DEFAULT_UNIFIED_SETTINGS.sidebarProjectGroupingMode ? (
               <SettingResetButton
-                label="project grouping"
+                label="agrupación de proyectos"
                 onClick={() =>
                   updateSettings({
                     sidebarProjectGroupingMode: DEFAULT_UNIFIED_SETTINGS.sidebarProjectGroupingMode,
@@ -1753,14 +1766,14 @@ export function GeneralSettingsPanel() {
                   ),
                 });
               }}
-              aria-label="Project grouping"
+              aria-label="Agrupación de proyectos"
             />
           }
         />
 
         <SettingsRow
           {...searchableSetting("auto-settle-inactive-threads")}
-          description="Sidebar threads with no activity for this long settle automatically. Threads on merged or closed PRs always settle."
+          description="Las conversaciones sin actividad durante este periodo se archivan automáticamente. Las asociadas a solicitudes fusionadas o cerradas siempre se archivan."
           resetAction={
             settings.sidebarAutoSettleAfterDays !==
             DEFAULT_UNIFIED_SETTINGS.sidebarAutoSettleAfterDays ? (
@@ -1782,14 +1795,14 @@ export function GeneralSettingsPanel() {
                   sidebarAutoSettleAfterDays: checked ? AUTO_SETTLE_DEFAULT_DAYS : null,
                 })
               }
-              aria-label="Auto-settle inactive threads"
+              aria-label="Finalizar automáticamente las conversaciones inactivas"
             />
           }
         />
         {settings.sidebarAutoSettleAfterDays !== null ? (
           <SettingsRow
-            title="Days of inactivity before auto-settle"
-            description="Any new activity un-settles a thread automatically."
+            title="Días de inactividad antes de finalizar automáticamente"
+            description="Cualquier actividad nueva recupera automáticamente la conversación."
             control={
               <AutoSettleDaysInput
                 value={settings.sidebarAutoSettleAfterDays}
@@ -1801,7 +1814,7 @@ export function GeneralSettingsPanel() {
 
         <SettingsRow
           {...searchableSetting("time-format")}
-          description="System default follows your browser or OS clock preference."
+          description="El valor del sistema sigue la preferencia horaria del navegador o del sistema operativo."
           resetAction={
             settings.timestampFormat !== DEFAULT_UNIFIED_SETTINGS.timestampFormat ? (
               <SettingResetButton
@@ -1843,11 +1856,11 @@ export function GeneralSettingsPanel() {
 
         <SettingsRow
           {...searchableSetting("hide-whitespace-changes")}
-          description="Set whether the diff panel ignores whitespace-only edits by default."
+          description="Define si el panel de diferencias ignora por defecto los cambios solo de espacios."
           resetAction={
             settings.diffIgnoreWhitespace !== DEFAULT_UNIFIED_SETTINGS.diffIgnoreWhitespace ? (
               <SettingResetButton
-                label="diff whitespace changes"
+                label="cambios de espacios en blanco en las diferencias"
                 onClick={() =>
                   updateSettings({
                     diffIgnoreWhitespace: DEFAULT_UNIFIED_SETTINGS.diffIgnoreWhitespace,
@@ -1862,19 +1875,19 @@ export function GeneralSettingsPanel() {
               onCheckedChange={(checked) =>
                 updateSettings({ diffIgnoreWhitespace: Boolean(checked) })
               }
-              aria-label="Hide whitespace changes by default"
+              aria-label="Ocultar por defecto los cambios de espacios en blanco"
             />
           }
         />
 
         <SettingsRow
           {...searchableSetting("provider-update-checks")}
-          description="Check installed provider CLIs for newer available versions."
+          description="Comprueba si hay versiones nuevas de las herramientas de proveedor instaladas."
           resetAction={
             settings.enableProviderUpdateChecks !==
             DEFAULT_UNIFIED_SETTINGS.enableProviderUpdateChecks ? (
               <SettingResetButton
-                label="provider update checks"
+                label="comprobaciones de actualización de proveedores"
                 onClick={() =>
                   updateSettings({
                     enableProviderUpdateChecks: DEFAULT_UNIFIED_SETTINGS.enableProviderUpdateChecks,
@@ -1889,7 +1902,7 @@ export function GeneralSettingsPanel() {
               onCheckedChange={(checked) =>
                 updateSettings({ enableProviderUpdateChecks: Boolean(checked) })
               }
-              aria-label="Check provider versions"
+              aria-label="Comprobar versiones de proveedores"
             />
           }
         />
@@ -1899,8 +1912,8 @@ export function GeneralSettingsPanel() {
             <span className="inline-flex items-center gap-1.5">
               Background activity
               <PolicyTooltip>
-                This shared policy gates background work such as Git refreshes and provider health
-                probes after their individual intervals elapse.
+                Esta política compartida controla tareas en segundo plano como las actualizaciones
+                de Git y las comprobaciones de proveedores.
               </PolicyTooltip>
             </span>
           }
@@ -1931,7 +1944,10 @@ export function GeneralSettingsPanel() {
                   }
                 }}
               >
-                <SelectTrigger className="w-full sm:w-40" aria-label="Background activity profile">
+                <SelectTrigger
+                  className="w-full sm:w-40"
+                  aria-label="Perfil de actividad en segundo plano"
+                >
                   <SelectValue>
                     {BACKGROUND_ACTIVITY_PROFILE_OPTION_LABELS[backgroundActivityProfileOption]}
                   </SelectValue>
@@ -1965,7 +1981,7 @@ export function GeneralSettingsPanel() {
                       </Button>
                     }
                   />
-                  <TooltipPopup side="top">Configure background activity</TooltipPopup>
+                  <TooltipPopup side="top">Configurar actividad en segundo plano</TooltipPopup>
                 </Tooltip>
               ) : null}
               <BackgroundActivityAdvancedDialog
@@ -1978,13 +1994,13 @@ export function GeneralSettingsPanel() {
 
         <SettingsRow
           {...searchableSetting("new-threads")}
-          description="Pick the default workspace mode for newly created draft threads."
+          description="Elige el modo de espacio de trabajo predeterminado para conversaciones nuevas."
           resetAction={
             settings.defaultThreadEnvMode !== DEFAULT_UNIFIED_SETTINGS.defaultThreadEnvMode ||
             settings.newWorktreesStartFromOrigin !==
               DEFAULT_UNIFIED_SETTINGS.newWorktreesStartFromOrigin ? (
               <SettingResetButton
-                label="new threads"
+                label="conversaciones nuevas"
                 onClick={() =>
                   updateSettings({
                     defaultThreadEnvMode: DEFAULT_UNIFIED_SETTINGS.defaultThreadEnvMode,
@@ -2004,9 +2020,14 @@ export function GeneralSettingsPanel() {
                 }
               }}
             >
-              <SelectTrigger className="w-full sm:w-44" aria-label="Default thread mode">
+              <SelectTrigger
+                className="w-full sm:w-44"
+                aria-label="Modo predeterminado de conversación"
+              >
                 <SelectValue>
-                  {settings.defaultThreadEnvMode === "worktree" ? "New worktree" : "Local"}
+                  {settings.defaultThreadEnvMode === "worktree"
+                    ? "Nuevo árbol de trabajo"
+                    : "Local"}
                 </SelectValue>
               </SelectTrigger>
               <SelectPopup align="end" alignItemWithTrigger={false}>
@@ -2014,7 +2035,7 @@ export function GeneralSettingsPanel() {
                   Local
                 </SelectItem>
                 <SelectItem hideIndicator value="worktree">
-                  New worktree
+                  Nuevo árbol de trabajo
                 </SelectItem>
               </SelectPopup>
             </Select>
@@ -2025,12 +2046,12 @@ export function GeneralSettingsPanel() {
           <SettingsRow
             className="bg-muted/20 sm:pl-9"
             title={searchableSetting("start-from-origin").title}
-            description="Creates the worktree from the latest matching branch on origin instead of your local branch."
+            description="Crea el directorio de trabajo desde la rama remota más reciente en vez de la rama local."
             resetAction={
               settings.newWorktreesStartFromOrigin !==
               DEFAULT_UNIFIED_SETTINGS.newWorktreesStartFromOrigin ? (
                 <SettingResetButton
-                  label="new worktrees start from origin"
+                  label="los nuevos directorios de trabajo parten del origen"
                   onClick={() =>
                     updateSettings({
                       newWorktreesStartFromOrigin:
@@ -2046,7 +2067,7 @@ export function GeneralSettingsPanel() {
                 onCheckedChange={(checked) =>
                   updateSettings({ newWorktreesStartFromOrigin: Boolean(checked) })
                 }
-                aria-label="Start new worktrees from origin by default"
+                aria-label="Iniciar los nuevos directorios de trabajo desde el origen"
               />
             }
           />
@@ -2054,12 +2075,12 @@ export function GeneralSettingsPanel() {
 
         <SettingsRow
           {...searchableSetting("add-project-starts-in")}
-          description='Leave empty to use "~/" when the Add Project browser opens.'
+          description='Déjalo vacío para usar "~/" al abrir el selector de proyectos.'
           resetAction={
             settings.addProjectBaseDirectory !==
             DEFAULT_UNIFIED_SETTINGS.addProjectBaseDirectory ? (
               <SettingResetButton
-                label="add project base directory"
+                label="añadir directorio base del proyecto"
                 onClick={() =>
                   updateSettings({
                     addProjectBaseDirectory: DEFAULT_UNIFIED_SETTINGS.addProjectBaseDirectory,
@@ -2075,14 +2096,14 @@ export function GeneralSettingsPanel() {
               onCommit={(next) => updateSettings({ addProjectBaseDirectory: next })}
               placeholder="~/"
               spellCheck={false}
-              aria-label="Add project base directory"
+              aria-label="Añadir directorio base del proyecto"
             />
           }
         />
 
         <SettingsRow
           {...searchableSetting("archive-confirmation")}
-          description="Require a second click on the inline archive action before a thread is archived."
+          description="Exige una segunda pulsación antes de archivar una conversación."
           resetAction={
             settings.confirmThreadArchive !== DEFAULT_UNIFIED_SETTINGS.confirmThreadArchive ? (
               <SettingResetButton
@@ -2101,18 +2122,18 @@ export function GeneralSettingsPanel() {
               onCheckedChange={(checked) =>
                 updateSettings({ confirmThreadArchive: Boolean(checked) })
               }
-              aria-label="Confirm thread archiving"
+              aria-label="Confirmar archivado de conversaciones"
             />
           }
         />
 
         <SettingsRow
           {...searchableSetting("delete-confirmation")}
-          description="Ask before deleting a thread and its chat history."
+          description="Pregunta antes de eliminar una conversación y su historial."
           resetAction={
             settings.confirmThreadDelete !== DEFAULT_UNIFIED_SETTINGS.confirmThreadDelete ? (
               <SettingResetButton
-                label="delete confirmation"
+                label="confirmación de eliminación"
                 onClick={() =>
                   updateSettings({
                     confirmThreadDelete: DEFAULT_UNIFIED_SETTINGS.confirmThreadDelete,
@@ -2127,18 +2148,18 @@ export function GeneralSettingsPanel() {
               onCheckedChange={(checked) =>
                 updateSettings({ confirmThreadDelete: Boolean(checked) })
               }
-              aria-label="Confirm thread deletion"
+              aria-label="Confirmar eliminación de conversaciones"
             />
           }
         />
 
         <SettingsRow
           {...searchableSetting("text-generation-model")}
-          description="Default model for generated text like thread titles and source control content. Source control settings can override it with a dedicated source control writer model."
+          description="Modelo predeterminado para títulos de conversación y contenido de control de versiones. Los ajustes de control de versiones pueden usar un modelo específico."
           resetAction={
             isTextGenerationModelDirty ? (
               <SettingResetButton
-                label="text generation model"
+                label="modelo de generación de texto"
                 onClick={() =>
                   updateSettings({
                     textGenerationModelSelection:
@@ -2213,7 +2234,7 @@ export function GeneralSettingsPanel() {
         ) : (
           <SettingsRow
             title={<AboutVersionTitle />}
-            description="Current version of the application."
+            description="Versión actual de la aplicación."
           />
         )}
         <SettingsRow
@@ -2303,7 +2324,7 @@ export function ArchivedThreadsPanel() {
       const clicked = await api.contextMenu.show(
         [
           { id: "unarchive", label: "Unarchive" },
-          { id: "delete", label: "Delete", destructive: true },
+          { id: "delete", label: "Eliminar", destructive: true },
         ],
         position,
       );
@@ -2317,8 +2338,8 @@ export function ArchivedThreadsPanel() {
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: "Failed to unarchive thread",
-              description: error instanceof Error ? error.message : "An error occurred.",
+              title: "No se pudo recuperar la conversación",
+              description: error instanceof Error ? error.message : "Se ha producido un error.",
             }),
           );
         }
@@ -2334,8 +2355,8 @@ export function ArchivedThreadsPanel() {
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: "Failed to delete thread",
-              description: error instanceof Error ? error.message : "An error occurred.",
+              title: "No se pudo eliminar la conversación",
+              description: error instanceof Error ? error.message : "Se ha producido un error.",
             }),
           );
         }
@@ -2360,16 +2381,16 @@ export function ArchivedThreadsPanel() {
                   <ArchiveIcon className="size-3.5 text-muted-foreground" />
                 )}
                 {isLoadingArchive
-                  ? "Loading archived threads"
+                  ? "Cargando conversaciones archivadas"
                   : archiveError
-                    ? "Could not load archived threads"
-                    : "No archived threads"}
+                    ? "No se pudieron cargar las conversaciones archivadas"
+                    : "No hay conversaciones archivadas"}
               </span>
             }
             description={
               isLoadingArchive
-                ? "Checking connected environments."
-                : (archiveError ?? "Archived threads will appear here.")
+                ? "Comprobando los entornos conectados."
+                : (archiveError ?? "Las conversaciones archivadas aparecerán aquí.")
             }
           />
         </SettingsSection>
@@ -2401,9 +2422,9 @@ export function ArchivedThreadsPanel() {
                       toastManager.add(
                         stackedThreadToast({
                           type: "error",
-                          title: "Archived thread action failed",
+                          title: "Falló la acción sobre la conversación archivada",
                           description:
-                            error instanceof Error ? error.message : "An error occurred.",
+                            error instanceof Error ? error.message : "Se ha producido un error.",
                         }),
                       );
                     }
@@ -2437,9 +2458,11 @@ export function ArchivedThreadsPanel() {
                           toastManager.add(
                             stackedThreadToast({
                               type: "error",
-                              title: "Failed to unarchive thread",
+                              title: "No se pudo recuperar la conversación",
                               description:
-                                error instanceof Error ? error.message : "An error occurred.",
+                                error instanceof Error
+                                  ? error.message
+                                  : "Se ha producido un error.",
                             }),
                           );
                         }
@@ -2447,7 +2470,7 @@ export function ArchivedThreadsPanel() {
                     }}
                   >
                     <ArchiveX className="size-3.5" />
-                    <span>Unarchive</span>
+                    <span>Recuperar</span>
                   </Button>
                 }
               />

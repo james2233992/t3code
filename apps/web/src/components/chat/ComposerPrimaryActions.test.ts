@@ -69,7 +69,7 @@ describe("formatPendingPrimaryActionLabel", () => {
         isResponding: true,
         questionIndex: 0,
       }),
-    ).toBe("Submitting...");
+    ).toBe("Enviando...");
   });
 
   it("returns 'Submitting...' while responding regardless of other flags", () => {
@@ -80,7 +80,7 @@ describe("formatPendingPrimaryActionLabel", () => {
         isResponding: true,
         questionIndex: 3,
       }),
-    ).toBe("Submitting...");
+    ).toBe("Enviando...");
   });
 
   it("returns 'Submit' in compact mode on the last question", () => {
@@ -91,7 +91,7 @@ describe("formatPendingPrimaryActionLabel", () => {
         isResponding: false,
         questionIndex: 0,
       }),
-    ).toBe("Submit");
+    ).toBe("Enviar");
   });
 
   it("returns 'Next' in compact mode when not the last question", () => {
@@ -102,7 +102,7 @@ describe("formatPendingPrimaryActionLabel", () => {
         isResponding: false,
         questionIndex: 1,
       }),
-    ).toBe("Next");
+    ).toBe("Siguiente");
   });
 
   it("returns 'Next question' when not the last question", () => {
@@ -113,7 +113,7 @@ describe("formatPendingPrimaryActionLabel", () => {
         isResponding: false,
         questionIndex: 0,
       }),
-    ).toBe("Next question");
+    ).toBe("Siguiente pregunta");
   });
 
   it("returns singular 'Submit answer' on the last question when it is the only question", () => {
@@ -124,7 +124,7 @@ describe("formatPendingPrimaryActionLabel", () => {
         isResponding: false,
         questionIndex: 0,
       }),
-    ).toBe("Submit answer");
+    ).toBe("Enviar respuesta");
   });
 
   it("returns plural 'Submit answers' on the last question when there are multiple questions", () => {
@@ -135,7 +135,7 @@ describe("formatPendingPrimaryActionLabel", () => {
         isResponding: false,
         questionIndex: 1,
       }),
-    ).toBe("Submit answers");
+    ).toBe("Enviar respuestas");
   });
 
   it("returns plural 'Submit answers' for higher question indices", () => {
@@ -146,17 +146,17 @@ describe("formatPendingPrimaryActionLabel", () => {
         isResponding: false,
         questionIndex: 5,
       }),
-    ).toBe("Submit answers");
+    ).toBe("Enviar respuestas");
   });
 });
 
 describe("ComposerPrimaryActions", () => {
   it("offers Stop generation while a running turn is waiting for user input", () => {
-    expect(renderPendingActions(true)).toContain('aria-label="Stop generation"');
+    expect(renderPendingActions(true)).toContain('aria-label="Detener generación"');
   });
 
   it("does not offer Stop generation for a pending request without a running turn", () => {
-    expect(renderPendingActions(false)).not.toContain('aria-label="Stop generation"');
+    expect(renderPendingActions(false)).not.toContain('aria-label="Detener generación"');
   });
 
   it("matches the small pending action size without changing the standalone size", () => {

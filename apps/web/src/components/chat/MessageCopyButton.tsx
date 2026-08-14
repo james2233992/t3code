@@ -32,7 +32,7 @@ const onCopyError = (ref: React.RefObject<HTMLButtonElement | null>, error: Erro
         anchor: ref.current,
       },
       timeout: ANCHORED_TOAST_TIMEOUT_MS,
-      title: "Failed to copy",
+      title: "No se pudo copiar",
       description: error.message,
     });
   }
@@ -61,7 +61,7 @@ export const MessageCopyButton = memo(function MessageCopyButton({
       <TooltipTrigger
         render={
           <Button
-            aria-label="Copy link"
+            aria-label="Copiar enlace"
             disabled={isCopied}
             onClick={() => copyToClipboard(text)}
             ref={ref}
@@ -75,7 +75,7 @@ export const MessageCopyButton = memo(function MessageCopyButton({
         {isCopied ? <CheckIcon className="size-3 text-primary" /> : <CopyIcon className="size-3" />}
       </TooltipTrigger>
       <TooltipPopup>
-        <p>Copy to clipboard</p>
+        <p>Copiar al portapapeles</p>
       </TooltipPopup>
     </Tooltip>
   );

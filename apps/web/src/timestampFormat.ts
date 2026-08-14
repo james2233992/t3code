@@ -33,7 +33,7 @@ function getTimestampFormatter(
   }
 
   const formatter = new Intl.DateTimeFormat(
-    undefined,
+    "es-ES",
     getTimestampFormatOptions(timestampFormat, includeSeconds),
   );
   timestampFormatterCache.set(cacheKey, formatter);
@@ -51,22 +51,7 @@ export function formatTimestamp(isoDate: string, timestampFormat: TimestampForma
   return getTimestampFormatter(timestampFormat, true).format(date);
 }
 
-const monthNameFormatter = new Intl.DateTimeFormat(undefined, { month: "long" });
-
-function ordinalSuffix(day: number): string {
-  const lastTwo = day % 100;
-  if (lastTwo >= 11 && lastTwo <= 13) return "th";
-  switch (day % 10) {
-    case 1:
-      return "st";
-    case 2:
-      return "nd";
-    case 3:
-      return "rd";
-    default:
-      return "th";
-  }
-}
+const monthNameFormatter = new Intl.DateTimeFormat("es-ES", { month: "long" });
 
 /**
  * Long-form tooltip label, e.g. `12:04, 4th June`.
@@ -82,7 +67,7 @@ export function formatChatTimestampTooltip(
   const day = date.getDate();
   const month = monthNameFormatter.format(date);
   const year = date.getFullYear();
-  return `${time}, ${day}${ordinalSuffix(day)} ${month} ${year}`;
+  return `${time}, ${day} de ${month} de ${year}`;
 }
 
 export function formatShortTimestamp(isoDate: string, timestampFormat: TimestampFormat): string {
@@ -106,15 +91,15 @@ export function formatRelativeTime(isoDate: string): RelativeTimeParts | null {
   const date = parseTimestampDate(isoDate);
   if (!date) return null;
   const diffMs = Date.now() - date.getTime();
-  if (diffMs < 0) return { value: "just now", suffix: null };
+  if (diffMs < 0) return { value: "ahora", suffix: null };
   const seconds = Math.floor(diffMs / 1000);
-  if (seconds < 60) return { value: "just now", suffix: null };
+  if (seconds < 60) return { value: "ahora", suffix: null };
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return { value: `${minutes}m`, suffix: "ago" };
+  if (minutes < 60) return { value: `${minutes}m`, suffix: "atrás" };
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return { value: `${hours}h`, suffix: "ago" };
+  if (hours < 24) return { value: `${hours}h`, suffix: "atrás" };
   const days = Math.floor(hours / 24);
-  return { value: `${days}d`, suffix: "ago" };
+  return { value: `${days}d`, suffix: "atrás" };
 }
 
 export function formatRelativeTimeLabel(isoDate: string) {
@@ -138,10 +123,10 @@ export function formatElapsedDurationLabel(isoDate: string, nowMs: number = Date
   const date = parseTimestampDate(isoDate);
   if (!date) return "";
   const diffMs = nowMs - date.getTime();
-  if (diffMs <= 0) return "just now";
+  if (diffMs <= 0) return "ahora";
 
   const seconds = Math.floor(diffMs / 1000);
-  if (seconds < 5) return "just now";
+  if (seconds < 5) return "ahora";
   if (seconds < 60) return `${seconds}s`;
 
   const minutes = Math.floor(seconds / 60);
@@ -161,16 +146,16 @@ export function formatRelativeTimeUntil(isoDate: string): RelativeTimeParts | nu
   const date = parseTimestampDate(isoDate);
   if (!date) return null;
   const diffMs = date.getTime() - Date.now();
-  if (diffMs <= 0) return { value: "Expired", suffix: null };
+  if (diffMs <= 0) return { value: "Caducado", suffix: null };
   const seconds = Math.floor(diffMs / 1000);
-  if (seconds < 5) return { value: "Soon", suffix: null };
-  if (seconds < 60) return { value: `${seconds}s`, suffix: "left" };
+  if (seconds < 5) return { value: "Pronto", suffix: null };
+  if (seconds < 60) return { value: `${seconds}s`, suffix: "restantes" };
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return { value: `${minutes}m`, suffix: "left" };
+  if (minutes < 60) return { value: `${minutes}m`, suffix: "restantes" };
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return { value: `${hours}h`, suffix: "left" };
+  if (hours < 24) return { value: `${hours}h`, suffix: "restantes" };
   const days = Math.floor(hours / 24);
-  return { value: `${days}d`, suffix: "left" };
+  return { value: `${days}d`, suffix: "restantes" };
 }
 
 export function formatRelativeTimeUntilLabel(isoDate: string): string {
@@ -187,16 +172,16 @@ export function formatExpiresInLabel(isoDate: string, nowMs: number = Date.now()
   const date = parseTimestampDate(isoDate);
   if (!date) return "";
   const diffMs = date.getTime() - nowMs;
-  if (diffMs <= 0) return "Expired";
+  if (diffMs <= 0) return "Caducado";
 
   const totalSeconds = Math.floor(diffMs / 1000);
-  if (totalSeconds < 5) return "Expires in a moment";
-  if (totalSeconds < 60) return `Expires in ${totalSeconds}s`;
+  if (totalSeconds < 5) return "Caduca en un momento";
+  if (totalSeconds < 60) return `Caduca en ${totalSeconds}s`;
 
   if (totalSeconds < 3600) {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    return seconds === 0 ? `Expires in ${minutes}m` : `Expires in ${minutes}m ${seconds}s`;
+    return seconds === 0 ? `Caduca en ${minutes}m` : `Caduca en ${minutes}m ${seconds}s`;
   }
 
   if (totalSeconds < 86_400) {
@@ -207,12 +192,12 @@ export function formatExpiresInLabel(isoDate: string, nowMs: number = Date.now()
     const parts = [`${hours}h`];
     if (minutes > 0) parts.push(`${minutes}m`);
     if (seconds > 0) parts.push(`${seconds}s`);
-    return `Expires in ${parts.join(" ")}`;
+    return `Caduca en ${parts.join(" ")}`;
   }
 
   const days = Math.floor(totalSeconds / 86_400);
   const remAfterDays = totalSeconds % 86_400;
-  if (remAfterDays === 0) return `Expires in ${days}d`;
+  if (remAfterDays === 0) return `Caduca en ${days}d`;
   const hours = Math.floor(remAfterDays / 3600);
   const rem = remAfterDays % 3600;
   const minutes = Math.floor(rem / 60);
@@ -221,5 +206,5 @@ export function formatExpiresInLabel(isoDate: string, nowMs: number = Date.now()
   if (hours > 0) tail.push(`${hours}h`);
   if (minutes > 0) tail.push(`${minutes}m`);
   if (seconds > 0) tail.push(`${seconds}s`);
-  return tail.length > 0 ? `Expires in ${days}d ${tail.join(" ")}` : `Expires in ${days}d`;
+  return tail.length > 0 ? `Caduca en ${days}d ${tail.join(" ")}` : `Caduca en ${days}d`;
 }

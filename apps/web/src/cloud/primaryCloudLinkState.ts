@@ -72,7 +72,7 @@ export function usePrimaryCloudLinkState() {
   let error: string | null = null;
   if (result._tag === "Failure") {
     const cause = Cause.squash(result.cause);
-    error = cause instanceof Error ? cause.message : "Could not read Fenix Connect link state.";
+    error = cause instanceof Error ? cause.message : "No se pudo leer el estado de Fenix Connect.";
   }
 
   return {

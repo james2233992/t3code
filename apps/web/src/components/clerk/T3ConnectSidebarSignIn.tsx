@@ -33,7 +33,7 @@ function ConfiguredT3ConnectSidebarAvatar() {
       }}
     >
       <UserButton.UserProfilePage
-        label="Mobile clients"
+        label="Clientes móviles"
         labelIcon={<SmartphoneIcon className="size-4" />}
         url="mobile-clients"
       >
@@ -55,7 +55,7 @@ function ConfiguredT3ConnectSidebarSignIn() {
         <SidebarMenuItem>
           <SidebarMenuButton onClick={openAuthPrompt}>
             <LogInIcon />
-            <span>Sign in to Fenix Connect</span>
+            <span>Iniciar sesión en Fenix Connect</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>

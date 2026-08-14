@@ -155,7 +155,7 @@ describe("EnvironmentProviderSettings routing", () => {
     const panel = renderPanel();
     const refreshButton = visitElements(
       panel,
-      (element) => element.props["aria-label"] === "Refresh provider status",
+      (element) => element.props["aria-label"] === "Actualizar estado del proveedor",
     );
     expect(refreshButton).not.toBeNull();
     (refreshButton?.props.onClick as (() => void) | undefined)?.();
@@ -194,7 +194,10 @@ describe("EnvironmentProviderSettings routing", () => {
       visitElements(panel, (element) => element.props["aria-label"] === "Add provider instance"),
     ).toBeNull();
     expect(
-      visitElements(panel, (element) => element.props["aria-label"] === "Refresh provider status"),
+      visitElements(
+        panel,
+        (element) => element.props["aria-label"] === "Actualizar estado del proveedor",
+      ),
     ).toBeNull();
   });
 

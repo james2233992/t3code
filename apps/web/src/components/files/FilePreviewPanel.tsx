@@ -143,7 +143,7 @@ function WorkspaceImagePreview(props: {
   if (assetUrl._tag === "Failure" || (assetUrl._tag === "Success" && failedUrl === assetUrl.url)) {
     return (
       <div className="flex min-h-0 flex-1 items-center justify-center px-6 text-center text-xs leading-relaxed text-destructive">
-        Unable to load workspace image.
+        No se pudo cargar la imagen del espacio de trabajo.
       </div>
     );
   }
@@ -847,8 +847,8 @@ export default function FilePreviewPanel({
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: "Unable to open file in browser",
-          description: error instanceof Error ? error.message : "An error occurred.",
+          title: "No se pudo abrir el archivo en el navegador",
+          description: error instanceof Error ? error.message : "Se ha producido un error.",
         }),
       );
     })();
@@ -936,7 +936,7 @@ export default function FilePreviewPanel({
                     className="shrink-0"
                     pressed={false}
                     onPressedChange={handleOpenInBrowser}
-                    aria-label="Open file in preview browser"
+                    aria-label="Abrir archivo en el navegador de previsualización"
                     variant="ghost"
                     size="sm"
                   >
@@ -944,7 +944,7 @@ export default function FilePreviewPanel({
                   </Toggle>
                 }
               />
-              <TooltipPopup>Open file in preview browser</TooltipPopup>
+              <TooltipPopup>Abrir archivo en el navegador de previsualización</TooltipPopup>
             </Tooltip>
           ) : null}
           <Tooltip>
@@ -954,7 +954,11 @@ export default function FilePreviewPanel({
                   className="shrink-0"
                   pressed={explorerOpen}
                   onPressedChange={toggleExplorer}
-                  aria-label={explorerOpen ? "Hide file explorer" : "Show file explorer"}
+                  aria-label={
+                    explorerOpen
+                      ? "Ocultar explorador de archivos"
+                      : "Mostrar explorador de archivos"
+                  }
                   variant="ghost"
                   size="sm"
                 >
@@ -963,14 +967,15 @@ export default function FilePreviewPanel({
               }
             />
             <TooltipPopup>
-              {explorerOpen ? "Hide file explorer" : "Show file explorer"}
+              {explorerOpen ? "Ocultar explorador de archivos" : "Mostrar explorador de archivos"}
             </TooltipPopup>
           </Tooltip>
         </div>
       ) : null}
       {relativePath && file.data?.truncated ? (
         <div className="shrink-0 border-b border-warning/20 bg-warning-surface px-3 py-1.5 text-[11px] text-warning-foreground">
-          Preview limited to the first 1 MB of a {file.data.byteLength.toLocaleString()} byte file.
+          La vista previa se limita al primer MB de un archivo de{" "}
+          {file.data.byteLength.toLocaleString()} bytes.
         </div>
       ) : null}
       <div className="flex min-h-0 flex-1 overflow-hidden">

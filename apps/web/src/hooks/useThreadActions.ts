@@ -47,7 +47,7 @@ export class ThreadArchiveBlockedError extends Schema.TaggedErrorClass<ThreadArc
   },
 ) {
   override get message(): string {
-    return "Cannot archive a running thread.";
+    return "No se puede archivar una conversación en ejecución.";
   }
 }
 
@@ -59,7 +59,7 @@ export class ThreadSettlementUnsupportedError extends Schema.TaggedErrorClass<Th
   },
 ) {
   override get message(): string {
-    return "This environment's server does not support settling yet. Update the server to use Settle.";
+    return "El servidor de este entorno todavía no permite finalizar conversaciones. Actualiza el servidor para usar esta función.";
   }
 }
 
@@ -71,7 +71,7 @@ export class ThreadSettleBlockedError extends Schema.TaggedErrorClass<ThreadSett
   },
 ) {
   override get message(): string {
-    return "This thread still needs attention. Resolve or interrupt it first, then try again.";
+    return "Esta conversación aún necesita atención. Resuélvela o interrúmpela antes de intentarlo de nuevo.";
   }
 }
 
@@ -83,7 +83,7 @@ export class ThreadSnoozeUnsupportedError extends Schema.TaggedErrorClass<Thread
   },
 ) {
   override get message(): string {
-    return "This environment's server does not support snoozing yet. Update the server to use Snooze.";
+    return "El servidor de este entorno todavía no permite posponer conversaciones. Actualiza el servidor para usar esta función.";
   }
 }
 
@@ -95,7 +95,7 @@ export class ThreadSnoozeBlockedError extends Schema.TaggedErrorClass<ThreadSnoo
   },
 ) {
   override get message(): string {
-    return "This thread is waiting on you. Respond to the pending request before snoozing it.";
+    return "Esta conversación está esperando tu respuesta. Responde a la solicitud pendiente antes de posponerla.";
   }
 }
 
@@ -119,7 +119,7 @@ export class ThreadPinningUnsupportedError extends Schema.TaggedErrorClass<Threa
   },
 ) {
   override get message(): string {
-    return "This environment's server does not support pinning yet. Update the server to use Pin.";
+    return "El servidor de este entorno todavía no permite fijar conversaciones. Actualiza el servidor para usar esta función.";
   }
 }
 
@@ -131,7 +131,7 @@ export class ThreadPinReorderUnsupportedError extends Schema.TaggedErrorClass<Th
   },
 ) {
   override get message(): string {
-    return "This environment's server does not support reordering pinned threads yet. Update the server to reorder pins.";
+    return "El servidor de este entorno todavía no permite reordenar conversaciones fijadas. Actualiza el servidor para usar esta función.";
   }
 }
 
@@ -319,10 +319,10 @@ export function useThreadActions() {
         const confirmationResult = await settlePromise(() =>
           localApi.dialogs.confirm(
             [
-              "This thread is the only one linked to this worktree:",
+              "Esta conversación es la única vinculada a este directorio de trabajo:",
               displayWorktreePath ?? orphanedWorktreePath,
               "",
-              "Delete the worktree too?",
+              "¿Eliminar también el directorio de trabajo?",
             ].join("\n"),
           ),
         );
@@ -433,18 +433,24 @@ export function useThreadActions() {
             : null;
       if (cleanupFailure) {
         const error = squashAtomCommandFailure(cleanupFailure);
-        const message = error instanceof Error ? error.message : "Unknown error removing worktree.";
-        console.error("Failed to remove orphaned worktree after thread deletion", {
-          threadId: threadRef.threadId,
-          projectCwd: threadProject.workspaceRoot,
-          worktreePath: orphanedWorktreePath,
-          error,
-        });
+        const message =
+          error instanceof Error
+            ? error.message
+            : "Error desconocido al eliminar el directorio de trabajo.";
+        console.error(
+          "No se pudo eliminar el árbol de trabajo huérfano tras borrar la conversación",
+          {
+            threadId: threadRef.threadId,
+            projectCwd: threadProject.workspaceRoot,
+            worktreePath: orphanedWorktreePath,
+            error,
+          },
+        );
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Thread deleted, but worktree removal failed",
-            description: `Could not remove ${displayWorktreePath ?? orphanedWorktreePath}. ${message}`,
+            title: "Conversación eliminada, pero falló la eliminación del directorio de trabajo",
+            description: `No se pudo eliminar ${displayWorktreePath ?? orphanedWorktreePath}. ${message}`,
           }),
         );
         return cleanupFailure;
@@ -671,12 +677,12 @@ export function useThreadActions() {
       const resolved = resolveThreadTarget(target);
 
       if (confirmThreadDelete && localApi) {
-        const title = resolved?.thread.title ?? "this thread";
+        const title = resolved?.thread.title ?? "esta conversación";
         const confirmationResult = await settlePromise(() =>
           localApi.dialogs.confirm(
             [
-              `Delete thread "${title}"?`,
-              "This permanently clears conversation history for this thread.",
+              `¿Eliminar la conversación «${title}»?`,
+              "Esto borra permanentemente el historial de esta conversación.",
             ].join("\n"),
           ),
         );

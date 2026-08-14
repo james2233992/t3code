@@ -26,7 +26,7 @@ class DesktopNetworkAccessUnavailableError extends Schema.TaggedErrorClass<Deskt
   {},
 ) {
   override get message(): string {
-    return "Desktop network access is unavailable.";
+    return "El acceso de red del escritorio no está disponible.";
   }
 }
 
@@ -35,7 +35,7 @@ class DesktopServerExposureStateLoadError extends Schema.TaggedErrorClass<Deskto
   { cause: Schema.Defect() },
 ) {
   override get message(): string {
-    return "Failed to load desktop server exposure state.";
+    return "No se pudo cargar el estado de exposición del servidor de escritorio.";
   }
 }
 
@@ -44,7 +44,7 @@ class DesktopAdvertisedEndpointsLoadError extends Schema.TaggedErrorClass<Deskto
   { cause: Schema.Defect() },
 ) {
   override get message(): string {
-    return "Failed to load advertised desktop endpoints.";
+    return "No se pudieron cargar los endpoints anunciados del escritorio.";
   }
 }
 

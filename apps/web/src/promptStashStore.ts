@@ -166,7 +166,10 @@ function persistEntries(entries: ReadonlyArray<PromptStashEntry>): {
     );
     return { written: true, durable: storageIsDurable };
   } catch (error) {
-    console.error("[PROMPT-STASH] Could not persist stash (storage quota?).", error);
+    console.error(
+      "[BORRADORES] No se pudo guardar el borrador (¿cuota de almacenamiento?).",
+      error,
+    );
     return { written: false, durable: false };
   }
 }

@@ -323,7 +323,7 @@ describe("resolveInitialServerAuthGateState", () => {
     expect(error).toMatchObject({
       _tag: "PrimaryEnvironmentPairingCredentialRequiredError",
       providedLength: 3,
-      message: "Enter a pairing token to continue.",
+      message: "Introduce un token de emparejamiento para continuar.",
     });
   });
 
@@ -347,7 +347,7 @@ describe("resolveInitialServerAuthGateState", () => {
     expect(error).toMatchObject({
       _tag: "PrimaryEnvironmentPairingCredentialRejectedError",
       providedLength: 9,
-      message: "Invalid pairing token. Check the token and try again.",
+      message: "Token de emparejamiento no válido. Compruébalo e inténtalo de nuevo.",
     });
     expect(isPrimaryEnvironmentPairingCredentialRejectedError(error)).toBe(true);
     if (!isPrimaryEnvironmentPairingCredentialRejectedError(error)) {
@@ -373,7 +373,7 @@ describe("resolveInitialServerAuthGateState", () => {
     expect(error.status).toBe(500);
     expect(error.cause).toBe(cause);
     expect(error.message).toBe(
-      "Primary environment request failed during list-pairing-links (HTTP 500).",
+      "La solicitud al entorno principal falló durante list-pairing-links (HTTP 500).",
     );
     expect(error.message).not.toContain(cause.message);
   });
@@ -429,7 +429,7 @@ describe("resolveInitialServerAuthGateState", () => {
     await expect(gateStatePromise).resolves.toEqual({
       status: "requires-auth",
       auth: DESKTOP_AUTH,
-      errorMessage: "Timed out waiting for authenticated session after bootstrap.",
+      errorMessage: "Se agotó el tiempo de espera de la sesión autenticada tras el inicio.",
     });
     expect(testApi.calls.browserSession).toEqual([{ credential: "desktop-bootstrap-token" }]);
   });

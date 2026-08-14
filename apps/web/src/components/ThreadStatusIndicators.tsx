@@ -28,7 +28,7 @@ export interface PrStatusIndicator {
 }
 
 export interface TerminalStatusIndicator {
-  label: "Terminal process running";
+  label: "Proceso de terminal en ejecución";
   colorClass: string;
   pulse: boolean;
 }
@@ -133,7 +133,7 @@ export function terminalStatusFromRunningIds(
     return null;
   }
   return {
-    label: "Terminal process running",
+    label: "Proceso de terminal en ejecución",
     colorClass: "text-teal-600 dark:text-teal-300/90",
     pulse: true,
   };
@@ -151,8 +151,8 @@ export function ThreadWorktreeIndicator({
 
   const displayPath = formatWorktreePathForDisplay(worktreePath);
   const tooltip = thread.branch
-    ? `Worktree: ${displayPath} (${thread.branch})`
-    : `Worktree: ${displayPath}`;
+    ? `Árbol de trabajo: ${displayPath} (${thread.branch})`
+    : `Árbol de trabajo: ${displayPath}`;
 
   return (
     <Tooltip>
@@ -180,13 +180,24 @@ export function ThreadStatusLabel({
   status: ThreadStatusPill;
   compact?: boolean;
 }) {
+  const visibleLabel: Record<ThreadStatusPill["label"], string> = {
+    Working: "Trabajando",
+    Monitoring: "Supervisando",
+    Connecting: "Conectando",
+    Completed: "Completada",
+    "Pending Approval": "Pendiente de aprobación",
+    "Awaiting Input": "Esperando respuesta",
+    "Plan Ready": "Plan listo",
+  };
+  const label = visibleLabel[status.label];
+
   if (compact) {
     return (
       <Tooltip>
         <TooltipTrigger
           render={
             <span
-              aria-label={status.label}
+              aria-label={label}
               className={`inline-flex size-3.5 shrink-0 items-center justify-center ${status.colorClass}`}
             />
           }
@@ -197,7 +208,7 @@ export function ThreadStatusLabel({
             }`}
           />
         </TooltipTrigger>
-        <TooltipPopup side="top">{status.label}</TooltipPopup>
+        <TooltipPopup side="top">{label}</TooltipPopup>
       </Tooltip>
     );
   }
@@ -207,7 +218,7 @@ export function ThreadStatusLabel({
       <TooltipTrigger
         render={
           <span
-            aria-label={status.label}
+            aria-label={label}
             className={`inline-flex items-center gap-1 text-[10px] ${status.colorClass}`}
           />
         }
@@ -217,9 +228,9 @@ export function ThreadStatusLabel({
             status.pulse ? "animate-status-pulse" : ""
           }`}
         />
-        <span className="hidden md:inline">{status.label}</span>
+        <span className="hidden md:inline">{label}</span>
       </TooltipTrigger>
-      <TooltipPopup side="top">{status.label}</TooltipPopup>
+      <TooltipPopup side="top">{label}</TooltipPopup>
     </Tooltip>
   );
 }

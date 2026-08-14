@@ -35,7 +35,7 @@ function describeServer(server: PreviewableServer): string {
 
 function PulsingDot() {
   return (
-    <span aria-label="Listening" className="relative inline-flex size-2 shrink-0">
+    <span aria-label="Escuchando" className="relative inline-flex size-2 shrink-0">
       <span className="absolute inset-0 animate-status-ping rounded-full bg-success opacity-60" />
       <span className="relative inline-flex size-2 rounded-full bg-success" />
     </span>
@@ -45,7 +45,7 @@ function PulsingDot() {
 function DimDot() {
   return (
     <span
-      aria-label="Not currently listening"
+      aria-label="No está escuchando ahora"
       className="size-2 shrink-0 rounded-full bg-muted-foreground/40"
     />
   );

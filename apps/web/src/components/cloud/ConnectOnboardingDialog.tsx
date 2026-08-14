@@ -116,7 +116,7 @@ function ConfiguredConnectOnboardingDialog() {
   const publishStepDecided = !canManageRelay || controller.linkState.target !== null;
 
   // Open once the session scopes resolve so the step set is stable. Accounts
-  // that chose "Don't show this again" are skipped.
+  // that chose "No volver a mostrar" are skipped.
   useEffect(() => {
     if (requestedAccount === null || openForAccount !== null) return;
     if (optOutAccounts.includes(requestedAccount)) {
@@ -200,10 +200,10 @@ function ConfiguredConnectOnboardingDialog() {
     if (!ok) return;
     toastManager.add({
       type: "success",
-      title: "Fenix Connect enabled",
+      title: "Fenix Connect activado",
       description: exposeEnvironment
-        ? "This environment is available to your other devices through Fenix Connect."
-        : "This environment publishes agent activity to your mobile clients.",
+        ? "Este entorno está disponible para tus otros dispositivos mediante Fenix Connect."
+        : "Este entorno publica la actividad del agente en tus clientes móviles.",
     });
     setStep("devices");
   };
@@ -219,10 +219,9 @@ function ConfiguredConnectOnboardingDialog() {
     >
       <DialogPopup className="max-w-xl">
         <DialogHeader>
-          <DialogTitle>Set up Fenix Connect</DialogTitle>
+          <DialogTitle>Configurar Fenix Connect</DialogTitle>
           <DialogDescription>
-            Mesh your devices together — publish this environment and connect the rest, all in one
-            place.
+            Conecta tus dispositivos: publica este entorno y enlaza los demás desde un único lugar.
           </DialogDescription>
           {steps.length > 1 ? (
             <OnboardingStepper
@@ -253,7 +252,7 @@ function ConfiguredConnectOnboardingDialog() {
               checked={dontShowAgain}
               onCheckedChange={(checked) => setDontShowAgain(checked === true)}
             />
-            Don&apos;t show this again
+            No volver a mostrar
           </label>
           <div className="flex flex-col-reverse gap-2 sm:flex-row">
             {step === "publish" ? (
@@ -267,7 +266,7 @@ function ConfiguredConnectOnboardingDialog() {
                   }
                   onClick={() => void applyPublishSelection()}
                 >
-                  {isApplying ? "Enabling…" : "Continue"}
+                  {isApplying ? "Activando…" : "Continuar"}
                 </Button>
               </>
             ) : (
@@ -283,8 +282,8 @@ function ConfiguredConnectOnboardingDialog() {
 }
 
 const STEP_LABELS: Record<OnboardingStep, string> = {
-  publish: "Publish",
-  devices: "Connect devices",
+  publish: "Publicar",
+  devices: "Conectar dispositivos",
 };
 
 function OnboardingStepper({
@@ -360,15 +359,15 @@ function PublishStep({
     <div className="space-y-3">
       <div className="rounded-lg border">
         <OnboardingToggleRow
-          title="Publish this environment"
-          description="Make this environment available to your other devices through Fenix Connect."
+          title="Publicar este entorno"
+          description="Haz que este entorno esté disponible en tus otros dispositivos mediante Fenix Connect."
           checked={exposeEnvironment}
           disabled={disabled}
           onCheckedChange={onExposeEnvironmentChange}
         />
         <OnboardingToggleRow
-          title="Publish agent activity"
-          description="Send activity from this environment to your mobile clients for push notifications and Live Activities."
+          title="Publicar actividad del agente"
+          description="Envía la actividad de este entorno a tus clientes móviles para recibir notificaciones push y actividades en directo."
           checked={publishAgentActivity}
           disabled={disabled}
           onCheckedChange={onPublishAgentActivityChange}
@@ -423,8 +422,8 @@ function DevicesStep() {
         showSavedEnvironments
         empty={
           <p className="px-4 py-6 text-center text-sm text-muted-foreground">
-            No other environments are published to your account yet. Publish one from another device
-            and it will show up here.
+            Todavía no hay otros entornos publicados en tu cuenta. Publica uno desde otro
+            dispositivo y aparecerá aquí.
           </p>
         }
       />

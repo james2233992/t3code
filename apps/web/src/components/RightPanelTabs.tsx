@@ -52,9 +52,10 @@ interface RightPanelTabsProps {
 }
 
 const SURFACE_DISABLED_REASONS = {
-  browser: "Browser previews are only available in the Fenix Code desktop app.",
-  files: "Files are only available when a project is open.",
-  diff: "Diff is only available for server threads in Git repositories.",
+  browser:
+    "Las previsualizaciones solo están disponibles en la aplicación de escritorio de Fenix Code.",
+  files: "Los archivos solo están disponibles cuando hay un proyecto abierto.",
+  diff: "Las diferencias solo están disponibles en conversaciones del servidor vinculadas a repositorios Git.",
 } as const;
 
 type TabContextMenuAction = "copy-path" | "close" | "close-others" | "close-to-right" | "close-all";
@@ -99,8 +100,8 @@ function RightPanelEmptyState(props: {
 }) {
   const actions = [
     {
-      label: "Browser",
-      description: "Open a local app or URL.",
+      label: "Navegador",
+      description: "Abre una aplicación local o una URL.",
       icon: Globe2,
       available: props.browserAvailable,
       disabledReason: SURFACE_DISABLED_REASONS.browser,
@@ -108,31 +109,31 @@ function RightPanelEmptyState(props: {
     },
     {
       label: "Terminal",
-      description: "Start a shell in this workspace.",
+      description: "Inicia un terminal en este espacio de trabajo.",
       icon: TerminalSquare,
       available: true,
       disabledReason: null,
       onClick: props.onAddTerminal,
     },
     {
-      label: "Files",
-      description: "Browse and read workspace files.",
+      label: "Archivos",
+      description: "Explora y lee los archivos del espacio de trabajo.",
       icon: Files,
       available: props.filesAvailable,
       disabledReason: SURFACE_DISABLED_REASONS.files,
       onClick: props.onAddFiles,
     },
     {
-      label: "Diff",
-      description: "Review changes in this thread.",
+      label: "Diferencias",
+      description: "Revisa los cambios de esta conversación.",
       icon: FileDiff,
       available: props.diffAvailable,
       disabledReason: SURFACE_DISABLED_REASONS.diff,
       onClick: props.onAddDiff,
     },
     {
-      label: "Agents",
-      description: "Watch subagents and workflows run.",
+      label: "Agentes",
+      description: "Observa la ejecución de subagentes y flujos de trabajo.",
       icon: Bot,
       available: true,
       disabledReason: null,
@@ -144,9 +145,9 @@ function RightPanelEmptyState(props: {
     <div className="flex min-h-0 flex-1 items-center justify-center p-6">
       <div className="w-full max-w-xl">
         <div className="mb-5 text-center">
-          <h3 className="text-sm font-medium text-foreground">Open a surface</h3>
+          <h3 className="text-sm font-medium text-foreground">Abrir una superficie</h3>
           <p className="mt-1 text-xs text-muted-foreground">
-            Choose what to show in the right panel.
+            Elige qué mostrar en el panel derecho.
           </p>
         </div>
         <div className="grid grid-cols-2 gap-2">
@@ -217,12 +218,12 @@ function surfaceTitle(
       return "Agents";
     case "preview": {
       const snapshot = surface.resourceId ? sessions[surface.resourceId] : null;
-      if (!snapshot || snapshot.navStatus._tag === "Idle") return "Browser";
+      if (!snapshot || snapshot.navStatus._tag === "Idle") return "Navegador";
       if (snapshot.navStatus.title.trim().length > 0) return snapshot.navStatus.title;
       try {
-        return new URL(snapshot.navStatus.url).host || "Browser";
+        return new URL(snapshot.navStatus.url).host || "Navegador";
       } catch {
-        return "Browser";
+        return "Navegador";
       }
     }
   }
@@ -297,23 +298,23 @@ export function RightPanelTabs(props: RightPanelTabsProps) {
 
       const items: ContextMenuItem<TabContextMenuAction>[] = [];
       if (surface.kind === "file") {
-        items.push({ id: "copy-path", label: "Copy path" });
+        items.push({ id: "copy-path", label: "Copiar ruta" });
       }
       items.push(
-        { id: "close", label: "Close" },
+        { id: "close", label: "Cerrar" },
         {
           id: "close-others",
-          label: "Close others",
+          label: "Cerrar las demás",
           disabled: props.surfaces.length <= 1,
         },
         {
           id: "close-to-right",
-          label: "Close to the right",
+          label: "Cerrar las de la derecha",
           disabled: surfaceIndex >= props.surfaces.length - 1,
         },
         {
           id: "close-all",
-          label: "Close all",
+          label: "Cerrar todas",
           disabled: props.surfaces.length === 0,
         },
       );
@@ -404,7 +405,7 @@ export function RightPanelTabs(props: RightPanelTabsProps) {
                   <button
                     type="button"
                     className="group/close relative flex size-4 shrink-0 items-center justify-center rounded-sm hover:bg-muted"
-                    aria-label={`Close ${title}`}
+                    aria-label={`Cerrar ${title}`}
                     onClick={() => props.onCloseSurface(surface)}
                   >
                     <span className="relative flex size-3 items-center justify-center group-hover/tab:hidden group-focus-visible/close:hidden">
@@ -443,7 +444,7 @@ export function RightPanelTabs(props: RightPanelTabsProps) {
               <Menu>
                 <MenuTrigger
                   className="relative inline-flex size-6 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground"
-                  aria-label="Add panel surface"
+                  aria-label="Añadir superficie al panel"
                 >
                   <Plus className="size-3.5" />
                 </MenuTrigger>
@@ -454,7 +455,7 @@ export function RightPanelTabs(props: RightPanelTabsProps) {
                     onClick={props.onAddBrowser}
                   >
                     <Globe2 />
-                    Browser
+                    Navegador
                   </SurfaceMenuItem>
                   <SurfaceMenuItem available onClick={props.onAddTerminal}>
                     <TerminalSquare />
@@ -466,7 +467,7 @@ export function RightPanelTabs(props: RightPanelTabsProps) {
                     onClick={props.onAddFiles}
                   >
                     <Files />
-                    Files
+                    Archivos
                   </SurfaceMenuItem>
                   <SurfaceMenuItem
                     available={props.diffAvailable}
@@ -474,11 +475,11 @@ export function RightPanelTabs(props: RightPanelTabsProps) {
                     onClick={props.onAddDiff}
                   >
                     <FileDiff />
-                    Diff
+                    Diferencias
                   </SurfaceMenuItem>
                   <SurfaceMenuItem available onClick={props.onAddAgents}>
                     <Bot />
-                    Agents
+                    Agentes
                   </SurfaceMenuItem>
                 </MenuPopup>
               </Menu>

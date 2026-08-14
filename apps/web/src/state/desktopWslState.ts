@@ -14,7 +14,7 @@ class DesktopWslStateUnavailableError extends Schema.TaggedErrorClass<DesktopWsl
   {},
 ) {
   override get message(): string {
-    return "Desktop WSL state is unavailable.";
+    return "El estado de WSL del escritorio no está disponible.";
   }
 }
 
@@ -23,7 +23,7 @@ class DesktopWslStateLoadError extends Schema.TaggedErrorClass<DesktopWslStateLo
   { cause: Schema.Defect() },
 ) {
   override get message(): string {
-    return "Failed to load WSL state.";
+    return "No se pudo cargar el estado de WSL.";
   }
 }
 

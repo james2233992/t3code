@@ -110,7 +110,7 @@ export function PreviewChromeRow({
   return (
     <div className="relative">
       <form onSubmit={submit} className="surface-subheader gap-1 px-2" data-surface-subheader>
-        <div className="flex items-center gap-0.5" role="group" aria-label="Navigation">
+        <div className="flex items-center gap-0.5" role="group" aria-label="Navegación">
           <Tooltip>
             <TooltipTrigger
               render={
@@ -119,14 +119,14 @@ export function PreviewChromeRow({
                   size="icon-xs"
                   onClick={canGoBack ? onBack : NOOP}
                   disabled={!canGoBack}
-                  aria-label="Back"
+                  aria-label="Volver"
                   type="button"
                 />
               }
             >
               <ArrowLeft />
             </TooltipTrigger>
-            <TooltipPopup>Back</TooltipPopup>
+            <TooltipPopup>Volver</TooltipPopup>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger
@@ -136,14 +136,14 @@ export function PreviewChromeRow({
                   size="icon-xs"
                   onClick={canGoForward ? onForward : NOOP}
                   disabled={!canGoForward}
-                  aria-label="Forward"
+                  aria-label="Avanzar"
                   type="button"
                 />
               }
             >
               <ArrowRight />
             </TooltipTrigger>
-            <TooltipPopup>Forward</TooltipPopup>
+            <TooltipPopup>Avanzar</TooltipPopup>
           </Tooltip>
           <Tooltip>
             <TooltipTrigger
@@ -153,14 +153,14 @@ export function PreviewChromeRow({
                   size="icon-xs"
                   onClick={refreshDisabled ? NOOP : onRefresh}
                   disabled={refreshDisabled}
-                  aria-label={loading ? "Stop" : "Refresh"}
+                  aria-label={loading ? "Detener" : "Actualizar"}
                   type="button"
                 />
               }
             >
               <RotateCw className={cn(loading && "animate-spin")} />
             </TooltipTrigger>
-            <TooltipPopup>{loading ? "Loading…" : "Refresh"}</TooltipPopup>
+            <TooltipPopup>{loading ? "Cargando…" : "Actualizar"}</TooltipPopup>
           </Tooltip>
         </div>
 
@@ -193,7 +193,7 @@ export function PreviewChromeRow({
                       inputRef.current?.blur();
                     }
                   }}
-                  placeholder="Search or enter URL"
+                  placeholder="Buscar o introducir una URL"
                   spellCheck={false}
                   disabled={inputDisabled}
                   data-preview-url-input
@@ -214,14 +214,14 @@ export function PreviewChromeRow({
                       variant="ghost"
                       size="icon-xs"
                       onClick={onOpenInBrowser}
-                      aria-label="Open in system browser"
+                      aria-label="Abrir en el navegador del sistema"
                       type="button"
                     />
                   }
                 >
                   <ExternalLink />
                 </TooltipTrigger>
-                <TooltipPopup>Open in system browser</TooltipPopup>
+                <TooltipPopup>Abrir en el navegador del sistema</TooltipPopup>
               </Tooltip>
             </InputGroupAddon>
           ) : null}
@@ -236,7 +236,7 @@ export function PreviewChromeRow({
                   size="icon-xs"
                   onClick={onPickElement}
                   disabled={pickDisabled}
-                  aria-label={pickActive ? "Cancel annotation" : "Annotate preview"}
+                  aria-label={pickActive ? "Cancelar anotación" : "Anotar previsualización"}
                   aria-pressed={pickActive ? "true" : "false"}
                   type="button"
                 />
@@ -248,8 +248,8 @@ export function PreviewChromeRow({
               {pickDisabled && pickDisabledReason
                 ? pickDisabledReason
                 : pickActive
-                  ? "Cancel annotation (Esc)"
-                  : "Annotate elements, regions, and drawings"}
+                  ? "Cancelar anotación (Esc)"
+                  : "Anotar elementos, regiones y dibujos"}
             </TooltipPopup>
           </Tooltip>
         ) : null}
@@ -261,7 +261,7 @@ export function PreviewChromeRow({
                   variant={recording ? "secondary" : "ghost"}
                   size="icon-xs"
                   onClick={(event) => onCapture(event.shiftKey)}
-                  aria-label={recording ? "Stop recording" : "Capture screenshot"}
+                  aria-label={recording ? "Detener grabación" : "Capturar pantalla"}
                   type="button"
                   className="relative"
                   disabled={captureDisabled}
@@ -274,7 +274,7 @@ export function PreviewChromeRow({
               ) : null}
             </TooltipTrigger>
             <TooltipPopup>
-              {recording ? "Stop recording" : "Screenshot · Shift-click to record"}
+              {recording ? "Detener grabación" : "Captura de pantalla · Mayús-clic para grabar"}
             </TooltipPopup>
           </Tooltip>
         ) : null}
@@ -287,7 +287,9 @@ export function PreviewChromeRow({
                   size="icon-xs"
                   onClick={onPictureInPicture}
                   aria-label={
-                    pictureInPicture ? "Close floating preview" : "Float preview over chat"
+                    pictureInPicture
+                      ? "Cerrar previsualización flotante"
+                      : "Mostrar previsualización sobre el chat"
                   }
                   aria-pressed={pictureInPicture ? "true" : "false"}
                   type="button"
@@ -298,7 +300,9 @@ export function PreviewChromeRow({
               <PictureInPicture2 className={cn(pictureInPicture && "text-primary")} />
             </TooltipTrigger>
             <TooltipPopup>
-              {pictureInPicture ? "Close floating preview" : "Float preview over chat"}
+              {pictureInPicture
+                ? "Cerrar previsualización flotante"
+                : "Mostrar previsualización sobre el chat"}
             </TooltipPopup>
           </Tooltip>
         ) : null}

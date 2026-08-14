@@ -82,7 +82,7 @@ export function parseWhenExpressionDraft(
   if (!ast) {
     return {
       ok: false,
-      message: "Use variables with !, &&, ||, and parentheses.",
+      message: "Usa variables con !, &&, || y paréntesis.",
     };
   }
 

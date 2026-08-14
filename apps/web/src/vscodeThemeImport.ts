@@ -184,7 +184,7 @@ function resolveName(value: Record<string, unknown>): string {
 }
 
 export function parseVsCodeThemeFile(value: unknown): ThemeDefinition {
-  if (!isRecord(value)) throw new Error("Theme files must contain a JSON object.");
+  if (!isRecord(value)) throw new Error("Los archivos de tema deben contener un objeto JSON.");
   const colors = isRecord(value.colors) ? value.colors : {};
 
   /** First key that carries a usable color, in priority order. */
@@ -203,7 +203,7 @@ export function parseVsCodeThemeFile(value: unknown): ThemeDefinition {
   const canvasColor = pick("editor.background", "editorPane.background");
   if (!canvasColor) {
     throw new Error(
-      'That VS Code theme has no "editor.background" color, so there is nothing to build a palette from.',
+      'Ese tema de VS Code no tiene el color "editor.background", por lo que no se puede generar una paleta.',
     );
   }
   const canvas = { r: canvasColor.r, g: canvasColor.g, b: canvasColor.b };

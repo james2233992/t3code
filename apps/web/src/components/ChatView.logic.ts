@@ -87,7 +87,7 @@ export function buildLocalDraftThread(
     id: threadId,
     environmentId: draftThread.environmentId,
     projectId: draftThread.projectId,
-    title: "New thread",
+    title: "Nueva conversación",
     modelSelection: fallbackModelSelection,
     runtimeMode: draftThread.runtimeMode,
     interactionMode: draftThread.interactionMode,
@@ -241,10 +241,10 @@ export function readFileAsDataUrl(file: File): Promise<string> {
         resolve(reader.result);
         return;
       }
-      reject(new Error("Could not read image data."));
+      reject(new Error("No se pudieron leer los datos de la imagen."));
     });
     reader.addEventListener("error", () => {
-      reject(reader.error ?? new Error("Failed to read image."));
+      reject(reader.error ?? new Error("No se pudo leer la imagen."));
     });
     reader.readAsDataURL(file);
   });
@@ -311,16 +311,17 @@ export function buildExpiredTerminalContextToastCopy(
   variant: "omitted" | "empty",
 ): { title: string; description: string } {
   const count = Math.max(1, Math.floor(expiredTerminalContextCount));
-  const noun = count === 1 ? "Expired terminal context" : "Expired terminal contexts";
+  const noun =
+    count === 1 ? "El contexto de terminal caducado" : "Los contextos de terminal caducados";
   if (variant === "empty") {
     return {
-      title: `${noun} won't be sent`,
-      description: "Remove it or re-add it to include terminal output.",
+      title: `${noun} no se enviará`,
+      description: "Elimínalo o vuelve a añadirlo para incluir la salida del terminal.",
     };
   }
   return {
-    title: `${noun} omitted from message`,
-    description: "Re-add it if you want that terminal output included.",
+    title: `${noun} se omitirán del mensaje`,
+    description: "Vuelve a añadirlo si quieres incluir esa salida del terminal.",
   };
 }
 
@@ -438,8 +439,8 @@ export function getStartedThreadModelChangeBlockReason(input: {
     return null;
   }
   return {
-    title: "Start a new chat to change models",
-    description: "This provider does not allow switching models after a conversation has started.",
+    title: "Inicia una conversación nueva para cambiar de modelo",
+    description: "Este proveedor no permite cambiar de modelo después de iniciar una conversación.",
   };
 }
 

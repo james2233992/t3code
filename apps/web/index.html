@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="es">
   <head>
     <meta charset="UTF-8" />
     <meta
@@ -7,8 +7,10 @@
       content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content"
     />
     <meta name="theme-color" content="#0a0a0a" />
-    <link rel="icon" href="/favicon.ico" sizes="48x48" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="icon" href="%BASE_URL%fenix-code.ico" sizes="48x48" />
+    <link rel="icon" href="%BASE_URL%fenix-code-32x32.png" sizes="32x32" type="image/png" />
+    <link rel="icon" href="%BASE_URL%fenix-code-16x16.png" sizes="16x16" type="image/png" />
+    <link rel="apple-touch-icon" href="%BASE_URL%fenix-code-touch.png" />
     <script>
       (() => {
         const LIGHT_BACKGROUND = "#ffffff";
@@ -435,13 +437,13 @@
         object-fit: contain;
       }
     </style>
-    <title>Fenix Code (Alpha)</title>
+    <title>Fenix Code</title>
   </head>
   <body>
     <div id="root">
       <div id="boot-shell">
         <div id="boot-shell-card" aria-label="Fenix Code splash screen">
-          <img id="boot-shell-logo" src="/apple-touch-icon.png" alt="Fenix Code" />
+          <img id="boot-shell-logo" src="%BASE_URL%fenix-code-touch.png" alt="Fenix Code" />
         </div>
       </div>
     </div>

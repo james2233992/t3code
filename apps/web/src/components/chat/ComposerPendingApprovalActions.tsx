@@ -24,7 +24,7 @@ export const ComposerPendingApprovalActions = memo(function ComposerPendingAppro
         disabled={isResponding}
         onClick={() => void onRespondToApproval(requestId, "cancel")}
       >
-        Cancel turn
+        Cancelar turno
       </Button>
       <Button
         size="sm"
@@ -32,7 +32,7 @@ export const ComposerPendingApprovalActions = memo(function ComposerPendingAppro
         disabled={isResponding}
         onClick={() => void onRespondToApproval(requestId, "decline")}
       >
-        Decline
+        Rechazar
       </Button>
       <Button
         size="sm"
@@ -40,7 +40,7 @@ export const ComposerPendingApprovalActions = memo(function ComposerPendingAppro
         disabled={isResponding}
         onClick={() => void onRespondToApproval(requestId, "acceptForSession")}
       >
-        Always allow this session
+        Permitir siempre durante esta sesión
       </Button>
       <Button
         size="sm"
@@ -48,7 +48,7 @@ export const ComposerPendingApprovalActions = memo(function ComposerPendingAppro
         disabled={isResponding}
         onClick={() => void onRespondToApproval(requestId, "accept")}
       >
-        Approve once
+        Aprobar una vez
       </Button>
     </>
   );

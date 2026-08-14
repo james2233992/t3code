@@ -20,12 +20,12 @@ export interface SettingsSearchItem {
  */
 export const SETTINGS_SECTION_LABELS: Readonly<Record<SettingsPath, string>> = {
   "/settings/general": "General",
-  "/settings/appearance": "Appearance",
-  "/settings/keybindings": "Keybindings",
-  "/settings/providers": "Providers",
-  "/settings/source-control": "Source Control",
-  "/settings/connections": "Connections",
-  "/settings/archived": "Archive",
+  "/settings/appearance": "Apariencia",
+  "/settings/keybindings": "Atajos de teclado",
+  "/settings/providers": "Proveedores",
+  "/settings/source-control": "Control de versiones",
+  "/settings/connections": "Conexiones",
+  "/settings/archived": "Archivo",
 };
 
 /**
@@ -37,14 +37,14 @@ export const SETTINGS_SECTION_LABELS: Readonly<Record<SettingsPath, string>> = {
 export const SETTINGS_SEARCH_ITEMS = [
   {
     id: "color-scheme",
-    title: "Color scheme",
+    title: "Esquema de color",
     to: "/settings/appearance",
     // The scheme tiles sit at the top of the Appearance section.
     targetId: "appearance",
   },
   {
     id: "theme",
-    title: "Themes",
+    title: "Temas",
     to: "/settings/appearance",
     // Theme cards live directly under the scheme tiles; the section is the
     // stable scroll destination for both.
@@ -53,145 +53,145 @@ export const SETTINGS_SEARCH_ITEMS = [
   {
     // Prefixed because the slider control already owns the `glass-opacity` id.
     id: "setting-glass-opacity",
-    title: "Glass opacity",
+    title: "Opacidad del cristal",
     to: "/settings/appearance",
   },
   {
     id: "environment-identification",
-    title: "Environment identification",
+    title: "Identificación del entorno",
     to: "/settings/appearance",
     // The setting is stage-dependent, so its parent section is the stable destination.
     targetId: "appearance",
   },
   {
     id: "interface-font",
-    title: "Interface font",
+    title: "Fuente de la interfaz",
     to: "/settings/appearance",
   },
   {
     id: "prompt-font",
-    title: "Prompt font",
+    title: "Fuente de las instrucciones",
     to: "/settings/appearance",
   },
   {
     id: "code-font",
-    title: "Code font",
+    title: "Fuente del código",
     to: "/settings/appearance",
   },
   {
     id: "terminal-font",
-    title: "Terminal font",
+    title: "Fuente del terminal",
     to: "/settings/appearance",
   },
   {
     id: "font-smoothing",
-    title: "Font smoothing",
+    title: "Suavizado de fuentes",
     to: "/settings/appearance",
   },
   {
     id: "word-wrap",
-    title: "Word wrap",
+    title: "Ajuste de línea",
     to: "/settings/appearance",
   },
   {
     id: "project-grouping",
-    title: "Project grouping",
+    title: "Agrupación de proyectos",
     to: "/settings/general",
   },
   {
     id: "auto-settle-inactive-threads",
-    title: "Auto-settle inactive threads",
+    title: "Archivar conversaciones inactivas automáticamente",
     to: "/settings/general",
   },
   {
     id: "time-format",
-    title: "Time format",
+    title: "Formato de hora",
     to: "/settings/general",
   },
   {
     id: "hide-whitespace-changes",
-    title: "Hide whitespace changes",
+    title: "Ocultar cambios de espacios en blanco",
     to: "/settings/general",
   },
   {
     id: "provider-update-checks",
-    title: "Provider update checks",
+    title: "Comprobación de actualizaciones de proveedores",
     to: "/settings/general",
   },
   {
     id: "new-threads",
-    title: "New threads",
+    title: "Conversaciones nuevas",
     to: "/settings/general",
   },
   {
     id: "start-from-origin",
-    title: "Start from origin",
+    title: "Empezar desde el origen",
     to: "/settings/general",
     targetId: "new-threads",
   },
   {
     id: "add-project-starts-in",
-    title: "Add project starts in",
+    title: "Directorio inicial al añadir un proyecto",
     to: "/settings/general",
   },
   {
     id: "archive-confirmation",
-    title: "Archive confirmation",
+    title: "Confirmación al archivar",
     to: "/settings/general",
   },
   {
     id: "delete-confirmation",
-    title: "Delete confirmation",
+    title: "Confirmación al eliminar",
     to: "/settings/general",
   },
   {
     id: "text-generation-model",
-    title: "Text generation model",
+    title: "Modelo de generación de texto",
     to: "/settings/general",
   },
   {
     id: "diagnostics",
-    title: "Diagnostics",
+    title: "Diagnóstico",
     to: "/settings/general",
   },
   {
     id: "legacy-plan-mode",
-    title: "Plan mode (legacy)",
+    title: "Modo de planificación (heredado)",
     to: "/settings/general",
   },
   {
     id: "legacy-token-streaming",
-    title: "Stream token by token (legacy)",
+    title: "Transmitir token a token (heredado)",
     to: "/settings/general",
   },
   {
     id: "legacy-sidebar",
-    title: "Sidebar (legacy)",
+    title: "Barra lateral (heredada)",
     to: "/settings/general",
   },
   {
     id: "keybindings",
-    title: "Keybindings",
+    title: "Atajos de teclado",
     to: "/settings/keybindings",
   },
   {
     id: "providers",
-    title: "Providers",
+    title: "Proveedores",
     to: "/settings/providers",
   },
   {
     id: "source-control",
-    title: "Source control",
+    title: "Control de versiones",
     to: "/settings/source-control",
   },
   {
     id: "remote-environments",
-    title: "Remote environments",
+    title: "Entornos remotos",
     to: "/settings/connections",
   },
   {
     id: "archive",
-    title: "Archived threads",
+    title: "Conversaciones archivadas",
     to: "/settings/archived",
   },
 ] as const satisfies ReadonlyArray<SettingsSearchItem>;

@@ -74,8 +74,8 @@ export function ThreadPreviewMiniPlayer({ threadRef, tabId, bottomInset }: Props
     void operation(runtimeTabId).catch((error) => {
       toastManager.add({
         type: "error",
-        title: "Unable to update popped-out preview",
-        description: error instanceof Error ? error.message : "An error occurred.",
+        title: "No se pudo actualizar la previsualización independiente",
+        description: error instanceof Error ? error.message : "Se ha producido un error.",
       });
     });
   };
@@ -215,7 +215,7 @@ export function ThreadPreviewMiniPlayer({ threadRef, tabId, bottomInset }: Props
   return (
     <section
       ref={rootRef}
-      aria-label="Floating browser preview"
+      aria-label="Previsualización flotante del navegador"
       data-preview-mini-player={tabId}
       className="pointer-events-none absolute select-none"
       style={
@@ -244,8 +244,8 @@ export function ThreadPreviewMiniPlayer({ threadRef, tabId, bottomInset }: Props
           <Button
             variant="ghost"
             size="icon-xs"
-            aria-label="Open preview in right panel"
-            title="Open in right panel"
+            aria-label="Abrir previsualización en el panel derecho"
+            title="Abrir en el panel derecho"
             onPointerDown={(event) => event.stopPropagation()}
             onClick={openInPanel}
           >
@@ -256,13 +256,13 @@ export function ThreadPreviewMiniPlayer({ threadRef, tabId, bottomInset }: Props
             size="icon-xs"
             aria-label={
               desktopOverlay?.pictureInPicture
-                ? "Close popped-out preview"
-                : "Pop preview into separate window"
+                ? "Cerrar previsualización independiente"
+                : "Abrir la previsualización en una ventana independiente"
             }
             title={
               desktopOverlay?.pictureInPicture
-                ? "Close separate window"
-                : "Pop into separate window"
+                ? "Cerrar ventana independiente"
+                : "Abrir en una ventana independiente"
             }
             disabled={!desktopOverlay?.hasWebContents}
             onPointerDown={(event) => event.stopPropagation()}
@@ -273,8 +273,8 @@ export function ThreadPreviewMiniPlayer({ threadRef, tabId, bottomInset }: Props
           <Button
             variant="ghost"
             size="icon-xs"
-            aria-label="Close floating preview"
-            title="Close floating preview"
+            aria-label="Cerrar previsualización flotante"
+            title="Cerrar previsualización flotante"
             onPointerDown={(event) => event.stopPropagation()}
             onClick={close}
           >
@@ -296,13 +296,13 @@ export function ThreadPreviewMiniPlayer({ threadRef, tabId, bottomInset }: Props
         <div className="pointer-events-none absolute inset-0 z-[31] rounded-xl ring-1 ring-inset ring-border/80" />
         {!desktopOverlay?.hasWebContents ? (
           <div className="pointer-events-none absolute inset-0 z-[32] flex items-center justify-center rounded-xl bg-muted text-xs text-muted-foreground">
-            Reconnecting preview…
+            Reconectando la vista previa…
           </div>
         ) : null}
         <button
           type="button"
-          aria-label="Resize floating preview"
-          title="Resize floating preview"
+          aria-label="Cambiar tamaño de la previsualización flotante"
+          title="Cambiar tamaño de la previsualización flotante"
           className="pointer-events-auto absolute bottom-0 right-0 z-[33] size-5 cursor-nwse-resize rounded-br-xl after:absolute after:bottom-1 after:right-1 after:size-2 after:border-b after:border-r after:border-foreground/45"
           onPointerDown={handleResizePointerDown}
           onPointerMove={handleResizePointerMove}

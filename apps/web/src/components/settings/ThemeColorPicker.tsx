@@ -14,12 +14,12 @@ export function getThemeRoleLabel(role: ThemeColorRole): string {
     toolbarControlForeground: "Toolbar control text",
     toolbarControlHover: "Toolbar control hover",
     accent: "Accent color",
-    errorForeground: "Error text",
+    errorForeground: "Texto de error",
     errorSurface: "Error background",
     warningForeground: "Warning text",
     warningSurface: "Warning background",
-    updateForeground: "Update text",
-    updateSurface: "Update background",
+    updateForeground: "Actualizar texto",
+    updateSurface: "Actualizar fondo",
   };
   const label = labels[role];
   if (label) return label;
@@ -317,7 +317,7 @@ function ThemeColorPickerPanel({
       <div className="flex items-center justify-between border-b border-border/70 px-4 py-3">
         <div className="min-w-0">
           <p className="truncate text-xs font-semibold text-foreground">{label}</p>
-          <p className="text-[11px] text-muted-foreground">Choose a color</p>
+          <p className="text-[11px] text-muted-foreground">Elige un color</p>
         </div>
         <span
           className="size-7 shrink-0 rounded-full shadow-sm"
@@ -515,11 +515,11 @@ export const ThemeColorField = memo(function ThemeColorField({
       data-theme-color-role={role}
     >
       <button
-        aria-label={`${selected ? "Hide" : "Show"} ${label} usage`}
+        aria-label={`${selected ? "Ocultar" : "Mostrar"} uso de ${label}`}
         aria-pressed={selected}
         className="flex min-w-0 flex-1 cursor-pointer items-center rounded-md text-left text-sm text-muted-foreground outline-none hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring"
         onClick={() => onToggleSelected?.(role)}
-        title={`${selected ? "Hide" : "Show"} where ${label} is used`}
+        title={`${selected ? "Ocultar" : "Mostrar"} dónde se usa ${label}`}
         type="button"
       >
         <span className="min-w-0 flex-1 truncate">{label}</span>

@@ -365,7 +365,7 @@ describe("theme files", () => {
         colors: { canvas: "#f8fbff" },
         variants: { light: { canvas: "#101827" } },
       }),
-    ).toThrow('Theme variants must not repeat the base appearance "light".');
+    ).toThrow('Las variantes de tema no pueden repetir la apariencia base "light".');
   });
 
   it("keeps a single-mode theme on its only palette", () => {

@@ -37,10 +37,10 @@ function ConnectCliAuthMessage({
 }
 
 const invalidLinkMessage = {
-  eyebrow: "Authorization request",
-  title: "This connect link is incomplete",
+  eyebrow: "Solicitud de autorización",
+  title: "Este enlace de conexión está incompleto",
   description:
-    "The link is missing its authorization request. Re-run `fenix-code connect` in your terminal and open the freshly printed URL.",
+    "Al enlace le falta la solicitud de autorización. Ejecuta de nuevo `fenix-code connect` en el terminal y abre la URL recién generada.",
 } as const;
 
 /**
@@ -85,12 +85,12 @@ export function ConnectCliAuthorizeSurface() {
   return (
     <AuthSurfaceShell>
       <ConnectCliAuthMessage
-        eyebrow="Step 1 of 2 · Browser authorization"
-        title="Connecting your terminal"
+        eyebrow="Paso 1 de 2 · Autorización en el navegador"
+        title="Conectando tu terminal"
         description={
           isSignedIn
-            ? "Redirecting to authorize Fenix Connect for your CLI…"
-            : "Sign in to continue authorizing Fenix Connect for your CLI."
+            ? "Redirigiendo para autorizar Fenix Connect en tu CLI…"
+            : "Inicia sesión para seguir autorizando Fenix Connect en tu CLI."
         }
       />
       {isLoaded && !isSignedIn ? (
@@ -101,7 +101,7 @@ export function ConnectCliAuthorizeSurface() {
               clerk.openSignIn(resolveClerkSignInProps(window.location.href, isElectron))
             }
           >
-            Sign in
+            Iniciar sesión
           </Button>
         </div>
       ) : null}
@@ -117,15 +117,15 @@ export function ConnectCliCallbackSurface() {
   const [result] = useState(readConnectCliCallbackResult);
   const [expectedState] = useState(readConnectCliAuthState);
   const { user } = useUser();
-  const { copyToClipboard, isCopied } = useCopyToClipboard({ target: "authentication code" });
+  const { copyToClipboard, isCopied } = useCopyToClipboard({ target: "código de autenticación" });
 
   if (!result) {
     return (
       <AuthSurfaceShell>
         <ConnectCliAuthMessage
-          eyebrow="Step 2 of 2 · Terminal handoff"
-          title="Authorization did not complete"
-          description="No authorization code was returned. Re-run `fenix-code connect` in your terminal and try again."
+          eyebrow="Paso 2 de 2 · Transferencia al terminal"
+          title="La autorización no se completó"
+          description="No se devolvió ningún código de autorización. Ejecuta de nuevo `fenix-code connect` en tu terminal y vuelve a intentarlo."
         />
       </AuthSurfaceShell>
     );
@@ -139,9 +139,9 @@ export function ConnectCliCallbackSurface() {
     return (
       <AuthSurfaceShell>
         <ConnectCliAuthMessage
-          eyebrow="Step 2 of 2 · Terminal handoff"
-          title="This code belongs to a different request"
-          description="This authorization response does not match a connect request started in this browser. Re-run `fenix-code connect` in your terminal and open the freshly printed URL in this browser."
+          eyebrow="Paso 2 de 2 · Entrega al terminal"
+          title="Este código pertenece a otra solicitud"
+          description="Esta respuesta de autorización no coincide con una solicitud de conexión iniciada en este navegador. Ejecuta de nuevo `fenix-code connect` en tu terminal y abre en este navegador la nueva URL mostrada."
         />
       </AuthSurfaceShell>
     );
@@ -153,21 +153,21 @@ export function ConnectCliCallbackSurface() {
   return (
     <AuthSurfaceShell>
       <ConnectCliAuthMessage
-        eyebrow="Step 2 of 2 · Terminal handoff"
-        title="Almost connected"
+        eyebrow="Paso 2 de 2 · Entrega al terminal"
+        title="Conexión casi terminada"
         description={
           accountLabel
-            ? `Enter this code in your waiting terminal to connect it as ${accountLabel}.`
-            : "Enter this code in your waiting terminal to finish connecting."
+            ? `Introduce este código en el terminal en espera para conectarlo como ${accountLabel}.`
+            : "Introduce este código en el terminal en espera para completar la conexión."
         }
       />
 
       <div className="mt-6 overflow-hidden rounded-xl border border-border/80 bg-background/65">
         <div className="flex items-center justify-between border-b border-border/70 px-4 py-2.5">
           <span className="text-[10px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
-            One-time authorization code
+            Código de autorización de un solo uso
           </span>
-          <span className="font-mono text-[10px] text-muted-foreground">expires shortly</span>
+          <span className="font-mono text-[10px] text-muted-foreground">caduca pronto</span>
         </div>
         <code
           className="block p-4 font-mono text-sm leading-relaxed break-all select-all"
@@ -179,13 +179,13 @@ export function ConnectCliCallbackSurface() {
 
       <div className="mt-4 flex items-center gap-3">
         <Button type="button" onClick={() => copyToClipboard(authCode)}>
-          {isCopied ? "Copied!" : "Copy authorization code"}
+          {isCopied ? "¡Copiado!" : "Copiar código de autorización"}
         </Button>
       </div>
 
       <p className="mt-6 text-xs leading-relaxed text-muted-foreground">
-        Only enter this code in a terminal session you started yourself. Anyone holding it can link
-        their machine to your Fenix Connect account while it is valid.
+        Introduce este código únicamente en una sesión de terminal que hayas iniciado tú. Mientras
+        sea válido, cualquiera que lo tenga podría vincular su equipo a tu cuenta de Fenix Connect.
       </p>
     </AuthSurfaceShell>
   );

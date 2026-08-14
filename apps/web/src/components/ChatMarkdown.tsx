@@ -324,7 +324,7 @@ function MarkdownTable({ children, ...props }: React.ComponentProps<"table">) {
   const [copied, setCopied] = useState(false);
   const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const expandLabel = expanded ? "Collapse table cells" : "Expand table cells";
-  const copyLabel = copied ? "Copied" : "Copy table";
+  const copyLabel = copied ? "Copiada" : "Copiar tabla";
 
   function toggleExpanded() {
     const table = tableRef.current;
@@ -443,8 +443,8 @@ function MarkdownTable({ children, ...props }: React.ComponentProps<"table">) {
             <TooltipPopup side="top">{copyLabel}</TooltipPopup>
           </Tooltip>
           <MenuPopup align="end">
-            <MenuItem onClick={() => handleCopy("markdown")}>Copy as Markdown</MenuItem>
-            <MenuItem onClick={() => handleCopy("csv")}>Copy as CSV</MenuItem>
+            <MenuItem onClick={() => handleCopy("markdown")}>Copiar como Markdown</MenuItem>
+            <MenuItem onClick={() => handleCopy("csv")}>Copiar como CSV</MenuItem>
           </MenuPopup>
         </Menu>
       </div>
@@ -465,7 +465,7 @@ function MarkdownDetails({
   const summary =
     isValidElement<{ children?: ReactNode }>(summaryNode) && summaryNode.props.children
       ? summaryNode.props.children
-      : "Details";
+      : "Detalles";
   const content = childNodes.filter((_, index) => index !== summaryIndex);
 
   return (
@@ -552,8 +552,8 @@ function MarkdownCodeBlock({
   const [copied, setCopied] = useState(false);
   const [wrapped, setWrapped] = useState(readInitialWordWrapSetting);
   const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const wrapLabel = wrapped ? "Disable line wrap" : "Wrap lines";
-  const copyLabel = copied ? "Copied" : "Copy code";
+  const wrapLabel = wrapped ? "Desactivar ajuste de línea" : "Ajustar líneas";
+  const copyLabel = copied ? "Copiado" : "Copiar código";
 
   const handleCopy = useCallback(() => {
     if (typeof navigator === "undefined" || navigator.clipboard == null) {
@@ -607,7 +607,11 @@ function MarkdownCodeBlock({
             theme={theme}
           />
         </span>
-        <span className="flex items-center gap-0.5" role="toolbar" aria-label="Code block actions">
+        <span
+          className="flex items-center gap-0.5"
+          role="toolbar"
+          aria-label="Acciones del bloque de código"
+        >
           <Tooltip>
             <TooltipTrigger
               render={
@@ -1045,8 +1049,8 @@ const MarkdownFileLink = memo(function MarkdownFileLink({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Unable to open file",
-            description: error instanceof Error ? error.message : "An error occurred.",
+            title: "No se pudo abrir el archivo",
+            description: error instanceof Error ? error.message : "Se ha producido un error.",
           }),
         );
       } catch (cause) {
@@ -1057,8 +1061,8 @@ const MarkdownFileLink = memo(function MarkdownFileLink({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Unable to open file",
-            description: cause instanceof Error ? cause.message : "An error occurred.",
+            title: "No se pudo abrir el archivo",
+            description: cause instanceof Error ? cause.message : "Se ha producido un error.",
           }),
         );
       }
@@ -1091,8 +1095,8 @@ const MarkdownFileLink = memo(function MarkdownFileLink({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Unable to open file in browser",
-            description: error instanceof Error ? error.message : "An error occurred.",
+            title: "No se pudo abrir el archivo en el navegador",
+            description: error instanceof Error ? error.message : "Se ha producido un error.",
           }),
         );
       } catch (cause) {
@@ -1103,8 +1107,8 @@ const MarkdownFileLink = memo(function MarkdownFileLink({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: "Unable to open file in browser",
-            description: cause instanceof Error ? cause.message : "An error occurred.",
+            title: "No se pudo abrir el archivo en el navegador",
+            description: cause instanceof Error ? cause.message : "Se ha producido un error.",
           }),
         );
       }
@@ -1117,8 +1121,8 @@ const MarkdownFileLink = memo(function MarkdownFileLink({
         toastManager.add(
           stackedThreadToast({
             type: "error",
-            title: `Failed to copy ${title.toLowerCase()}`,
-            description: "Clipboard API unavailable.",
+            title: `No se pudo copiar ${title.toLowerCase()}`,
+            description: "El portapapeles no está disponible.",
           }),
         );
         return;
@@ -1128,7 +1132,7 @@ const MarkdownFileLink = memo(function MarkdownFileLink({
         () => {
           toastManager.add({
             type: "success",
-            title: `${title} copied`,
+            title: `${title} copiado`,
             description: value,
           });
         },
@@ -1140,8 +1144,8 @@ const MarkdownFileLink = memo(function MarkdownFileLink({
           toastManager.add(
             stackedThreadToast({
               type: "error",
-              title: `Failed to copy ${title.toLowerCase()}`,
-              description: error instanceof Error ? error.message : "An error occurred.",
+              title: `No se pudo copiar ${title.toLowerCase()}`,
+              description: error instanceof Error ? error.message : "Se ha producido un error.",
             }),
           );
         },
@@ -1161,12 +1165,12 @@ const MarkdownFileLink = memo(function MarkdownFileLink({
       try {
         const clicked = await api.contextMenu.show(
           [
-            { id: "open", label: "Open in editor" },
+            { id: "open", label: "Abrir en el editor" },
             ...(onOpenInBrowser
-              ? ([{ id: "open-in-browser", label: "Open in integrated browser" }] as const)
+              ? ([{ id: "open-in-browser", label: "Abrir en el navegador integrado" }] as const)
               : []),
-            { id: "copy-relative", label: "Copy relative path" },
-            { id: "copy-full", label: "Copy full path" },
+            { id: "copy-relative", label: "Copiar ruta relativa" },
+            { id: "copy-full", label: "Copiar ruta completa" },
           ] as const,
           { x: event.clientX, y: event.clientY },
         );
@@ -1331,7 +1335,7 @@ function ChatMarkdown({
           AsyncResult.failure<void, BrowserPreviewUnavailableError>(
             Cause.fail(
               new BrowserPreviewUnavailableError({
-                message: "Thread context is unavailable.",
+                message: "El contexto de la conversación no está disponible.",
               }),
             ),
           ),
@@ -1351,7 +1355,7 @@ function ChatMarkdown({
           AsyncResult.failure<void, BrowserPreviewUnavailableError>(
             Cause.fail(
               new BrowserPreviewUnavailableError({
-                message: "Environment is not connected.",
+                message: "El entorno no está conectado.",
               }),
             ),
           ),
@@ -1443,7 +1447,7 @@ function ChatMarkdown({
             {...props}
             type="checkbox"
             name="markdown-task"
-            aria-label="Toggle task"
+            aria-label="Cambiar estado de la tarea"
             checked={checked}
             onChange={(event) => {
               const markerOffset = Number(

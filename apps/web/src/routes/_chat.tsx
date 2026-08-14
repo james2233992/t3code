@@ -116,8 +116,9 @@ function ChatRouteGlobalShortcuts() {
           toastManager.add(
             stackedThreadToast({
               type: "info",
-              title: "Preview is desktop-only",
-              description: "Open Fenix Code in the desktop app to use the in-app preview.",
+              title: "La previsualización solo está disponible en escritorio",
+              description:
+                "Abre Fenix Code en la aplicación de escritorio para usar la previsualización integrada.",
             }),
           );
           return;

@@ -101,10 +101,10 @@ describe("resolvePreviousWorktreeSeed", () => {
 describe("resolvePreviousWorktreeLabel", () => {
   it("includes the branch when known", () => {
     expect(resolvePreviousWorktreeLabel({ branch: "t3/fix-thing", worktreePath: "/wt" })).toBe(
-      "Previous worktree (t3/fix-thing)",
+      "Copia de trabajo anterior (t3/fix-thing)",
     );
     expect(resolvePreviousWorktreeLabel({ branch: null, worktreePath: "/wt" })).toBe(
-      "Previous worktree",
+      "Copia de trabajo anterior",
     );
   });
 });
@@ -255,7 +255,7 @@ describe("resolveBranchTriggerLabel", () => {
         resolvedActiveBranchIsRemote: null,
         startFromOrigin: true,
       }),
-    ).toBe("Select ref");
+    ).toBe("Seleccionar referencia");
   });
 
   it("does not fabricate an origin ref while branch metadata is loading", () => {
@@ -369,7 +369,7 @@ describe("resolveEnvironmentOptionLabel", () => {
         runtimeLabel: "Local environment",
         savedLabel: "Local",
       }),
-    ).toBe("This device");
+    ).toBe("Este dispositivo");
   });
 
   it("keeps configured labels for non-primary environments", () => {
@@ -478,28 +478,30 @@ describe("resolveEffectiveEnvMode", () => {
 
 describe("resolveEnvModeLabel", () => {
   it("uses explicit workspace labels", () => {
-    expect(resolveEnvModeLabel("local")).toBe("Current checkout");
-    expect(resolveEnvModeLabel("worktree")).toBe("New worktree");
+    expect(resolveEnvModeLabel("local")).toBe("Checkout actual");
+    expect(resolveEnvModeLabel("worktree")).toBe("Nueva copia de trabajo");
   });
 });
 
 describe("resolveCurrentWorkspaceLabel", () => {
   it("describes the main repo checkout when no worktree path is active", () => {
-    expect(resolveCurrentWorkspaceLabel(null)).toBe("Current checkout");
+    expect(resolveCurrentWorkspaceLabel(null)).toBe("Checkout actual");
   });
 
   it("describes the active checkout as a worktree when one is attached", () => {
-    expect(resolveCurrentWorkspaceLabel("/repo/.t3/worktrees/feature-a")).toBe("Current worktree");
+    expect(resolveCurrentWorkspaceLabel("/repo/.t3/worktrees/feature-a")).toBe(
+      "Copia de trabajo actual",
+    );
   });
 });
 
 describe("resolveLockedWorkspaceLabel", () => {
   it("uses a shorter label for the main repo checkout", () => {
-    expect(resolveLockedWorkspaceLabel(null)).toBe("Local checkout");
+    expect(resolveLockedWorkspaceLabel(null)).toBe("Checkout local");
   });
 
   it("uses a shorter label for an attached worktree", () => {
-    expect(resolveLockedWorkspaceLabel("/repo/.t3/worktrees/feature-a")).toBe("Worktree");
+    expect(resolveLockedWorkspaceLabel("/repo/.t3/worktrees/feature-a")).toBe("Copia de trabajo");
   });
 });
 

@@ -100,7 +100,8 @@ export const ComposerStashMenu = memo(function ComposerStashMenu(props: {
             </CommandGroupLabel>
             {entries.length === 0 ? (
               <p className="px-3 pb-3 pt-1 text-secondary-label text-xs">
-                Nothing stashed yet. Press ⌘S with a prompt in the composer to stash it.
+                Todavía no hay nada guardado. Pulsa ⌘S con un prompt en el editor para guardarlo
+                temporalmente.
               </p>
             ) : (
               entries.map((entry) => (
@@ -157,7 +158,7 @@ export const ComposerStashMenu = memo(function ComposerStashMenu(props: {
                     variant="ghost"
                     size="icon-xs"
                     className="shrink-0 opacity-0 transition-opacity group-hover/stash:opacity-100"
-                    aria-label="Delete stashed prompt"
+                    aria-label="Eliminar instrucción guardada"
                     onClick={(event) => {
                       event.stopPropagation();
                       onDelete(entry);

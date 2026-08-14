@@ -17,7 +17,7 @@ export function resolveServerBackedAppStageLabel(input: {
 }): string {
   return input.primaryServerVersion &&
     NIGHTLY_SERVER_VERSION_PATTERN.test(input.primaryServerVersion)
-    ? "Nightly"
+    ? "Nocturna"
     : input.fallbackStageLabel;
 }
 

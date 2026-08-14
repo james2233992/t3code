@@ -51,15 +51,15 @@ export function buildThreadActionMenuItems(
       ? [
           {
             id: "new-thread-on-branch" as const,
-            label: `New thread on ${state.branch}`,
+            label: `Nueva conversación en ${state.branch}`,
           },
         ]
       : []),
     ...(state.supports.pinning
       ? [
           state.isPinned
-            ? { id: "unpin" as const, label: "Unpin thread" }
-            : { id: "pin" as const, label: "Pin thread" },
+            ? { id: "unpin" as const, label: "Desfijar conversación" }
+            : { id: "pin" as const, label: "Fijar conversación" },
         ]
       : []),
     // Both lifecycle actions stay available on pinned threads: settling
@@ -68,17 +68,17 @@ export function buildThreadActionMenuItems(
     ...(state.supports.settlement
       ? [
           state.isSettled
-            ? { id: "unsettle" as const, label: "Un-settle thread" }
-            : { id: "settle" as const, label: "Settle thread" },
+            ? { id: "unsettle" as const, label: "Reabrir conversación" }
+            : { id: "settle" as const, label: "Finalizar conversación" },
         ]
       : []),
     ...(state.supports.snooze
       ? [
           state.isSnoozed
-            ? { id: "unsnooze" as const, label: "Wake thread" }
+            ? { id: "unsnooze" as const, label: "Reactivar conversación" }
             : {
                 id: "snooze" as const,
-                label: "Snooze",
+                label: "Posponer",
                 disabled: !state.canSnoozeNow,
                 children: state.snoozePresets.map((preset) => ({
                   id: `snooze:${preset.id}` as const,
@@ -87,19 +87,19 @@ export function buildThreadActionMenuItems(
               },
         ]
       : []),
-    { id: "rename", label: "Rename thread" },
+    { id: "rename", label: "Cambiar nombre" },
     ...(state.supports.titleRegeneration
       ? [
           {
             id: "regenerate-title" as const,
-            label: state.isRegeneratingTitle ? "Regenerating…" : "Regenerate title",
+            label: state.isRegeneratingTitle ? "Regenerando…" : "Regenerar título",
             disabled: state.isRegeneratingTitle,
           },
         ]
       : []),
-    { id: "mark-unread", label: "Mark unread" },
-    { id: "copy-path", label: "Copy path", icon: "copy" },
-    ...(state.branch ? [{ id: "copy-branch" as const, label: "Copy branch", icon: "copy" }] : []),
-    { id: "delete", label: "Delete", destructive: true, icon: "trash" },
+    { id: "mark-unread", label: "Marcar como no leída" },
+    { id: "copy-path", label: "Copiar ruta", icon: "copy" },
+    ...(state.branch ? [{ id: "copy-branch" as const, label: "Copiar rama", icon: "copy" }] : []),
+    { id: "delete", label: "Eliminar", destructive: true, icon: "trash" },
   ];
 }

@@ -136,23 +136,25 @@ export function formatDiagnosticsDescription(input: {
   readonly otlpMetricsEnabled: boolean;
   readonly otlpMetricsUrl?: string | undefined;
 }): string {
-  const mode = input.localTracingEnabled ? "Local trace file" : "Terminal logs only";
+  const mode = input.localTracingEnabled
+    ? "Archivo de trazas local"
+    : "Solo registros del terminal";
   const tracesUrl = input.otlpTracesEnabled ? input.otlpTracesUrl : undefined;
   const metricsUrl = input.otlpMetricsEnabled ? input.otlpMetricsUrl : undefined;
 
   if (tracesUrl && metricsUrl) {
     const collapsedUrl = collapseOtelSignalsUrl({ tracesUrl, metricsUrl });
     return collapsedUrl
-      ? `${mode}. Exporting OTEL to ${collapsedUrl}.`
-      : `${mode}. Exporting OTEL traces to ${tracesUrl} and metrics to ${metricsUrl}.`;
+      ? `${mode}. Exportando OTEL a ${collapsedUrl}.`
+      : `${mode}. Exportando trazas OTEL a ${tracesUrl} y métricas a ${metricsUrl}.`;
   }
 
   if (tracesUrl) {
-    return `${mode}. Exporting OTEL traces to ${tracesUrl}.`;
+    return `${mode}. Exportando trazas OTEL a ${tracesUrl}.`;
   }
 
   if (metricsUrl) {
-    return `${mode}. Exporting OTEL metrics to ${metricsUrl}.`;
+    return `${mode}. Exportando métricas OTEL a ${metricsUrl}.`;
   }
 
   return `${mode}.`;

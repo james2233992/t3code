@@ -117,7 +117,7 @@ export function ProviderModelsSection({
       return;
     }
     if (models.some((model) => !model.isCustom && model.slug === normalized)) {
-      setError("That model is already built in.");
+      setError("Ese modelo ya está integrado.");
       return;
     }
     if (normalized.length > MAX_CUSTOM_MODEL_LENGTH) {
@@ -125,7 +125,7 @@ export function ProviderModelsSection({
       return;
     }
     if (customModels.includes(normalized)) {
-      setError("That custom model is already saved.");
+      setError("Ese modelo personalizado ya está guardado.");
       return;
     }
 
@@ -186,9 +186,9 @@ export function ProviderModelsSection({
 
   return (
     <div>
-      <div className="text-xs font-medium text-foreground">Models</div>
+      <div className="text-xs font-medium text-foreground">Modelos</div>
       <div className="mt-1 text-xs text-muted-foreground">
-        {models.length} model{models.length === 1 ? "" : "s"} available.
+        {models.length} model{models.length === 1 ? "" : "s"} disponibles.
       </div>
       <div ref={listRef} className="mt-2 max-h-40 overflow-y-auto pb-1">
         {orderedModels.map((model, index) => {
@@ -248,7 +248,7 @@ export function ProviderModelsSection({
                           size="icon-xs"
                           variant="ghost"
                           className="size-5 rounded-sm p-0 text-muted-foreground/60 hover:text-muted-foreground"
-                          aria-label={`Details for ${model.name}`}
+                          aria-label={`Detalles de ${model.name}`}
                         />
                       }
                     >
@@ -289,8 +289,8 @@ export function ProviderModelsSection({
                           isFavorite && "text-yellow-500 hover:text-yellow-600",
                         )}
                         onClick={() => handleToggleFavorite(model.slug)}
-                        aria-label={`${isFavorite ? "Remove" : "Add"} ${model.name} ${
-                          isFavorite ? "from" : "to"
+                        aria-label={`${isFavorite ? "Eliminar" : "Añadir"} ${model.name} ${
+                          isFavorite ? "de" : "a"
                         } favorites`}
                       />
                     }
@@ -298,7 +298,7 @@ export function ProviderModelsSection({
                     <StarIcon className={cn("size-3", isFavorite && "fill-current")} />
                   </TooltipTrigger>
                   <TooltipPopup side="top">
-                    {isFavorite ? "Remove from favorites" : "Add to favorites"}
+                    {isFavorite ? "Eliminar de favoritos" : "Añadir a favoritos"}
                   </TooltipPopup>
                 </Tooltip>
                 <Tooltip>
@@ -316,7 +316,7 @@ export function ProviderModelsSection({
                   >
                     <ArrowUpIcon className="size-3" />
                   </TooltipTrigger>
-                  <TooltipPopup side="top">Move up</TooltipPopup>
+                  <TooltipPopup side="top">Subir</TooltipPopup>
                 </Tooltip>
                 <Tooltip>
                   <TooltipTrigger
@@ -333,7 +333,7 @@ export function ProviderModelsSection({
                   >
                     <ArrowDownIcon className="size-3" />
                   </TooltipTrigger>
-                  <TooltipPopup side="top">Move down</TooltipPopup>
+                  <TooltipPopup side="top">Bajar</TooltipPopup>
                 </Tooltip>
                 {!model.isCustom ? (
                   <Tooltip>
@@ -344,7 +344,7 @@ export function ProviderModelsSection({
                           variant="ghost"
                           className="size-5 rounded-sm p-0 text-muted-foreground hover:text-foreground"
                           onClick={() => handleToggleHidden(model.slug)}
-                          aria-label={`${isHidden ? "Show" : "Hide"} ${model.name}`}
+                          aria-label={`${isHidden ? "Mostrar" : "Ocultar"} ${model.name}`}
                         />
                       }
                     >
@@ -355,7 +355,7 @@ export function ProviderModelsSection({
                       )}
                     </TooltipTrigger>
                     <TooltipPopup side="top">
-                      {isHidden ? "Show in picker" : "Hide from picker"}
+                      {isHidden ? "Mostrar en el selector" : "Ocultar del selector"}
                     </TooltipPopup>
                   </Tooltip>
                 ) : null}
@@ -367,14 +367,14 @@ export function ProviderModelsSection({
                           size="icon-xs"
                           variant="ghost"
                           className="size-5 rounded-sm p-0 text-muted-foreground hover:text-foreground"
-                          aria-label={`Remove ${model.slug}`}
+                          aria-label={`Eliminar ${model.slug}`}
                           onClick={() => handleRemove(model.slug)}
                         />
                       }
                     >
                       <XIcon className="size-3" />
                     </TooltipTrigger>
-                    <TooltipPopup side="top">Remove custom model</TooltipPopup>
+                    <TooltipPopup side="top">Eliminar modelo personalizado</TooltipPopup>
                   </Tooltip>
                 ) : null}
               </div>
@@ -401,7 +401,7 @@ export function ProviderModelsSection({
         />
         <Button className="shrink-0" variant="outline" onClick={handleAdd}>
           <PlusIcon className="size-3.5" />
-          Add
+          Añadir
         </Button>
       </div>
 

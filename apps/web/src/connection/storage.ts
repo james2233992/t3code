@@ -90,7 +90,7 @@ const encodeStoredVcsRefs = Schema.encodeEffect(StoredVcsRefsJson);
 function catalogError(operation: string, cause: unknown) {
   return new ConnectionTransientError({
     reason: "remote-unavailable",
-    detail: `Could not ${operation} the local connection catalog: ${String(cause)}`,
+    detail: `No se pudo ${operation} el catálogo de conexiones locales: ${String(cause)}`,
   });
 }
 
@@ -123,7 +123,9 @@ const openDatabase = Effect.fn("web.connectionStorage.openDatabase")(function* (
   return yield* Effect.callback<IDBDatabase, ConnectionTransientError>((resume) => {
     if (typeof indexedDB === "undefined") {
       resume(
-        Effect.fail(catalogError("open", "IndexedDB is unavailable in this browser context.")),
+        Effect.fail(
+          catalogError("open", "IndexedDB no está disponible en este contexto del navegador."),
+        ),
       );
       return;
     }
@@ -146,7 +148,7 @@ const openDatabase = Effect.fn("web.connectionStorage.openDatabase")(function* (
       }
     });
     request.addEventListener("error", () => {
-      resume(Effect.fail(catalogError("open", request.error ?? "Unknown IndexedDB error")));
+      resume(Effect.fail(catalogError("open", request.error ?? "Error desconocido de IndexedDB")));
     });
     request.addEventListener("success", () => {
       resume(Effect.succeed(request.result));
@@ -158,7 +160,11 @@ function readDatabaseValue(database: IDBDatabase, storeName: string, key: IDBVal
   return Effect.callback<unknown, ConnectionTransientError>((resume) => {
     const request = database.transaction(storeName, "readonly").objectStore(storeName).get(key);
     request.addEventListener("error", () => {
-      resume(Effect.fail(catalogError("read", request.error ?? "Unknown IndexedDB read error")));
+      resume(
+        Effect.fail(
+          catalogError("read", request.error ?? "Error desconocido de lectura de IndexedDB"),
+        ),
+      );
     });
     request.addEventListener("success", () => {
       resume(Effect.succeed(request.result));
@@ -176,7 +182,9 @@ function writeDatabaseValue(
     const transaction = database.transaction(storeName, "readwrite");
     transaction.addEventListener("error", () => {
       resume(
-        Effect.fail(catalogError("write", transaction.error ?? "Unknown IndexedDB write error")),
+        Effect.fail(
+          catalogError("write", transaction.error ?? "Error desconocido de escritura de IndexedDB"),
+        ),
       );
     });
     transaction.addEventListener("complete", () => {
@@ -191,7 +199,9 @@ function removeDatabaseValue(database: IDBDatabase, storeName: string, key: IDBV
     const transaction = database.transaction(storeName, "readwrite");
     transaction.addEventListener("error", () => {
       resume(
-        Effect.fail(catalogError("remove", transaction.error ?? "Unknown IndexedDB remove error")),
+        Effect.fail(
+          catalogError("remove", transaction.error ?? "Error desconocido al eliminar en IndexedDB"),
+        ),
       );
     });
     transaction.addEventListener("complete", () => {
@@ -206,7 +216,9 @@ function removeDatabaseValuesInRange(database: IDBDatabase, storeName: string, r
     const transaction = database.transaction(storeName, "readwrite");
     transaction.addEventListener("error", () => {
       resume(
-        Effect.fail(catalogError("remove", transaction.error ?? "Unknown IndexedDB cursor error")),
+        Effect.fail(
+          catalogError("remove", transaction.error ?? "Error desconocido del cursor de IndexedDB"),
+        ),
       );
     });
     transaction.addEventListener("complete", () => {
@@ -215,7 +227,9 @@ function removeDatabaseValuesInRange(database: IDBDatabase, storeName: string, r
     const request = transaction.objectStore(storeName).openCursor(range);
     request.addEventListener("error", () => {
       resume(
-        Effect.fail(catalogError("remove", request.error ?? "Unknown IndexedDB cursor error")),
+        Effect.fail(
+          catalogError("remove", request.error ?? "Error desconocido del cursor de IndexedDB"),
+        ),
       );
     });
     request.addEventListener("success", () => {
@@ -276,7 +290,7 @@ export function makeCatalogBackend(database: IDBDatabase): CatalogBackend {
               : Effect.fail(
                   catalogError(
                     "save",
-                    "Desktop secure storage is unavailable in this system context.",
+                    "El almacenamiento seguro del escritorio no está disponible en este contexto del sistema.",
                   ),
                 ),
           ),
@@ -324,7 +338,7 @@ export const makeCatalogStore = Effect.fn("web.connectionStorage.makeCatalogStor
             if (backend.quarantine !== undefined) {
               yield* backend.quarantine(raw).pipe(
                 Effect.catch((cause) =>
-                  Effect.logWarning("Could not quarantine the corrupt web connection catalog.", {
+                  Effect.logWarning("No se pudo aislar el catálogo de conexiones web dañado.", {
                     error: cause.message,
                   }),
                 ),
@@ -333,7 +347,7 @@ export const makeCatalogStore = Effect.fn("web.connectionStorage.makeCatalogStor
             const encoded = yield* encodeCatalog(EMPTY_CONNECTION_CATALOG_DOCUMENT);
             yield* backend.write(encoded).pipe(
               Effect.catch((cause) =>
-                Effect.logWarning("Could not persist the recovered web connection catalog.", {
+                Effect.logWarning("No se pudo guardar el catálogo de conexiones web recuperado.", {
                   error: cause.message,
                 }),
               ),

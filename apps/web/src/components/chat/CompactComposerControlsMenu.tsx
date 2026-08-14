@@ -27,7 +27,7 @@ export const CompactComposerControlsMenu = memo(function CompactComposerControls
             size="sm"
             variant="ghost"
             className="shrink-0 px-2 text-muted-foreground/70 hover:text-foreground/80"
-            aria-label="More composer controls"
+            aria-label="Más controles del editor"
           />
         }
       >
@@ -42,7 +42,7 @@ export const CompactComposerControlsMenu = memo(function CompactComposerControls
         ) : null}
         {props.showInteractionModeToggle ? (
           <>
-            <div className="px-2 py-1.5 font-medium text-muted-foreground text-xs">Mode</div>
+            <div className="px-2 py-1.5 font-medium text-muted-foreground text-xs">Modo</div>
             <MenuRadioGroup
               value={props.interactionMode}
               onValueChange={(value) => {
@@ -56,7 +56,7 @@ export const CompactComposerControlsMenu = memo(function CompactComposerControls
             <MenuDivider />
           </>
         ) : null}
-        <div className="px-2 py-1.5 font-medium text-muted-foreground text-xs">Access</div>
+        <div className="px-2 py-1.5 font-medium text-muted-foreground text-xs">Acceso</div>
         <MenuRadioGroup
           value={props.runtimeMode}
           onValueChange={(value) => {
@@ -64,10 +64,10 @@ export const CompactComposerControlsMenu = memo(function CompactComposerControls
             props.onRuntimeModeChange(value as RuntimeMode);
           }}
         >
-          <MenuRadioItem value="approval-required">Supervised</MenuRadioItem>
-          <MenuRadioItem value="auto-accept-edits">Auto-accept edits</MenuRadioItem>
-          <MenuRadioItem value="auto">Auto</MenuRadioItem>
-          <MenuRadioItem value="full-access">Full access</MenuRadioItem>
+          <MenuRadioItem value="approval-required">Supervisado</MenuRadioItem>
+          <MenuRadioItem value="auto-accept-edits">Aceptar ediciones automáticamente</MenuRadioItem>
+          <MenuRadioItem value="auto">Automático</MenuRadioItem>
+          <MenuRadioItem value="full-access">Acceso completo</MenuRadioItem>
         </MenuRadioGroup>
       </MenuPopup>
     </Menu>

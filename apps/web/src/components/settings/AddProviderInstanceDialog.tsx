@@ -106,10 +106,10 @@ const COMING_SOON_DRIVER_OPTIONS: readonly ComingSoonDriverOption[] = [
  * Returns a user-facing error string, or `null` if valid.
  */
 function validateInstanceId(id: string, existing: ReadonlySet<string>): string | null {
-  if (id.length === 0) return "Instance ID is required.";
-  if (id.length > 64) return "Instance ID must be 64 characters or fewer.";
+  if (id.length === 0) return "El ID de instancia es obligatorio.";
+  if (id.length > 64) return "El ID de instancia debe tener 64 caracteres como máximo.";
   if (!INSTANCE_ID_PATTERN.test(id)) {
-    return "Instance ID must start with a letter and use only letters, digits, '-', or '_'.";
+    return "El ID de instancia debe empezar por una letra y usar solo letras, números, '-' o '_'.";
   }
   if (existing.has(id)) return `An instance named '${id}' already exists.`;
   return null;
@@ -215,15 +215,15 @@ export function AddProviderInstanceDialog({
       updateSettings({ providerInstances: nextMap });
       toastManager.add({
         type: "success",
-        title: "Provider instance added",
+        title: "Instancia de proveedor añadida",
         description: `${driverOption.label} instance '${instanceId}' was added.`,
       });
       onOpenChange(false);
     } catch (error) {
       toastManager.add({
         type: "error",
-        title: "Could not add provider instance",
-        description: error instanceof Error ? error.message : "Update failed.",
+        title: "No se pudo añadir la instancia del proveedor",
+        description: error instanceof Error ? error.message : "Falló la actualización.",
       });
     }
   };
@@ -233,10 +233,10 @@ export function AddProviderInstanceDialog({
       <DialogPopup className="max-w-xl overflow-hidden">
         <div className="flex min-h-0 flex-col overflow-hidden">
           <DialogHeader>
-            <DialogTitle>Add provider instance</DialogTitle>
+            <DialogTitle>Añadir instancia de proveedor</DialogTitle>
             <DialogDescription>
-              Configure an additional provider instance on {environmentLabel} — for example, a
-              second Codex install pointed at a different workspace.
+              Configura una instancia adicional del proveedor en {environmentLabel} —por ejemplo,
+              otra instalación de Codex dirigida a un espacio de trabajo diferente.
             </DialogDescription>
             <AddProviderInstanceWizardSteps
               currentStep={wizardStep}
@@ -315,7 +315,7 @@ export function AddProviderInstanceDialog({
               </div>
 
               <label className={cn("grid gap-2", wizardStep !== 1 && "hidden")}>
-                <span className="text-xs font-medium text-foreground">Label</span>
+                <span className="text-xs font-medium text-foreground">Etiqueta</span>
                 <Input
                   className="bg-background"
                   placeholder="e.g. Work"
@@ -323,12 +323,12 @@ export function AddProviderInstanceDialog({
                   onChange={(event) => setLabel(event.target.value)}
                 />
                 <span className="text-[11px] text-muted-foreground">
-                  Shown in the provider list. Optional.
+                  Se muestra en la lista de proveedores. Es opcional.
                 </span>
               </label>
 
               <label className={cn("grid gap-2", wizardStep !== 1 && "hidden")}>
-                <span className="text-xs font-medium text-foreground">Instance ID</span>
+                <span className="text-xs font-medium text-foreground">ID de instancia</span>
                 <Input
                   className="bg-background"
                   placeholder={`${driver}_work`}
@@ -342,19 +342,20 @@ export function AddProviderInstanceDialog({
                   <span className="text-[11px] text-destructive">{instanceIdError}</span>
                 ) : (
                   <span className="text-[11px] text-muted-foreground">
-                    Routing key used by threads and sessions. Letters, digits, '-', or '_'.
+                    Clave de enrutado usada por conversaciones y sesiones. Admite letras, números,
+                    «-» y «_».
                   </span>
                 )}
               </label>
 
               <div className={cn("grid gap-2", wizardStep !== 1 && "hidden")}>
-                <span className="text-xs font-medium text-foreground">Accent color</span>
+                <span className="text-xs font-medium text-foreground">Color de acento</span>
                 <div className="flex min-w-0 flex-wrap items-center gap-2">
                   <input
                     type="color"
                     value={normalizeProviderAccentColor(accentColor) ?? PROVIDER_ACCENT_SWATCHES[0]}
                     onChange={(event) => setAccentColor(event.target.value)}
-                    aria-label="Provider instance accent color"
+                    aria-label="Color de acento de la instancia del proveedor"
                     className="h-8 w-10 cursor-pointer rounded-xl border border-input bg-background p-0.5"
                   />
                   <div className="flex flex-wrap gap-1.5">
@@ -390,7 +391,7 @@ export function AddProviderInstanceDialog({
                   ) : null}
                 </div>
                 <span className="text-[11px] text-muted-foreground">
-                  Optional marker shown in the picker.
+                  Indicador opcional que se muestra en el selector.
                 </span>
               </div>
 
@@ -407,7 +408,7 @@ export function AddProviderInstanceDialog({
               ) : wizardStep === 2 ? (
                 <div className="grid gap-2">
                   <p className="text-sm text-muted-foreground">
-                    This driver has no required configuration. You can add the instance now.
+                    Este driver no requiere configuración. Ya puedes añadir la instancia.
                   </p>
                 </div>
               ) : null}
@@ -426,15 +427,15 @@ export function AddProviderInstanceDialog({
                 setWizardStep((step) => Math.max(0, step - 1));
               }}
             >
-              {wizardStep === 0 ? "Cancel" : "Back"}
+              {wizardStep === 0 ? "Cancelar" : "Atrás"}
             </Button>
             {wizardStep < ADD_PROVIDER_WIZARD_STEPS.length - 1 ? (
               <Button size="sm" onClick={() => navigateToStep(wizardStep + 1)}>
-                Next
+                Siguiente
               </Button>
             ) : (
               <Button size="sm" onClick={handleSave}>
-                Add instance
+                Añadir instancia
               </Button>
             )}
           </DialogFooter>

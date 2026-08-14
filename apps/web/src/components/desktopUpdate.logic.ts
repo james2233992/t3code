@@ -59,7 +59,7 @@ export function isDesktopUpdateButtonDisabled(state: DesktopUpdateState | null):
 
 export function getArm64IntelBuildWarningDescription(state: DesktopUpdateState): string {
   if (!shouldShowArm64IntelBuildWarning(state)) {
-    return "This install is using the correct architecture.";
+    return "Esta instalación usa la arquitectura correcta.";
   }
 
   const action = resolveDesktopUpdateButtonAction(state);
@@ -74,26 +74,26 @@ export function getArm64IntelBuildWarningDescription(state: DesktopUpdateState):
 
 export function getDesktopUpdateButtonTooltip(state: DesktopUpdateState): string {
   if (state.status === "available") {
-    return `Update ${state.availableVersion ?? "available"} ready to download`;
+    return `Actualización ${state.availableVersion ?? "disponible"} lista para descargar`;
   }
   if (state.status === "downloading") {
     const progress =
       typeof state.downloadPercent === "number" ? ` (${Math.floor(state.downloadPercent)}%)` : "";
-    return `Downloading update${progress}`;
+    return `Descargando actualización${progress}`;
   }
   if (state.status === "downloaded") {
-    return `Update ${state.downloadedVersion ?? state.availableVersion ?? "ready"} downloaded. Click to restart and install.`;
+    return `Actualización ${state.downloadedVersion ?? state.availableVersion ?? "lista"} descargada. Pulsa para reiniciar e instalar.`;
   }
   if (state.status === "error") {
     if (state.errorContext === "download" && state.availableVersion) {
-      return `Download failed for ${state.availableVersion}. Click to retry.`;
+      return `Falló la descarga de ${state.availableVersion}. Pulsa para reintentarlo.`;
     }
     if (state.errorContext === "install" && state.downloadedVersion) {
-      return `Install failed for ${state.downloadedVersion}. Click to retry.`;
+      return `Falló la instalación de ${state.downloadedVersion}. Pulsa para reintentarlo.`;
     }
-    return state.message ?? "Update failed";
+    return state.message ?? "Falló la actualización";
   }
-  return "Up to date";
+  return "Actualizado";
 }
 
 export function getDesktopUpdateInstallConfirmationMessage(

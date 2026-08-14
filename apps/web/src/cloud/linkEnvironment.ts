@@ -70,21 +70,29 @@ function ensureRelayClientAvailable(
     const registry = yield* EnvironmentRegistry;
     const status = yield* registry
       .run(environmentId, request(WS_METHODS.cloudGetRelayClientStatus, {}))
-      .pipe(Effect.mapError(relayClientRpcError("Could not check relay client availability.")));
+      .pipe(
+        Effect.mapError(
+          relayClientRpcError(
+            "No se pudo comprobar la disponibilidad del cliente de retransmisión.",
+          ),
+        ),
+      );
     if (status.status === "available") return;
     if (status.status === "unsupported") {
       return yield* new CloudEnvironmentLinkError({
-        message: `Fenix Code cannot install the relay client automatically on ${status.platform}-${status.arch}.`,
+        message: `Fenix Code no puede instalar automáticamente el cliente de retransmisión en ${status.platform}-${status.arch}.`,
       });
     }
 
     const confirmed = yield* Effect.tryPromise({
       try: () => requestRelayClientInstallConfirmation(status.version),
-      catch: relayClientRpcError("Could not confirm relay client installation."),
+      catch: relayClientRpcError(
+        "No se pudo confirmar la instalación del cliente de retransmisión.",
+      ),
     });
     if (!confirmed) {
       return yield* new CloudEnvironmentLinkError({
-        message: "Relay client installation was cancelled.",
+        message: "Se canceló la instalación del cliente de retransmisión.",
       });
     }
 
@@ -97,12 +105,12 @@ function ensureRelayClientAvailable(
       )
       .pipe(
         Stream.runLast,
-        Effect.mapError(relayClientRpcError("Could not install the relay client.")),
+        Effect.mapError(relayClientRpcError("No se pudo instalar el cliente de retransmisión.")),
         Effect.ensuring(Effect.sync(finishRelayClientInstall)),
       );
     if (Option.isNone(installed) || installed.value.type !== "complete") {
       return yield* new CloudEnvironmentLinkError({
-        message: "The relay client install completed without a final status.",
+        message: "La instalación del cliente de retransmisión terminó sin un estado final.",
       });
     }
     const installedStatus = installed.value.status;
@@ -110,8 +118,8 @@ function ensureRelayClientAvailable(
       return yield* new CloudEnvironmentLinkError({
         message:
           installedStatus.status === "unsupported"
-            ? `Fenix Code cannot install the relay client automatically on ${installedStatus.platform}-${installedStatus.arch}.`
-            : "The relay client is still unavailable after installation.",
+            ? `Fenix Code no puede instalar automáticamente el cliente de retransmisión en ${installedStatus.platform}-${installedStatus.arch}.`
+            : "El cliente de retransmisión sigue sin estar disponible tras la instalación.",
       });
     }
   });
@@ -134,39 +142,39 @@ function relayProtectedErrorMessage(error: RelayProtectedErrorType): string {
       switch (error.reason) {
         case "missing_bearer":
         case "invalid_bearer":
-          return "Relay rejected the cloud session token.";
+          return "El servicio de retransmisión rechazó el token de sesión en la nube.";
         case "invalid_dpop":
-          return "Relay rejected the DPoP proof.";
+          return "El servicio de retransmisión rechazó la prueba DPoP.";
         case "not_authorized":
-          return "Relay rejected the authenticated request.";
+          return "El servicio de retransmisión rechazó la solicitud autenticada.";
       }
     case "RelayEnvironmentLinkProofExpiredError":
-      return "Relay rejected an expired environment link proof.";
+      return "El servicio de retransmisión rechazó una prueba de enlace de entorno caducada.";
     case "RelayEnvironmentLinkProofInvalidError":
-      return `Relay rejected the environment link proof (${error.reason}).`;
+      return `El servicio de retransmisión rechazó la prueba de enlace del entorno (${error.reason}).`;
     case "RelayEnvironmentConnectNotAuthorizedError":
       // "Not authorized" covers non-auth causes too; surface the reason so a
       // missing link doesn't read as a credential problem.
       if (error.reason === "environment_link_not_found") {
-        return "Relay has no active link for this environment. The environment server may not have re-established its link yet.";
+        return "La retransmisión no tiene un enlace activo para este entorno. Es posible que el servidor todavía no lo haya restablecido.";
       }
       return error.reason
-        ? `Relay rejected the environment connection request (${error.reason}).`
-        : "Relay rejected the environment connection request.";
+        ? `El servicio de retransmisión rechazó la solicitud de conexión del entorno (${error.reason}).`
+        : "El servicio de retransmisión rechazó la solicitud de conexión del entorno.";
     case "RelayEnvironmentEndpointUnavailableError":
-      return `Relay could not reach the environment endpoint (${error.reason}).`;
+      return `El servicio de retransmisión no pudo alcanzar el endpoint del entorno (${error.reason}).`;
     case "RelayEnvironmentEndpointTimedOutError":
-      return "Relay timed out while contacting the environment endpoint.";
+      return "La retransmisión agotó el tiempo de espera al contactar con el endpoint del entorno.";
     case "RelayEnvironmentLinkFailedError":
-      return `Relay could not link the environment (${error.reason}).`;
+      return `El servicio de retransmisión no pudo enlazar el entorno (${error.reason}).`;
     case "RelayEnvironmentLinkUnavailableError":
-      return `Relay cannot provision the managed endpoint (${error.reason}).`;
+      return `El servicio de retransmisión no puede aprovisionar el endpoint gestionado (${error.reason}).`;
     case "RelayEnvironmentLinkLimitExceededError":
-      return `Relay refused the link: this account already has its maximum of ${error.maxTunnels} managed tunnels. Unlink an environment to free one up.`;
+      return `El servicio de retransmisión rechazó el enlace: esta cuenta ya tiene el máximo de ${error.maxTunnels} túneles gestionados. Desvincula un entorno para liberar uno.`;
     case "RelayAgentActivityPublishProofExpiredError":
-      return "Relay rejected an expired agent activity publish proof.";
+      return "El servicio de retransmisión rechazó una prueba caducada de publicación de actividad.";
     case "RelayAgentActivityPublishProofInvalidError":
-      return `Relay rejected the agent activity publish proof (${error.reason}).`;
+      return `El servicio de retransmisión rechazó la prueba de publicación de actividad (${error.reason}).`;
     case "RelayInternalError":
       return `Relay encountered an internal error (${error.reason}).`;
   }
@@ -224,12 +232,12 @@ function ensureLinkedEnvironmentMatches(input: {
 }): Effect.Effect<void, CloudEnvironmentLinkError> {
   if (input.link.environmentId !== input.expectedEnvironmentId) {
     return new CloudEnvironmentLinkError({
-      message: "Relay returned credentials for a different environment.",
+      message: "El relay devolvió credenciales para un entorno diferente.",
     });
   }
   if (input.link.endpoint.providerKind !== input.expectedProviderKind) {
     return new CloudEnvironmentLinkError({
-      message: "Relay returned credentials for a different endpoint provider.",
+      message: "El relay devolvió credenciales para un proveedor de endpoint diferente.",
     });
   }
   return Effect.void;
@@ -285,7 +293,7 @@ export function listManagedCloudEnvironments(input: {
     const configuredRelayUrl = relayUrl();
     if (!configuredRelayUrl) {
       return yield* new CloudEnvironmentLinkError({
-        message: "T3CODE_RELAY_URL is not configured.",
+        message: "La URL del relay de Fenix Code no está configurada.",
       });
     }
     const relayClient = yield* ManagedRelay.ManagedRelayClient;
@@ -297,7 +305,7 @@ export function listManagedCloudEnvironments(input: {
         Effect.mapError(
           (cause) =>
             new CloudEnvironmentLinkError({
-              message: "Could not list relay-managed environments.",
+              message: "No se pudieron listar los entornos gestionados por el relay.",
               cause,
             }),
         ),
@@ -315,7 +323,7 @@ export function listCloudDevices(input: {
   return Effect.gen(function* () {
     if (!relayUrl()) {
       return yield* new CloudEnvironmentLinkError({
-        message: "T3CODE_RELAY_URL is not configured.",
+        message: "La URL del relay de Fenix Code no está configurada.",
       });
     }
     const relayClient = yield* ManagedRelay.ManagedRelayClient;
@@ -323,7 +331,7 @@ export function listCloudDevices(input: {
       Effect.mapError(
         (cause) =>
           new CloudEnvironmentLinkError({
-            message: "Could not list cloud devices.",
+            message: "No se pudieron listar los dispositivos en la nube.",
             cause,
           }),
       ),
@@ -338,7 +346,11 @@ export function readPrimaryCloudLinkState(input: {
     const client = yield* makeEnvironmentHttpApiClient(input.target.httpBaseUrl);
     return yield* client.connect
       .linkState({ headers: {} })
-      .pipe(Effect.mapError(environmentApiError("Could not read environment cloud link state.")));
+      .pipe(
+        Effect.mapError(
+          environmentApiError("No se pudo leer el estado del enlace en la nube del entorno."),
+        ),
+      );
   }).pipe(Effect.provide(primaryEnvironmentHttpLayer));
 }
 
@@ -354,7 +366,9 @@ export function updatePrimaryCloudPreferences(input: {
         payload: input,
       })
       .pipe(
-        Effect.mapError(environmentApiError("Could not update environment cloud preferences.")),
+        Effect.mapError(
+          environmentApiError("No se pudieron actualizar las preferencias de nube del entorno."),
+        ),
       );
   }).pipe(Effect.provide(primaryEnvironmentHttpLayer));
 }
@@ -371,7 +385,7 @@ export function unlinkPrimaryEnvironmentFromCloud(input: {
     const client = yield* makeEnvironmentHttpApiClient(input.target.httpBaseUrl);
     yield* client.connect
       .unlink({ headers: {} })
-      .pipe(Effect.mapError(environmentApiError("Could not unlink the environment from cloud.")));
+      .pipe(Effect.mapError(environmentApiError("No se pudo desvincular el entorno de la nube.")));
 
     const configuredRelayUrl = relayUrl();
     if (configuredRelayUrl && input.clerkToken) {
@@ -383,9 +397,12 @@ export function unlinkPrimaryEnvironmentFromCloud(input: {
         })
         .pipe(
           Effect.catch((cause) =>
-            Effect.logWarning("Could not revoke cloud environment link after local unlink.", {
-              cause,
-            }),
+            Effect.logWarning(
+              "No se pudo revocar el enlace remoto tras desvincular el entorno local.",
+              {
+                cause,
+              },
+            ),
           ),
         );
     }
@@ -412,7 +429,7 @@ export function linkPrimaryEnvironmentToCloud(input: {
     const configuredRelayUrl = relayUrl();
     if (!configuredRelayUrl) {
       return yield* new CloudEnvironmentLinkError({
-        message: "T3CODE_RELAY_URL is not configured.",
+        message: "La URL del servicio de retransmisión no está configurada.",
       });
     }
     const managedTunnelsEnabled = (input.mode ?? "managed") === "managed";
@@ -455,7 +472,9 @@ export function linkPrimaryEnvironmentToCloud(input: {
           origin: endpointOrigin(input.target.httpBaseUrl),
         },
       })
-      .pipe(Effect.mapError(environmentApiError("Could not obtain environment link proof.")));
+      .pipe(
+        Effect.mapError(environmentApiError("No se pudo obtener la prueba de enlace del entorno.")),
+      );
     const link = yield* relayClient
       .linkEnvironment({
         clerkToken: input.clerkToken,
@@ -489,6 +508,10 @@ export function linkPrimaryEnvironmentToCloud(input: {
           endpointRuntime: link.endpointRuntime,
         },
       })
-      .pipe(Effect.mapError(environmentApiError("Could not configure environment relay access.")));
+      .pipe(
+        Effect.mapError(
+          environmentApiError("No se pudo configurar el acceso de retransmisión del entorno."),
+        ),
+      );
   }).pipe(Effect.provide(primaryEnvironmentHttpLayer));
 }

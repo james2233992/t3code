@@ -113,7 +113,9 @@ describe("desktopUpdateStateAtom", () => {
     await vi.waitFor(() => expect(reportError).toHaveBeenCalledOnce());
     expect(getUpdateState).toHaveBeenCalledTimes(3);
     const [, errorMessage, errorContext] = reportError.mock.calls[0] ?? [];
-    expect(errorMessage).toBe("Failed to read the initial desktop update state after 3 attempts.");
+    expect(errorMessage).toBe(
+      "No se pudo leer el estado inicial de actualización tras 3 intentos.",
+    );
     expect(errorContext).toMatchObject({
       errorTag: "DesktopUpdateStateReadError",
       attemptCount: 3,

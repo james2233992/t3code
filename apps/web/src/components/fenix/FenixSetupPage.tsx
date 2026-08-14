@@ -317,7 +317,7 @@ export function FenixSetupPage() {
   };
 
   return (
-    <main className="min-h-dvh overflow-x-hidden bg-[#070707] text-white">
+    <main className="h-full min-h-dvh overflow-x-hidden overflow-y-auto overscroll-y-auto bg-[#070707] text-white">
       <section className="relative flex flex-col overflow-hidden border-b border-white/10">
         <img
           src={`${baseUrl}fenix-code-workspace-hero.jpg`}

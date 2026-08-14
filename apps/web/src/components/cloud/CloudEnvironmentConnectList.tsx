@@ -99,8 +99,8 @@ export function CloudEnvironmentConnectRows({
     if (result._tag === "Success") {
       toastManager.add({
         type: "success",
-        title: "Environment added",
-        description: `Connecting to ${environment.label} through Fenix Connect.`,
+        title: "Entorno añadido",
+        description: `Conectando con ${environment.label} mediante Fenix Connect.`,
       });
       return;
     }
@@ -109,17 +109,17 @@ export function CloudEnvironmentConnectRows({
     }
     const cause = squashAtomCommandFailure(result);
     const message =
-      cause instanceof Error ? cause.message : "Could not connect the Fenix Connect environment.";
+      cause instanceof Error ? cause.message : "No se pudo conectar el entorno de Fenix Connect.";
     const traceId = findErrorTraceId(cause);
-    console.error("[t3-connect] Could not connect environment", { message, traceId, cause });
+    console.error("[fenix-connect] No se pudo conectar el entorno", { message, traceId, cause });
     toastManager.add({
       type: "error",
-      title: "Could not connect environment",
+      title: "No se pudo conectar el entorno",
       description: message,
       data: traceId
         ? {
             secondaryActionProps: {
-              children: "Copy trace ID",
+              children: "Copiar ID de traza",
               onClick: () => void navigator.clipboard?.writeText(traceId),
             },
           }
@@ -148,13 +148,13 @@ export function CloudEnvironmentConnectRows({
     // A failed or offline discovery is not "no environments" — misreporting it
     // as empty would read as the user's devices having disappeared.
     const discoveryProblem = environmentsState.offline
-      ? "You appear to be offline."
+      ? "Parece que no tienes conexión."
       : (Option.getOrNull(environmentsState.error)?.message ?? null);
     if (discoveryProblem !== null && !environmentsState.refreshing) {
       return (
         <div className={ITEM_ROW_CLASSNAME}>
           <p className="text-sm font-medium text-destructive">
-            Could not load Fenix Connect environments
+            No se pudieron cargar los entornos de Fenix Connect
           </p>
           <p className="mt-1 text-xs text-muted-foreground">{discoveryProblem}</p>
           <Button
@@ -163,7 +163,7 @@ export function CloudEnvironmentConnectRows({
             className="mt-3"
             onClick={() => void refreshRelayEnvironments()}
           >
-            Try again
+            Reintentar
           </Button>
         </div>
       );
@@ -194,12 +194,13 @@ export function CloudEnvironmentConnectRows({
     const statusText = savedConnection
       ? savedConnection.statusText
       : availability === "online"
-        ? "Available · Relay online"
+        ? "Disponible · Retransmisión en línea"
         : availability === "offline"
-          ? "Available · Relay offline"
+          ? "Disponible · Retransmisión sin conexión"
           : availability === "checking"
-            ? "Available · Checking relay status…"
-            : (Option.getOrNull(error)?.message ?? "Available · Relay status unavailable");
+            ? "Disponible · Comprobando la retransmisión…"
+            : (Option.getOrNull(error)?.message ??
+              "Disponible · Estado de retransmisión no disponible");
     return (
       <div key={environment.environmentId} className={ITEM_ROW_CLASSNAME}>
         <div className={ITEM_ROW_INNER_CLASSNAME}>
@@ -250,7 +251,7 @@ export function CloudEnvironmentConnectRows({
               disabled={connectingEnvironmentId !== null}
               onClick={() => void connectEnvironment(environment)}
             >
-              {connectingEnvironmentId === environment.environmentId ? "Connecting…" : "Connect"}
+              {connectingEnvironmentId === environment.environmentId ? "Conectando…" : "Conectar"}
             </Button>
           )}
         </div>

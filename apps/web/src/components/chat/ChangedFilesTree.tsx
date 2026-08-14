@@ -85,7 +85,7 @@ export const ChangedFilesCard = memo(function ChangedFilesCard(props: {
           />
           <span className="flex min-w-0 items-center gap-1 whitespace-nowrap font-medium text-foreground text-xs leading-4">
             <span>
-              {files.length} changed file{files.length === 1 ? "" : "s"}
+              {files.length} archivo{files.length === 1 ? " modificado" : "s modificados"}
             </span>
             {hasNonZeroStat(summaryStat) && (
               <DiffStatLabel
@@ -97,7 +97,7 @@ export const ChangedFilesCard = memo(function ChangedFilesCard(props: {
             )}
           </span>
           <span className="ml-1 hidden truncate text-[11px] text-muted-foreground group-hover:text-foreground/80 sm:inline">
-            {expanded ? "Hide files" : "Show files"}
+            {expanded ? "Ocultar archivos" : "Mostrar archivos"}
           </span>
         </button>
         <div className="flex items-center gap-1.5">
@@ -111,7 +111,9 @@ export const ChangedFilesCard = memo(function ChangedFilesCard(props: {
                     variant="outline"
                     className="!size-[22px]"
                     aria-label={
-                      allDirectoriesExpanded ? "Collapse all folders" : "Expand all folders"
+                      allDirectoriesExpanded
+                        ? "Contraer todas las carpetas"
+                        : "Expandir todas las carpetas"
                     }
                     data-scroll-anchor-ignore
                     onClick={onToggleAllDirectories}
@@ -125,7 +127,9 @@ export const ChangedFilesCard = memo(function ChangedFilesCard(props: {
                 )}
               </TooltipTrigger>
               <TooltipPopup side="top">
-                {allDirectoriesExpanded ? "Collapse all folders" : "Expand all folders"}
+                {allDirectoriesExpanded
+                  ? "Contraer todas las carpetas"
+                  : "Expandir todas las carpetas"}
               </TooltipPopup>
             </Tooltip>
           ) : null}
@@ -136,15 +140,15 @@ export const ChangedFilesCard = memo(function ChangedFilesCard(props: {
                   type="button"
                   size="xs"
                   variant="outline"
-                  aria-label="Open diff"
+                  aria-label="Abrir diferencias"
                   onClick={() => onOpenTurnDiff(turnId, files[0]?.path)}
                 />
               }
             >
               <FileDiffIcon className="size-3" />
-              <span className="hidden sm:inline">Open diff</span>
+              <span className="hidden sm:inline">Abrir diferencias</span>
             </TooltipTrigger>
-            <TooltipPopup side="top">Open the full diff</TooltipPopup>
+            <TooltipPopup side="top">Abrir todas las diferencias</TooltipPopup>
           </Tooltip>
         </div>
       </div>
@@ -165,7 +169,7 @@ export const ChangedFilesCard = memo(function ChangedFilesCard(props: {
                 {index > 0 ? <span aria-hidden="true">·</span> : null}
                 <span className="font-mono text-foreground/75">{scope.label}</span>
                 <span>
-                  {scope.fileCount} file{scope.fileCount === 1 ? "" : "s"}
+                  {scope.fileCount} {scope.fileCount === 1 ? "archivo" : "archivos"}
                 </span>
               </span>
             ))}
@@ -193,7 +197,7 @@ export const ChangedFilesCard = memo(function ChangedFilesCard(props: {
               className="rounded-md px-1.5 py-1 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               onClick={() => onExpandedChange(true)}
             >
-              Show all {files.length} files
+              {files.length === 1 ? "Mostrar el archivo" : `Mostrar los ${files.length} archivos`}
             </button>
           </div>
         </div>

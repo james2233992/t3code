@@ -8,7 +8,7 @@ export class ClipboardApiUnavailableError extends Schema.TaggedErrorClass<Clipbo
   },
 ) {
   override get message(): string {
-    return `Clipboard API is unavailable while copying ${this.target}.`;
+    return `El portapapeles no está disponible al copiar ${this.target}.`;
   }
 }
 
@@ -20,7 +20,7 @@ export class ClipboardWriteError extends Schema.TaggedErrorClass<ClipboardWriteE
   },
 ) {
   override get message(): string {
-    return `Failed to copy ${this.target} to the clipboard.`;
+    return `No se pudo copiar ${this.target} al portapapeles.`;
   }
 }
 

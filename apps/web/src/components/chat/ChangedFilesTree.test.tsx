@@ -25,11 +25,11 @@ describe("ChangedFilesCard", () => {
     expect(markup).toContain("whitespace-nowrap");
     expect(markup).toContain("!size-[22px]");
     expect(markup).toContain("size-3");
-    expect(markup).toContain('aria-label="Collapse all folders"');
-    expect(markup).toContain('aria-label="Open diff"');
-    expect(markup).toContain('role="group" aria-label="2 additions, 1 deletions"');
-    expect(markup).toContain("1 changed file");
-    expect(markup).not.toContain("1 changed files");
+    expect(markup).toContain('aria-label="Contraer todas las carpetas"');
+    expect(markup).toContain('aria-label="Abrir diferencias"');
+    expect(markup).toContain('role="group" aria-label="2 inserciones, 1 eliminación"');
+    expect(markup).toContain("1 archivo modificado");
+    expect(markup).not.toContain("1 archivos modificados");
   });
 
   it("renders a scope and representative-file preview for a large latest change", () => {
@@ -60,13 +60,13 @@ describe("ChangedFilesCard", () => {
     expect(markup).toContain('data-changed-files-state="preview"');
     expect(markup).toContain('aria-expanded="false"');
     expect(markup).toContain("apps");
-    expect(markup).toContain("2 files");
+    expect(markup).toContain("2 archivos");
     expect(markup).toContain("packages");
     expect(markup).toContain("root");
     expect(markup).toContain("App.tsx");
     expect(markup).toContain("git.ts");
     expect(markup).toContain("README.md");
-    expect(markup).toContain("Show all 4 files");
+    expect(markup).toContain("Mostrar los 4 archivos");
     expect(markup).not.toContain("App.test.tsx");
   });
 
@@ -86,7 +86,7 @@ describe("ChangedFilesCard", () => {
     );
 
     expect(markup).toContain('data-changed-files-state="collapsed"');
-    expect(markup).toContain("1 changed file");
+    expect(markup).toContain("1 archivo modificado");
     expect(markup).not.toContain("Show all");
     expect(markup).not.toContain("App.tsx");
   });

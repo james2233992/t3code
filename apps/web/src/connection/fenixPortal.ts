@@ -14,7 +14,7 @@ const PORTAL_REQUEST_TIMEOUT_MS = 15_000;
 
 class FenixPortalHttpError extends Error {
   constructor(readonly status: number) {
-    super(`Fenix Code Lab request failed with HTTP ${status}.`);
+    super(`La solicitud de Fenix Code ha fallado con HTTP ${status}.`);
   }
 }
 
@@ -136,7 +136,7 @@ async function csrfHeader(fetchImpl: typeof fetch, url: URL): Promise<Record<str
     readonly data?: { readonly token?: unknown };
   };
   if (typeof envelope.data?.token !== "string" || envelope.data.token.length === 0) {
-    throw new Error("Fenix Code Lab CSRF token is unavailable.");
+    throw new Error("El token CSRF de Fenix Code Lab no está disponible.");
   }
   return { "X-CSRF-TOKEN": envelope.data.token };
 }
@@ -190,7 +190,7 @@ export async function issueFenixPortalPairing(input: {
   const url = input.url ?? new URL(window.location.href);
   const deviceName = input.deviceName.trim();
   if (deviceName.length === 0 || deviceName.length > 80) {
-    throw new Error("Enter a local environment name of 1 to 80 characters.");
+    throw new Error("Introduce un nombre de entorno local de 1 a 80 caracteres.");
   }
   const headers = await csrfHeader(fetchImpl, url);
   const value = (await readJson(

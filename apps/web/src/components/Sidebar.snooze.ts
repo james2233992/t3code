@@ -25,9 +25,17 @@ export function resolveSnoozePresets(
     const time = timeOfDayLabel(wake, timestampFormat);
     return {
       ...preset,
+      label:
+        preset.id === "hour"
+          ? "En 1 hora"
+          : preset.id === "evening"
+            ? "Esta tarde"
+            : preset.id === "tomorrow"
+              ? "Mañana"
+              : "La próxima semana",
       whenLabel:
         preset.id === "next-week"
-          ? `${wake.toLocaleDateString(undefined, { weekday: "short" })} ${time}`
+          ? `${wake.toLocaleDateString("es-ES", { weekday: "short" })} ${time}`
           : time,
     };
   });
@@ -49,9 +57,9 @@ export function snoozeWakeDescription(
   startOfToday.setHours(0, 0, 0, 0);
   const dayDelta = Math.floor((wake.getTime() - startOfToday.getTime()) / DAY_MS);
   if (dayDelta === 0) return time;
-  if (dayDelta === 1) return `tomorrow ${time}`;
-  const weekday = wake.toLocaleDateString(undefined, { weekday: "short" });
+  if (dayDelta === 1) return `mañana ${time}`;
+  const weekday = wake.toLocaleDateString("es-ES", { weekday: "short" });
   if (dayDelta < 7) return `${weekday} ${time}`;
-  const date = wake.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  const date = wake.toLocaleDateString("es-ES", { month: "short", day: "numeric" });
   return `${date}, ${time}`;
 }

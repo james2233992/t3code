@@ -28,7 +28,7 @@ export function useResourceTelemetry(): ResourceTelemetryState {
   });
   const retry = useCallback(async () => {
     if (environmentId === null) {
-      throw new Error("No environment is selected.");
+      throw new Error("No hay ningún entorno seleccionado.");
     }
     const result = await retryCommand({ environmentId, input: {} });
     if (result._tag === "Failure") {

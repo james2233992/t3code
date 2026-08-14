@@ -76,7 +76,7 @@ function SidebarBrand({ onBackdrop }: { onBackdrop: boolean }) {
 
   return (
     <Link
-      aria-label={`Go to ${APP_BASE_NAME} threads`}
+      aria-label={`Ir a las conversaciones de ${APP_BASE_NAME}`}
       className={cn(
         "sidebar-brand relative z-10 ml-[var(--workspace-titlebar-content-left)] h-7 w-fit min-w-0 shrink-0 items-center gap-1 overflow-hidden rounded-md outline-hidden ring-ring focus-visible:ring-2",
         onBackdrop ? "text-white" : "text-foreground",
@@ -130,13 +130,13 @@ export const SidebarChromeFooter = memo(function SidebarChromeFooter() {
         <SidebarMenuItem>
           <SidebarMenuButton onClick={handleUsageClick}>
             <ChartNoAxesColumnIcon />
-            <span>Usage</span>
+            <span>Uso</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
         <SidebarMenuItem>
           <SidebarMenuButton onClick={handleSettingsClick}>
             <SettingsIcon />
-            <span>Settings</span>
+            <span>Ajustes</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>

@@ -14,11 +14,11 @@ interface ComposerPreviewAnnotationCardsProps {
   className?: string;
 }
 
-function TargetStat(props: { icon: ReactNode; count: number; label: string }) {
+function TargetStat(props: { icon: ReactNode; count: number; label: string; pluralLabel: string }) {
   return (
     <span
       className="inline-flex items-center gap-1 text-[10px] font-medium text-muted-foreground"
-      title={`${props.count} ${props.label}${props.count === 1 ? "" : "s"}`}
+      title={`${props.count} ${props.count === 1 ? props.label : props.pluralLabel}`}
     >
       {props.icon}
       {props.count}
@@ -52,13 +52,13 @@ export function ComposerPreviewAnnotationCards({
             {image?.previewUrl ? (
               <button
                 type="button"
-                aria-label={`Preview ${image.name}`}
+                aria-label={`Previsualizar ${image.name}`}
                 className="size-14 shrink-0 cursor-zoom-in overflow-hidden border-r border-border/70 bg-muted"
                 onClick={() => onExpandImage(image.id)}
               >
                 <img
                   src={image.previewUrl}
-                  alt="Annotated preview crop"
+                  alt="Recorte anotado de la previsualización"
                   className="size-full object-cover transition duration-200 group-hover/preview-annotation:scale-[1.03]"
                 />
               </button>
@@ -101,28 +101,32 @@ export function ComposerPreviewAnnotationCards({
                     <TargetStat
                       icon={<MousePointerClick className="size-3" />}
                       count={annotation.elements.length}
-                      label="element"
+                      label="elemento"
+                      pluralLabel="elementos"
                     />
                   ) : null}
                   {annotation.regions.length > 0 ? (
                     <TargetStat
                       icon={<Frame className="size-3" />}
                       count={annotation.regions.length}
-                      label="region"
+                      label="región"
+                      pluralLabel="regiones"
                     />
                   ) : null}
                   {annotation.strokes.length > 0 ? (
                     <TargetStat
                       icon={<PenLine className="size-3" />}
                       count={annotation.strokes.length}
-                      label="drawing"
+                      label="dibujo"
+                      pluralLabel="dibujos"
                     />
                   ) : null}
                   {annotation.styleChanges.length > 0 ? (
                     <TargetStat
                       icon={<Paintbrush className="size-3" />}
                       count={annotation.styleChanges.length}
-                      label="style change"
+                      label="cambio de estilo"
+                      pluralLabel="cambios de estilo"
                     />
                   ) : null}
                 </div>
@@ -130,7 +134,7 @@ export function ComposerPreviewAnnotationCards({
             </div>
             <button
               type="button"
-              aria-label="Remove preview annotation"
+              aria-label="Eliminar anotación de previsualización"
               className="absolute right-1.5 top-1.5 grid size-5 place-items-center rounded text-icon-muted transition hover:bg-muted hover:text-foreground"
               onClick={() => onRemove(annotation.id)}
             >

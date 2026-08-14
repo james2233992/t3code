@@ -116,13 +116,13 @@ describe("browser target resolver", () => {
         kind: "environment-port",
         port: 5173,
       }),
-    ).toThrow(/authenticated preview gateway/);
+    ).toThrow(/pasarela de previsualización autenticada/);
     expect(() =>
       resolveBrowserNavigationTarget(EnvironmentId.make("environment-1"), {
         kind: "url",
         url: "http://localhost:5173",
       }),
-    ).toThrow(/authenticated preview gateway/);
+    ).toThrow(/pasarela de previsualización autenticada/);
   });
 
   it("normalizes schemeless localhost server-picker values", async () => {

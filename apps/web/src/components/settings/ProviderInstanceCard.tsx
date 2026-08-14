@@ -146,8 +146,8 @@ function ProviderAuthEmail(props: {
       <RedactedSensitiveText
         value={trimmed}
         ariaLabel="Toggle account email visibility"
-        revealTooltip="Click to reveal email"
-        hideTooltip="Click to hide email"
+        revealTooltip="Haz clic para mostrar el correo"
+        hideTooltip="Haz clic para ocultar el correo"
       />
     </span>
   );
@@ -205,7 +205,7 @@ function ProviderEnvironmentSection(props: {
   return (
     <div className="grid gap-2">
       <div className="flex items-center justify-between gap-3">
-        <span className="text-xs font-medium text-foreground">Environment variables</span>
+        <span className="text-xs font-medium text-foreground">Variables de entorno</span>
         <Button
           type="button"
           size="sm"
@@ -224,12 +224,12 @@ function ProviderEnvironmentSection(props: {
           }
         >
           <PlusIcon className="size-3" />
-          Add
+          Añadir
         </Button>
       </div>
       {rows.length === 0 ? (
         <p className="text-xs text-muted-foreground">
-          Add variables to pass API keys, base URLs, or other per-instance CLI settings.
+          Añade variables para pasar claves API, URL base u otros ajustes de CLI de esta instancia.
         </p>
       ) : (
         <div className="overflow-hidden rounded-md border border-border/70">
@@ -237,10 +237,10 @@ function ProviderEnvironmentSection(props: {
             <TableHeader className="bg-muted/25 text-[11px] text-muted-foreground">
               <TableRow className="hover:bg-transparent">
                 <TableHead>Variable</TableHead>
-                <TableHead>Value</TableHead>
-                <TableHead className="w-20">Sensitive</TableHead>
+                <TableHead>Valor</TableHead>
+                <TableHead className="w-20">Sensible</TableHead>
                 <TableHead className="w-12 text-right">
-                  <span className="sr-only">Options</span>
+                  <span className="sr-only">Opciones</span>
                 </TableHead>
               </TableRow>
             </TableHeader>
@@ -256,7 +256,7 @@ function ProviderEnvironmentSection(props: {
                       onCommit={(name) => updateVariable(variable.id, { name: name.trim() })}
                       placeholder="VARIABLE_NAME"
                       spellCheck={false}
-                      aria-label={`Environment variable name ${index + 1}`}
+                      aria-label={`Nombre de la variable de entorno ${index + 1}`}
                     />
                   </TableCell>
                   <TableCell>
@@ -267,11 +267,11 @@ function ProviderEnvironmentSection(props: {
                       autoComplete="off"
                       placeholder={
                         variable.valueRedacted
-                          ? "Stored secret - enter a new value to replace"
-                          : "Value"
+                          ? "Secreto guardado: introduce un valor nuevo para sustituirlo"
+                          : "Valor"
                       }
                       spellCheck={false}
-                      aria-label={`Environment variable value ${index + 1}`}
+                      aria-label={`Valor de la variable de entorno ${index + 1}`}
                     />
                   </TableCell>
                   <TableCell className="w-20">
@@ -299,7 +299,7 @@ function ProviderEnvironmentSection(props: {
                         variant="ghost"
                         className="size-8 text-muted-foreground hover:text-destructive"
                         onClick={() => removeVariable(variable.id)}
-                        aria-label={`Remove environment variable ${variable.name || index + 1}`}
+                        aria-label={`Eliminar variable de entorno ${variable.name || index + 1}`}
                       >
                         <XIcon className="size-3.5" />
                       </Button>
@@ -312,7 +312,8 @@ function ProviderEnvironmentSection(props: {
         </div>
       )}
       <span className="text-xs text-muted-foreground">
-        Sensitive values are stored separately and are not returned to the app after saving.
+        Los valores sensibles se almacenan por separado y no se devuelven a la aplicación después de
+        guardarlos.
       </span>
     </div>
   );
@@ -421,14 +422,14 @@ export function ProviderInstanceCard({
       toastManager.add({
         type: "success",
         title: `${providerName} update command copied`,
-        description: "Run it in a terminal when you are ready to update.",
+        description: "Ejecútalo en un terminal cuando estés listo para actualizar.",
       });
     },
     onError: (error, { providerName }) => {
       toastManager.add(
         stackedThreadToast({
           type: "error",
-          title: `Could not copy ${providerName} update command`,
+          title: `No se pudo copiar el comando de actualización de ${providerName}`,
           description: error.message,
         }),
       );
@@ -564,13 +565,13 @@ export function ProviderInstanceCard({
                   variant="ghost"
                   className="size-5 rounded-sm p-0 text-muted-foreground hover:text-destructive"
                   onClick={onDelete}
-                  aria-label={`Delete provider instance ${instanceId}`}
+                  aria-label={`Eliminar instancia del proveedor ${instanceId}`}
                 >
                   <Trash2Icon className="size-3" />
                 </Button>
               }
             />
-            <TooltipPopup side="top">Delete instance</TooltipPopup>
+            <TooltipPopup side="top">Eliminar instancia</TooltipPopup>
           </Tooltip>
         </span>
       ) : null}
@@ -581,7 +582,7 @@ export function ProviderInstanceCard({
     <p className="flex min-w-0 flex-wrap items-center gap-x-1 text-[13px] leading-[1.45] text-muted-foreground/80">
       {hasAuthenticatedEmail ? (
         <>
-          <span>Authenticated as</span>
+          <span>Autenticado como</span>
           <ProviderAuthEmail email={authEmail} />
           {authenticatedDetail ? <span>· {authenticatedDetail}</span> : null}
         </>
@@ -621,7 +622,7 @@ export function ProviderInstanceCard({
                             ? "text-warning hover:text-warning"
                             : "text-update hover:text-update",
                         )}
-                        aria-label="Update available — view details"
+                        aria-label="Actualización disponible: ver detalles"
                       >
                         <ArrowUpCircleIcon className="size-3.5 [animation:bounce_2.4s_ease-in-out_infinite] motion-reduce:animate-none" />
                       </Button>
@@ -635,7 +636,7 @@ export function ProviderInstanceCard({
                     <div className="grid min-w-0 gap-3">
                       <div className="grid gap-0.5">
                         <p className="text-[13px] font-semibold leading-tight text-foreground">
-                          Update available
+                          Actualización disponible
                         </p>
                         <p
                           className={cn(
@@ -658,13 +659,13 @@ export function ProviderInstanceCard({
                           onClick={onRunUpdate}
                         >
                           {isUpdating ? <LoaderIcon className="animate-spin" /> : <DownloadIcon />}
-                          {isUpdating ? "Updating" : "Update now"}
+                          {isUpdating ? "Actualizando" : "Actualizar ahora"}
                         </Button>
                       ) : null}
                       {onRunUpdate && updateCommand ? (
                         <div className="flex items-center gap-2 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
                           <span aria-hidden className="h-px flex-1 bg-border" />
-                          or, update manually using
+                          o actualiza manualmente con
                           <span aria-hidden className="h-px flex-1 bg-border" />
                         </div>
                       ) : null}
@@ -688,13 +689,13 @@ export function ProviderInstanceCard({
                                       providerName: displayName,
                                     })
                                   }
-                                  aria-label="Copy update command"
+                                  aria-label="Copiar comando de actualización"
                                 >
                                   <CopyIcon className="size-3" />
                                 </Button>
                               }
                             />
-                            <TooltipPopup side="top">Copy command</TooltipPopup>
+                            <TooltipPopup side="top">Copiar comando</TooltipPopup>
                           </Tooltip>
                         </div>
                       ) : null}
@@ -721,7 +722,7 @@ export function ProviderInstanceCard({
             <Switch
               checked={enabled}
               onCheckedChange={(checked) => updateEnabled(Boolean(checked))}
-              aria-label={`Enable ${displayName}`}
+              aria-label={`Activar ${displayName}`}
             />
           </div>
         </div>
@@ -732,7 +733,7 @@ export function ProviderInstanceCard({
           <div className="space-y-5 px-3 pb-4 pt-2 sm:px-4">
             <div>
               <label htmlFor={`provider-instance-${instanceId}-display-name`} className="block">
-                <span className="text-xs font-medium text-foreground">Display name</span>
+                <span className="text-xs font-medium text-foreground">Nombre visible</span>
                 <DraftInput
                   id={`provider-instance-${instanceId}-display-name`}
                   className="mt-1.5"
@@ -742,7 +743,7 @@ export function ProviderInstanceCard({
                   spellCheck={false}
                 />
                 <span className="mt-1 block text-xs text-muted-foreground">
-                  Optional label shown in the provider list.
+                  Etiqueta opcional que se muestra en la lista de proveedores.
                 </span>
               </label>
             </div>
@@ -753,7 +754,7 @@ export function ProviderInstanceCard({
                 value={accentColor}
                 onCommit={updateAccentColor}
                 commitDelayMs={120}
-                description="Used to distinguish this instance in picker rails and model lists."
+                description="Se usa para distinguir esta instancia en los selectores y las listas de modelos."
               />
             </div>
 
@@ -791,10 +792,10 @@ export function ProviderInstanceCard({
             ) : (
               <div>
                 <p className="text-xs text-muted-foreground">
-                  This instance uses a driver (
-                  <code className="text-foreground">{String(instance.driver)}</code>) that is not
-                  shipped with the current build. Configuration values are preserved but cannot be
-                  edited from this surface.
+                  Esta instancia usa un driver (
+                  <code className="text-foreground">{String(instance.driver)}</code>) que no se
+                  incluye en esta compilación. Los valores se conservan, pero no pueden editarse
+                  desde esta pantalla.
                 </p>
               </div>
             )}

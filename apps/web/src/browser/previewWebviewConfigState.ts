@@ -19,7 +19,7 @@ export class PreviewWebviewBridgeUnavailableError extends Schema.TaggedErrorClas
   { environmentId: Schema.String },
 ) {
   override get message(): string {
-    return `Desktop preview configuration is unavailable for environment "${this.environmentId}".`;
+    return `La configuración de previsualización del escritorio no está disponible para el entorno "${this.environmentId}".`;
   }
 }
 
@@ -31,7 +31,7 @@ export class PreviewWebviewConfigLoadError extends Schema.TaggedErrorClass<Previ
   },
 ) {
   override get message(): string {
-    return `Failed to load desktop preview configuration for environment "${this.environmentId}".`;
+    return `No se pudo cargar la configuración de previsualización del escritorio para el entorno "${this.environmentId}".`;
   }
 }
 

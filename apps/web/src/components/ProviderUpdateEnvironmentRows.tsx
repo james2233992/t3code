@@ -65,7 +65,7 @@ function toProviderUpdateOutcome(input: {
     const error = squashAtomCommandFailure(input.result);
     return {
       status: "rejected",
-      reason: error instanceof Error ? error : new Error("Provider update failed."),
+      reason: error instanceof Error ? error : new Error("Falló la actualización del proveedor."),
     };
   }
 
@@ -127,14 +127,14 @@ function EnvironmentUpdateRow({
     case "unchanged":
       trailing = (
         <Button size="xs" variant="outline" onClick={onUpdate}>
-          Retry
+          Reintentar
         </Button>
       );
       break;
     default:
       trailing = (
         <Button size="xs" onClick={onUpdate}>
-          Update
+          Actualizar
         </Button>
       );
       break;
@@ -261,7 +261,10 @@ export function ProviderUpdateEnvironmentRows({
         inFlightEnvironmentsRef.current.delete(environmentId);
         clearPending(environmentId);
         setErrorByEnvironment((previous) =>
-          new Map(previous).set(environmentId, "Update timed out — try again."),
+          new Map(previous).set(
+            environmentId,
+            "La actualización agotó el tiempo de espera; inténtalo de nuevo.",
+          ),
         );
       }, PENDING_EXPIRY_MS);
       try {
@@ -283,7 +286,10 @@ export function ProviderUpdateEnvironmentRows({
             } catch (error) {
               return {
                 status: "rejected",
-                reason: error instanceof Error ? error : new Error("Provider update failed."),
+                reason:
+                  error instanceof Error
+                    ? error
+                    : new Error("Falló la actualización del proveedor."),
               };
             }
           }),
@@ -308,7 +314,7 @@ export function ProviderUpdateEnvironmentRows({
           setErrorByEnvironment((previous) =>
             new Map(previous).set(
               environmentId,
-              "This environment isn’t connected — try again once it reconnects.",
+              "Este entorno no está conectado; inténtalo de nuevo cuando se reconecte.",
             ),
           );
           return;
@@ -341,7 +347,7 @@ export function ProviderUpdateEnvironmentRows({
           setErrorByEnvironment((previous) =>
             new Map(previous).set(
               environmentId,
-              error instanceof Error ? error.message : "Provider update failed.",
+              error instanceof Error ? error.message : "Falló la actualización del proveedor.",
             ),
           );
         }

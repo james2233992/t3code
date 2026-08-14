@@ -37,7 +37,7 @@ export const PanelLayoutControls = memo(function PanelLayoutControls({
               className="shrink-0 [-webkit-app-region:no-drag]"
               pressed={terminalOpen}
               onPressedChange={onToggleTerminal}
-              aria-label="Toggle terminal drawer"
+              aria-label="Mostrar u ocultar el panel de terminal"
               variant="ghost"
               size="sm"
               disabled={!terminalAvailable}
@@ -49,7 +49,7 @@ export const PanelLayoutControls = memo(function PanelLayoutControls({
         <TooltipPopup side="bottom">
           {terminalAvailable
             ? `Toggle terminal drawer${terminalShortcutLabel ? ` (${terminalShortcutLabel})` : ""}`
-            : "Terminal drawer is unavailable"}
+            : "El panel del terminal no está disponible"}
         </TooltipPopup>
       </Tooltip>
       <Tooltip>
@@ -59,7 +59,7 @@ export const PanelLayoutControls = memo(function PanelLayoutControls({
               className="shrink-0 [-webkit-app-region:no-drag]"
               pressed={rightPanelOpen}
               onPressedChange={onToggleRightPanel}
-              aria-label="Toggle right panel"
+              aria-label="Mostrar u ocultar el panel derecho"
               variant="ghost"
               size="sm"
               disabled={!rightPanelAvailable}
@@ -71,7 +71,7 @@ export const PanelLayoutControls = memo(function PanelLayoutControls({
         <TooltipPopup side="bottom">
           {rightPanelAvailable
             ? `Toggle right panel${rightPanelShortcutLabel ? ` (${rightPanelShortcutLabel})` : ""}`
-            : "Right panel is unavailable"}
+            : "El panel derecho no está disponible"}
         </TooltipPopup>
       </Tooltip>
     </div>

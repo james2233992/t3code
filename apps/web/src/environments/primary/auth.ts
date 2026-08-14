@@ -62,7 +62,7 @@ export class PrimaryEnvironmentRequestError extends Schema.TaggedErrorClass<Prim
   }
 
   override get message(): string {
-    return `Primary environment request failed during ${this.operation} (HTTP ${this.status}).`;
+    return `La solicitud al entorno principal falló durante ${this.operation} (HTTP ${this.status}).`;
   }
 }
 
@@ -76,7 +76,7 @@ export class PrimaryEnvironmentPairingCredentialRejectedError extends Schema.Tag
   },
 ) {
   override get message(): string {
-    return "Invalid pairing token. Check the token and try again.";
+    return "Token de emparejamiento no válido. Compruébalo e inténtalo de nuevo.";
   }
 }
 
@@ -92,7 +92,7 @@ export class PrimaryEnvironmentAuthSessionTimeoutError extends Schema.TaggedErro
   },
 ) {
   override get message(): string {
-    return "Timed out waiting for authenticated session after bootstrap.";
+    return "Se agotó el tiempo de espera de la sesión autenticada tras el inicio.";
   }
 }
 
@@ -107,7 +107,7 @@ export class PrimaryEnvironmentPairingCredentialRequiredError extends Schema.Tag
   },
 ) {
   override get message(): string {
-    return "Enter a pairing token to continue.";
+    return "Introduce un token de emparejamiento para continuar.";
   }
 }
 
@@ -339,7 +339,7 @@ async function bootstrapServerAuth(): Promise<ServerAuthGateState> {
     return {
       status: "requires-auth",
       auth: currentSession.auth,
-      errorMessage: error instanceof Error ? error.message : "Authentication failed.",
+      errorMessage: error instanceof Error ? error.message : "Falló la autenticación.",
     };
   }
 }

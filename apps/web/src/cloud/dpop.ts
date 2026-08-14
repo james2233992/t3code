@@ -49,7 +49,9 @@ function openDpopDatabase(): Effect.Effect<IDBDatabase, BrowserDpopError> {
     const request = indexedDB.open(DPOP_DATABASE_NAME, DPOP_DATABASE_VERSION);
     request.addEventListener("error", () =>
       resume(
-        Effect.fail(dpopError("Could not open DPoP key storage.", request.error ?? undefined)),
+        Effect.fail(
+          dpopError("No se pudo abrir el almacén de claves DPoP.", request.error ?? undefined),
+        ),
       ),
     );
     request.addEventListener("upgradeneeded", () => {
@@ -74,7 +76,9 @@ export function readStoredBrowserDpopKey(): Effect.Effect<BrowserDpopKey | null,
           .objectStore(DPOP_KEY_STORE_NAME)
           .get(DPOP_KEY_ID);
         request.addEventListener("error", () =>
-          resume(Effect.fail(dpopError("Could not read DPoP key.", request.error ?? undefined))),
+          resume(
+            Effect.fail(dpopError("No se pudo leer la clave DPoP.", request.error ?? undefined)),
+          ),
         );
         request.addEventListener("success", () =>
           resume(Effect.succeed((request.result as BrowserDpopKey | undefined) ?? null)),
@@ -97,7 +101,9 @@ export function writeStoredBrowserDpopKey(
         const transaction = database.transaction(DPOP_KEY_STORE_NAME, "readwrite");
         transaction.addEventListener("error", () =>
           resume(
-            Effect.fail(dpopError("Could not write DPoP key.", transaction.error ?? undefined)),
+            Effect.fail(
+              dpopError("No se pudo guardar la clave DPoP.", transaction.error ?? undefined),
+            ),
           ),
         );
         transaction.addEventListener("complete", () => resume(Effect.void));
@@ -114,26 +120,26 @@ export const generateBrowserDpopKey = Effect.gen(function* () {
         "sign",
         "verify",
       ]) as Promise<CryptoKeyPair>,
-    catch: (cause) => dpopError("Could not generate DPoP proof key.", cause),
+    catch: (cause) => dpopError("No se pudo generar la clave de prueba DPoP.", cause),
   });
   const privateJwk = yield* Effect.tryPromise({
     try: () => crypto.subtle.exportKey("jwk", generated.privateKey),
-    catch: (cause) => dpopError("Could not export DPoP private key.", cause),
+    catch: (cause) => dpopError("No se pudo exportar la clave privada DPoP.", cause),
   });
   const publicJwk = yield* Effect.tryPromise({
     try: () => crypto.subtle.exportKey("jwk", generated.publicKey),
-    catch: (cause) => dpopError("Could not export DPoP public key.", cause),
+    catch: (cause) => dpopError("No se pudo exportar la clave pública DPoP.", cause),
   }).pipe(
     Effect.flatMap((jwk) => decodeDpopPublicJwk(jwk)),
     Effect.mapError((cause) =>
       cause instanceof BrowserDpopError
         ? cause
-        : dpopError("Generated DPoP public key is invalid.", cause),
+        : dpopError("La clave pública DPoP generada no es válida.", cause),
     ),
   );
   const privateKey = yield* Effect.tryPromise({
     try: () => importJWK(privateJwk as JWK, "ES256", { extractable: false }) as Promise<CryptoKey>,
-    catch: (cause) => dpopError("Could not import DPoP private key.", cause),
+    catch: (cause) => dpopError("No se pudo importar la clave privada DPoP.", cause),
   });
   return {
     privateKey,
@@ -155,13 +161,15 @@ export function createBrowserDpopProof(input: {
   return Effect.gen(function* () {
     const normalizedUrl = yield* Effect.try({
       try: () => new URL(input.url),
-      catch: (cause) => dpopError("Could not normalize DPoP proof URL.", cause),
+      catch: (cause) => dpopError("No se pudo normalizar la URL de prueba DPoP.", cause),
     });
     normalizedUrl.search = "";
     normalizedUrl.hash = "";
     const jti = yield* Crypto.Crypto.pipe(
       Effect.flatMap((crypto) => crypto.randomUUIDv4),
-      Effect.mapError((cause) => dpopError("Could not generate DPoP proof identifier.", cause)),
+      Effect.mapError((cause) =>
+        dpopError("No se pudo generar el identificador de prueba DPoP.", cause),
+      ),
     );
     const proof = yield* Effect.tryPromise({
       try: () =>
@@ -178,7 +186,7 @@ export function createBrowserDpopProof(input: {
           })
           .setIssuedAt()
           .sign(input.proofKey.privateKey),
-      catch: (cause) => dpopError("Could not sign DPoP proof.", cause),
+      catch: (cause) => dpopError("No se pudo firmar la prueba DPoP.", cause),
     });
     return { proof, thumbprint: input.proofKey.thumbprint };
   });

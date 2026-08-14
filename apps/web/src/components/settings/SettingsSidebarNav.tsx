@@ -204,8 +204,8 @@ export function SettingsSidebarNav({ pathname }: { pathname: string }) {
                 setActiveResultIndex(0);
               }}
               onKeyDown={handleSearchKeyDown}
-              placeholder="Search"
-              aria-label="Search settings"
+              placeholder="Buscar"
+              aria-label="Buscar en ajustes"
               role="combobox"
               aria-autocomplete="list"
               aria-expanded={isSearching && hasResults}
@@ -223,7 +223,7 @@ export function SettingsSidebarNav({ pathname }: { pathname: string }) {
                 size="icon-xs"
                 variant="ghost"
                 className="size-5 shrink-0 rounded-sm text-sidebar-muted-foreground hover:bg-sidebar-control-surface hover:text-sidebar-foreground"
-                aria-label="Clear settings search"
+                aria-label="Borrar búsqueda de ajustes"
                 onClick={() => {
                   clearSearch();
                   searchInputRef.current?.focus();
@@ -242,14 +242,14 @@ export function SettingsSidebarNav({ pathname }: { pathname: string }) {
               role="status"
               className="px-2 py-6 text-center text-xs text-sidebar-muted-foreground"
             >
-              No settings found
+              No se encontraron ajustes
             </p>
           ) : null}
           <SidebarMenu
             className="ps-px"
             id={isSearching && hasResults ? "settings-search-results" : undefined}
             role={isSearching && hasResults ? "listbox" : undefined}
-            aria-label={isSearching && hasResults ? "Settings search results" : undefined}
+            aria-label={isSearching && hasResults ? "Resultados de búsqueda de ajustes" : undefined}
           >
             {isSearching
               ? results.map((item, index) => (
@@ -302,7 +302,7 @@ export function SettingsSidebarNav({ pathname }: { pathname: string }) {
             <SidebarMenuItem>
               <SidebarMenuButton onClick={handleBackClick}>
                 <ArrowLeftIcon />
-                <span>Back</span>
+                <span>Volver</span>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>

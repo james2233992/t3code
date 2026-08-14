@@ -57,7 +57,7 @@ describe("desktop update button state", () => {
     };
     expect(shouldShowDesktopUpdateButton(state)).toBe(true);
     expect(resolveDesktopUpdateButtonAction(state)).toBe("download");
-    expect(getDesktopUpdateButtonTooltip(state)).toContain("Click to retry");
+    expect(getDesktopUpdateButtonTooltip(state)).toContain("Pulsa para reintentarlo");
   });
 
   it("keeps install action available after an install error", () => {
@@ -72,7 +72,7 @@ describe("desktop update button state", () => {
     };
     expect(shouldShowDesktopUpdateButton(state)).toBe(true);
     expect(resolveDesktopUpdateButtonAction(state)).toBe("install");
-    expect(getDesktopUpdateButtonTooltip(state)).toContain("Click to retry");
+    expect(getDesktopUpdateButtonTooltip(state)).toContain("Pulsa para reintentarlo");
   });
 
   it("prefers install when a downloaded version already exists", () => {
@@ -357,9 +357,9 @@ describe("canCheckForUpdate", () => {
 
 describe("getDesktopUpdateButtonTooltip", () => {
   it("returns 'Up to date' for non-actionable states", () => {
-    expect(getDesktopUpdateButtonTooltip({ ...baseState, status: "idle" })).toBe("Up to date");
+    expect(getDesktopUpdateButtonTooltip({ ...baseState, status: "idle" })).toBe("Actualizado");
     expect(getDesktopUpdateButtonTooltip({ ...baseState, status: "up-to-date" })).toBe(
-      "Up to date",
+      "Actualizado",
     );
   });
 });

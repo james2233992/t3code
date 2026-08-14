@@ -33,7 +33,7 @@ describe("mobile client presentation", () => {
 
     expect(mobileClientPlatformLabel(client)).toBe("iOS 18 · Fenix Code 1.2.3");
     expect(mobileClientNotificationDetail(client)).toBe(
-      "Alerts enabled for approvals, completions.",
+      "Avisos activados para aprobaciones, finalizaciones.",
     );
   });
 
@@ -42,7 +42,7 @@ describe("mobile client presentation", () => {
       mobileClientNotificationDetail(
         device({ notifications: { ...device().notifications, enabled: false } }),
       ),
-    ).toBe("Push notifications are disabled on this device.");
+    ).toBe("Las notificaciones push están desactivadas en este dispositivo.");
     expect(
       mobileClientNotificationDetail(
         device({
@@ -55,11 +55,13 @@ describe("mobile client presentation", () => {
           },
         }),
       ),
-    ).toBe("Push notifications are enabled, but no alert types are selected.");
+    ).toBe(
+      "Las notificaciones push están activadas, pero no hay ningún tipo de aviso seleccionado.",
+    );
   });
 
   it("handles missing app versions and invalid update timestamps", () => {
     expect(mobileClientPlatformLabel(device({ appVersion: null }))).toBe("iOS 18");
-    expect(mobileClientUpdatedAtLabel("not-a-date")).toBe("Update time unavailable");
+    expect(mobileClientUpdatedAtLabel("not-a-date")).toBe("Hora de actualización no disponible");
   });
 });

@@ -200,7 +200,7 @@ export function usePaginatedBranches(target: VcsRefTarget) {
           const cause = Cause.squash(failed.cause);
           return cause instanceof Error && cause.message.trim().length > 0
             ? cause.message
-            : "Failed to load refs.";
+            : "No se pudieron cargar las referencias.";
         })()
       : null;
   const refresh = useCallback(() => {
