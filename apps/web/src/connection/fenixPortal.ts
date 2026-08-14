@@ -134,12 +134,14 @@ async function csrfHeader(fetchImpl: typeof fetch, url: URL): Promise<Record<str
     signal: portalRequestSignal(),
   });
   const envelope = (await readJson(response)) as {
+    readonly token?: unknown;
     readonly data?: { readonly token?: unknown };
   };
-  if (typeof envelope.data?.token !== "string" || envelope.data.token.length === 0) {
+  const token = envelope.token ?? envelope.data?.token;
+  if (typeof token !== "string" || token.length === 0) {
     throw new Error("El token CSRF de Fenix Code Lab no está disponible.");
   }
-  return { "X-CSRF-TOKEN": envelope.data.token };
+  return { "X-CSRF-TOKEN": token };
 }
 
 export async function listFenixPortalDevices(input: {
