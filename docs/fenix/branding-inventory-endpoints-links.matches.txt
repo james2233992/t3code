@@ -75,6 +75,11 @@
 ./docs/fenix/f0-bootstrap.md:8:48:github.com/pingdotgg/t3code
 ./docs/fenix/fenix-code-pause-handoff-20260808.md:28:228:t3.codes
 ./docs/fenix/local-companion-macos-branding-report-20260813.md:96:20:t3.codes
+./docs/fenix/upstream-parity-audit-20260814.md:11:33:github.com/pingdotgg/t3code
+./docs/fenix/upstream-parity-audit-20260814.md:12:28:github.com/pingdotgg/t3code
+./docs/fenix/upstream-parity-audit-20260814.md:13:34:github.com/pingdotgg/t3code
+./docs/fenix/upstream-parity-audit-20260814.md:14:42:github.com/pingdotgg/t3code
+./docs/fenix/upstream-parity-audit-20260814.md:15:27:t3.codes
 ./docs/internals/remote.md:109:9:app.t3.codes
 ./docs/internals/t3-connect.md:85:15:app.t3.codes
 ./docs/operations/release.md:121:49:app.t3.codes
