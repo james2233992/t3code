@@ -137,7 +137,7 @@ async function csrfHeader(fetchImpl: typeof fetch, url: URL): Promise<Record<str
     readonly token?: unknown;
     readonly data?: { readonly token?: unknown };
   };
-  const token = envelope.token ?? envelope.data?.token;
+  const token = typeof envelope.token === "string" ? envelope.token : envelope.data?.token;
   if (typeof token !== "string" || token.length === 0) {
     throw new Error("El token CSRF de Fenix Code Lab no está disponible.");
   }
