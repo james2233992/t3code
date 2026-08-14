@@ -60,7 +60,7 @@ import {
 } from "./desktopLocal";
 import { connectionStorageLayer } from "./storage";
 import {
-  fenixPortalDeviceRegistration,
+  fenixPortalConnectedDeviceRegistrations,
   fenixPortalSocket,
   classifyFenixPortalFailure,
   isFenixPortalEmbeddedApp,
@@ -510,9 +510,7 @@ const platformConnectionSourceLayer = Layer.effect(
           ),
           Effect.orElseSucceed(() => []),
         );
-        return devices
-          .filter((device) => !device.revoked)
-          .map(fenixPortalDeviceRegistration) as ReadonlyArray<PlatformConnectionRegistration>;
+        return fenixPortalConnectedDeviceRegistrations(devices);
       });
       return PlatformConnectionSource.of({
         registrations: Stream.tick(PLATFORM_POLL_INTERVAL).pipe(
