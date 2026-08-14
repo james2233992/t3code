@@ -197,7 +197,7 @@ export const ChangedFilesCard = memo(function ChangedFilesCard(props: {
               className="rounded-md px-1.5 py-1 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-accent/60 hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
               onClick={() => onExpandedChange(true)}
             >
-              Mostrar los {files.length} archivos
+              {files.length === 1 ? "Mostrar el archivo" : `Mostrar los ${files.length} archivos`}
             </button>
           </div>
         </div>

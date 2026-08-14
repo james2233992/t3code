@@ -25,4 +25,21 @@ describe("ComposerPendingApprovalPanel", () => {
     expect(markup).not.toContain("truncate");
     expect(markup).not.toContain("line-clamp");
   });
+
+  it("localizes file-change approval details", () => {
+    const markup = renderToStaticMarkup(
+      <ComposerPendingApprovalPanel
+        approval={{
+          requestId: ApprovalRequestId.make("approval-2"),
+          requestKind: "file-change",
+          createdAt: "2026-07-18T00:00:00.000Z",
+          detail: "src/example.ts",
+        }}
+        pendingCount={1}
+      />,
+    );
+
+    expect(markup).toContain("Se solicita aprobacion para modificar el archivo");
+    expect(markup).toContain('aria-label="Cambio de archivo"');
+  });
 });

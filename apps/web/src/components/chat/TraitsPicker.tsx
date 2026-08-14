@@ -48,6 +48,25 @@ type TraitsPersistence =
 
 const ULTRATHINK_PROMPT_PREFIX = "Ultrathink:\n";
 
+const SPANISH_PROVIDER_OPTION_LABELS: Readonly<Record<string, string>> = {
+  Reasoning: "Razonamiento",
+  "Fast Mode": "Modo rapido",
+  "Context Window": "Ventana de contexto",
+  Thinking: "Pensamiento",
+  "Service Tier": "Nivel de servicio",
+  Standard: "Estandar",
+  Fast: "Rapido",
+  Low: "Bajo",
+  Medium: "Medio",
+  High: "Alto",
+  "Extra High": "Muy alto",
+  Max: "Maximo",
+};
+
+function localizeProviderOptionLabel(label: string): string {
+  return SPANISH_PROVIDER_OPTION_LABELS[label] ?? label;
+}
+
 function DefaultBadge() {
   return (
     <Badge
@@ -306,7 +325,7 @@ export const TraitsMenuContent = memo(function TraitsMenuContentImpl({
             {index > 0 ? <MenuDivider /> : null}
             <MenuGroup>
               <div className="px-2 pt-1.5 pb-1 font-medium text-muted-foreground text-xs">
-                {descriptor.label}
+                {localizeProviderOptionLabel(descriptor.label)}
               </div>
               {ultrathinkInBodyText && descriptor.id === primarySelectDescriptor?.id ? (
                 <div className="px-2 pb-1.5 text-muted-foreground/80 text-xs">
@@ -326,7 +345,7 @@ export const TraitsMenuContent = memo(function TraitsMenuContentImpl({
                   >
                     <span className="flex w-full min-w-0 items-center justify-between gap-3">
                       <span className="min-w-0 truncate">
-                        {option.label}
+                        {localizeProviderOptionLabel(option.label)}
                         {option.isDefault ? (
                           <>
                             {" "}
@@ -350,7 +369,7 @@ export const TraitsMenuContent = memo(function TraitsMenuContentImpl({
             {index > 0 || selectDescriptors.length > 0 ? <MenuDivider /> : null}
             <MenuGroup>
               <div className="px-2 py-1.5 font-medium text-muted-foreground text-xs">
-                {descriptor.label}
+                {localizeProviderOptionLabel(descriptor.label)}
               </div>
               <MenuRadioGroup
                 value={selectedValue}
@@ -363,7 +382,7 @@ export const TraitsMenuContent = memo(function TraitsMenuContentImpl({
                 {(["on", "off"] as const).map((value) => (
                   <MenuRadioItem key={value} value={value} hideIndicator>
                     <span className="flex w-full min-w-0 items-center justify-between gap-3">
-                      <span>{value === "on" ? "On" : "Off"}</span>
+                      <span>{value === "on" ? "Activado" : "Desactivado"}</span>
                     </span>
                   </MenuRadioItem>
                 ))}
@@ -415,8 +434,11 @@ export function buildTraitsTriggerDisplay(input: {
       input.ultrathinkPromptControlled && descriptor.id === input.primarySelectDescriptorId
         ? "Ultrathink"
         : descriptor.type === "boolean"
-          ? `${descriptor.label} ${descriptor.currentValue === true ? "On" : "Off"}`
-          : getProviderOptionCurrentLabel(descriptor);
+          ? `${localizeProviderOptionLabel(descriptor.label)} ${descriptor.currentValue === true ? "Activado" : "Desactivado"}`
+          : (() => {
+              const currentLabel = getProviderOptionCurrentLabel(descriptor);
+              return currentLabel ? localizeProviderOptionLabel(currentLabel) : currentLabel;
+            })();
     if (typeof label === "string" && label.length > 0) {
       labels.push(label);
     }
@@ -426,7 +448,7 @@ export function buildTraitsTriggerDisplay(input: {
   // off an empty label list alone would also catch descriptors that resolved to
   // no label at all, printing a bogus "Normal" for a model without fast mode.
   if (labels.length === 0 && hasFastMode) {
-    return { label: fastModeEnabled ? "Fast" : "Normal", showFastModeIcon: false };
+    return { label: fastModeEnabled ? "Rapido" : "Normal", showFastModeIcon: false };
   }
   return { label: labels.join(" · "), showFastModeIcon: fastModeEnabled };
 }

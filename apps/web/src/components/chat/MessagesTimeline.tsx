@@ -1357,9 +1357,9 @@ const WorkGroupSection = memo(function WorkGroupSection({
   const onlyToolEntries = nonEmptyEntries.every((entry) => workLogEntryIsToolLike(entry));
   const groupLabel = onlyToolEntries
     ? nonEmptyEntries.length === 1
-      ? "1 tool call"
-      : `${nonEmptyEntries.length} tool calls`
-    : "Work Log";
+      ? "1 llamada a herramienta"
+      : `${nonEmptyEntries.length} llamadas a herramientas`
+    : "Registro de trabajo";
 
   if (nonEmptyEntries.length === 0) return null;
 
@@ -1389,11 +1389,11 @@ function WorkGroupToggleTimelineRow({
   const ctx = use(TimelineRowCtx);
   const labelNoun = row.onlyToolEntries
     ? row.hiddenCount === 1
-      ? "tool call"
-      : "tool calls"
+      ? "llamada a herramienta"
+      : "llamadas a herramientas"
     : row.hiddenCount === 1
-      ? "log entry"
-      : "log entries";
+      ? "entrada de registro"
+      : "entradas de registro";
 
   return (
     <button
@@ -2176,17 +2176,17 @@ const AgentSpawnCtaRow = memo(function AgentSpawnCtaRow(props: { workEntry: Time
   const working = running + waiting;
   const dotClass = live ? "bg-info" : failed > 0 ? "bg-destructive" : "bg-success";
   const lead = live
-    ? `Kicked off ${agentCount} subagent${agentCount === 1 ? "" : "s"}`
-    : `Ran ${agentCount} subagent${agentCount === 1 ? "" : "s"}`;
+    ? `Se ${agentCount === 1 ? "inició" : "iniciaron"} ${agentCount} subagente${agentCount === 1 ? "" : "s"}`
+    : `Se ${agentCount === 1 ? "ejecutó" : "ejecutaron"} ${agentCount} subagente${agentCount === 1 ? "" : "s"}`;
   const status = live
     ? livePhase
-      ? `${livePhase.title} · ${livePhase.activeCount} working`
+      ? `${livePhase.title} · ${livePhase.activeCount} en curso`
       : working > 0
-        ? `${working} working`
-        : "working"
+        ? `${working} en curso`
+        : "en curso"
     : failed > 0
-      ? `${failed} failed`
-      : "✓ completed";
+      ? `${failed} con error`
+      : "✓ completado";
 
   return (
     <button

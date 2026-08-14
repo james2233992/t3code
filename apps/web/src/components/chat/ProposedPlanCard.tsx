@@ -66,7 +66,7 @@ export const ProposedPlanCard = memo(function ProposedPlanCard({
     },
   });
   const savePathInputId = useId();
-  const title = proposedPlanTitle(planMarkdown) ?? "Proposed plan";
+  const title = proposedPlanTitle(planMarkdown) ?? "Plan propuesto";
   const lineCount = planMarkdown.split("\n").length;
   const canCollapse = planMarkdown.length > 900 || lineCount > 20;
   const displayedPlanMarkdown = stripDisplayedPlanMarkdown(planMarkdown);
@@ -198,7 +198,7 @@ export const ProposedPlanCard = memo(function ProposedPlanCard({
               data-scroll-anchor-ignore
               onClick={() => setExpanded((value) => !value)}
             >
-              {expanded ? "Collapse plan" : "Expand plan"}
+              {expanded ? "Contraer plan" : "Ampliar plan"}
             </Button>
           </div>
         ) : null}

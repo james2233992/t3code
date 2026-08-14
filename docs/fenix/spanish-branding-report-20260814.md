@@ -40,7 +40,7 @@ internos de la marca que puede ver un usuario.
 
 - `pnpm exec vp check --fix`: PASS, 2412 ficheros comprobados, sin avisos ni errores.
 - `pnpm --filter @t3tools/web typecheck`: PASS.
-- Suite web completa: 224/224 ficheros y 2024/2024 tests PASS.
+- Suite web completa: 224/224 ficheros y 2025/2025 tests PASS.
 - Suite focal de localizacion y branding: 11 ficheros y 209 tests PASS.
 - Suite focal adicional: 3 ficheros y 126 tests PASS.
 - Inventario de branding `generate`, `selftest` y `check`: PASS.

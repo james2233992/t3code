@@ -27,7 +27,7 @@ describe("ChangedFilesCard", () => {
     expect(markup).toContain("size-3");
     expect(markup).toContain('aria-label="Contraer todas las carpetas"');
     expect(markup).toContain('aria-label="Abrir diferencias"');
-    expect(markup).toContain('role="group" aria-label="2 inserciones, 1 eliminaciones"');
+    expect(markup).toContain('role="group" aria-label="2 inserciones, 1 eliminación"');
     expect(markup).toContain("1 archivo modificado");
     expect(markup).not.toContain("1 archivos modificados");
   });

@@ -425,11 +425,11 @@ function deriveTurnFolds(input: {
     const duration = elapsedMs !== null ? formatDuration(elapsedMs) : null;
     const label = isLatestInterruptedTurn
       ? duration
-        ? `You stopped after ${duration}`
+        ? `Has detenido esta respuesta tras ${duration}`
         : "Has detenido esta respuesta"
       : duration
-        ? `Worked for ${duration}`
-        : "Worked";
+        ? `Trabajó durante ${duration}`
+        : "Trabajo completado";
 
     foldsByAnchorEntryId.set(firstEntry.id, {
       turnId,

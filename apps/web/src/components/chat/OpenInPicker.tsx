@@ -287,7 +287,7 @@ export const OpenInPicker = memo(function OpenInPicker({
         <MenuTrigger
           render={
             <Button
-              aria-label={compact ? "Elegir editor" : "Opciones de copia"}
+              aria-label={compact ? "Elegir editor" : "Opciones del editor"}
               size="icon-xs"
               variant="outline"
             />

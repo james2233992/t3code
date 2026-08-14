@@ -732,7 +732,8 @@ export const ModelPickerContent = memo(function ModelPickerContent(props: {
                               Modelos heredados
                             </div>
                             <div className="mt-1 text-xs font-normal leading-snug text-muted-foreground/70">
-                              {legacySection.legacyModels.length} models
+                              {legacySection.legacyModels.length}{" "}
+                              {legacySection.legacyModels.length === 1 ? "modelo" : "modelos"}
                             </div>
                           </div>
                           <ChevronRightIcon
@@ -791,7 +792,7 @@ export const ModelPickerContent = memo(function ModelPickerContent(props: {
               </ComboboxListVirtualized>
             </div>
             <ComboboxEmpty className="not-empty:py-6 empty:h-0 text-xs font-normal leading-snug">
-              No models found
+              No se encontraron modelos
             </ComboboxEmpty>
           </div>
         </Combobox>

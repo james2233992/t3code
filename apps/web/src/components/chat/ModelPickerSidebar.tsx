@@ -14,7 +14,7 @@ import { isProviderInstancePickerReady, type ProviderInstanceEntry } from "../..
 function describeUnavailableInstance(entry: ProviderInstanceEntry): string {
   const label = entry.displayName;
   if (!entry.enabled || entry.status === "disabled") {
-    return `${label} — Disabled in settings.`;
+    return `${label} — Desactivado en los ajustes.`;
   }
   if (entry.status === "ready" && entry.isAvailable) {
     return label;

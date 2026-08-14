@@ -2011,17 +2011,17 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       const missingImageReasons: string[] = [];
       if (entry.droppedImageNames.length > 0) {
         missingImageReasons.push(
-          `${entry.droppedImageNames.join(", ")} superó el límite del guardado temporal al guardar este prompt.`,
+          `Se supero el limite del guardado temporal al guardar este prompt: ${entry.droppedImageNames.join(", ")}.`,
         );
       }
       if (entry.unreadableImageNames && entry.unreadableImageNames.length > 0) {
         missingImageReasons.push(
-          `No se pudo leer ${entry.unreadableImageNames.join(", ")} al guardar este prompt.`,
+          `No fue posible leer ${entry.unreadableImageNames.join(", ")} al guardar este prompt.`,
         );
       }
       if (unrestoredImageNames.length > 0) {
         missingImageReasons.push(
-          `No se pudo restaurar ${unrestoredImageNames.join(", ")}: el editor ha alcanzado el límite de ${PROVIDER_SEND_TURN_MAX_ATTACHMENTS} imágenes.`,
+          `No fue posible restaurar ${unrestoredImageNames.join(", ")}: el editor ha alcanzado el limite de ${PROVIDER_SEND_TURN_MAX_ATTACHMENTS} imagenes.`,
         );
       }
       if (missingImageReasons.length > 0) {
