@@ -26,6 +26,7 @@ Ejecuta: fenix-code fenix root add /ruta/a/la/carpeta
 PRIVACIDAD
 - La credencial queda guardada con permisos 0600 en tu usuario local.
 - Fenix Code no instala ni inicia el servidor sin autorizacion vigente de Fenix.
+- El instalador detiene el proceso si la firma de un componente nativo no es válida.
 - Solo se exponen las raíces que autorizas expresamente.
 - Cada usuario y dispositivo mantiene su propia identidad y sus propios proyectos.
 - No compartas el comando de emparejamiento: es una credencial de un solo uso.

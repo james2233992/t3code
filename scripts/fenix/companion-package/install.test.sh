@@ -3,12 +3,13 @@ set -euo pipefail
 
 repo_root="$(cd "$(dirname "$0")/../../.." && pwd -P)"
 test_root="$(mktemp -d "${TMPDIR:-/tmp}/fenix-install-test.XXXXXX")"
+test_root="$(cd "$test_root" && pwd -P)"
 trap 'rm -rf "$test_root"' EXIT
 
 package_dir="${test_root}/package"
 fake_bin="${test_root}/fake-bin"
 token_state="${test_root}/used-token"
-xattr_state="${test_root}/xattr-calls"
+codesign_state="${test_root}/codesign-calls"
 mkdir -p \
   "${package_dir}/payload/runtime/node_modules/t3/dist" \
   "${package_dir}/payload/node/bin" \
@@ -26,13 +27,6 @@ printf 'Fenix portal authorization required\n' > "${package_dir}/payload/runtime
 cat > "${package_dir}/payload/node/bin/node" <<'FAKE_NODE'
 #!/usr/bin/env bash
 set -euo pipefail
-entrypoint="$1"
-node_root="$(cd "$(dirname "$0")/.." && pwd -P)"
-runtime_root="$(cd "$(dirname "$entrypoint")/../../.." && pwd -P)"
-if find "$node_root" "$runtime_root" -name '*.fenix-test-quarantined' -print -quit | grep -q .; then
-  echo "quarantine was not cleared before runtime verification" >&2
-  exit 78
-fi
 shift
 if [[ "${1:-}" == "--version" ]]; then
   printf 'fenix-code v1.2.3\n'
@@ -60,25 +54,30 @@ printf '{"paired":true}\n' > "${base_dir}/userdata/fenix-companion.json"
 chmod 0600 "${base_dir}/userdata/fenix-companion.json"
 FAKE_NODE
 
-cat > "${fake_bin}/xattr" <<'FAKE_XATTR'
+cat > "${fake_bin}/file" <<'FAKE_FILE'
 #!/usr/bin/env bash
 set -euo pipefail
-if [[ "$#" -ne 3 || "$2" != "com.apple.quarantine" ]]; then exit 79; fi
-marker="${3}.fenix-test-quarantined"
-case "$1" in
-  -p) test -e "$marker" ;;
+candidate="${@: -1}"
+case "$candidate" in
+  *.node|*.dylib) printf 'Mach-O 64-bit bundle arm64\n' ;;
+  *) printf 'ASCII text\n' ;;
+esac
+FAKE_FILE
+
+cat > "${fake_bin}/codesign" <<'FAKE_CODESIGN'
+#!/usr/bin/env bash
+set -euo pipefail
+candidate="${@: -1}"
+case "${1:-}" in
+  --verify)
+    printf 'verify\t%s\n' "$candidate" >> "${FENIX_INSTALL_TEST_CODESIGN_STATE}"
+    ;;
   -d)
-    test -e "$marker"
-    if [[ -n "${FENIX_INSTALL_TEST_XATTR_FAIL_MATCH:-}" &&
-      "$3" == *"${FENIX_INSTALL_TEST_XATTR_FAIL_MATCH}"* ]]; then
-      exit 80
-    fi
-    printf '%s\n' "$3" >> "${FENIX_INSTALL_TEST_XATTR_STATE}"
-    unlink "$marker"
+    printf 'TeamIdentifier=ABCDE12345\n' >&2
     ;;
   *) exit 79 ;;
 esac
-FAKE_XATTR
+FAKE_CODESIGN
 
 cat > "${fake_bin}/uname" <<'FAKE_UNAME'
 #!/usr/bin/env bash
@@ -88,26 +87,31 @@ chmod 0755 \
   "${package_dir}/install.sh" \
   "${package_dir}/bin/fenix-code" \
   "${package_dir}/payload/node/bin/node" \
-  "${fake_bin}/xattr" \
+  "${fake_bin}/codesign" \
+  "${fake_bin}/file" \
   "${fake_bin}/uname"
 
 printf 'native fixture\n' > "${package_dir}/payload/runtime/native-addon.node"
-printf 'private executable fixture\n' > "${package_dir}/payload/runtime/private-helper"
-chmod 0700 "${package_dir}/payload/runtime/private-helper"
-(
-  cd "$package_dir"
-  find bin payload -type f -print0 | sort -z | xargs -0 shasum -a 256 > PAYLOAD-SHA256SUMS
-)
-touch \
-  "${package_dir}/payload/runtime/native-addon.node.fenix-test-quarantined" \
-  "${package_dir}/payload/runtime/private-helper.fenix-test-quarantined" \
-  "${package_dir}/payload/node/bin/node.fenix-test-quarantined"
+printf 'native library fixture\n' > "${package_dir}/payload/runtime/native-library.dylib"
+cat > "${package_dir}/payload/SIGNING-METADATA" <<'EOF'
+schema_version=1
+team_id=ABCDE12345
+native_file_count=2
+EOF
+
+refresh_checksums() {
+  (
+    cd "$package_dir"
+    find bin payload -type f -print0 | sort -z | xargs -0 shasum -a 256 > PAYLOAD-SHA256SUMS
+  )
+}
+refresh_checksums
 
 run_install() {
   HOME="${test_root}/home" \
   FENIX_CODE_HOME="${test_root}/home/.fenix-code" \
   FENIX_INSTALL_TEST_TOKEN_STATE="$token_state" \
-  FENIX_INSTALL_TEST_XATTR_STATE="$xattr_state" \
+  FENIX_INSTALL_TEST_CODESIGN_STATE="$codesign_state" \
   PATH="${fake_bin}:${PATH}" \
     "${package_dir}/install.sh" "$@"
 }
@@ -139,36 +143,58 @@ if integrity_output="$(
   echo "installer accepted a modified payload" >&2
   exit 1
 fi
-test "$integrity_output" = "El paquete no supera la verificación interna de integridad."
+test "${integrity_output##*$'\n'}" = "El paquete no supera la verificación interna de integridad."
 printf 'export {};\n' > "${package_dir}/payload/runtime/node_modules/t3/dist/service-launcher.mjs"
 
-if failure_output="$(
-  FENIX_INSTALL_TEST_XATTR_FAIL_MATCH=private-helper \
-    run_install \
-      --portal https://iaonline.io \
-      --attempt-id attempt-xattr-failure \
-      --pairing-token valid-token \
-      --allow-root "$test_root" 2>&1
+sed 's/team_id=ABCDE12345/team_id=ZZZZZ99999/' \
+  "${package_dir}/payload/SIGNING-METADATA" > "${package_dir}/payload/SIGNING-METADATA.next"
+mv "${package_dir}/payload/SIGNING-METADATA.next" \
+  "${package_dir}/payload/SIGNING-METADATA"
+refresh_checksums
+if signing_output="$(
+  run_install \
+    --portal https://iaonline.io \
+    --attempt-id attempt-signing-team \
+    --pairing-token valid-token \
+    --allow-root "$test_root" 2>&1
 )"; then
-  echo "installer ignored an xattr authorization failure" >&2
+  echo "installer accepted a payload signed by another team" >&2
   exit 1
 fi
-test "$failure_output" = "macOS no pudo autorizar el runtime local de Fenix Code (private-helper)."
-test ! -e "${test_root}/home/.fenix-code/runtime/versions/1.2.3"
-rm -f "$xattr_state"
+test "${signing_output##*$'\n'}" = \
+  "El paquete contiene un componente nativo firmado por otro equipo (payload/runtime/native-addon.node)."
+sed 's/team_id=ZZZZZ99999/team_id=ABCDE12345/' \
+  "${package_dir}/payload/SIGNING-METADATA" > "${package_dir}/payload/SIGNING-METADATA.next"
+mv "${package_dir}/payload/SIGNING-METADATA.next" \
+  "${package_dir}/payload/SIGNING-METADATA"
+refresh_checksums
 
-run_install \
-  --portal https://iaonline.io \
-  --attempt-id attempt-1 \
-  --pairing-token valid-token \
-  --allow-root "$test_root" >/dev/null
+if ! install_output="$(
+  run_install \
+    --portal https://iaonline.io \
+    --attempt-id attempt-1 \
+    --pairing-token valid-token \
+    --allow-root "$test_root" 2>&1
+)"; then
+  echo "installer rejected a valid signed payload: ${install_output}" >&2
+  exit 1
+fi
 
 config="${test_root}/home/.fenix-code/userdata/fenix-companion.json"
 test "$(cat "$config")" = '{"paired":true}'
 if mode="$(stat -f '%Lp' "$config" 2>/dev/null)"; then :; else mode="$(stat -c '%a' "$config")"; fi
 test "$mode" = "600"
 test -x "${test_root}/home/.local/bin/fenix-code"
-test "$(wc -l < "$xattr_state" | tr -d ' ')" = "3"
+for verified_file in \
+  "${package_dir}/payload/runtime/native-addon.node" \
+  "${package_dir}/payload/runtime/native-library.dylib" \
+  "${package_dir}/payload/node/bin/node"; do
+  if ! grep -Fq $'verify\t'"$verified_file" "$codesign_state"; then
+    echo "installer did not verify expected signature: $verified_file" >&2
+    cat "$codesign_state" >&2
+    exit 1
+  fi
+done
 before_sha="$(shasum -a 256 "$config" | awk '{print $1}')"
 
 if run_install \

@@ -10,31 +10,52 @@ fi
 repo_root="$(git rev-parse --show-toplevel)"
 cd "$repo_root"
 
-version="$(node -p 'require("./apps/server/package.json").version')"
+version="$(tr -d '[:space:]' < scripts/fenix/companion-package/VERSION)"
+if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "invalid companion version: $version" >&2
+  exit 65
+fi
+release_label="${FENIX_CODE_RELEASE_LABEL:-${version}-pilot.$(date -u +%Y%m%d)}"
 node_version="22.21.1"
 package_name="Fenix-Code-Companion-${version}-macos-arm64"
 release_dir="${repo_root}/release/fenix-code"
 public_dir="${repo_root}/apps/web/public/downloads"
 archive_path="${release_dir}/${package_name}.tar.gz"
-work_dir="$(mktemp -d "${TMPDIR:-/tmp}/fenix-companion.XXXXXX")"
-package_dir="${work_dir}/${package_name}"
 
-cleanup() {
-  rm -rf "$work_dir"
-}
-trap cleanup EXIT
+codesign_identity="${FENIX_CODE_CODESIGN_IDENTITY:-}"
+apple_team_id="${APPLE_TEAM_ID:-}"
+apple_api_key="${APPLE_API_KEY:-}"
+if [[ -z "$codesign_identity" || "$codesign_identity" == "-" ||
+  ! "$apple_team_id" =~ ^[A-Z0-9]{10}$ ||
+  -z "$apple_api_key" || ! -f "$apple_api_key" ||
+  -z "${APPLE_API_KEY_ID:-}" || -z "${APPLE_API_ISSUER:-}" ]]; then
+  echo "Developer ID and Apple notarization credentials are required for an official Companion build" >&2
+  exit 78
+fi
 
-for command in node pnpm curl shasum tar ln; do
+for command in node pnpm curl shasum tar ln file codesign ditto xcrun security; do
   command -v "$command" >/dev/null 2>&1 || {
     echo "missing required command: $command" >&2
     exit 69
   }
 done
 
+if ! security find-identity -v -p codesigning | grep -Fq "$codesign_identity"; then
+  echo "FENIX_CODE_CODESIGN_IDENTITY is not available in the current keychain" >&2
+  exit 78
+fi
+
 if [[ "$(uname -s)" != "Darwin" || "$(uname -m)" != "arm64" ]]; then
   echo "macos-arm64 packages must be built on an Apple Silicon Mac" >&2
   exit 64
 fi
+
+work_dir="$(mktemp -d "${TMPDIR:-/tmp}/fenix-companion.XXXXXX")"
+package_dir="${work_dir}/${package_name}"
+cleanup() {
+  rm -rf "$work_dir"
+}
+trap cleanup EXIT
 
 pnpm --filter t3 build:bundle >/dev/null
 if [[ ! -f apps/server/dist/bin.mjs || ! -f apps/server/dist/service-launcher.mjs ]]; then
@@ -107,18 +128,29 @@ while IFS= read -r node_pty_dir; do
   fi
 done < <(find "$pnpm_store" -path '*/node_modules/node-pty' -type d -print)
 
+# Other native packages also nest platform prebuilds below an otherwise
+# platform-neutral package. Retain only Darwin ARM64 payloads.
+while IFS= read -r -d '' prebuild_root; do
+  while IFS= read -r -d '' prebuild_dir; do
+    find "$prebuild_dir" -depth -delete
+  done < <(
+    find "$prebuild_root" -mindepth 1 -maxdepth 1 -type d \
+      ! -name 'darwin-arm64' -print0
+  )
+done < <(find "$pnpm_store" -type d -name prebuilds -print0)
+
 find "$deploy_dir/dist" -type f -name '*.map' -delete
 mkdir -p "$runtime_dir/node_modules/t3/dist"
 cp -R "${deploy_dir}/node_modules/." "$runtime_dir/node_modules/"
 cp -R "${deploy_dir}/dist/." "$runtime_dir/node_modules/t3/dist/"
 
-node - apps/server/package.json "$runtime_dir/node_modules/t3/package.json" <<'NODE'
+node - apps/server/package.json "$runtime_dir/node_modules/t3/package.json" "$version" <<'NODE'
 const fs = require("node:fs");
-const [sourceFile, targetFile] = process.argv.slice(2);
+const [sourceFile, targetFile, companionVersion] = process.argv.slice(2);
 const source = JSON.parse(fs.readFileSync(sourceFile, "utf8"));
 const runtimePackage = {
   name: "fenix-code",
-  version: source.version,
+  version: companionVersion,
   description: "Fenix Code local companion runtime",
   license: source.license,
   private: true,
@@ -157,6 +189,8 @@ cp scripts/fenix/companion-package/README.txt "$package_dir/README.txt"
 sed -i '' "s/__FENIX_CODE_VERSION__/${version}/g" "$package_dir/install.sh" "$package_dir/bin/fenix-code"
 chmod 0755 "$package_dir/install.sh" "$package_dir/bin/fenix-code" "$package_dir/payload/node/bin/node"
 
+scripts/fenix/sign-companion-payload.sh "$package_dir"
+
 (
   cd "$package_dir"
   find bin payload -type f -print0 |
@@ -176,6 +210,13 @@ if [[ "$smoke_version" != "fenix-code v${version}" ]]; then
   exit 65
 fi
 
+notarization_output="$(scripts/fenix/notarize-companion-package.sh "$package_dir")"
+notarization_id="$(printf '%s\n' "$notarization_output" | awk -F= '$1 == "notarization_id" { print $2 }')"
+if [[ -z "$notarization_id" ]]; then
+  echo "companion notarization did not return a submission id" >&2
+  exit 65
+fi
+
 rm -f "$archive_path"
 COPYFILE_DISABLE=1 tar -czf "$archive_path" -C "$work_dir" "$package_name"
 archive_sha="$(shasum -a 256 "$archive_path" | awk '{ print $1 }')"
@@ -183,12 +224,12 @@ archive_size="$(stat -f '%z' "$archive_path")"
 rm -f "$public_dir/$(basename "$archive_path")"
 ln "$archive_path" "$public_dir/$(basename "$archive_path")"
 
-node - "$public_dir/manifest.json" "$version" "$(basename "$archive_path")" "$archive_sha" "$archive_size" <<'NODE'
+node - "$public_dir/manifest.json" "$release_label" "$version" "$(basename "$archive_path")" "$archive_sha" "$archive_size" <<'NODE'
 const fs = require("node:fs");
-const [file, version, fileName, sha256, sizeBytes] = process.argv.slice(2);
+const [file, releaseVersion, version, fileName, sha256, sizeBytes] = process.argv.slice(2);
 const manifest = {
   schemaVersion: 1,
-  releaseVersion: `${version}-pilot.20260814`,
+  releaseVersion,
   artifacts: [
     { platform: "macos", architecture: "arm64", fileName, sha256, sizeBytes: Number(sizeBytes), available: true },
     { platform: "windows", architecture: "x64", fileName: `Fenix-Code-Companion-${version}-windows-x64.zip`, sha256: "0".repeat(64), sizeBytes: 0, available: false },
@@ -198,4 +239,5 @@ const manifest = {
 fs.writeFileSync(file, `${JSON.stringify(manifest, null, 2)}\n`);
 NODE
 
-printf 'artifact=%s\nsha256=%s\nsize_bytes=%s\n' "$archive_path" "$archive_sha" "$archive_size"
+printf 'artifact=%s\nsha256=%s\nsize_bytes=%s\nnotarization_id=%s\n' \
+  "$archive_path" "$archive_sha" "$archive_size" "$notarization_id"

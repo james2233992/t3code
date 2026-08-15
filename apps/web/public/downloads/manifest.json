@@ -6,9 +6,9 @@
       "platform": "macos",
       "architecture": "arm64",
       "fileName": "Fenix-Code-Companion-0.0.32-macos-arm64.tar.gz",
-      "sha256": "08e79056ce766ba7a3cb3214f3abe4a89a4ba985f918fca85f23ec7226184458",
-      "sizeBytes": 144009266,
-      "available": true
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "sizeBytes": 0,
+      "available": false
     },
     {
       "platform": "windows",

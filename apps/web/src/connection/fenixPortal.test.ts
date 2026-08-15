@@ -366,7 +366,6 @@ describe("Fenix portal companion API", () => {
         'case "$FENIX_CODE_ARCHIVE" in /*) ;; *) echo "Debes indicar una ruta absoluta al paquete." >&2; exit 1 ;; esac',
         'test -f "$FENIX_CODE_ARCHIVE" || { echo "No se encuentra el paquete descargado." >&2; exit 1; }',
         `test "$(shasum -a 256 "$FENIX_CODE_ARCHIVE" | awk '{print $1}')" = '${"f".repeat(64)}' || { echo "El paquete no supera la verificacion de integridad." >&2; exit 1; }`,
-        'xattr -d com.apple.quarantine "$FENIX_CODE_ARCHIVE" 2>/dev/null || true',
         'FENIX_CODE_INSTALL_DIR="$(mktemp -d "${TMPDIR:-/tmp}/fenix-code-install.XXXXXX")"',
         "trap 'rm -rf \"$FENIX_CODE_INSTALL_DIR\"' EXIT",
         'tar -xzf "$FENIX_CODE_ARCHIVE" -C "$FENIX_CODE_INSTALL_DIR"',

@@ -58,7 +58,9 @@ jobs:
           bash scripts/fenix/check-spanish-ui.sh
 
       - name: Verify login-bound companion installer
-        run: bash scripts/fenix/companion-package/install.test.sh
+        run: |
+          bash scripts/fenix/companion-package/install.test.sh
+          bash scripts/fenix/companion-release-security.test.sh
 
       - name: Verify Fenix mobile release isolation
         run: node scripts/fenix/check-mobile-release-config.mjs

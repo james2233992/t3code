@@ -78,6 +78,7 @@ for required in \
   "${package_dir}/payload/runtime/node_modules/t3/dist/bin.mjs" \
   "${package_dir}/payload/runtime/node_modules/t3/dist/service-launcher.mjs" \
   "${package_dir}/payload/runtime/.fenix-portal-auth-required" \
+  "${package_dir}/payload/SIGNING-METADATA" \
   "${package_dir}/payload/node/bin/node" \
   "${package_dir}/bin/fenix-code" \
   "${package_dir}/PAYLOAD-SHA256SUMS"; do
@@ -89,6 +90,55 @@ done
 
 if ! (cd "$package_dir" && shasum -a 256 -c PAYLOAD-SHA256SUMS >/dev/null 2>&1); then
   echo "El paquete no supera la verificación interna de integridad." >&2
+  exit 65
+fi
+
+for command in codesign file; do
+  command -v "$command" >/dev/null 2>&1 || {
+    echo "macOS no dispone de la herramienta de verificación ${command}." >&2
+    exit 69
+  }
+done
+
+signing_team="$(
+  awk -F= '$1 == "team_id" { print $2 }' "${package_dir}/payload/SIGNING-METADATA"
+)"
+expected_native_count="$(
+  awk -F= '$1 == "native_file_count" { print $2 }' \
+    "${package_dir}/payload/SIGNING-METADATA"
+)"
+if [[ ! "$signing_team" =~ ^[A-Z0-9]{10}$ ||
+  ! "$expected_native_count" =~ ^[1-9][0-9]*$ ]]; then
+  echo "El paquete no contiene metadatos de firma válidos." >&2
+  exit 65
+fi
+
+native_count=0
+while IFS= read -r -d '' native_file; do
+  if ! file -b "$native_file" | grep -q 'Mach-O'; then
+    continue
+  fi
+  if ! codesign --verify --strict --verbose=2 "$native_file"; then
+    echo "El paquete contiene un componente nativo sin firma válida (${native_file#${package_dir}/})." >&2
+    exit 65
+  fi
+  actual_team="$(
+    codesign -d --verbose=4 "$native_file" 2>&1 |
+      awk -F= '$1 == "TeamIdentifier" { print $2 }'
+  )"
+  if [[ "$actual_team" != "$signing_team" ]]; then
+    echo "El paquete contiene un componente nativo firmado por otro equipo (${native_file#${package_dir}/})." >&2
+    exit 65
+  fi
+  native_count=$((native_count + 1))
+done < <(find "${package_dir}/payload/runtime" -type f -print0)
+
+if [[ "$native_count" != "$expected_native_count" ]]; then
+  echo "El inventario de componentes nativos del paquete no coincide con su firma." >&2
+  exit 65
+fi
+if ! codesign --verify --strict --verbose=2 "${package_dir}/payload/node/bin/node"; then
+  echo "El runtime Node.js del paquete no conserva una firma válida." >&2
   exit 65
 fi
 
@@ -137,33 +187,6 @@ cp -R "${package_dir}/payload/runtime/." "$version_staging/"
 printf '%s\n' "$version" > "${version_staging}/.install-complete"
 cp -R "${package_dir}/payload/node/." "$node_staging/"
 install -m 0755 "${package_dir}/bin/fenix-code" "$wrapper_staging"
-
-# Browser downloads inherit macOS quarantine on extracted executables and
-# native addons. Inspect regular runtime files only: the pnpm payload contains
-# optional dangling symlinks that make recursive xattr fail even when every
-# executable was cleared correctly.
-if command -v xattr >/dev/null 2>&1; then
-  while IFS= read -r -d '' runtime_file; do
-    if [[ ! -x "$runtime_file" && \
-      "$runtime_file" != *.node && \
-      "$runtime_file" != *.dylib && \
-      "$runtime_file" != *.so ]]; then
-      continue
-    fi
-    if xattr -p com.apple.quarantine "$runtime_file" >/dev/null 2>&1; then
-      if ! xattr -d com.apple.quarantine "$runtime_file"; then
-        runtime_label="${runtime_file#${version_staging}/}"
-        if [[ "$runtime_label" == "$runtime_file" ]]; then
-          runtime_label="node/${runtime_file#${node_staging}/}"
-        fi
-        echo "macOS no pudo autorizar el runtime local de Fenix Code (${runtime_label})." >&2
-        exit 65
-      fi
-    fi
-  done < <(
-    find "$version_staging" "$node_staging" -type f -print0
-  )
-fi
 
 staged_version="$(
   "$node_staging/bin/node" "$version_staging/node_modules/t3/dist/bin.mjs" --version
