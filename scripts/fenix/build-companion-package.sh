@@ -7,6 +7,17 @@ if [[ "$target" != "macos-arm64" ]]; then
   exit 64
 fi
 
+build_channel="${FENIX_CODE_BUILD_CHANNEL:-official}"
+if [[ "$build_channel" != "official" && "$build_channel" != "internal-qa" ]]; then
+  echo "invalid companion build channel: $build_channel" >&2
+  exit 64
+fi
+if [[ "$build_channel" == "internal-qa" &&
+  "${FENIX_CODE_INTERNAL_QA_ACK:-}" != "MANUEL_INTERNAL_QA_ONLY" ]]; then
+  echo "internal QA builds require FENIX_CODE_INTERNAL_QA_ACK=MANUEL_INTERNAL_QA_ONLY" >&2
+  exit 78
+fi
+
 repo_root="$(git rev-parse --show-toplevel)"
 cd "$repo_root"
 
@@ -15,32 +26,49 @@ if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   echo "invalid companion version: $version" >&2
   exit 65
 fi
-release_label="${FENIX_CODE_RELEASE_LABEL:-${version}-pilot.$(date -u +%Y%m%d)}"
+server_version="$(node -p 'require("./apps/server/package.json").version')"
+if [[ "$server_version" != "$version" ]]; then
+  echo "companion version ${version} does not match server version ${server_version}" >&2
+  exit 65
+fi
 node_version="22.21.1"
-package_name="Fenix-Code-Companion-${version}-macos-arm64"
-release_dir="${repo_root}/release/fenix-code"
+if [[ "$build_channel" == "official" ]]; then
+  release_label="${FENIX_CODE_RELEASE_LABEL:-${version}-pilot.$(date -u +%Y%m%d)}"
+  package_name="Fenix-Code-Companion-${version}-macos-arm64"
+  release_dir="${repo_root}/release/fenix-code"
+else
+  package_name="Fenix-Code-Companion-${version}-internal-qa-macos-arm64"
+  release_dir="${repo_root}/release/fenix-code/internal-qa"
+fi
 public_dir="${repo_root}/apps/web/public/downloads"
 archive_path="${release_dir}/${package_name}.tar.gz"
 
-codesign_identity="${FENIX_CODE_CODESIGN_IDENTITY:-}"
-apple_team_id="${APPLE_TEAM_ID:-}"
-apple_api_key="${APPLE_API_KEY:-}"
-if [[ -z "$codesign_identity" || "$codesign_identity" == "-" ||
-  ! "$apple_team_id" =~ ^[A-Z0-9]{10}$ ||
-  -z "$apple_api_key" || ! -f "$apple_api_key" ||
-  -z "${APPLE_API_KEY_ID:-}" || -z "${APPLE_API_ISSUER:-}" ]]; then
-  echo "Developer ID and Apple notarization credentials are required for an official Companion build" >&2
-  exit 78
+if [[ "$build_channel" == "official" ]]; then
+  codesign_identity="${FENIX_CODE_CODESIGN_IDENTITY:-}"
+  apple_team_id="${APPLE_TEAM_ID:-}"
+  apple_api_key="${APPLE_API_KEY:-}"
+  if [[ -z "$codesign_identity" || "$codesign_identity" == "-" ||
+    ! "$apple_team_id" =~ ^[A-Z0-9]{10}$ ||
+    -z "$apple_api_key" || ! -f "$apple_api_key" ||
+    -z "${APPLE_API_KEY_ID:-}" || -z "${APPLE_API_ISSUER:-}" ]]; then
+    echo "Developer ID and Apple notarization credentials are required for an official Companion build" >&2
+    exit 78
+  fi
 fi
 
-for command in node pnpm curl shasum tar ln file codesign ditto xcrun security; do
+required_commands=(node pnpm curl shasum tar file codesign)
+if [[ "$build_channel" == "official" ]]; then
+  required_commands+=(ln ditto xcrun security)
+fi
+for command in "${required_commands[@]}"; do
   command -v "$command" >/dev/null 2>&1 || {
     echo "missing required command: $command" >&2
     exit 69
   }
 done
 
-if ! security find-identity -v -p codesigning | grep -Fq "$codesign_identity"; then
+if [[ "$build_channel" == "official" ]] &&
+  ! security find-identity -v -p codesigning | grep -Fq "$codesign_identity"; then
   echo "FENIX_CODE_CODESIGN_IDENTITY is not available in the current keychain" >&2
   exit 78
 fi
@@ -63,7 +91,10 @@ if [[ ! -f apps/server/dist/bin.mjs || ! -f apps/server/dist/service-launcher.mj
   exit 66
 fi
 
-mkdir -p "$release_dir" "$public_dir" "$package_dir/bin" "$package_dir/payload"
+mkdir -p "$release_dir" "$package_dir/bin" "$package_dir/payload"
+if [[ "$build_channel" == "official" ]]; then
+  mkdir -p "$public_dir"
+fi
 
 deploy_dir="${work_dir}/deploy"
 runtime_dir="${work_dir}/runtime"
@@ -139,6 +170,11 @@ while IFS= read -r -d '' prebuild_root; do
   )
 done < <(find "$pnpm_store" -type d -name prebuilds -print0)
 
+# Pruning optional platform packages can leave pnpm's index symlinks pointing
+# at the removed directories. They are not needed on this target and the
+# installer rejects unresolved links rather than trusting them.
+find "$deploy_dir" -type l ! -exec test -e {} \; -delete
+
 find "$deploy_dir/dist" -type f -name '*.map' -delete
 mkdir -p "$runtime_dir/node_modules/t3/dist"
 cp -R "${deploy_dir}/node_modules/." "$runtime_dir/node_modules/"
@@ -185,15 +221,34 @@ printf 'Fenix portal authorization required\n' > "$package_dir/payload/runtime/.
 cp -R "${node_extract}/." "$package_dir/payload/node/"
 cp scripts/fenix/companion-package/install.sh "$package_dir/install.sh"
 cp scripts/fenix/companion-package/fenix-code "$package_dir/bin/fenix-code"
-cp scripts/fenix/companion-package/README.txt "$package_dir/README.txt"
+if [[ "$build_channel" == "official" ]]; then
+  cp scripts/fenix/companion-package/README.txt "$package_dir/README.txt"
+else
+  cp scripts/fenix/companion-package/README-INTERNAL-QA.txt "$package_dir/README.txt"
+fi
 sed -i '' "s/__FENIX_CODE_VERSION__/${version}/g" "$package_dir/install.sh" "$package_dir/bin/fenix-code"
+if [[ "$build_channel" == "internal-qa" ]]; then
+  sed -i '' 's/^package_channel="official"$/package_channel="internal-qa"/' "$package_dir/install.sh"
+fi
 chmod 0755 "$package_dir/install.sh" "$package_dir/bin/fenix-code" "$package_dir/payload/node/bin/node"
 
-scripts/fenix/sign-companion-payload.sh "$package_dir"
+if [[ "$build_channel" == "official" ]]; then
+  scripts/fenix/sign-companion-payload.sh "$package_dir"
+else
+  scripts/fenix/sign-companion-payload-internal-qa.sh "$package_dir"
+fi
 
 (
   cd "$package_dir"
-  find bin payload -type f -print0 |
+  find bin payload -type l -print0 |
+    sort -z |
+    while IFS= read -r -d '' link_path; do
+      printf '%s\t%s\n' "$link_path" "$(readlink "$link_path")"
+    done > PAYLOAD-SYMLINKS
+  {
+    find bin payload -type f -print0
+    printf 'PAYLOAD-SYMLINKS\0'
+  } |
     sort -z |
     xargs -0 shasum -a 256 > PAYLOAD-SHA256SUMS
 )
@@ -210,6 +265,17 @@ if [[ "$smoke_version" != "fenix-code v${version}" ]]; then
   exit 65
 fi
 
+if [[ "$build_channel" == "internal-qa" ]]; then
+  rm -f "$archive_path"
+  COPYFILE_DISABLE=1 tar -czf "$archive_path" -C "$work_dir" "$package_name"
+  archive_sha="$(shasum -a 256 "$archive_path" | awk '{ print $1 }')"
+  archive_size="$(stat -f '%z' "$archive_path")"
+  printf '%s  %s\n' "$archive_sha" "$(basename "$archive_path")" > "${archive_path}.sha256"
+  printf 'channel=internal-qa\nartifact=%s\nsha256=%s\nsize_bytes=%s\n' \
+    "$archive_path" "$archive_sha" "$archive_size"
+  exit 0
+fi
+
 notarization_output="$(scripts/fenix/notarize-companion-package.sh "$package_dir")"
 notarization_id="$(printf '%s\n' "$notarization_output" | awk -F= '$1 == "notarization_id" { print $2 }')"
 if [[ -z "$notarization_id" ]]; then
@@ -217,6 +283,7 @@ if [[ -z "$notarization_id" ]]; then
   exit 65
 fi
 
+# The official archive is created only after notarization succeeds.
 rm -f "$archive_path"
 COPYFILE_DISABLE=1 tar -czf "$archive_path" -C "$work_dir" "$package_name"
 archive_sha="$(shasum -a 256 "$archive_path" | awk '{ print $1 }')"

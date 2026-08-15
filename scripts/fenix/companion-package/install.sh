@@ -2,6 +2,7 @@
 set -euo pipefail
 
 version="__FENIX_CODE_VERSION__"
+package_channel="official"
 package_dir="$(cd "$(dirname "$0")" && pwd -P)"
 base_dir="${FENIX_CODE_HOME:-${HOME}/.fenix-code}"
 version_dir="${base_dir}/runtime/versions/${version}"
@@ -26,17 +27,24 @@ portal=""
 attempt_id=""
 pairing_token=""
 allow_root=""
+accept_internal_qa=false
 
 usage() {
-  cat >&2 <<'EOF'
-Uso: ./install.sh --portal URL --attempt-id ID --pairing-token TOKEN --allow-root RUTA
-
-Genera este comando desde https://iaonline.io/code-lab/setup tras iniciar sesión.
-EOF
+  if [[ "$package_channel" == "internal-qa" ]]; then
+    echo "Uso: ./install.sh --accept-unnotarized-internal-qa --portal URL --attempt-id ID --pairing-token TOKEN --allow-root RUTA" >&2
+  else
+    echo "Uso: ./install.sh --portal URL --attempt-id ID --pairing-token TOKEN --allow-root RUTA" >&2
+  fi
+  echo >&2
+  echo "Genera este comando desde https://iaonline.io/code-lab/setup tras iniciar sesión." >&2
 }
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --accept-unnotarized-internal-qa)
+      accept_internal_qa=true
+      shift
+      ;;
     --portal|--attempt-id|--pairing-token|--allow-root)
       if [[ $# -lt 2 || -z "$2" ]]; then
         usage
@@ -57,6 +65,19 @@ while [[ $# -gt 0 ]]; do
   esac
 done
 
+if [[ "$package_channel" != "official" && "$package_channel" != "internal-qa" ]]; then
+  echo "El paquete declara un canal de distribución desconocido." >&2
+  exit 65
+fi
+if [[ "$package_channel" == "internal-qa" && "$accept_internal_qa" != true ]]; then
+  echo "Este paquete temporal no está notarizado. Requiere --accept-unnotarized-internal-qa." >&2
+  exit 64
+fi
+if [[ "$package_channel" == "official" && "$accept_internal_qa" == true ]]; then
+  echo "La aceptación temporal de QA no es válida para un paquete oficial." >&2
+  exit 64
+fi
+
 if [[ -z "$portal" || -z "$attempt_id" || -z "$pairing_token" || -z "$allow_root" ]]; then
   echo "La instalación requiere una autorización de un solo uso emitida por Fenix." >&2
   usage
@@ -74,41 +95,82 @@ if [[ "$(uname -s)" != "Darwin" || "$(uname -m)" != "arm64" ]]; then
   exit 64
 fi
 
-for required in \
+required_files=( \
   "${package_dir}/payload/runtime/node_modules/t3/dist/bin.mjs" \
   "${package_dir}/payload/runtime/node_modules/t3/dist/service-launcher.mjs" \
   "${package_dir}/payload/runtime/.fenix-portal-auth-required" \
-  "${package_dir}/payload/SIGNING-METADATA" \
   "${package_dir}/payload/node/bin/node" \
   "${package_dir}/bin/fenix-code" \
-  "${package_dir}/PAYLOAD-SHA256SUMS"; do
+  "${package_dir}/PAYLOAD-SYMLINKS" \
+  "${package_dir}/PAYLOAD-SHA256SUMS"
+)
+if [[ "$package_channel" == "official" ]]; then
+  required_files+=("${package_dir}/payload/SIGNING-METADATA")
+else
+  required_files+=("${package_dir}/payload/INTERNAL-QA-METADATA")
+fi
+for required in "${required_files[@]}"; do
   if [[ ! -f "$required" ]]; then
     echo "Paquete incompleto: falta ${required#${package_dir}/}." >&2
     exit 65
   fi
 done
 
-if ! (cd "$package_dir" && shasum -a 256 -c PAYLOAD-SHA256SUMS >/dev/null 2>&1); then
-  echo "El paquete no supera la verificación interna de integridad." >&2
-  exit 65
+required_commands=(codesign diff file readlink realpath)
+if [[ "$package_channel" == "internal-qa" ]]; then
+  required_commands+=(xattr)
 fi
-
-for command in codesign file; do
+for command in "${required_commands[@]}"; do
   command -v "$command" >/dev/null 2>&1 || {
     echo "macOS no dispone de la herramienta de verificación ${command}." >&2
     exit 69
   }
 done
 
-signing_team="$(
-  awk -F= '$1 == "team_id" { print $2 }' "${package_dir}/payload/SIGNING-METADATA"
-)"
+while IFS= read -r -d '' link_path; do
+  link_target="$(readlink "$link_path")"
+  if [[ "$link_target" == /* ]]; then
+    echo "El paquete contiene un enlace simbólico absoluto no permitido." >&2
+    exit 65
+  fi
+  if ! resolved_link="$(realpath "$link_path" 2>/dev/null)" ||
+    [[ "$resolved_link" != "${package_dir}/"* ]]; then
+    echo "El paquete contiene un enlace simbólico que sale de su contenido." >&2
+    exit 65
+  fi
+done < <(find "${package_dir}/bin" "${package_dir}/payload" -type l -print0)
+
+if ! (cd "$package_dir" && shasum -a 256 -c PAYLOAD-SHA256SUMS >/dev/null 2>&1); then
+  echo "El paquete no supera la verificación interna de integridad." >&2
+  exit 65
+fi
+if ! diff -u "${package_dir}/PAYLOAD-SYMLINKS" <(
+  cd "$package_dir"
+  find bin payload -type l -print0 |
+    sort -z |
+    while IFS= read -r -d '' link_path; do
+      printf '%s\t%s\n' "$link_path" "$(readlink "$link_path")"
+    done
+) >/dev/null; then
+  echo "El inventario de enlaces simbólicos del paquete no coincide." >&2
+  exit 65
+fi
+
+if [[ "$package_channel" == "official" ]]; then
+  metadata_path="${package_dir}/payload/SIGNING-METADATA"
+  signing_team="$(awk -F= '$1 == "team_id" { print $2 }' "$metadata_path")"
+  expected_channel=""
+else
+  metadata_path="${package_dir}/payload/INTERNAL-QA-METADATA"
+  signing_team=""
+  expected_channel="$(awk -F= '$1 == "channel" { print $2 }' "$metadata_path")"
+fi
 expected_native_count="$(
-  awk -F= '$1 == "native_file_count" { print $2 }' \
-    "${package_dir}/payload/SIGNING-METADATA"
+  awk -F= '$1 == "native_file_count" { print $2 }' "$metadata_path"
 )"
-if [[ ! "$signing_team" =~ ^[A-Z0-9]{10}$ ||
-  ! "$expected_native_count" =~ ^[1-9][0-9]*$ ]]; then
+if [[ ! "$expected_native_count" =~ ^[1-9][0-9]*$ ]] ||
+  { [[ "$package_channel" == "official" ]] && [[ ! "$signing_team" =~ ^[A-Z0-9]{10}$ ]]; } ||
+  { [[ "$package_channel" == "internal-qa" ]] && [[ "$expected_channel" != "internal-qa" ]]; }; then
   echo "El paquete no contiene metadatos de firma válidos." >&2
   exit 65
 fi
@@ -122,13 +184,15 @@ while IFS= read -r -d '' native_file; do
     echo "El paquete contiene un componente nativo sin firma válida (${native_file#${package_dir}/})." >&2
     exit 65
   fi
-  actual_team="$(
-    codesign -d --verbose=4 "$native_file" 2>&1 |
-      awk -F= '$1 == "TeamIdentifier" { print $2 }'
-  )"
-  if [[ "$actual_team" != "$signing_team" ]]; then
-    echo "El paquete contiene un componente nativo firmado por otro equipo (${native_file#${package_dir}/})." >&2
-    exit 65
+  if [[ "$package_channel" == "official" ]]; then
+    actual_team="$(
+      codesign -d --verbose=4 "$native_file" 2>&1 |
+        awk -F= '$1 == "TeamIdentifier" { print $2 }'
+    )"
+    if [[ "$actual_team" != "$signing_team" ]]; then
+      echo "El paquete contiene un componente nativo firmado por otro equipo (${native_file#${package_dir}/})." >&2
+      exit 65
+    fi
   fi
   native_count=$((native_count + 1))
 done < <(find "${package_dir}/payload/runtime" -type f -print0)
@@ -187,6 +251,22 @@ cp -R "${package_dir}/payload/runtime/." "$version_staging/"
 printf '%s\n' "$version" > "${version_staging}/.install-complete"
 cp -R "${package_dir}/payload/node/." "$node_staging/"
 install -m 0755 "${package_dir}/bin/fenix-code" "$wrapper_staging"
+
+if [[ "$package_channel" == "internal-qa" ]]; then
+  while IFS= read -r -d '' staged_file; do
+    if [[ -x "$staged_file" ]] || file -b "$staged_file" | grep -q 'Mach-O'; then
+      if xattr -p com.apple.quarantine "$staged_file" >/dev/null 2>&1; then
+        if ! xattr -d com.apple.quarantine "$staged_file"; then
+          echo "No se pudo retirar la cuarentena del componente verificado ${staged_file#${base_dir}/}." >&2
+          exit 65
+        fi
+      fi
+    fi
+  done < <(find "$version_staging" "$node_staging" -type f -print0)
+  if xattr -p com.apple.quarantine "$wrapper_staging" >/dev/null 2>&1; then
+    xattr -d com.apple.quarantine "$wrapper_staging"
+  fi
+fi
 
 staged_version="$(
   "$node_staging/bin/node" "$version_staging/node_modules/t3/dist/bin.mjs" --version
@@ -248,7 +328,11 @@ install_complete=true
 rm -rf "$version_backup" "$node_backup"
 rm -f "$wrapper_backup" "$config_backup"
 
-printf '\nFenix Code Companion %s instalado.\n' "$version"
+if [[ "$package_channel" == "internal-qa" ]]; then
+  printf '\nFenix Code Companion %s instalado para QA interno temporal (no notarizado).\n' "$version"
+else
+  printf '\nFenix Code Companion %s instalado.\n' "$version"
+fi
 printf 'Comando: %s\n' "$wrapper_path"
 if [[ ":${PATH}:" != *":${bin_dir}:"* ]]; then
   printf 'Añade esta línea a ~/.zprofile y abre una Terminal nueva:\n'

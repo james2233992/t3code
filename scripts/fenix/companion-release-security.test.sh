@@ -133,4 +133,32 @@ if env -u FENIX_CODE_CODESIGN_IDENTITY -u APPLE_TEAM_ID -u APPLE_API_KEY \
   exit 1
 fi
 
+rm -f "${package_dir}/payload/SIGNING-METADATA" "$codesign_state"
+if PATH="${fake_bin}:${PATH}" \
+  "${repo_root}/scripts/fenix/sign-companion-payload-internal-qa.sh" "$package_dir" \
+    >/dev/null 2>&1; then
+  echo "internal QA signing accepted a missing explicit acknowledgement" >&2
+  exit 1
+fi
+
+internal_sign_output="$(
+  PATH="${fake_bin}:${PATH}" \
+  FENIX_SIGN_TEST_STATE="$codesign_state" \
+  FENIX_CODE_INTERNAL_QA_ACK="MANUEL_INTERNAL_QA_ONLY" \
+    "${repo_root}/scripts/fenix/sign-companion-payload-internal-qa.sh" "$package_dir"
+)"
+test "$internal_sign_output" = "internal_qa_signed_native_files=2"
+test "$(cat "${package_dir}/payload/INTERNAL-QA-METADATA")" = "$(cat <<'EOF'
+schema_version=1
+channel=internal-qa
+native_file_count=2
+EOF
+)"
+
+if "${repo_root}/scripts/fenix/build-companion-package-internal-qa.sh" \
+  >/dev/null 2>&1; then
+  echo "internal QA build accepted a missing explicit acknowledgement" >&2
+  exit 1
+fi
+
 printf 'fenix-companion-release-security-selftest-pass\n'

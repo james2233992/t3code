@@ -10,6 +10,7 @@ package_dir="${test_root}/package"
 fake_bin="${test_root}/fake-bin"
 token_state="${test_root}/used-token"
 codesign_state="${test_root}/codesign-calls"
+xattr_state="${test_root}/xattr-calls"
 mkdir -p \
   "${package_dir}/payload/runtime/node_modules/t3/dist" \
   "${package_dir}/payload/node/bin" \
@@ -83,13 +84,23 @@ cat > "${fake_bin}/uname" <<'FAKE_UNAME'
 #!/usr/bin/env bash
 if [[ "${1:-}" == "-s" ]]; then printf 'Darwin\n'; else printf 'arm64\n'; fi
 FAKE_UNAME
+cat > "${fake_bin}/xattr" <<'FAKE_XATTR'
+#!/usr/bin/env bash
+set -euo pipefail
+case "${1:-}" in
+  -p) exit 0 ;;
+  -d) printf 'clear\t%s\n' "${@: -1}" >> "${FENIX_INSTALL_TEST_XATTR_STATE}" ;;
+  *) exit 79 ;;
+esac
+FAKE_XATTR
 chmod 0755 \
   "${package_dir}/install.sh" \
   "${package_dir}/bin/fenix-code" \
   "${package_dir}/payload/node/bin/node" \
   "${fake_bin}/codesign" \
   "${fake_bin}/file" \
-  "${fake_bin}/uname"
+  "${fake_bin}/uname" \
+  "${fake_bin}/xattr"
 
 printf 'native fixture\n' > "${package_dir}/payload/runtime/native-addon.node"
 printf 'native library fixture\n' > "${package_dir}/payload/runtime/native-library.dylib"
@@ -102,7 +113,15 @@ EOF
 refresh_checksums() {
   (
     cd "$package_dir"
-    find bin payload -type f -print0 | sort -z | xargs -0 shasum -a 256 > PAYLOAD-SHA256SUMS
+    find bin payload -type l -print0 |
+      sort -z |
+      while IFS= read -r -d '' link_path; do
+        printf '%s\t%s\n' "$link_path" "$(readlink "$link_path")"
+      done > PAYLOAD-SYMLINKS
+    {
+      find bin payload -type f -print0
+      printf 'PAYLOAD-SYMLINKS\0'
+    } | sort -z | xargs -0 shasum -a 256 > PAYLOAD-SHA256SUMS
   )
 }
 refresh_checksums
@@ -112,6 +131,7 @@ run_install() {
   FENIX_CODE_HOME="${test_root}/home/.fenix-code" \
   FENIX_INSTALL_TEST_TOKEN_STATE="$token_state" \
   FENIX_INSTALL_TEST_CODESIGN_STATE="$codesign_state" \
+  FENIX_INSTALL_TEST_XATTR_STATE="$xattr_state" \
   PATH="${fake_bin}:${PATH}" \
     "${package_dir}/install.sh" "$@"
 }
@@ -145,6 +165,18 @@ if integrity_output="$(
 fi
 test "${integrity_output##*$'\n'}" = "El paquete no supera la verificación interna de integridad."
 printf 'export {};\n' > "${package_dir}/payload/runtime/node_modules/t3/dist/service-launcher.mjs"
+
+ln -s /tmp "${package_dir}/payload/runtime/unsafe-link"
+refresh_checksums
+if run_install \
+  --portal https://iaonline.io \
+  --attempt-id attempt-unsafe-link \
+  --pairing-token valid-token \
+  --allow-root "$test_root" >/dev/null 2>&1; then
+  echo "installer accepted an absolute package symlink" >&2
+  exit 1
+fi
+rm "${package_dir}/payload/runtime/unsafe-link"
 
 sed 's/team_id=ABCDE12345/team_id=ZZZZZ99999/' \
   "${package_dir}/payload/SIGNING-METADATA" > "${package_dir}/payload/SIGNING-METADATA.next"
@@ -220,5 +252,58 @@ if run_install \
 fi
 test -L "$config"
 test "$(readlink "$config")" = "${test_root}/outside-config"
+
+rm -rf "${test_root}/home"
+rm -f "$token_state" "$codesign_state" "$xattr_state"
+sed -e 's/__FENIX_CODE_VERSION__/1.2.3/g' \
+  -e 's/^package_channel="official"$/package_channel="internal-qa"/' \
+  "${repo_root}/scripts/fenix/companion-package/install.sh" > "${package_dir}/install.sh"
+chmod 0755 "${package_dir}/install.sh"
+rm -f "${package_dir}/payload/SIGNING-METADATA"
+cat > "${package_dir}/payload/INTERNAL-QA-METADATA" <<'EOF'
+schema_version=1
+channel=internal-qa
+native_file_count=2
+EOF
+refresh_checksums
+
+if run_install \
+  --portal https://iaonline.io \
+  --attempt-id attempt-internal-no-ack \
+  --pairing-token valid-token \
+  --allow-root "$test_root" >/dev/null 2>&1; then
+  echo "internal QA installer accepted a missing explicit acknowledgement" >&2
+  exit 1
+fi
+test ! -e "${test_root}/home/.fenix-code"
+
+printf 'tampered\n' >> "${package_dir}/payload/runtime/native-addon.node"
+if run_install \
+  --accept-unnotarized-internal-qa \
+  --portal https://iaonline.io \
+  --attempt-id attempt-internal-tampered \
+  --pairing-token valid-token \
+  --allow-root "$test_root" >/dev/null 2>&1; then
+  echo "internal QA installer accepted a modified payload" >&2
+  exit 1
+fi
+test ! -e "$xattr_state"
+printf 'native fixture\n' > "${package_dir}/payload/runtime/native-addon.node"
+refresh_checksums
+
+if ! internal_output="$(
+  run_install \
+    --accept-unnotarized-internal-qa \
+    --portal https://iaonline.io \
+    --attempt-id attempt-internal \
+    --pairing-token valid-token \
+    --allow-root "$test_root" 2>&1
+)"; then
+  echo "internal QA installer rejected a valid temporary payload: ${internal_output}" >&2
+  exit 1
+fi
+grep -Fq 'QA interno temporal (no notarizado)' <<<"$internal_output"
+grep -Fq $'clear\t'"${test_root}/home/.fenix-code/runtime/versions/.install-1.2.3-" "$xattr_state"
+test "$(cat "${test_root}/home/.fenix-code/userdata/fenix-companion.json")" = '{"paired":true}'
 
 printf 'fenix-login-bound-installer-selftest-pass\n'
