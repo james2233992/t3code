@@ -32,6 +32,13 @@ describe("Fenix setup", () => {
     );
   });
 
+  it("lets an authenticated owner review and revoke stale local devices", () => {
+    expect(setupPageSource).toContain("Equipos autorizados");
+    expect(setupPageSource).toContain("listFenixPortalDevices");
+    expect(setupPageSource).toContain("revokeFenixPortalDevice");
+    expect(setupPageSource).toContain("¿Revocar el acceso");
+  });
+
   it("detects the three supported instruction lanes", () => {
     expect(detectFenixSetupPlatform("MacIntel")).toBe("macos");
     expect(detectFenixSetupPlatform("Win32")).toBe("windows");

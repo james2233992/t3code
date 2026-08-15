@@ -2832,20 +2832,20 @@
 ./apps/web/src/components/desktopUpdate.toast.test.tsx:3:42:@t3tools
 ./apps/web/src/components/desktopUpdate.toast.tsx:1:57:@t3tools
 ./apps/web/src/components/diffs/AnnotatableCodeView.tsx:10:39:@t3tools
-./apps/web/src/components/fenix/FenixSetupPage.tsx:261:55:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:285:61:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:294:24:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:338:19:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:356:15:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:411:37:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:419:31:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:435:15:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:444:37:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:576:59:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:687:55:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:737:52:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:779:57:Fenix Code
-./apps/web/src/components/fenix/FenixSetupPage.tsx:828:15:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:302:55:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:326:61:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:335:24:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:379:19:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:397:15:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:452:37:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:460:31:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:476:15:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:485:37:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:617:59:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:793:55:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:843:52:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:885:57:Fenix Code
+./apps/web/src/components/fenix/FenixSetupPage.tsx:934:15:Fenix Code
 ./apps/web/src/components/files/FileBrowserPanel.tsx:5:51:@t3tools
 ./apps/web/src/components/files/FileBrowserPanel.tsx:7:44:@t3tools
 ./apps/web/src/components/files/FilePreviewPanel.tsx:14:9:@t3tools
@@ -3033,17 +3033,17 @@
 ./apps/web/src/connection/desktopLocal.test.ts:5:62:@t3tools
 ./apps/web/src/connection/desktopLocal.ts:1:40:@t3tools
 ./apps/web/src/connection/desktopLocal.ts:6:9:@t3tools
-./apps/web/src/connection/fenixPortal.test.ts:312:46:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:137:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:161:39:Fenix Code
+./apps/web/src/connection/fenixPortal.test.ts:363:46:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:142:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:166:39:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:17:28:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:241:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:281:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:284:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:295:42:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:345:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:272:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:312:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:315:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:326:42:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:376:22:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:39:21:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:40:4:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:41:4:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:5:9:@t3tools
 ./apps/web/src/connection/fenixPortal.ts:6:32:@t3tools
 ./apps/web/src/connection/onboarding.ts:1:39:@t3tools
