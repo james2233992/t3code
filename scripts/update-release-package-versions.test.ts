@@ -73,6 +73,14 @@ const captureLogs = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
   });
 
 it.layer(ScriptTestLayer)("update-release-package-versions", (it) => {
+  it.effect("keeps checked-in release package versions aligned", () =>
+    Effect.gen(function* () {
+      const versions = yield* readReleaseVersions(process.cwd());
+
+      assert.equal(new Set(versions.values()).size, 1);
+    }),
+  );
+
   it.effect("updates all release package versions under the provided root", () =>
     Effect.gen(function* () {
       const fs = yield* FileSystem.FileSystem;
