@@ -317,13 +317,16 @@ function toToolLifecycleItemType(toolName: string): ToolLifecycleItemType {
   return "dynamic_tool_call";
 }
 
-function mapPermissionToRequestType(
+export function mapPermissionToRequestType(
   permission: string,
 ): "command_execution_approval" | "file_read_approval" | "file_change_approval" | "unknown" {
   switch (permission) {
     case "bash":
       return "command_execution_approval";
     case "read":
+    case "glob":
+    case "grep":
+    case "list":
       return "file_read_approval";
     case "edit":
       return "file_change_approval";

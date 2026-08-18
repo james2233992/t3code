@@ -1,20 +1,20 @@
 {
   "schemaVersion": 1,
-  "releaseVersion": "0.0.33-internal-qa.20260818",
+  "releaseVersion": "0.0.34-internal-qa.20260818",
   "distributionChannel": "internal-qa",
   "artifacts": [
     {
       "platform": "macos",
       "architecture": "arm64",
-      "fileName": "Fenix-Code-Companion-0.0.33-internal-qa-macos-arm64.tar.gz",
-      "sha256": "6f97c6df84ffaf9223f523ab3be52c697dda951987fbb26a6e9c21ca71436363",
-      "sizeBytes": 187578134,
+      "fileName": "Fenix-Code-Companion-0.0.34-internal-qa-macos-arm64.tar.gz",
+      "sha256": "67946694548a189e7ff168ec9e8c21835f46f1f8eeac057ce1d5c1d938112771",
+      "sizeBytes": 187576302,
       "available": true
     },
     {
       "platform": "windows",
       "architecture": "x64",
-      "fileName": "Fenix-Code-Companion-0.0.33-windows-x64.zip",
+      "fileName": "Fenix-Code-Companion-0.0.34-windows-x64.zip",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
       "sizeBytes": 0,
       "available": false
@@ -22,7 +22,7 @@
     {
       "platform": "linux",
       "architecture": "x64",
-      "fileName": "Fenix-Code-Companion-0.0.33-linux-x64.tar.gz",
+      "fileName": "Fenix-Code-Companion-0.0.34-linux-x64.tar.gz",
       "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
       "sizeBytes": 0,
       "available": false

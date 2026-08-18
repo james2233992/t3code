@@ -36,6 +36,7 @@ import {
   isOpenCodeNotFound,
   isSameOpenCodeDirectory,
   makeOpenCodeAdapter,
+  mapPermissionToRequestType,
   mergeOpenCodeAssistantText,
 } from "./OpenCodeAdapter.ts";
 
@@ -279,6 +280,16 @@ beforeEach(() => {
 
 const advanceTestClock = (ms: number) =>
   TestClock.adjust(`${ms} millis`).pipe(Effect.andThen(Effect.yieldNow));
+
+it("classifies OpenCode file discovery permissions as read approvals", () => {
+  NodeAssert.equal(mapPermissionToRequestType("read"), "file_read_approval");
+  NodeAssert.equal(mapPermissionToRequestType("glob"), "file_read_approval");
+  NodeAssert.equal(mapPermissionToRequestType("grep"), "file_read_approval");
+  NodeAssert.equal(mapPermissionToRequestType("list"), "file_read_approval");
+  NodeAssert.equal(mapPermissionToRequestType("edit"), "file_change_approval");
+  NodeAssert.equal(mapPermissionToRequestType("bash"), "command_execution_approval");
+  NodeAssert.equal(mapPermissionToRequestType("custom-tool"), "unknown");
+});
 
 it.layer(OpenCodeAdapterTestLayer)("OpenCodeAdapterLive", (it) => {
   it.effect("reuses a configured OpenCode server URL instead of spawning a local server", () =>

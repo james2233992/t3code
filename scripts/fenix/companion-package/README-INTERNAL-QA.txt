@@ -1,4 +1,4 @@
-FENIX CODE COMPANION 0.0.33 - QA INTERNO TEMPORAL
+FENIX CODE COMPANION 0.0.34 - QA INTERNO TEMPORAL
 =================================================
 
 Este paquete es exclusivamente para la validación de Manuel antes de disponer
@@ -6,13 +6,13 @@ de la licencia Apple Developer. No es una versión oficial ni está notarizado.
 No debe publicarse, redistribuirse ni usarse con clientes.
 
 ARCHIVOS NECESARIOS
-- Fenix-Code-Companion-0.0.33-internal-qa-macos-arm64.tar.gz
-- Fenix-Code-Companion-0.0.33-internal-qa-macos-arm64.tar.gz.sha256
+- Fenix-Code-Companion-0.0.34-internal-qa-macos-arm64.tar.gz
+- Fenix-Code-Companion-0.0.34-internal-qa-macos-arm64.tar.gz.sha256
 
 VERIFICACIÓN OBLIGATORIA
 Coloca ambos archivos en la misma carpeta y ejecuta:
 
-  shasum -a 256 -c Fenix-Code-Companion-0.0.33-internal-qa-macos-arm64.tar.gz.sha256
+  shasum -a 256 -c Fenix-Code-Companion-0.0.34-internal-qa-macos-arm64.tar.gz.sha256
 
 Continúa únicamente si Terminal muestra "OK". No uses comandos manuales como
 "xattr -cr" sobre la descarga.

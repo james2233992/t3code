@@ -15,13 +15,17 @@ export const ComposerPendingApprovalPanel = memo(function ComposerPendingApprova
       ? "Se solicita aprobación del comando"
       : approval.requestKind === "file-read"
         ? "Se solicita aprobación para leer el archivo"
-        : "Se solicita aprobación para modificar el archivo";
+        : approval.requestKind === "file-change"
+          ? "Se solicita aprobación para modificar el archivo"
+          : "Se solicita aprobación";
   const detailLabel =
     approval.requestKind === "command"
       ? "Comando"
       : approval.requestKind === "file-read"
         ? "Archivo que se va a leer"
-        : "Cambio de archivo";
+        : approval.requestKind === "file-change"
+          ? "Cambio de archivo"
+          : "Solicitud";
 
   return (
     <div className="px-4 py-3.5 sm:px-5 sm:py-4">

@@ -156,6 +156,32 @@ describe("derivePendingApprovals", () => {
     ]);
   });
 
+  it("keeps unknown provider requests actionable without guessing their capability", () => {
+    const activities: OrchestrationThreadActivity[] = [
+      makeActivity({
+        id: "approval-open-unknown",
+        createdAt: "2026-08-18T14:37:26.391Z",
+        kind: "approval.requested",
+        summary: "Approval requested",
+        tone: "approval",
+        payload: {
+          requestId: "req-unknown",
+          requestType: "unknown",
+          detail: "**/canary.txt",
+        },
+      }),
+    ];
+
+    expect(derivePendingApprovals(activities)).toEqual([
+      {
+        requestId: "req-unknown",
+        requestKind: "generic",
+        createdAt: "2026-08-18T14:37:26.391Z",
+        detail: "**/canary.txt",
+      },
+    ]);
+  });
+
   it("clears stale pending approvals when provider reports unknown pending request", () => {
     const activities: OrchestrationThreadActivity[] = [
       makeActivity({

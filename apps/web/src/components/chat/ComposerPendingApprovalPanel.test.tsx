@@ -42,4 +42,22 @@ describe("ComposerPendingApprovalPanel", () => {
     expect(markup).toContain("Se solicita aprobación para modificar el archivo");
     expect(markup).toContain('aria-label="Cambio de archivo"');
   });
+
+  it("labels unclassified provider requests without claiming a capability", () => {
+    const markup = renderToStaticMarkup(
+      <ComposerPendingApprovalPanel
+        approval={{
+          requestId: ApprovalRequestId.make("approval-generic"),
+          requestKind: "generic",
+          createdAt: "2026-08-18T14:37:26.391Z",
+          detail: "**/canary.txt",
+        }}
+        pendingCount={1}
+      />,
+    );
+
+    expect(markup).toContain("Se solicita aprobación");
+    expect(markup).toContain('aria-label="Solicitud"');
+    expect(markup).toContain("**/canary.txt");
+  });
 });
