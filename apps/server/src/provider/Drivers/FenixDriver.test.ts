@@ -3,7 +3,7 @@ import { FenixSettings, ProviderDriverKind } from "@t3tools/contracts";
 import * as Schema from "effect/Schema";
 
 import * as FenixPairingSessionBridge from "../Services/FenixPairingSessionBridge.ts";
-import { FenixDriver } from "./FenixDriver.ts";
+import { FenixDriver, resolveFenixDriverEnabled } from "./FenixDriver.ts";
 
 describe("FenixDriver", () => {
   it("is a dedicated provider driver with fail-closed defaults", () => {
@@ -16,6 +16,14 @@ describe("FenixDriver", () => {
       supportsMultipleInstances: true,
     });
     expect(decoded.enabled).toBe(false);
+  });
+
+  it("enables only the portal-authenticated Companion runtime", () => {
+    expect(resolveFenixDriverEnabled(false, undefined)).toBe(false);
+    expect(resolveFenixDriverEnabled(false, "0")).toBe(false);
+    expect(resolveFenixDriverEnabled(false, "true")).toBe(false);
+    expect(resolveFenixDriverEnabled(false, "1")).toBe(true);
+    expect(resolveFenixDriverEnabled(true, undefined)).toBe(true);
   });
 
   it("accepts pairing only before a finite, safe expiry boundary", () => {

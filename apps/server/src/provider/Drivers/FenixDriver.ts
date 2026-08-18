@@ -43,6 +43,13 @@ const UPDATE = makeStaticProviderMaintenanceResolver(
   }),
 );
 
+export function resolveFenixDriverEnabled(
+  configuredEnabled: boolean,
+  requirePortalAuth = process.env.FENIX_CODE_REQUIRE_PORTAL_AUTH,
+): boolean {
+  return configuredEnabled || requirePortalAuth === "1";
+}
+
 export type FenixDriverEnv =
   | BackgroundPolicy.BackgroundPolicy
   | Crypto.Crypto
@@ -93,7 +100,8 @@ export const FenixDriver: ProviderDriver<FenixSettings, FenixDriverEnv> = {
         accentColor,
         continuationGroupKey: continuationIdentity.continuationKey,
       });
-      const effectiveConfig = { ...config, enabled } satisfies FenixSettings;
+      const effectiveEnabled = resolveFenixDriverEnabled(enabled);
+      const effectiveConfig = { ...config, enabled: effectiveEnabled } satisfies FenixSettings;
       const maintenanceCapabilities = yield* resolveProviderMaintenanceCapabilitiesEffect(UPDATE, {
         binaryPath: "",
         env: process.env,
@@ -152,7 +160,7 @@ export const FenixDriver: ProviderDriver<FenixSettings, FenixDriverEnv> = {
         continuationIdentity,
         displayName,
         accentColor,
-        enabled,
+        enabled: effectiveEnabled,
         snapshot,
         adapter,
         textGeneration,
