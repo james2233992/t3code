@@ -9,8 +9,10 @@ import { describe, expect, it } from "@effect/vitest";
 import * as Effect from "effect/Effect";
 
 import {
+  FENIX_PORTAL_DEVICE_CACHE_TTL_MS,
   canRetainCachedPlatformRegistrationAfterRefreshFailure,
   canReuseCachedPlatformRegistration,
+  fenixPortalDevicesToUseAfterRead,
   primaryRegistrationToRetainAfterTopologyRead,
   provisionDesktopSshEnvironment,
   readPrimaryEnvironmentTargetResult,
@@ -18,6 +20,14 @@ import {
   secondaryBearerExpiresAtEpochMs,
   secondaryBearerRefreshAtEpochMs,
 } from "./platform.ts";
+
+const FENIX_DEVICE = {
+  deviceId: "00000000-0000-4000-8000-000000000009",
+  deviceName: "Mac mini - Escritorio Fenix Code Final",
+  capabilities: ["filesystem.read", "filesystem.write"],
+  revoked: false,
+  connected: true,
+} as const;
 
 const TARGET: DesktopSshEnvironmentTarget = {
   alias: "devbox",
@@ -184,6 +194,61 @@ describe("desktop-local bearer cache", () => {
         10_000,
       ),
     ).toEqual(new Map());
+  });
+});
+
+describe("Fenix portal device cache", () => {
+  it("retains the last confirmed device list during a transient poll failure", () => {
+    const previous = {
+      devices: [FENIX_DEVICE],
+      observedAtEpochMs: 10_000,
+    };
+
+    expect(
+      fenixPortalDevicesToUseAfterRead(
+        previous,
+        { _tag: "Failure", cause: new Error("signal timed out") },
+        20_000,
+      ),
+    ).toBe(previous);
+  });
+
+  it("drops a stale device list when transient failures outlive the cache window", () => {
+    const previous = {
+      devices: [FENIX_DEVICE],
+      observedAtEpochMs: 10_000,
+    };
+
+    expect(
+      fenixPortalDevicesToUseAfterRead(
+        previous,
+        { _tag: "Failure", cause: new Error("signal timed out") },
+        10_000 + FENIX_PORTAL_DEVICE_CACHE_TTL_MS + 1,
+      ),
+    ).toBeNull();
+  });
+
+  it("treats a successful empty response as immediate authoritative removal", () => {
+    const previous = {
+      devices: [FENIX_DEVICE],
+      observedAtEpochMs: 10_000,
+    };
+
+    expect(
+      fenixPortalDevicesToUseAfterRead(previous, { _tag: "Success", devices: [] }, 11_000),
+    ).toEqual({ devices: [], observedAtEpochMs: 11_000 });
+  });
+
+  it("replaces cached devices after the next successful poll", () => {
+    const previous = {
+      devices: [FENIX_DEVICE],
+      observedAtEpochMs: 10_000,
+    };
+    const updated = { ...FENIX_DEVICE, connected: false };
+
+    expect(
+      fenixPortalDevicesToUseAfterRead(previous, { _tag: "Success", devices: [updated] }, 12_000),
+    ).toEqual({ devices: [updated], observedAtEpochMs: 12_000 });
   });
 });
 

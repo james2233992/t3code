@@ -67,6 +67,7 @@ import {
   issueFenixPortalBrowserTicket,
   listFenixPortalDevices,
   readFenixPortalAgentId,
+  type FenixPortalDevice,
 } from "./fenixPortal";
 
 let nextObservedRpcRequestId = 0;
@@ -397,6 +398,39 @@ const loadSecondaryConnectionRegistration = Effect.fn(
 // signature of their endpoint + token until bearer credentials approach expiry.
 const PLATFORM_POLL_INTERVAL = "3 seconds";
 const SECONDARY_BEARER_REFRESH_SKEW_MS = 5_000;
+export const FENIX_PORTAL_DEVICE_CACHE_TTL_MS = 30_000;
+
+export interface CachedFenixPortalDevices {
+  readonly devices: ReadonlyArray<FenixPortalDevice>;
+  readonly observedAtEpochMs: number;
+}
+
+export type FenixPortalDevicesRead =
+  | {
+      readonly _tag: "Success";
+      readonly devices: ReadonlyArray<FenixPortalDevice>;
+    }
+  | {
+      readonly _tag: "Failure";
+      readonly cause: unknown;
+    };
+
+export function fenixPortalDevicesToUseAfterRead(
+  previous: CachedFenixPortalDevices | null,
+  read: FenixPortalDevicesRead,
+  nowEpochMs: number,
+): CachedFenixPortalDevices | null {
+  if (read._tag === "Success") {
+    return { devices: read.devices, observedAtEpochMs: nowEpochMs };
+  }
+  if (
+    previous !== null &&
+    nowEpochMs - previous.observedAtEpochMs <= FENIX_PORTAL_DEVICE_CACHE_TTL_MS
+  ) {
+    return previous;
+  }
+  return null;
+}
 
 export function secondaryBearerExpiresAtEpochMs(
   issuedAtEpochMs: number,
@@ -492,10 +526,11 @@ const platformConnectionSourceLayer = Layer.effect(
   PlatformConnectionSource,
   Effect.gen(function* () {
     if (isFenixPortalEmbeddedApp()) {
+      const deviceCacheRef = yield* Ref.make<CachedFenixPortalDevices | null>(null);
       const buildFenixPortalRegistrations = Effect.gen(function* () {
         const agentId = readFenixPortalAgentId();
         if (agentId === null) return [];
-        const devices = yield* Effect.tryPromise({
+        const read = yield* Effect.tryPromise({
           try: () => listFenixPortalDevices({ agentId }),
           catch: (cause) =>
             new ConnectionTransientError({
@@ -503,14 +538,18 @@ const platformConnectionSourceLayer = Layer.effect(
               detail: cause instanceof Error ? cause.message : String(cause),
             }),
         }).pipe(
-          Effect.tapError((error) =>
+          Effect.map((devices): FenixPortalDevicesRead => ({ _tag: "Success", devices })),
+          Effect.catch((cause) =>
             Effect.logWarning("No se pudieron listar los companions de Fenix Code emparejados.", {
-              error,
-            }),
+              cause,
+            }).pipe(Effect.as<FenixPortalDevicesRead>({ _tag: "Failure", cause })),
           ),
-          Effect.orElseSucceed(() => []),
         );
-        return fenixPortalConnectedDeviceRegistrations(devices);
+        const nowEpochMs = yield* Clock.currentTimeMillis;
+        const previous = yield* Ref.get(deviceCacheRef);
+        const cached = fenixPortalDevicesToUseAfterRead(previous, read, nowEpochMs);
+        yield* Ref.set(deviceCacheRef, cached);
+        return fenixPortalConnectedDeviceRegistrations(cached?.devices ?? []);
       });
       return PlatformConnectionSource.of({
         registrations: Stream.tick(PLATFORM_POLL_INTERVAL).pipe(
