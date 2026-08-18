@@ -1,546 +1,260 @@
-import { describe, expect, it } from "@effect/vitest";
-import { FenixSettings, ProviderInstanceId, ThreadId } from "@t3tools/contracts";
+import { describe, expect, it, vi } from "@effect/vitest";
+import {
+  FenixSettings,
+  ProviderDriverKind,
+  ProviderInstanceId,
+  ThreadId,
+  TurnId,
+  type ProviderSendTurnInput,
+  type ProviderSession,
+  type ProviderSessionStartInput,
+} from "@t3tools/contracts";
 import * as Effect from "effect/Effect";
-import * as Fiber from "effect/Fiber";
 import * as Schema from "effect/Schema";
 import * as Stream from "effect/Stream";
 
-import { makeFenixAdapter } from "./FenixAdapter.ts";
+import type { ProviderAdapterError } from "../Errors.ts";
+import type { ProviderAdapterShape } from "../Services/ProviderAdapter.ts";
+import {
+  buildFenixOpenCodeConfig,
+  buildIsolatedFenixOpenCodeEnvironment,
+  wrapFenixOpenCodeAdapter,
+} from "./FenixAdapter.ts";
+
+const OPENCODE = ProviderDriverKind.make("opencode");
+const FENIX = ProviderDriverKind.make("fenix");
+const INSTANCE = ProviderInstanceId.make("fenix");
+const EXTERNAL_MODEL = "groq/openai/gpt-oss-120b";
+const INTERNAL_MODEL = "fenix/openai/gpt-oss-120b";
 
 const decodeFenixSettings = Schema.decodeSync(FenixSettings);
-const decodeUnknownJson = Schema.decodeUnknownSync(Schema.fromJsonString(Schema.Unknown));
 
-const fenixSettings = (overrides: Partial<FenixSettings> = {}) =>
-  decodeFenixSettings({
-    enabled: true,
-    baseUrl: "https://iaonline.io",
-    sendMessagePath: "/api/v1/ChatModels/SendMessageWithOptions",
-    featuredModel: "groq/openai/gpt-oss-120b",
-    ...overrides,
-  });
+function settings() {
+  return decodeFenixSettings({ enabled: true, featuredModel: EXTERNAL_MODEL });
+}
 
-const throwingFetch = (() => {
-  throw new Error("fetch must not be called");
-}) as unknown as typeof fetch;
+function makeDelegate() {
+  const sessions = new Map<ThreadId, ProviderSession>();
+  const startSession = vi.fn((input: ProviderSessionStartInput) =>
+    Effect.sync(() => {
+      const session: ProviderSession = {
+        provider: OPENCODE,
+        providerInstanceId: input.modelSelection?.instanceId,
+        model: input.modelSelection?.model,
+        status: "ready",
+        runtimeMode: input.runtimeMode,
+        threadId: input.threadId,
+        resumeCursor: input.resumeCursor ?? { opaque: `resume-${input.threadId}` },
+        cwd: input.cwd ?? "/tmp/fenix-project",
+        createdAt: "2026-08-18T00:00:00.000Z",
+        updatedAt: "2026-08-18T00:00:00.000Z",
+      };
+      sessions.set(input.threadId, session);
+      return session;
+    }),
+  );
+  const sendTurn = vi.fn((input: ProviderSendTurnInput) =>
+    Effect.succeed({
+      threadId: input.threadId,
+      turnId: TurnId.make(`turn-${input.threadId}`),
+    }),
+  );
+  const interruptTurn = vi.fn(() => Effect.void);
+  const stopSession = vi.fn((threadId: ThreadId) =>
+    Effect.sync(() => {
+      sessions.delete(threadId);
+    }),
+  );
+  const rollbackThread = vi.fn((threadId: ThreadId, _numTurns: number) =>
+    Effect.succeed({ threadId, turns: [] as const }),
+  );
+
+  const adapter: ProviderAdapterShape<ProviderAdapterError> = {
+    provider: OPENCODE,
+    capabilities: { sessionModelSwitch: "in-session" },
+    startSession,
+    sendTurn,
+    interruptTurn,
+    respondToRequest: () => Effect.void,
+    respondToUserInput: () => Effect.void,
+    stopSession,
+    listSessions: () => Effect.succeed(Array.from(sessions.values())),
+    hasSession: (threadId) => Effect.succeed(sessions.has(threadId)),
+    readThread: (threadId) => Effect.succeed({ threadId, turns: [] }),
+    rollbackThread,
+    stopAll: () =>
+      Effect.sync(() => {
+        sessions.clear();
+      }),
+    streamEvents: Stream.empty,
+  };
+
+  return { adapter, startSession, sendTurn, interruptTurn, stopSession, rollbackThread };
+}
 
 describe("FenixAdapter", () => {
-  it.effect("posts turns through the Fenix generic chat lane with the paired Fenix cookie", () =>
+  it("pins one provider/model and isolates OpenCode from project and user config", () => {
+    const config = JSON.parse(
+      buildFenixOpenCodeConfig("http://127.0.0.1:4567/v1", "local-only-secret"),
+    ) as Record<string, unknown>;
+    const environment = buildIsolatedFenixOpenCodeEnvironment(
+      "/Users/test/.fenix-code/runtime/opencode-fenix",
+      JSON.stringify(config),
+    );
+
+    expect(config).toMatchObject({
+      model: INTERNAL_MODEL,
+      small_model: INTERNAL_MODEL,
+      enabled_providers: ["fenix"],
+      autoupdate: false,
+      share: "disabled",
+      plugin: [],
+      mcp: {},
+    });
+    expect(Object.keys(config.provider as Record<string, unknown>)).toEqual(["fenix"]);
+    expect(environment).toMatchObject({
+      XDG_CONFIG_HOME: "/Users/test/.fenix-code/runtime/opencode-fenix/config",
+      XDG_DATA_HOME: "/Users/test/.fenix-code/runtime/opencode-fenix/data",
+      XDG_STATE_HOME: "/Users/test/.fenix-code/runtime/opencode-fenix/state",
+      XDG_CACHE_HOME: "/Users/test/.fenix-code/runtime/opencode-fenix/cache",
+      OPENCODE_DISABLE_PROJECT_CONFIG: "true",
+      OPENCODE_DISABLE_CLAUDE_CODE: "true",
+      OPENCODE_DISABLE_CLAUDE_CODE_PROMPT: "true",
+      OPENCODE_DISABLE_AUTOUPDATE: "true",
+      OPENCODE_AUTO_SHARE: "false",
+    });
+    expect(environment.OPENCODE_CONFIG).toBeUndefined();
+    expect(environment.OPENCODE_PERMISSION).toBeUndefined();
+  });
+
+  it.effect("presents only Agent 9 Groq while delegating local tool execution to OpenCode", () =>
     Effect.gen(function* () {
-      const requests: Array<{ url: string; body: string; headers: Record<string, string> }> = [];
-      const fetchImpl = (async (url, init) => {
-        requests.push({
-          url: String(url),
-          body: String(init?.body ?? "{}"),
-          headers: init?.headers as Record<string, string>,
-        });
-        return Response.json({ response: "respuesta fenix" });
-      }) as typeof fetch;
-      const adapter = yield* makeFenixAdapter(fenixSettings(), {
-        fetch: fetchImpl,
-        instanceId: ProviderInstanceId.make("fenix"),
-        pairingSession: { kind: "cookie", authToken: "fenix-session" },
+      const delegate = makeDelegate();
+      const adapter = wrapFenixOpenCodeAdapter({
+        settings: settings(),
+        instanceId: INSTANCE,
+        delegate: delegate.adapter,
       });
-      const threadId = ThreadId.make("thread-fenix");
-      const eventsFiber = yield* adapter.streamEvents.pipe(
-        Stream.take(6),
-        Stream.runCollect,
-        Effect.forkChild,
+      const threadId = ThreadId.make("thread-fenix-agent-9");
+
+      const session = yield* adapter.startSession({
+        threadId,
+        runtimeMode: "full-access",
+        cwd: "/Users/test/project",
+      });
+      const result = yield* adapter.sendTurn({ threadId, input: "edita README.md" });
+
+      expect(adapter.provider).toBe(FENIX);
+      expect(session).toMatchObject({
+        provider: FENIX,
+        providerInstanceId: INSTANCE,
+        model: EXTERNAL_MODEL,
+        cwd: "/Users/test/project",
+      });
+      expect(result.turnId).toBe(TurnId.make(`turn-${threadId}`));
+      expect(delegate.startSession).toHaveBeenCalledWith(
+        expect.objectContaining({
+          cwd: "/Users/test/project",
+          modelSelection: expect.objectContaining({
+            instanceId: INSTANCE,
+            model: INTERNAL_MODEL,
+          }),
+        }),
       );
-      yield* Effect.yieldNow;
-
-      yield* adapter.startSession({
-        threadId,
-        runtimeMode: "full-access",
-      });
-      const result = yield* adapter.sendTurn({ threadId, input: "crea una funcion" });
-      const events = Array.from(yield* Fiber.join(eventsFiber));
-      const requestBody = decodeUnknownJson(requests[0]?.body ?? "{}");
-
-      expect(result.threadId).toBe(threadId);
-      expect(requests).toHaveLength(1);
-      expect(requests[0]?.url).toBe("https://iaonline.io/api/v1/ChatModels/SendMessageWithOptions");
-      expect(requests[0]?.headers).toMatchObject({
-        accept: "application/json",
-        "content-type": "application/json",
-        cookie: "AuthToken=fenix-session",
-      });
-      expect(requestBody).toMatchObject({
-        message: "crea una funcion",
-        model: "groq/openai/gpt-oss-120b",
-        isGenericChatLane: true,
-        source: "fenix-code",
-        threadId,
-        turnId: result.turnId,
-        requestId: result.turnId,
-      });
-      expect(events.map((event) => event.type)).toEqual([
-        "session.started",
-        "session.state.changed",
-        "thread.started",
-        "turn.started",
-        "content.delta",
-        "turn.completed",
-      ]);
-      const contentDelta = events.find((event) => event.type === "content.delta");
-      expect(contentDelta?.payload).toMatchObject({
-        streamKind: "assistant_text",
-        delta: "respuesta fenix",
-      });
-    }),
-  );
-
-  it.effect("posts turns with a paired bearer token", () =>
-    Effect.gen(function* () {
-      const requests: Array<{ headers: Record<string, string> }> = [];
-      const fetchImpl = (async (_url, init) => {
-        requests.push({ headers: init?.headers as Record<string, string> });
-        return Response.json({ response: "respuesta bearer" });
-      }) as typeof fetch;
-      const adapter = yield* makeFenixAdapter(fenixSettings(), {
-        fetch: fetchImpl,
-        instanceId: ProviderInstanceId.make("fenix"),
-        pairingSession: { kind: "bearer", token: "fenix.bearer-token_1" },
-      });
-      const threadId = ThreadId.make("thread-fenix-bearer");
-
-      yield* adapter.startSession({
-        threadId,
-        runtimeMode: "full-access",
-      });
-      yield* adapter.sendTurn({ threadId, input: "crea una funcion" });
-
-      expect(requests[0]?.headers).toMatchObject({
-        authorization: "Bearer fenix.bearer-token_1",
-      });
-    }),
-  );
-
-  it.effect("canonicalizes a persisted legacy featured model before posting a turn", () =>
-    Effect.gen(function* () {
-      const requests: Array<{ body: string }> = [];
-      const fetchImpl = (async (_url, init) => {
-        requests.push({ body: String(init?.body ?? "{}") });
-        return Response.json({ response: "respuesta fenix" });
-      }) as typeof fetch;
-      const adapter = yield* makeFenixAdapter(
-        fenixSettings({ featuredModel: "openai/gpt-oss-120b" }),
-        {
-          fetch: fetchImpl,
-          instanceId: ProviderInstanceId.make("fenix"),
-          pairingSession: { kind: "cookie", authToken: "fenix-session" },
-        },
+      expect(delegate.sendTurn).toHaveBeenCalledWith(
+        expect.objectContaining({
+          input: "edita README.md",
+          modelSelection: expect.objectContaining({
+            instanceId: INSTANCE,
+            model: INTERNAL_MODEL,
+          }),
+        }),
       );
-      const threadId = ThreadId.make("thread-fenix-legacy-featured-model");
-
-      yield* adapter.startSession({
-        threadId,
-        runtimeMode: "full-access",
-      });
-      yield* adapter.sendTurn({ threadId, input: "crea una funcion" });
-      const sessions = yield* adapter.listSessions();
-
-      expect(sessions[0]?.model).toBe("groq/openai/gpt-oss-120b");
-      expect(decodeUnknownJson(requests[0]?.body ?? "{}")).toMatchObject({
-        model: "groq/openai/gpt-oss-120b",
-      });
     }),
   );
 
-  it.effect("canonicalizes a legacy selected model before posting a turn", () =>
+  it.effect("fails closed for every model except the exact Agent 9 Groq model", () =>
     Effect.gen(function* () {
-      const requests: Array<{ body: string }> = [];
-      const fetchImpl = (async (_url, init) => {
-        requests.push({ body: String(init?.body ?? "{}") });
-        return Response.json({ response: "respuesta fenix" });
-      }) as typeof fetch;
-      const instanceId = ProviderInstanceId.make("fenix");
-      const adapter = yield* makeFenixAdapter(fenixSettings(), {
-        fetch: fetchImpl,
-        instanceId,
-        pairingSession: { kind: "cookie", authToken: "fenix-session" },
+      const delegate = makeDelegate();
+      const adapter = wrapFenixOpenCodeAdapter({
+        settings: settings(),
+        instanceId: INSTANCE,
+        delegate: delegate.adapter,
       });
-      const threadId = ThreadId.make("thread-fenix-legacy-selected-model");
+      const threadId = ThreadId.make("thread-fenix-wrong-model");
 
-      yield* adapter.startSession({
-        threadId,
-        runtimeMode: "full-access",
-      });
-      yield* adapter.sendTurn({
-        threadId,
-        input: "crea una funcion",
-        modelSelection: {
-          instanceId,
-          model: "openai/gpt-oss-120b",
-          options: [],
-        },
-      });
-      const sessions = yield* adapter.listSessions();
-
-      expect(sessions[0]?.model).toBe("groq/openai/gpt-oss-120b");
-      expect(decodeUnknownJson(requests[0]?.body ?? "{}")).toMatchObject({
-        model: "groq/openai/gpt-oss-120b",
-      });
-    }),
-  );
-
-  it.effect("keeps unknown custom model slugs intact", () =>
-    Effect.gen(function* () {
-      const requests: Array<{ body: string }> = [];
-      const fetchImpl = (async (_url, init) => {
-        requests.push({ body: String(init?.body ?? "{}") });
-        return Response.json({ response: "respuesta fenix" });
-      }) as typeof fetch;
-      const adapter = yield* makeFenixAdapter(
-        fenixSettings({ featuredModel: "custom/fenix-dev" }),
-        {
-          fetch: fetchImpl,
-          instanceId: ProviderInstanceId.make("fenix"),
-          pairingSession: { kind: "cookie", authToken: "fenix-session" },
-        },
-      );
-      const threadId = ThreadId.make("thread-fenix-custom-model");
-
-      yield* adapter.startSession({
-        threadId,
-        runtimeMode: "full-access",
-      });
-      yield* adapter.sendTurn({ threadId, input: "crea una funcion" });
-
-      expect(decodeUnknownJson(requests[0]?.body ?? "{}")).toMatchObject({
-        model: "custom/fenix-dev",
-      });
-    }),
-  );
-
-  it.effect("does not resolve pairing credentials when starting a session", () =>
-    Effect.gen(function* () {
-      let resolveCount = 0;
-      const adapter = yield* makeFenixAdapter(fenixSettings(), {
-        fetch: throwingFetch,
-        instanceId: ProviderInstanceId.make("fenix"),
-        pairingSession: () => {
-          resolveCount += 1;
-          return Effect.succeed({ kind: "cookie", authToken: "fenix-session" });
-        },
-      });
-      const threadId = ThreadId.make("thread-fenix-start-neutral");
-      const eventsFiber = yield* adapter.streamEvents.pipe(
-        Stream.take(3),
-        Stream.runCollect,
-        Effect.forkChild,
-      );
-      yield* Effect.yieldNow;
-
-      yield* adapter.startSession({
-        threadId,
-        runtimeMode: "full-access",
-      });
-      const events = Array.from(yield* Fiber.join(eventsFiber));
-
-      const stateChanged = events.find((event) => event.type === "session.state.changed");
-      expect(resolveCount).toBe(0);
-      expect(stateChanged?.payload).toMatchObject({
-        state: "ready",
-        reason: "Fenix pairing checked on turn",
-      });
-    }),
-  );
-
-  it.effect("fails closed before reaching the Fenix backend without a pairing session", () =>
-    Effect.gen(function* () {
-      const adapter = yield* makeFenixAdapter(fenixSettings(), {
-        fetch: throwingFetch,
-        instanceId: ProviderInstanceId.make("fenix"),
-      });
-      const threadId = ThreadId.make("thread-fenix-unpaired");
-      const eventsFiber = yield* adapter.streamEvents.pipe(
-        Stream.take(3),
-        Stream.runCollect,
-        Effect.forkChild,
-      );
-      yield* Effect.yieldNow;
-
-      yield* adapter.startSession({
-        threadId,
-        runtimeMode: "full-access",
-      });
-      const events = Array.from(yield* Fiber.join(eventsFiber));
       const error = yield* adapter
-        .sendTurn({ threadId, input: "crea una funcion" })
-        .pipe(Effect.flip);
-      const sessions = yield* adapter.listSessions();
-
-      expect(error._tag).toBe("ProviderAdapterValidationError");
-      expect(error.message).toContain("active Code Lab pairing session");
-      expect(sessions[0]?.status).toBe("ready");
-      expect(sessions[0]?.activeTurnId).toBeUndefined();
-      const stateChanged = events.find((event) => event.type === "session.state.changed");
-      expect(stateChanged?.payload).toMatchObject({
-        state: "ready",
-        reason: "Fenix pairing checked on turn",
-      });
-    }),
-  );
-
-  it.effect("refuses to attach pairing credentials to non-Fenix origins", () =>
-    Effect.gen(function* () {
-      const adapter = yield* makeFenixAdapter(
-        fenixSettings({ baseUrl: "https://not-fenix.example" }),
-        {
-          fetch: throwingFetch,
-          instanceId: ProviderInstanceId.make("fenix"),
-          pairingSession: { kind: "cookie", authToken: "fenix-session" },
-        },
-      );
-      const threadId = ThreadId.make("thread-fenix-wrong-origin");
-
-      yield* adapter.startSession({
-        threadId,
-        runtimeMode: "full-access",
-      });
-      const error = yield* adapter
-        .sendTurn({ threadId, input: "crea una funcion" })
-        .pipe(Effect.flip);
-      const sessions = yield* adapter.listSessions();
-
-      expect(error._tag).toBe("ProviderAdapterValidationError");
-      expect(error.message).toContain("https://iaonline.io");
-      expect(sessions[0]?.status).toBe("ready");
-      expect(sessions[0]?.activeTurnId).toBeUndefined();
-    }),
-  );
-
-  it.effect("maps malformed Fenix URLs to typed validation errors before fetch", () =>
-    Effect.gen(function* () {
-      const adapter = yield* makeFenixAdapter(fenixSettings({ baseUrl: "https://[" }), {
-        fetch: throwingFetch,
-        instanceId: ProviderInstanceId.make("fenix"),
-        pairingSession: { kind: "cookie", authToken: "fenix-session" },
-      });
-      const threadId = ThreadId.make("thread-fenix-invalid-url");
-
-      yield* adapter.startSession({
-        threadId,
-        runtimeMode: "full-access",
-      });
-      const error = yield* adapter
-        .sendTurn({ threadId, input: "crea una funcion" })
-        .pipe(Effect.flip);
-      const sessions = yield* adapter.listSessions();
-
-      expect(error._tag).toBe("ProviderAdapterValidationError");
-      expect(error.message).toContain("https://iaonline.io");
-      expect(sessions[0]?.status).toBe("ready");
-      expect(sessions[0]?.activeTurnId).toBeUndefined();
-    }),
-  );
-
-  it.effect("rejects malformed cookie and bearer pairing values before fetch", () =>
-    Effect.gen(function* () {
-      for (const [index, pairingSession] of [
-        { kind: "cookie" as const, authToken: "fenix-session; Other=evil" },
-        { kind: "cookie" as const, authToken: " fenix-session" },
-        { kind: "bearer" as const, token: "fenix-token\r\nx-leak: true" },
-        { kind: "bearer" as const, token: "fenix-token " },
-      ].entries()) {
-        const adapter = yield* makeFenixAdapter(fenixSettings(), {
-          fetch: throwingFetch,
-          instanceId: ProviderInstanceId.make("fenix"),
-          pairingSession,
-        });
-        const threadId = ThreadId.make(`thread-fenix-malformed-${index}`);
-
-        yield* adapter.startSession({
+        .startSession({
           threadId,
           runtimeMode: "full-access",
-        });
-        const error = yield* adapter
-          .sendTurn({ threadId, input: "crea una funcion" })
-          .pipe(Effect.flip);
-
-        expect(error._tag).toBe("ProviderAdapterValidationError");
-        expect(error.message).toContain("active Code Lab pairing session");
-      }
-    }),
-  );
-
-  it.effect("rejects concurrent turns without stealing the active turn slot", () =>
-    Effect.gen(function* () {
-      let resolveFetchStarted!: () => void;
-      let resolveResponse!: (response: Response) => void;
-      const fetchStarted = new Promise<void>((resolve) => {
-        resolveFetchStarted = resolve;
-      });
-      const responsePromise = new Promise<Response>((resolve) => {
-        resolveResponse = resolve;
-      });
-      const requests: Array<string> = [];
-      const fetchImpl = (async () => {
-        requests.push("fetch");
-        resolveFetchStarted();
-        return await responsePromise;
-      }) as unknown as typeof fetch;
-      const adapter = yield* makeFenixAdapter(fenixSettings(), {
-        fetch: fetchImpl,
-        instanceId: ProviderInstanceId.make("fenix"),
-        pairingSession: { kind: "cookie", authToken: "fenix-session" },
-      });
-      const threadId = ThreadId.make("thread-fenix-busy");
-      const eventsFiber = yield* adapter.streamEvents.pipe(
-        Stream.take(7),
-        Stream.runCollect,
-        Effect.forkChild,
-      );
-      yield* Effect.yieldNow;
-
-      yield* adapter.startSession({
-        threadId,
-        runtimeMode: "full-access",
-      });
-      const firstTurn = yield* adapter
-        .sendTurn({ threadId, input: "primer turno" })
-        .pipe(Effect.forkChild);
-      yield* Effect.promise(() => fetchStarted);
-
-      const busyError = yield* adapter
-        .sendTurn({ threadId, input: "segundo turno" })
+          modelSelection: {
+            instanceId: INSTANCE,
+            model: "xai/grok-4.5",
+            options: [],
+          },
+        })
         .pipe(Effect.flip);
-      const runningSessions = yield* adapter.listSessions();
-      const activeTurnId = runningSessions[0]?.activeTurnId;
 
-      expect(requests).toHaveLength(1);
-      expect(busyError._tag).toBe("ProviderAdapterValidationError");
-      expect(busyError.message).toContain("already has an active turn");
-      expect(runningSessions[0]?.status).toBe("running");
-      expect(activeTurnId).toBeDefined();
-
-      resolveResponse(Response.json({ response: "respuesta final" }));
-      const result = yield* Fiber.join(firstTurn);
-      const readySessions = yield* adapter.listSessions();
-      const events = Array.from(yield* Fiber.join(eventsFiber));
-      const turnStarted = events.filter((event) => event.type === "turn.started");
-      const turnCompleted = events.filter((event) => event.type === "turn.completed");
-
-      expect(result.turnId).toBe(activeTurnId);
-      expect(readySessions[0]?.status).toBe("ready");
-      expect(readySessions[0]?.activeTurnId).toBeUndefined();
-      expect(turnStarted).toHaveLength(1);
-      expect(turnCompleted).toHaveLength(1);
-      expect(turnCompleted[0]?.payload).toMatchObject({ state: "completed" });
+      expect(error._tag).toBe("ProviderAdapterValidationError");
+      expect(error.message).toContain(EXTERNAL_MODEL);
+      expect(delegate.startSession).not.toHaveBeenCalled();
     }),
   );
 
-  it.effect(
-    "restores ready state and emits a failed turn when Fenix rejects the paired session",
-    () =>
-      Effect.gen(function* () {
-        const fetchImpl = (async () =>
-          Response.json({ error: "unauthorized" }, { status: 401 })) as unknown as typeof fetch;
-        const adapter = yield* makeFenixAdapter(fenixSettings(), {
-          fetch: fetchImpl,
-          instanceId: ProviderInstanceId.make("fenix"),
-          pairingSession: { kind: "cookie", authToken: "expired-token" },
-        });
-        const threadId = ThreadId.make("thread-fenix-401");
-        const eventsFiber = yield* adapter.streamEvents.pipe(
-          Stream.take(6),
-          Stream.runCollect,
-          Effect.forkChild,
-        );
-        yield* Effect.yieldNow;
+  it.effect("fails closed when model selection targets another provider instance", () =>
+    Effect.gen(function* () {
+      const delegate = makeDelegate();
+      const adapter = wrapFenixOpenCodeAdapter({
+        settings: settings(),
+        instanceId: INSTANCE,
+        delegate: delegate.adapter,
+      });
+      const threadId = ThreadId.make("thread-fenix-wrong-instance");
 
-        yield* adapter.startSession({
+      const error = yield* adapter
+        .startSession({
           threadId,
           runtimeMode: "full-access",
-        });
-        const error = yield* adapter
-          .sendTurn({ threadId, input: "crea una funcion" })
-          .pipe(Effect.flip);
-        const sessions = yield* adapter.listSessions();
-        const events = Array.from(yield* Fiber.join(eventsFiber));
-
-        expect(error._tag).toBe("ProviderAdapterRequestError");
-        expect(sessions[0]?.status).toBe("ready");
-        expect(sessions[0]?.activeTurnId).toBeUndefined();
-        expect(sessions[0]?.lastError).toContain("HTTP 401");
-        expect(events.map((event) => event.type)).toEqual([
-          "session.started",
-          "session.state.changed",
-          "thread.started",
-          "turn.started",
-          "runtime.error",
-          "turn.completed",
-        ]);
-        const failedTurn = events.find((event) => event.type === "turn.completed");
-        expect(failedTurn?.payload).toMatchObject({
-          state: "failed",
-        });
-        expect(
-          failedTurn?.type === "turn.completed" ? failedTurn.payload.errorMessage : undefined,
-        ).toContain("HTTP 401");
-      }),
-  );
-
-  it.effect("restores ready state when the Fenix rate limiter rejects the turn", () =>
-    Effect.gen(function* () {
-      const fetchImpl = (async () =>
-        Response.json(
-          { code: "fenix_code_rate_limit_exceeded", message: "Too many requests." },
-          { status: 429 },
-        )) as unknown as typeof fetch;
-      const adapter = yield* makeFenixAdapter(fenixSettings(), {
-        fetch: fetchImpl,
-        instanceId: ProviderInstanceId.make("fenix"),
-        pairingSession: { kind: "bearer", token: "fenix-session" },
-      });
-      const threadId = ThreadId.make("thread-fenix-429");
-
-      yield* adapter.startSession({
-        threadId,
-        runtimeMode: "full-access",
-      });
-      const error = yield* adapter
-        .sendTurn({ threadId, input: "crea una funcion" })
+          modelSelection: {
+            instanceId: ProviderInstanceId.make("another-instance"),
+            model: EXTERNAL_MODEL,
+            options: [],
+          },
+        })
         .pipe(Effect.flip);
-      const sessions = yield* adapter.listSessions();
 
-      expect(error._tag).toBe("ProviderAdapterRequestError");
-      expect(sessions[0]?.status).toBe("ready");
-      expect(sessions[0]?.activeTurnId).toBeUndefined();
-      expect(sessions[0]?.lastError).toContain("HTTP 429");
+      expect(error._tag).toBe("ProviderAdapterValidationError");
+      expect(error.message).toContain(String(INSTANCE));
+      expect(delegate.startSession).not.toHaveBeenCalled();
     }),
   );
 
-  it.effect("clears lastError after a later successful paired turn", () =>
+  it.effect("preserves cancel, thread reads, rollback, stop and reconnect session state", () =>
     Effect.gen(function* () {
-      let calls = 0;
-      const fetchImpl = (async () => {
-        calls += 1;
-        if (calls === 1) {
-          return Response.json({ error: "unauthorized" }, { status: 401 });
-        }
-        return Response.json({ response: "recuperado" });
-      }) as unknown as typeof fetch;
-      const adapter = yield* makeFenixAdapter(fenixSettings(), {
-        fetch: fetchImpl,
-        instanceId: ProviderInstanceId.make("fenix"),
-        pairingSession: { kind: "cookie", authToken: "fenix-session" },
+      const delegate = makeDelegate();
+      const adapter = wrapFenixOpenCodeAdapter({
+        settings: settings(),
+        instanceId: INSTANCE,
+        delegate: delegate.adapter,
       });
-      const threadId = ThreadId.make("thread-fenix-recovery");
+      const threadId = ThreadId.make("thread-fenix-lifecycle");
+      const turnId = TurnId.make("turn-fenix-lifecycle");
 
-      yield* adapter.startSession({
-        threadId,
-        runtimeMode: "full-access",
+      yield* adapter.startSession({ threadId, runtimeMode: "approval-required" });
+      expect(yield* adapter.hasSession(threadId)).toBe(true);
+      expect((yield* adapter.listSessions())[0]).toMatchObject({
+        provider: FENIX,
+        model: EXTERNAL_MODEL,
       });
-      yield* adapter.sendTurn({ threadId, input: "falla primero" }).pipe(Effect.flip);
-      expect((yield* adapter.listSessions())[0]?.lastError).toContain("HTTP 401");
+      yield* adapter.interruptTurn(threadId, turnId);
+      expect((yield* adapter.readThread(threadId)).threadId).toBe(threadId);
+      expect((yield* adapter.rollbackThread(threadId, 1)).threadId).toBe(threadId);
+      yield* adapter.stopSession(threadId);
+      expect(yield* adapter.hasSession(threadId)).toBe(false);
 
-      yield* adapter.sendTurn({ threadId, input: "recupera despues" });
-      const sessions = yield* adapter.listSessions();
-
-      expect(sessions[0]?.status).toBe("ready");
-      expect(sessions[0]?.activeTurnId).toBeUndefined();
-      expect(sessions[0]?.lastError).toBeUndefined();
+      expect(delegate.interruptTurn).toHaveBeenCalledWith(threadId, turnId);
+      expect(delegate.rollbackThread).toHaveBeenCalledWith(threadId, 1);
+      expect(delegate.stopSession).toHaveBeenCalledWith(threadId);
     }),
   );
 });

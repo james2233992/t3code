@@ -32,6 +32,8 @@ if [[ "$server_version" != "$version" ]]; then
   exit 65
 fi
 node_version="22.21.1"
+opencode_version="1.18.18"
+opencode_sha256="4f5979c2dadb06fbff1335335afaaea274e58f92e79aa43cf2ed98618d555422"
 if [[ "$build_channel" == "official" ]]; then
   release_label="${FENIX_CODE_RELEASE_LABEL:-${version}-pilot.$(date -u +%Y%m%d)}"
   package_name="Fenix-Code-Companion-${version}-macos-arm64"
@@ -66,6 +68,23 @@ for command in "${required_commands[@]}"; do
     exit 69
   }
 done
+
+opencode_source="${FENIX_CODE_OPENCODE_SOURCE:-$(command -v opencode || true)}"
+if [[ -z "$opencode_source" || ! -f "$opencode_source" || ! -x "$opencode_source" ||
+  -L "$opencode_source" ]]; then
+  echo "OpenCode ${opencode_version} must be supplied as a regular executable file" >&2
+  exit 69
+fi
+if [[ "$("$opencode_source" --version)" != "$opencode_version" ]] ||
+  ! file -b "$opencode_source" | grep -q 'Mach-O 64-bit executable arm64'; then
+  echo "the bundled OpenCode engine must be version ${opencode_version} for macOS ARM64" >&2
+  exit 65
+fi
+actual_opencode_sha256="$(shasum -a 256 "$opencode_source" | awk '{ print $1 }')"
+if [[ "$actual_opencode_sha256" != "$opencode_sha256" ]]; then
+  echo "OpenCode ${opencode_version} checksum verification failed" >&2
+  exit 65
+fi
 
 if [[ "$build_channel" == "official" ]] &&
   ! security find-identity -v -p codesigning | grep -Fq "$codesign_identity"; then
@@ -218,6 +237,9 @@ tar -xzf "${work_dir}/${node_archive}" -C "$node_extract" --strip-components=1
 mkdir -p "$package_dir/payload/runtime" "$package_dir/payload/node"
 cp -R "${runtime_dir}/." "$package_dir/payload/runtime/"
 printf 'Fenix portal authorization required\n' > "$package_dir/payload/runtime/.fenix-portal-auth-required"
+mkdir -p "$package_dir/payload/runtime/opencode/bin"
+cp "$opencode_source" "$package_dir/payload/runtime/opencode/bin/opencode"
+printf '%s\n' "$opencode_version" > "$package_dir/payload/runtime/opencode/VERSION"
 cp -R "${node_extract}/." "$package_dir/payload/node/"
 cp scripts/fenix/companion-package/install.sh "$package_dir/install.sh"
 cp scripts/fenix/companion-package/fenix-code "$package_dir/bin/fenix-code"
@@ -230,7 +252,11 @@ sed -i '' "s/__FENIX_CODE_VERSION__/${version}/g" "$package_dir/install.sh" "$pa
 if [[ "$build_channel" == "internal-qa" ]]; then
   sed -i '' 's/^package_channel="official"$/package_channel="internal-qa"/' "$package_dir/install.sh"
 fi
-chmod 0755 "$package_dir/install.sh" "$package_dir/bin/fenix-code" "$package_dir/payload/node/bin/node"
+chmod 0755 \
+  "$package_dir/install.sh" \
+  "$package_dir/bin/fenix-code" \
+  "$package_dir/payload/node/bin/node" \
+  "$package_dir/payload/runtime/opencode/bin/opencode"
 
 if [[ "$build_channel" == "official" ]]; then
   scripts/fenix/sign-companion-payload.sh "$package_dir"

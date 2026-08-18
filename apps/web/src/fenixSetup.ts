@@ -13,6 +13,7 @@ export interface FenixCompanionArtifact {
 export interface FenixCompanionManifest {
   readonly schemaVersion: 1;
   readonly releaseVersion: string;
+  readonly distributionChannel: "official" | "internal-qa";
   readonly artifacts: ReadonlyArray<FenixCompanionArtifact>;
 }
 
@@ -74,6 +75,9 @@ export function parseFenixCompanionManifest(value: unknown): FenixCompanionManif
     manifest.schemaVersion !== 1 ||
     typeof manifest.releaseVersion !== "string" ||
     manifest.releaseVersion.length === 0 ||
+    (manifest.distributionChannel !== undefined &&
+      manifest.distributionChannel !== "official" &&
+      manifest.distributionChannel !== "internal-qa") ||
     !Array.isArray(manifest.artifacts)
   ) {
     return null;
@@ -105,6 +109,8 @@ export function parseFenixCompanionManifest(value: unknown): FenixCompanionManif
   return {
     schemaVersion: 1,
     releaseVersion: manifest.releaseVersion,
+    distributionChannel:
+      manifest.distributionChannel === "internal-qa" ? "internal-qa" : "official",
     artifacts,
   };
 }

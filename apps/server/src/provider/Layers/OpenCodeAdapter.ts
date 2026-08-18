@@ -240,6 +240,8 @@ interface OpenCodeSessionContext {
 export interface OpenCodeAdapterLiveOptions {
   readonly instanceId?: ProviderInstanceId;
   readonly environment?: NodeJS.ProcessEnv;
+  readonly pure?: boolean;
+  readonly allowMcpSession?: boolean;
   readonly nativeEventLogPath?: string;
   readonly nativeEventLogger?: EventNdjsonLogger;
 }
@@ -1208,6 +1210,7 @@ export function makeOpenCodeAdapter(
                 binaryPath,
                 serverUrl,
                 ...(options?.environment ? { environment: options.environment } : {}),
+                ...(options?.pure !== undefined ? { pure: options.pure } : {}),
               });
               const client = openCodeRuntime.createOpenCodeSdkClient({
                 baseUrl: server.url,
@@ -1215,7 +1218,7 @@ export function makeOpenCodeAdapter(
                 ...(server.external && serverPassword ? { serverPassword } : {}),
               });
               const mcpSession = McpProviderSession.readMcpProviderSession(input.threadId);
-              if (mcpSession && !server.external) {
+              if (mcpSession && !server.external && options?.allowMcpSession !== false) {
                 yield* runOpenCodeSdk("mcp.add", () =>
                   client.mcp.add({
                     name: "t3-code",

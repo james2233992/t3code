@@ -70,11 +70,27 @@ describe("Fenix setup", () => {
 
   it("accepts only a bounded, same-directory companion manifest", () => {
     const manifest = parseFenixCompanionManifest(validManifest);
+    expect(manifest?.distributionChannel).toBe("official");
     expect(companionArtifactForPlatform(manifest, "macos", "arm64")?.architecture).toBe("arm64");
     expect(companionArtifactForPlatform(manifest, "macos", "x64")).toBeNull();
     expect(companionDownloadHref("/code-lab/", manifest!.artifacts[0]!)).toBe(
       `/code-lab/downloads/Fenix-Code-Companion-0.0.32-macos-arm64.tar.gz?sha256=${"a".repeat(64)}`,
     );
+  });
+
+  it("preserves the internal QA channel and rejects unknown channels", () => {
+    expect(
+      parseFenixCompanionManifest({
+        ...validManifest,
+        distributionChannel: "internal-qa",
+      })?.distributionChannel,
+    ).toBe("internal-qa");
+    expect(
+      parseFenixCompanionManifest({
+        ...validManifest,
+        distributionChannel: "preview",
+      }),
+    ).toBeNull();
   });
 
   it("fails closed on external paths, malformed hashes, or partial entries", () => {

@@ -305,6 +305,7 @@ export function buildFenixMobilePairingUrl(input: {
 export function buildFenixCompanionInstallCommand(input: {
   readonly artifactFileName: string;
   readonly artifactSha256: string;
+  readonly distributionChannel?: "official" | "internal-qa";
   readonly portalOrigin: string;
   readonly pairing: FenixPortalPairing;
 }): string {
@@ -335,6 +336,7 @@ export function buildFenixCompanionInstallCommand(input: {
     `cd "$FENIX_CODE_INSTALL_DIR"/${shellQuote(directoryName)}`,
     [
       "./install.sh",
+      ...(input.distributionChannel === "internal-qa" ? ["--accept-unnotarized-internal-qa"] : []),
       `--portal ${shellQuote(new URL(input.portalOrigin).origin)}`,
       `--attempt-id ${shellQuote(input.pairing.attemptId)}`,
       `--pairing-token ${shellQuote(input.pairing.pairingToken)}`,

@@ -374,6 +374,17 @@ describe("Fenix portal companion API", () => {
       ].join("\n"),
     );
     expect(installCommand).not.toMatch(/\bt3\b/i);
+
+    const internalQaInstallCommand = buildFenixCompanionInstallCommand({
+      artifactFileName: "Fenix-Code-Companion-0.0.33-internal-qa-macos-arm64.tar.gz",
+      artifactSha256: "e".repeat(64),
+      distributionChannel: "internal-qa",
+      portalOrigin: PORTAL_URL.origin,
+      pairing,
+    });
+    expect(internalQaInstallCommand).toContain(
+      "./install.sh --accept-unnotarized-internal-qa --portal 'https://iaonline.io'",
+    );
   });
 
   it("keeps compatibility with a wrapped CSRF token envelope", async () => {

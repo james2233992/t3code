@@ -13,6 +13,7 @@ codesign_state="${test_root}/codesign-calls"
 xattr_state="${test_root}/xattr-calls"
 mkdir -p \
   "${package_dir}/payload/runtime/node_modules/t3/dist" \
+  "${package_dir}/payload/runtime/opencode/bin" \
   "${package_dir}/payload/node/bin" \
   "${package_dir}/bin" \
   "$fake_bin"
@@ -24,6 +25,13 @@ sed 's/__FENIX_CODE_VERSION__/1.2.3/g' \
 printf 'export {};\n' > "${package_dir}/payload/runtime/node_modules/t3/dist/bin.mjs"
 printf 'export {};\n' > "${package_dir}/payload/runtime/node_modules/t3/dist/service-launcher.mjs"
 printf 'Fenix portal authorization required\n' > "${package_dir}/payload/runtime/.fenix-portal-auth-required"
+printf '1.18.18\n' > "${package_dir}/payload/runtime/opencode/VERSION"
+cat > "${package_dir}/payload/runtime/opencode/bin/opencode" <<'FAKE_OPENCODE'
+#!/usr/bin/env bash
+set -euo pipefail
+test "${1:-}" = "--version"
+printf '1.18.18\n'
+FAKE_OPENCODE
 
 cat > "${package_dir}/payload/node/bin/node" <<'FAKE_NODE'
 #!/usr/bin/env bash
@@ -60,7 +68,7 @@ cat > "${fake_bin}/file" <<'FAKE_FILE'
 set -euo pipefail
 candidate="${@: -1}"
 case "$candidate" in
-  *.node|*.dylib) printf 'Mach-O 64-bit bundle arm64\n' ;;
+  *.node|*.dylib|*/opencode) printf 'Mach-O 64-bit bundle arm64\n' ;;
   *) printf 'ASCII text\n' ;;
 esac
 FAKE_FILE
@@ -97,6 +105,7 @@ chmod 0755 \
   "${package_dir}/install.sh" \
   "${package_dir}/bin/fenix-code" \
   "${package_dir}/payload/node/bin/node" \
+  "${package_dir}/payload/runtime/opencode/bin/opencode" \
   "${fake_bin}/codesign" \
   "${fake_bin}/file" \
   "${fake_bin}/uname" \
@@ -107,7 +116,7 @@ printf 'native library fixture\n' > "${package_dir}/payload/runtime/native-libra
 cat > "${package_dir}/payload/SIGNING-METADATA" <<'EOF'
 schema_version=1
 team_id=ABCDE12345
-native_file_count=2
+native_file_count=3
 EOF
 
 refresh_checksums() {
@@ -220,6 +229,7 @@ test -x "${test_root}/home/.local/bin/fenix-code"
 for verified_file in \
   "${package_dir}/payload/runtime/native-addon.node" \
   "${package_dir}/payload/runtime/native-library.dylib" \
+  "${package_dir}/payload/runtime/opencode/bin/opencode" \
   "${package_dir}/payload/node/bin/node"; do
   if ! grep -Fq $'verify\t'"$verified_file" "$codesign_state"; then
     echo "installer did not verify expected signature: $verified_file" >&2
@@ -263,7 +273,7 @@ rm -f "${package_dir}/payload/SIGNING-METADATA"
 cat > "${package_dir}/payload/INTERNAL-QA-METADATA" <<'EOF'
 schema_version=1
 channel=internal-qa
-native_file_count=2
+native_file_count=3
 EOF
 refresh_checksums
 

@@ -10,11 +10,13 @@ fake_bin="${test_root}/fake-bin"
 codesign_state="${test_root}/codesign-calls"
 mkdir -p \
   "${package_dir}/payload/runtime/node_modules/.pnpm/ffi-rs@1.3.2/node_modules/ffi-rs" \
+  "${package_dir}/payload/runtime/opencode/bin" \
   "${package_dir}/payload/node/bin" \
   "$fake_bin"
 
 printf 'native addon\n' > "${package_dir}/payload/runtime/ffi.node"
 printf 'native library\n' > "${package_dir}/payload/runtime/libfff.dylib"
+printf 'opencode binary\n' > "${package_dir}/payload/runtime/opencode/bin/opencode"
 printf 'javascript\n' > \
   "${package_dir}/payload/runtime/node_modules/.pnpm/ffi-rs@1.3.2/node_modules/ffi-rs/index.js"
 
@@ -30,7 +32,7 @@ cat > "${fake_bin}/file" <<'FAKE_FILE'
 set -euo pipefail
 candidate="${@: -1}"
 case "$candidate" in
-  *.node|*.dylib) printf 'Mach-O 64-bit bundle arm64\n' ;;
+  *.node|*.dylib|*/opencode) printf 'Mach-O 64-bit bundle arm64\n' ;;
   *) printf 'ASCII text\n' ;;
 esac
 FAKE_FILE
@@ -85,16 +87,17 @@ sign_output="$(
   APPLE_TEAM_ID="ABCDE12345" \
     "${repo_root}/scripts/fenix/sign-companion-payload.sh" "$package_dir"
 )"
-test "$sign_output" = "signed_native_files=2"
+test "$sign_output" = "signed_native_files=3"
 test "$(cat "${package_dir}/payload/SIGNING-METADATA")" = "$(cat <<'EOF'
 schema_version=1
 team_id=ABCDE12345
-native_file_count=2
+native_file_count=3
 EOF
 )"
-test "$(grep -c $'^sign\t' "$codesign_state")" = "2"
+test "$(grep -c $'^sign\t' "$codesign_state")" = "3"
 grep -Fq $'verify\t'"${package_dir}/payload/runtime/ffi.node" "$codesign_state"
 grep -Fq $'verify\t'"${package_dir}/payload/runtime/libfff.dylib" "$codesign_state"
+grep -Fq $'verify\t'"${package_dir}/payload/runtime/opencode/bin/opencode" "$codesign_state"
 grep -Fq $'verify\t'"${package_dir}/payload/node/bin/node" "$codesign_state"
 
 if PATH="${fake_bin}:${PATH}" APPLE_TEAM_ID="ABCDE12345" \
@@ -147,11 +150,11 @@ internal_sign_output="$(
   FENIX_CODE_INTERNAL_QA_ACK="MANUEL_INTERNAL_QA_ONLY" \
     "${repo_root}/scripts/fenix/sign-companion-payload-internal-qa.sh" "$package_dir"
 )"
-test "$internal_sign_output" = "internal_qa_signed_native_files=2"
+test "$internal_sign_output" = "internal_qa_signed_native_files=3"
 test "$(cat "${package_dir}/payload/INTERNAL-QA-METADATA")" = "$(cat <<'EOF'
 schema_version=1
 channel=internal-qa
-native_file_count=2
+native_file_count=3
 EOF
 )"
 

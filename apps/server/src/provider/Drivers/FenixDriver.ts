@@ -1,11 +1,13 @@
 import { FenixSettings, ProviderDriverKind, type ServerProvider } from "@t3tools/contracts";
 import * as Clock from "effect/Clock";
+import * as Crypto from "effect/Crypto";
 import * as Effect from "effect/Effect";
 import * as FileSystem from "effect/FileSystem";
 import * as Path from "effect/Path";
 import * as Schema from "effect/Schema";
 
 import * as BackgroundPolicy from "../../background/BackgroundPolicy.ts";
+import { ServerConfig } from "../../config.ts";
 import { ServerSettingsService } from "../../serverSettings.ts";
 import { makeFenixTextGeneration } from "../../textGeneration/FenixTextGeneration.ts";
 import { ProviderDriverError } from "../Errors.ts";
@@ -28,6 +30,7 @@ import {
   makeProviderSnapshotSettingsSource,
   type ProviderSnapshotSettings,
 } from "../providerUpdateSettings.ts";
+import { OpenCodeRuntime } from "../opencodeRuntime.ts";
 import * as FenixPairingSessionBridge from "../Services/FenixPairingSessionBridge.ts";
 
 const decodeFenixSettings = Schema.decodeSync(FenixSettings);
@@ -42,9 +45,12 @@ const UPDATE = makeStaticProviderMaintenanceResolver(
 
 export type FenixDriverEnv =
   | BackgroundPolicy.BackgroundPolicy
+  | Crypto.Crypto
   | FenixPairingSessionBridge.FenixPairingSessionBridge
   | FileSystem.FileSystem
+  | OpenCodeRuntime
   | Path.Path
+  | ServerConfig
   | ServerSettingsService;
 
 const withInstanceIdentity =
@@ -74,6 +80,8 @@ export const FenixDriver: ProviderDriver<FenixSettings, FenixDriverEnv> = {
   create: ({ instanceId, displayName, accentColor, enabled, config }) =>
     Effect.gen(function* () {
       const serverSettings = yield* ServerSettingsService;
+      const serverConfig = yield* ServerConfig;
+      const path = yield* Path.Path;
       const pairingSessionBridge = yield* FenixPairingSessionBridge.FenixPairingSessionBridge;
       const continuationIdentity = defaultProviderContinuationIdentity({
         driverKind: DRIVER_KIND,
@@ -93,6 +101,7 @@ export const FenixDriver: ProviderDriver<FenixSettings, FenixDriverEnv> = {
 
       const adapter = yield* makeFenixAdapter(effectiveConfig, {
         instanceId,
+        runtimeDirectory: path.join(serverConfig.baseDir, "runtime", "opencode-fenix"),
         pairingSession: () =>
           Effect.gen(function* () {
             const nowEpochMs = yield* Clock.currentTimeMillis;
@@ -101,7 +110,17 @@ export const FenixDriver: ProviderDriver<FenixSettings, FenixDriverEnv> = {
             });
             return FenixPairingSessionBridge.activePairingSessionFromSnapshot(snapshot, nowEpochMs);
           }),
-      });
+      }).pipe(
+        Effect.mapError(
+          (cause) =>
+            new ProviderDriverError({
+              driver: DRIVER_KIND,
+              instanceId,
+              detail: `Failed to start the isolated Fenix execution runtime: ${cause.message}`,
+              cause,
+            }),
+        ),
+      );
       const textGeneration = yield* makeFenixTextGeneration;
 
       const snapshotSettings = makeProviderSnapshotSettingsSource(effectiveConfig, serverSettings);

@@ -99,6 +99,8 @@ required_files=( \
   "${package_dir}/payload/runtime/node_modules/t3/dist/bin.mjs" \
   "${package_dir}/payload/runtime/node_modules/t3/dist/service-launcher.mjs" \
   "${package_dir}/payload/runtime/.fenix-portal-auth-required" \
+  "${package_dir}/payload/runtime/opencode/bin/opencode" \
+  "${package_dir}/payload/runtime/opencode/VERSION" \
   "${package_dir}/payload/node/bin/node" \
   "${package_dir}/bin/fenix-code" \
   "${package_dir}/PAYLOAD-SYMLINKS" \
@@ -277,6 +279,12 @@ if [[ "$staged_version" != "fenix-code v${version}" ]]; then
 fi
 if [[ "$(cat "${version_staging}/.fenix-portal-auth-required")" != "Fenix portal authorization required" ]]; then
   echo "El paquete no contiene el marcador obligatorio de autorización Fenix." >&2
+  exit 65
+fi
+opencode_version="$(tr -d '[:space:]' < "${version_staging}/opencode/VERSION")"
+if [[ ! "$opencode_version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] ||
+  [[ "$("${version_staging}/opencode/bin/opencode" --version)" != "$opencode_version" ]]; then
+  echo "El motor local OpenCode no supera la verificación de versión." >&2
   exit 65
 fi
 

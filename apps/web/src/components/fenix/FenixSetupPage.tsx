@@ -224,10 +224,11 @@ export function FenixSetupPage() {
         : buildFenixCompanionInstallCommand({
             artifactFileName: artifact.fileName,
             artifactSha256: artifact.sha256,
+            distributionChannel: manifest?.distributionChannel ?? "official",
             portalOrigin: window.location.origin,
             pairing,
           }),
-    [artifact, pairing],
+    [artifact, manifest?.distributionChannel, pairing],
   );
   const baseUrl = import.meta.env.BASE_URL.endsWith("/")
     ? import.meta.env.BASE_URL
