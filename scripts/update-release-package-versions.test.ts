@@ -1,5 +1,6 @@
 import * as NodeServices from "@effect/platform-node/NodeServices";
 import { assert, it } from "@effect/vitest";
+import * as NodeURL from "node:url";
 import * as Config from "effect/Config";
 import * as ConfigProvider from "effect/ConfigProvider";
 import * as Effect from "effect/Effect";
@@ -23,6 +24,7 @@ import {
 
 const ScriptTestLayer = Layer.mergeAll(NodeServices.layer, TestConsole.layer);
 const runCli = Command.runWith(updateReleasePackageVersionsCommand, { version: "0.0.0" });
+const repoRoot = NodeURL.fileURLToPath(new URL("..", import.meta.url));
 const PackageJsonSchema = Schema.Record(Schema.String, Schema.Unknown);
 const PackageJsonPrettyJson = fromJsonStringPretty(PackageJsonSchema);
 const decodePackageJson = Schema.decodeEffect(PackageJsonPrettyJson);
@@ -75,7 +77,7 @@ const captureLogs = <A, E, R>(effect: Effect.Effect<A, E, R>) =>
 it.layer(ScriptTestLayer)("update-release-package-versions", (it) => {
   it.effect("keeps checked-in release package versions aligned", () =>
     Effect.gen(function* () {
-      const versions = yield* readReleaseVersions(process.cwd());
+      const versions = yield* readReleaseVersions(repoRoot);
 
       assert.equal(new Set(versions.values()).size, 1);
     }),
