@@ -13,6 +13,26 @@ import * as FenixPairingSessionBridge from "./FenixPairingSessionBridge.ts";
 const DEVICE_ID = "device-fenix-0001";
 const DEVICE_CREDENTIAL = "device-credential-0000000000000001";
 const FUTURE_EXPIRES_AT = "2100-01-01T00:00:00.000Z";
+const MODELS_ENDPOINT = "https://iaonline.io/api/v1/ChatModels/FenixCode";
+
+const modelCatalog = (overrides: Record<string, unknown> = {}) => ({
+  canSelectModels: true,
+  providers: [
+    {
+      providerSlug: "openai",
+      displayName: "OpenAI",
+      models: ["gpt-5.2-codex", "gpt-5.2-codex"],
+      isDefault: true,
+    },
+    {
+      providerSlug: "anthropic",
+      displayName: "Anthropic",
+      models: ["claude-sonnet-4-6"],
+      isDefault: false,
+    },
+  ],
+  ...overrides,
+});
 
 const envelope = (overrides: Record<string, unknown> = {}) => ({
   kind: "bearer",
@@ -35,16 +55,28 @@ const envelope = (overrides: Record<string, unknown> = {}) => ({
 
 const resolveSnapshot = (
   overrides: Partial<FenixPairingSessionBridge.FenixCompanionBridgeHttpConfig> = {},
+  modelsResponse: () => Promise<Response> = async () => Response.json(modelCatalog()),
 ) => {
-  const requests: Array<{ readonly url: string; readonly body: unknown }> = [];
+  const requests: Array<{
+    readonly url: string;
+    readonly method: string | undefined;
+    readonly body: unknown;
+    readonly authorization: string | undefined;
+    readonly redirect: NonNullable<Parameters<typeof fetch>[1]>["redirect"];
+  }> = [];
   const fetchMock = (async (
     url: Parameters<typeof fetch>[0],
     init?: Parameters<typeof fetch>[1],
   ) => {
+    const headers = new Headers(init?.headers);
     requests.push({
       url: String(url),
+      method: init?.method,
       body: JSON.parse(String(init?.body ?? "{}")) as unknown,
+      authorization: headers.get("authorization") ?? undefined,
+      redirect: init?.redirect,
     });
+    if (String(url) === MODELS_ENDPOINT) return modelsResponse();
     return Response.json(envelope());
   }) as unknown as typeof fetch;
 
@@ -65,7 +97,7 @@ describe("FenixPairingSessionBridge", () => {
     vi.unstubAllGlobals();
   });
 
-  it.effect("issues an active bearer snapshot from the local companion endpoint", () =>
+  it.effect("loads and sanitizes the model catalog with the short bearer", () =>
     Effect.gen(function* () {
       const { effect, requests } = resolveSnapshot();
 
@@ -75,14 +107,35 @@ describe("FenixPairingSessionBridge", () => {
         session: { kind: "bearer", token: "fenix.access-token_1" },
         expiresAtEpochMs: Date.parse(FUTURE_EXPIRES_AT),
         tenantScope: { companyId: 5, userId: 10 },
+        modelCatalog: {
+          canSelectModels: true,
+          providers: [
+            {
+              providerSlug: "openai",
+              displayName: "OpenAI",
+              models: ["gpt-5.2-codex"],
+              isDefault: true,
+            },
+          ],
+        },
       });
       expect(requests).toEqual([
         {
           url: `http://127.0.0.1:5100/api/v1/code-lab/companion/devices/${DEVICE_ID}/fenix-credential`,
+          method: "POST",
           body: {
             deviceCredential: DEVICE_CREDENTIAL,
             audience: "https://iaonline.io",
           },
+          authorization: undefined,
+          redirect: "manual",
+        },
+        {
+          url: MODELS_ENDPOINT,
+          method: "GET",
+          body: {},
+          authorization: "Bearer fenix.access-token_1",
+          redirect: "manual",
         },
       ]);
     }),
@@ -132,6 +185,15 @@ describe("FenixPairingSessionBridge", () => {
     }),
   );
 
+  it.effect("rejects a non-iaonline audience before fetch", () =>
+    Effect.gen(function* () {
+      const { effect, requests } = resolveSnapshot({ audience: "https://evil.example" });
+
+      expect(yield* effect).toBeNull();
+      expect(requests).toEqual([]);
+    }),
+  );
+
   it.effect("uses an exact trusted portal origin for a paired production companion", () =>
     Effect.gen(function* () {
       const requests: string[] = [];
@@ -161,7 +223,98 @@ describe("FenixPairingSessionBridge", () => {
       expect(foreign).toBeNull();
       expect(requests).toEqual([
         `https://iaonline.io/api/v1/code-lab/companion/devices/${DEVICE_ID}/fenix-credential`,
+        MODELS_ENDPOINT,
       ]);
+    }),
+  );
+
+  it.effect("uses only the fallback when model selection is disabled", () =>
+    Effect.gen(function* () {
+      const { effect } = resolveSnapshot({}, async () =>
+        Response.json(modelCatalog({ canSelectModels: false })),
+      );
+
+      const snapshot = yield* effect;
+
+      expect(snapshot?.modelCatalog).toEqual({
+        canSelectModels: false,
+        providers: [
+          {
+            providerSlug: "groq",
+            displayName: "Groq",
+            models: ["openai/gpt-oss-120b"],
+            isDefault: true,
+          },
+        ],
+      });
+    }),
+  );
+
+  it.effect("keeps pairing active with one fallback for model endpoint failures", () =>
+    Effect.gen(function* () {
+      const cases: ReadonlyArray<{
+        readonly name: string;
+        readonly response: () => Promise<Response>;
+      }> = [
+        {
+          name: "401",
+          response: async () => Response.json({ error: "unauthorized" }, { status: 401 }),
+        },
+        {
+          name: "http failure",
+          response: async () => Response.json({ error: "failure" }, { status: 500 }),
+        },
+        {
+          name: "wrong content type",
+          response: async () =>
+            new Response(JSON.stringify(modelCatalog()), {
+              headers: { "content-type": "text/plain" },
+            }),
+        },
+        {
+          name: "malformed json",
+          response: async () =>
+            new Response("{", {
+              headers: { "content-type": "application/json" },
+            }),
+        },
+        {
+          name: "invalid payload",
+          response: async () => Response.json({ CanSelectModels: true, Providers: [] }),
+        },
+        {
+          name: "external redirect",
+          response: async () =>
+            new Response(null, {
+              status: 302,
+              headers: { location: "https://evil.example/models" },
+            }),
+        },
+        {
+          name: "network failure",
+          response: async () => Promise.reject(new Error("offline")),
+        },
+      ];
+
+      for (const testCase of cases) {
+        const { effect } = resolveSnapshot({}, testCase.response);
+        const snapshot = yield* effect;
+        expect(snapshot?.session, testCase.name).toEqual({
+          kind: "bearer",
+          token: "fenix.access-token_1",
+        });
+        expect(snapshot?.modelCatalog, testCase.name).toEqual({
+          canSelectModels: false,
+          providers: [
+            {
+              providerSlug: "groq",
+              displayName: "Groq",
+              models: ["openai/gpt-oss-120b"],
+              isDefault: true,
+            },
+          ],
+        });
+      }
     }),
   );
 
@@ -194,6 +347,13 @@ describe("FenixPairingSessionBridge", () => {
         {
           name: "rate limited",
           response: Response.json({ error: "rate_limited" }, { status: 429 }),
+        },
+        {
+          name: "external credential redirect",
+          response: new Response(null, {
+            status: 302,
+            headers: { location: "https://evil.example/credential" },
+          }),
         },
       ];
 

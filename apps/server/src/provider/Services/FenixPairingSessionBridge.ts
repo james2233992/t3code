@@ -18,12 +18,18 @@ import {
   type FenixCodeTenantScope,
 } from "../../fenix/FenixCodeTenantScope.ts";
 import * as ServerConfig from "../../config.ts";
-import type { FenixPairingSession } from "../Layers/FenixAdapter.ts";
+import {
+  fallbackFenixCodeModelCatalog,
+  normalizeFenixCodeModelCatalog,
+  type FenixCodeModelCatalog,
+  type FenixPairingSession,
+} from "../Layers/FenixAdapter.ts";
 
 export interface FenixPairingSessionSnapshot {
   readonly session: FenixPairingSession;
   readonly expiresAtEpochMs: number;
   readonly tenantScope: FenixCodeTenantScope;
+  readonly modelCatalog: FenixCodeModelCatalog;
 }
 
 export interface FenixPairingSessionBridgeInput {
@@ -51,6 +57,7 @@ export class FenixPairingSessionBridge extends Context.Service<
 
 const MINIMUM_PAIRING_TTL_MS = 5_000;
 const FENIX_AUDIENCE = "https://iaonline.io";
+const FENIX_CODE_MODELS_ENDPOINT = `${FENIX_AUDIENCE}/api/v1/ChatModels/FenixCode`;
 const FENIX_CHAT_MODELS_SCOPE = "fenix.chatmodels.generic";
 const LOOPBACK_HOSTS = new Set(["localhost", "127.0.0.1", "::1"]);
 const DEVICE_ID_PATTERN = /^[A-Za-z0-9._:-]{16,64}$/;
@@ -92,8 +99,9 @@ export function unsafePairingSessionSnapshotForTest(
   session: FenixPairingSession,
   expiresAtEpochMs = Number.MAX_SAFE_INTEGER,
   tenantScope: FenixCodeTenantScope = { companyId: 1, userId: 1 },
+  modelCatalog: FenixCodeModelCatalog = fallbackFenixCodeModelCatalog(),
 ): FenixPairingSessionSnapshot {
-  return { session, expiresAtEpochMs, tenantScope };
+  return { session, expiresAtEpochMs, tenantScope, modelCatalog };
 }
 
 export const unpairedLayer = Layer.succeed(
@@ -230,7 +238,7 @@ function snapshotFromCompanionEnvelope(
     kind !== "bearer" ||
     accessToken === null ||
     !isCleanSingleLineSecret(accessToken) ||
-    audience !== (config.audience ?? FENIX_AUDIENCE) ||
+    audience !== FENIX_AUDIENCE ||
     expiresAtEpochMs === null ||
     !Array.isArray(scopes) ||
     !scopes.includes(FENIX_CHAT_MODELS_SCOPE) ||
@@ -264,8 +272,52 @@ function snapshotFromCompanionEnvelope(
       companyId: ownerRecord.companyId,
       userId: ownerRecord.userId,
     },
+    modelCatalog: fallbackFenixCodeModelCatalog(),
   };
   return activePairingEnvelopeFromSnapshot(snapshot, nowEpochMs);
+}
+
+function hasJsonContentType(response: Response): boolean {
+  return (
+    (response.headers.get("content-type") ?? "").split(";", 1)[0]?.trim().toLowerCase() ===
+    "application/json"
+  );
+}
+
+function resolveFenixCodeModelCatalog(
+  token: string,
+  fetchImpl: typeof fetch,
+): Effect.Effect<FenixCodeModelCatalog> {
+  return Effect.gen(function* () {
+    const response = yield* Effect.tryPromise({
+      try: () =>
+        fetchImpl(FENIX_CODE_MODELS_ENDPOINT, {
+          method: "GET",
+          headers: {
+            accept: "application/json",
+            authorization: `Bearer ${token}`,
+          },
+          redirect: "manual",
+        }),
+      catch: () => new FenixCompanionBridgeRequestError(),
+    }).pipe(Effect.orElseSucceed(() => null));
+
+    if (
+      !response?.ok ||
+      response.redirected ||
+      response.type === "opaqueredirect" ||
+      (response.url.length > 0 && response.url !== FENIX_CODE_MODELS_ENDPOINT) ||
+      !hasJsonContentType(response)
+    ) {
+      return fallbackFenixCodeModelCatalog();
+    }
+
+    const payload = yield* Effect.tryPromise({
+      try: () => response.json() as Promise<unknown>,
+      catch: () => new FenixCompanionBridgeRequestError(),
+    }).pipe(Effect.orElseSucceed(() => null));
+    return normalizeFenixCodeModelCatalog(payload);
+  });
 }
 
 function resolvePairingSessionSnapshot(
@@ -275,7 +327,8 @@ function resolvePairingSessionSnapshot(
   return Effect.gen(function* () {
     const deviceCredential = yield* readDeviceCredential(config);
     if (!requestUrl || !deviceCredential) return null;
-    const audience = config.audience ?? FENIX_AUDIENCE;
+    if (config.audience !== undefined && config.audience !== FENIX_AUDIENCE) return null;
+    const audience = FENIX_AUDIENCE;
     const body = yield* encodeCredentialRequestJson({ deviceCredential, audience }).pipe(
       Effect.orElseSucceed(() => null),
     );
@@ -291,18 +344,31 @@ function resolvePairingSessionSnapshot(
             "content-type": "application/json",
           },
           body,
+          redirect: "manual",
         }),
       catch: () => new FenixCompanionBridgeRequestError(),
     }).pipe(Effect.orElseSucceed(() => null));
-    if (!response?.ok) return null;
-    const contentType = response.headers.get("content-type") ?? "";
-    if (!contentType.includes("application/json")) return null;
+    if (
+      !response?.ok ||
+      response.redirected ||
+      response.type === "opaqueredirect" ||
+      (response.url.length > 0 && response.url !== requestUrl)
+    ) {
+      return null;
+    }
+    if (!hasJsonContentType(response)) return null;
 
     const payload = yield* Effect.tryPromise({
       try: () => response.json() as Promise<unknown>,
       catch: () => new FenixCompanionBridgeRequestError(),
     }).pipe(Effect.orElseSucceed(() => null));
-    return snapshotFromCompanionEnvelope(payload, config, nowEpochMs);
+    const snapshot = snapshotFromCompanionEnvelope(payload, config, nowEpochMs);
+    if (!snapshot || snapshot.session.kind !== "bearer") return snapshot;
+    const modelCatalog = yield* resolveFenixCodeModelCatalog(
+      snapshot.session.token,
+      config.fetch ?? fetch,
+    );
+    return { ...snapshot, modelCatalog };
   }).pipe(Effect.provide(NodeServices.layer));
 }
 

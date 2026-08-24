@@ -123,6 +123,7 @@ import { writeFenixCompanionConfig } from "./fenix/CompanionConfig.ts";
 import { SqlitePersistenceMemory } from "./persistence/Layers/Sqlite.ts";
 import { PersistenceSqlError } from "./persistence/Errors.ts";
 import * as ProviderRegistry from "./provider/Services/ProviderRegistry.ts";
+import * as FenixPairingSessionBridge from "./provider/Services/FenixPairingSessionBridge.ts";
 import { makeManualOnlyProviderMaintenanceCapabilities } from "./provider/providerMaintenance.ts";
 import * as ServerLifecycleEvents from "./serverLifecycleEvents.ts";
 import * as ServerRuntimeStartup from "./serverRuntimeStartup.ts";
@@ -419,6 +420,9 @@ const buildAppUnderTest = (options?: {
   layers?: {
     keybindings?: Partial<Keybindings.Keybindings["Service"]>;
     providerRegistry?: Partial<ProviderRegistry.ProviderRegistry["Service"]>;
+    fenixPairingSessionBridge?: Partial<
+      FenixPairingSessionBridge.FenixPairingSessionBridge["Service"]
+    >;
     serverSettings?: Partial<ServerSettings.ServerSettingsService["Service"]>;
     externalLauncher?: Partial<ExternalLauncher.ExternalLauncher["Service"]>;
     vcsDriver?: Partial<VcsDriver.VcsDriver["Service"]>;
@@ -680,6 +684,21 @@ const buildAppUnderTest = (options?: {
           setProviderMaintenanceActionState: () => Effect.succeed([]),
           streamChanges: Stream.empty,
           ...options?.layers?.providerRegistry,
+        }),
+      ),
+      Layer.provide(
+        Layer.mock(FenixPairingSessionBridge.FenixPairingSessionBridge)({
+          resolvePairingSessionSnapshot: () =>
+            Effect.succeed(
+              options?.fenixCodeTenantScope
+                ? FenixPairingSessionBridge.unsafePairingSessionSnapshotForTest(
+                    { kind: "bearer", token: "fenix-test-pairing-token" },
+                    Number.MAX_SAFE_INTEGER,
+                    options.fenixCodeTenantScope,
+                  )
+                : null,
+            ),
+          ...options?.layers?.fenixPairingSessionBridge,
         }),
       ),
       Layer.provide(
@@ -6852,6 +6871,173 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
         "thread.meta.update",
       ]);
     }).pipe(Effect.provide(NodeHttpServer.layerTest)),
+  );
+
+  it.effect(
+    "rejects a scoped Fenix thread model before dispatch when pairing did not entitle it",
+    () =>
+      Effect.gen(function* () {
+        const now = "2026-08-12T00:00:00.000Z";
+        const fenixCodeTenantScope = { companyId: 1, userId: 100 } satisfies FenixCodeTenantScope;
+        const scopedProjectId = ProjectId.make("project-fenix-model-denied");
+        let dispatchCalls = 0;
+
+        yield* buildAppUnderTest({
+          fenixCodeTenantScope,
+          layers: {
+            fenixScopedProjectionSnapshotQuery: {
+              projectBelongsToScope: (_scope, projectId) =>
+                Effect.succeed(projectId === scopedProjectId),
+            },
+            orchestrationEngine: {
+              dispatch: () =>
+                Effect.sync(() => {
+                  dispatchCalls += 1;
+                  return { sequence: dispatchCalls };
+                }),
+            },
+          },
+        });
+
+        const wsUrl = yield* getWsServerUrl("/ws");
+        const result = yield* Effect.scoped(
+          withWsRpcClient(wsUrl, (client) =>
+            client[ORCHESTRATION_WS_METHODS.dispatchCommand]({
+              type: "thread.create",
+              commandId: CommandId.make("cmd-fenix-thread-model-denied"),
+              threadId: ThreadId.make("thread-fenix-model-denied"),
+              projectId: scopedProjectId,
+              title: "Denied model",
+              modelSelection: {
+                instanceId: ProviderInstanceId.make("fenix"),
+                model: "openai/no-autorizado",
+              },
+              runtimeMode: "approval-required",
+              interactionMode: "default",
+              branch: null,
+              worktreePath: null,
+              createdAt: now,
+            }),
+          ).pipe(Effect.result),
+        );
+        const mismatchedBootstrapResult = yield* Effect.scoped(
+          withWsRpcClient(wsUrl, (client) =>
+            client[ORCHESTRATION_WS_METHODS.dispatchCommand]({
+              type: "thread.turn.start",
+              commandId: CommandId.make("cmd-fenix-bootstrap-model-mismatch"),
+              threadId: ThreadId.make("thread-fenix-bootstrap-model-mismatch"),
+              message: {
+                messageId: MessageId.make("msg-fenix-bootstrap-model-mismatch"),
+                role: "user",
+                text: "Use a mismatched model",
+                attachments: [],
+              },
+              modelSelection: {
+                instanceId: ProviderInstanceId.make("fenix"),
+                model: "openai/no-autorizado",
+              },
+              runtimeMode: "approval-required",
+              interactionMode: "default",
+              bootstrap: {
+                createThread: {
+                  projectId: scopedProjectId,
+                  title: "Bootstrap mismatch",
+                  modelSelection: {
+                    instanceId: ProviderInstanceId.make("fenix"),
+                    model: "groq/openai/gpt-oss-120b",
+                  },
+                  runtimeMode: "approval-required",
+                  interactionMode: "default",
+                  branch: null,
+                  worktreePath: null,
+                  createdAt: now,
+                },
+              },
+              createdAt: now,
+            }),
+          ).pipe(Effect.result),
+        );
+
+        assertTrue(result._tag === "Failure");
+        if (result._tag === "Failure") {
+          assert.equal(result.failure._tag, "OrchestrationDispatchCommandError");
+          assertInclude(
+            result.failure.message,
+            "Fenix scoped sessions cannot execute this command",
+          );
+        }
+        assertTrue(mismatchedBootstrapResult._tag === "Failure");
+        assert.equal(dispatchCalls, 0);
+      }).pipe(Effect.provide(NodeHttpServer.layerTest)),
+  );
+
+  it.effect(
+    "revalidates the persisted Fenix model before dispatching a turn without selection",
+    () =>
+      Effect.gen(function* () {
+        const now = "2026-08-12T00:00:00.000Z";
+        const fenixCodeTenantScope = { companyId: 1, userId: 100 } satisfies FenixCodeTenantScope;
+        const scopedProjectId = ProjectId.make("project-fenix-stale-model");
+        const scopedThreadId = ThreadId.make("thread-fenix-stale-model");
+        let dispatchCalls = 0;
+
+        yield* buildAppUnderTest({
+          fenixCodeTenantScope,
+          layers: {
+            fenixScopedProjectionSnapshotQuery: {
+              getThreadShellById: (_scope, threadId) =>
+                Effect.succeed(
+                  threadId === scopedThreadId
+                    ? Option.some(
+                        makeDefaultOrchestrationThreadShell({
+                          id: scopedThreadId,
+                          projectId: scopedProjectId,
+                          modelSelection: {
+                            instanceId: ProviderInstanceId.make("fenix"),
+                            model: "openai/gpt-5.2-codex",
+                          },
+                          runtimeMode: "approval-required",
+                        }),
+                      )
+                    : Option.none(),
+                ),
+            },
+            orchestrationEngine: {
+              dispatch: () =>
+                Effect.sync(() => {
+                  dispatchCalls += 1;
+                  return { sequence: dispatchCalls };
+                }),
+            },
+          },
+        });
+
+        const wsUrl = yield* getWsServerUrl("/ws");
+        const result = yield* Effect.scoped(
+          withWsRpcClient(wsUrl, (client) =>
+            client[ORCHESTRATION_WS_METHODS.dispatchCommand]({
+              type: "thread.turn.start",
+              commandId: CommandId.make("cmd-fenix-turn-stale-model"),
+              threadId: scopedThreadId,
+              message: {
+                messageId: MessageId.make("msg-fenix-turn-stale-model"),
+                role: "user",
+                text: "Use the stale model",
+                attachments: [],
+              },
+              runtimeMode: "approval-required",
+              interactionMode: "default",
+              createdAt: now,
+            }),
+          ).pipe(Effect.result),
+        );
+
+        assertTrue(result._tag === "Failure");
+        if (result._tag === "Failure") {
+          assert.equal(result.failure._tag, "OrchestrationDispatchCommandError");
+        }
+        assert.equal(dispatchCalls, 0);
+      }).pipe(Effect.provide(NodeHttpServer.layerTest)),
   );
 
   it.effect("scopes websocket workspace rpc methods to Fenix tenant project roots", () =>

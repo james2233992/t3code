@@ -1,14 +1,23 @@
 import { describe, expect, it } from "@effect/vitest";
 import { FenixSettings, ProviderDriverKind } from "@t3tools/contracts";
+import * as Effect from "effect/Effect";
 import * as Schema from "effect/Schema";
 
+import { buildInitialFenixProviderSnapshot } from "../Layers/FenixProvider.ts";
 import * as FenixPairingSessionBridge from "../Services/FenixPairingSessionBridge.ts";
-import { FenixDriver, resolveFenixDriverEnabled } from "./FenixDriver.ts";
+import {
+  applyFenixModelCatalogToSnapshot,
+  FenixDriver,
+  resolveFenixDriverEnabled,
+} from "./FenixDriver.ts";
+
+const decodeFenixSettings = Schema.decodeSync(FenixSettings);
+const decodeFenixSettingsEffect = Schema.decodeEffect(FenixSettings);
 
 describe("FenixDriver", () => {
   it("is a dedicated provider driver with fail-closed defaults", () => {
     const defaults = FenixDriver.defaultConfig();
-    const decoded = Schema.decodeSync(FenixSettings)(defaults);
+    const decoded = decodeFenixSettings(defaults);
 
     expect(FenixDriver.driverKind).toBe(ProviderDriverKind.make("fenix"));
     expect(FenixDriver.metadata).toEqual({
@@ -47,4 +56,33 @@ describe("FenixDriver", () => {
       ),
     ).toBeNull();
   });
+
+  it.effect("projects only the pairing catalog into the provider snapshot", () =>
+    Effect.gen(function* () {
+      const fenixSettings = yield* decodeFenixSettingsEffect({
+        enabled: true,
+        featuredModel: "xai/grok-4.5",
+        customModels: ["anthropic/claude-sonnet-4-6"],
+      });
+      const base = yield* buildInitialFenixProviderSnapshot(fenixSettings);
+      const snapshot = applyFenixModelCatalogToSnapshot(base, {
+        canSelectModels: true,
+        providers: [
+          {
+            providerSlug: "openai",
+            displayName: "OpenAI",
+            models: ["gpt-5.2-codex"],
+            isDefault: true,
+          },
+        ],
+      });
+
+      expect(snapshot.models.map((model) => model.slug)).toEqual(["openai/gpt-5.2-codex"]);
+      expect(snapshot.models.find((model) => model.isDefault)?.slug).toBe("openai/gpt-5.2-codex");
+      expect("session" in snapshot).toBe(false);
+      expect("token" in snapshot).toBe(false);
+      expect(snapshot.models.some((model) => model.slug.includes("claude"))).toBe(false);
+      expect(snapshot.models.some((model) => model.slug.includes("grok-4.5"))).toBe(false);
+    }),
+  );
 });

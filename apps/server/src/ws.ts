@@ -1,4 +1,5 @@
 import * as Cause from "effect/Cause";
+import * as Clock from "effect/Clock";
 import * as Crypto from "effect/Crypto";
 import * as DateTime from "effect/DateTime";
 import * as Duration from "effect/Duration";
@@ -34,6 +35,7 @@ import {
   OrchestrationGetTurnDiffError,
   ORCHESTRATION_WS_METHODS,
   type ProjectId,
+  type ProviderInstanceId,
   type ProjectEntriesFailure,
   type ProjectFileFailure,
   type ProjectFileOperation,
@@ -83,7 +85,8 @@ import {
   observeRpcStreamEffect as instrumentRpcStreamEffect,
 } from "./observability/RpcInstrumentation.ts";
 import * as ProviderRegistry from "./provider/Services/ProviderRegistry.ts";
-import { FENIX_FEATURED_CODING_MODEL } from "./provider/Layers/FenixProvider.ts";
+import { isCanonicalFenixModel, listFenixCatalogModels } from "./provider/Layers/FenixAdapter.ts";
+import * as FenixPairingSessionBridge from "./provider/Services/FenixPairingSessionBridge.ts";
 import * as ProviderMaintenanceRunner from "./provider/providerMaintenanceRunner.ts";
 import * as ServerSelfUpdate from "./cloud/selfUpdate.ts";
 import * as ServerLifecycleEvents from "./serverLifecycleEvents.ts";
@@ -445,6 +448,7 @@ const makeWsRpcLayer = (
       const previewManager = yield* PreviewManager.PreviewManager;
       const portDiscovery = yield* PortScanner.PortDiscovery;
       const providerRegistry = yield* ProviderRegistry.ProviderRegistry;
+      const fenixPairingSessionBridge = yield* FenixPairingSessionBridge.FenixPairingSessionBridge;
       const providerMaintenanceRunner = yield* ProviderMaintenanceRunner.ProviderMaintenanceRunner;
       const serverSelfUpdate = yield* ServerSelfUpdate.ServerSelfUpdate;
       const config = yield* ServerConfig.ServerConfig;
@@ -596,9 +600,46 @@ const makeWsRpcLayer = (
         });
 
       const isFenixModelSelection = (selection: {
-        readonly instanceId: string;
+        readonly instanceId: ProviderInstanceId;
         readonly model: string;
-      }) => selection.instanceId === "fenix" && selection.model === FENIX_FEATURED_CODING_MODEL;
+      }) => selection.instanceId === "fenix" && isCanonicalFenixModel(selection.model);
+
+      const requireCurrentScopedFenixModel = (selection: {
+        readonly instanceId: ProviderInstanceId;
+        readonly model: string;
+      }): Effect.Effect<void, OrchestrationDispatchCommandError> =>
+        Effect.gen(function* () {
+          if (currentFenixCodeTenantScope === undefined || !isFenixModelSelection(selection)) {
+            return yield* Effect.fail(scopedCommandDenied("fenix_model_boundary"));
+          }
+          const nowEpochMs = yield* Clock.currentTimeMillis;
+          const snapshot = yield* fenixPairingSessionBridge.resolvePairingSessionSnapshot({
+            instanceId: selection.instanceId,
+          });
+          const active = FenixPairingSessionBridge.activePairingEnvelopeFromSnapshot(
+            snapshot,
+            nowEpochMs,
+          );
+          if (
+            !active ||
+            active.tenantScope.companyId !== currentFenixCodeTenantScope.companyId ||
+            active.tenantScope.userId !== currentFenixCodeTenantScope.userId
+          ) {
+            return yield* Effect.fail(scopedCommandDenied("fenix_pairing_not_active"));
+          }
+          const allowedModels = new Set(
+            listFenixCatalogModels(active.modelCatalog).map((model) => model.canonical),
+          );
+          if (!allowedModels.has(selection.model)) {
+            return yield* Effect.fail(scopedCommandDenied("fenix_model_not_entitled"));
+          }
+        }).pipe(
+          Effect.mapError((cause) =>
+            isOrchestrationDispatchCommandError(cause)
+              ? cause
+              : scopedCommandDenied("fenix_model_scope_unavailable"),
+          ),
+        );
 
       const requireScopedProject = (projectId: ProjectId) =>
         scopedProjectionSnapshotQuery.projectBelongsToScope(projectId).pipe(
@@ -630,6 +671,24 @@ const makeWsRpcLayer = (
           ),
         );
 
+      const requireCurrentScopedFenixThreadModel = (threadId: ThreadId) =>
+        scopedProjectionSnapshotQuery.getThreadShellById(threadId).pipe(
+          Effect.flatMap(
+            Option.match({
+              onNone: () => Effect.fail(scopedCommandDenied("thread_not_in_scope")),
+              onSome: (thread) =>
+                isFenixModelSelection(thread.modelSelection)
+                  ? requireCurrentScopedFenixModel(thread.modelSelection)
+                  : Effect.fail(scopedCommandDenied("thread_provider_not_fenix")),
+            }),
+          ),
+          Effect.mapError((cause) =>
+            isOrchestrationDispatchCommandError(cause)
+              ? cause
+              : scopedCommandDenied("thread_model_scope_unavailable"),
+          ),
+        );
+
       const requireScopedDispatchAccess = (
         normalizedCommand: OrchestrationCommand,
       ): Effect.Effect<void, OrchestrationDispatchCommandError> => {
@@ -652,7 +711,9 @@ const makeWsRpcLayer = (
             return normalizedCommand.branch === null &&
               normalizedCommand.worktreePath === null &&
               isFenixModelSelection(normalizedCommand.modelSelection)
-              ? requireScopedProject(normalizedCommand.projectId)
+              ? requireScopedProject(normalizedCommand.projectId).pipe(
+                  Effect.andThen(requireCurrentScopedFenixModel(normalizedCommand.modelSelection)),
+                )
               : Effect.fail(scopedCommandDenied("thread_create_boundary"));
           case "thread.meta.update":
             return normalizedCommand.modelSelection === undefined &&
@@ -673,12 +734,24 @@ const makeWsRpcLayer = (
             }
             const createThread = normalizedCommand.bootstrap?.createThread;
             if (createThread === undefined) {
-              return requireScopedFenixThread(normalizedCommand.threadId);
+              return requireScopedFenixThread(normalizedCommand.threadId).pipe(
+                Effect.andThen(
+                  normalizedCommand.modelSelection
+                    ? requireCurrentScopedFenixModel(normalizedCommand.modelSelection)
+                    : requireCurrentScopedFenixThreadModel(normalizedCommand.threadId),
+                ),
+              );
             }
             return createThread.branch === null &&
               createThread.worktreePath === null &&
-              isFenixModelSelection(createThread.modelSelection)
-              ? requireScopedProject(createThread.projectId)
+              isFenixModelSelection(createThread.modelSelection) &&
+              (normalizedCommand.modelSelection === undefined ||
+                (normalizedCommand.modelSelection.instanceId ===
+                  createThread.modelSelection.instanceId &&
+                  normalizedCommand.modelSelection.model === createThread.modelSelection.model))
+              ? requireScopedProject(createThread.projectId).pipe(
+                  Effect.andThen(requireCurrentScopedFenixModel(createThread.modelSelection)),
+                )
               : Effect.fail(scopedCommandDenied("turn_bootstrap_boundary"));
           }
           case "thread.runtime-mode.set":

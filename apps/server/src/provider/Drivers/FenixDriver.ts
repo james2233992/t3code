@@ -12,7 +12,15 @@ import { ServerSettingsService } from "../../serverSettings.ts";
 import { makeFenixTextGeneration } from "../../textGeneration/FenixTextGeneration.ts";
 import { ProviderDriverError } from "../Errors.ts";
 import { makeFenixAdapter } from "../Layers/FenixAdapter.ts";
-import { buildInitialFenixProviderSnapshot } from "../Layers/FenixProvider.ts";
+import {
+  buildInitialFenixProviderSnapshot,
+  FENIX_BUILT_IN_MODELS,
+} from "../Layers/FenixProvider.ts";
+import {
+  fallbackFenixCodeModelCatalog,
+  listFenixCatalogModels,
+  type FenixCodeModelCatalog,
+} from "../Layers/FenixAdapter.ts";
 import { makeManagedServerProvider } from "../makeManagedServerProvider.ts";
 import {
   defaultProviderContinuationIdentity,
@@ -42,6 +50,23 @@ const UPDATE = makeStaticProviderMaintenanceResolver(
     packageName: null,
   }),
 );
+
+export function applyFenixModelCatalogToSnapshot(
+  snapshot: ServerProviderDraft,
+  catalog: FenixCodeModelCatalog,
+): ServerProviderDraft {
+  const capabilities = FENIX_BUILT_IN_MODELS[0]!.capabilities;
+  return {
+    ...snapshot,
+    models: listFenixCatalogModels(catalog).map((model) => ({
+      slug: model.canonical,
+      name: model.displayName,
+      isCustom: false,
+      isDefault: model.isDefault,
+      capabilities,
+    })),
+  };
+}
 
 export function resolveFenixDriverEnabled(
   configuredEnabled: boolean,
@@ -107,17 +132,35 @@ export const FenixDriver: ProviderDriver<FenixSettings, FenixDriverEnv> = {
         env: process.env,
       });
 
+      const resolveActivePairingSnapshot = () =>
+        Effect.gen(function* () {
+          const nowEpochMs = yield* Clock.currentTimeMillis;
+          const snapshot = yield* pairingSessionBridge.resolvePairingSessionSnapshot({
+            instanceId,
+          });
+          return FenixPairingSessionBridge.activePairingEnvelopeFromSnapshot(snapshot, nowEpochMs);
+        });
+      const buildProviderSnapshot = (settings: FenixSettings) =>
+        Effect.gen(function* () {
+          const [baseSnapshot, pairingSnapshot] = yield* Effect.all([
+            buildInitialFenixProviderSnapshot(settings),
+            resolveActivePairingSnapshot(),
+          ]);
+          return applyFenixModelCatalogToSnapshot(
+            baseSnapshot,
+            pairingSnapshot?.modelCatalog ?? fallbackFenixCodeModelCatalog(),
+          );
+        });
+
       const adapter = yield* makeFenixAdapter(effectiveConfig, {
         instanceId,
         runtimeDirectory: path.join(serverConfig.baseDir, "runtime", "opencode-fenix"),
-        pairingSession: () =>
-          Effect.gen(function* () {
-            const nowEpochMs = yield* Clock.currentTimeMillis;
-            const snapshot = yield* pairingSessionBridge.resolvePairingSessionSnapshot({
-              instanceId,
-            });
-            return FenixPairingSessionBridge.activePairingSessionFromSnapshot(snapshot, nowEpochMs);
-          }),
+        pairingEntitlement: () =>
+          resolveActivePairingSnapshot().pipe(
+            Effect.map((snapshot) =>
+              snapshot ? { session: snapshot.session, modelCatalog: snapshot.modelCatalog } : null,
+            ),
+          ),
       }).pipe(
         Effect.mapError(
           (cause) =>
@@ -138,10 +181,8 @@ export const FenixDriver: ProviderDriver<FenixSettings, FenixDriverEnv> = {
         streamSettings: snapshotSettings.streamSettings,
         haveSettingsChanged: haveProviderSnapshotSettingsChanged,
         initialSnapshot: (settings) =>
-          buildInitialFenixProviderSnapshot(settings.provider).pipe(Effect.map(stampIdentity)),
-        checkProvider: buildInitialFenixProviderSnapshot(effectiveConfig).pipe(
-          Effect.map(stampIdentity),
-        ),
+          buildProviderSnapshot(settings.provider).pipe(Effect.map(stampIdentity)),
+        checkProvider: buildProviderSnapshot(effectiveConfig).pipe(Effect.map(stampIdentity)),
       }).pipe(
         Effect.mapError(
           (cause) =>
