@@ -248,7 +248,11 @@ const runNativeStaticChecks = Effect.fn("runNativeStaticChecks")(function* () {
 
   if (swiftSources.length > 0) {
     if (availableTools.get("swiftlint")) {
-      yield* runCommand("swiftlint", ["lint", "--config", ".swiftlint.yml", "--strict"], root);
+      yield* runCommand(
+        "swiftlint",
+        ["lint", "--config", ".swiftlint.yml", "--strict", "--no-cache"],
+        root,
+      );
     } else {
       yield* warnMissingTool(tools[0], "SwiftLint");
     }

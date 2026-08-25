@@ -184,6 +184,29 @@ jobs:
             brew bundle install --file apps/mobile/Brewfile
           fi
 
+      - name: Configure Swift toolchain for SwiftLint
+        run: |
+          set -euo pipefail
+          DEVELOPER_ROOT="$(xcode-select -p)"
+          TOOLCHAIN_ROOT=""
+
+          for CANDIDATE in \
+            "${DEVELOPER_ROOT}" \
+            "${DEVELOPER_ROOT}/Toolchains/XcodeDefault.xctoolchain"; do
+            if test -x "${CANDIDATE}/usr/bin/swift" \
+              && test -d "${CANDIDATE}/usr/lib/sourcekitdInProc.framework"; then
+              TOOLCHAIN_ROOT="${CANDIDATE}"
+              break
+            fi
+          done
+
+          if test -z "${TOOLCHAIN_ROOT}"; then
+            echo "::error::SwiftLint SourceKit toolchain was not found below ${DEVELOPER_ROOT}."
+            exit 1
+          fi
+
+          echo "XCODE_DEFAULT_TOOLCHAIN_OVERRIDE=${TOOLCHAIN_ROOT}" >> "${GITHUB_ENV}"
+
       - name: Lint mobile native sources
         working-directory: ${{ runner.temp }}/fenix-code-ci/${{ github.run_id }}-${{ github.run_attempt }}/verify/source
         run: pnpm exec vp run lint:mobile
