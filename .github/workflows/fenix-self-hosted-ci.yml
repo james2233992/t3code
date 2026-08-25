@@ -213,7 +213,7 @@ jobs:
 
       - name: Exercise release-only workflow steps
         working-directory: ${{ runner.temp }}/fenix-code-ci/${{ github.run_id }}-${{ github.run_attempt }}/verify/source
-        run: node scripts/release-smoke.ts
+        run: pnpm exec vp run release:smoke
 
       - name: Job summary
         if: always()
