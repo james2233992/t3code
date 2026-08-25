@@ -1,0 +1,219 @@
+name: Fenix Self-Hosted CI
+
+on:
+  push:
+    branches:
+      - codex/fenix-code-model-entitlement-20260824
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fenix-self-hosted-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  HOMEBREW_NO_AUTO_UPDATE: "1"
+  MIN_RUNNER_FREE_GIB: "20"
+  NODE_OPTIONS: "--max-old-space-size=4096"
+  NODE_VERSION: "24.13.1"
+  PNPM_VERSION: "11.10.0"
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  verify:
+    name: Fenix Code Verify
+    if: github.repository == 'james2233992/t3code'
+    runs-on: [self-hosted, macOS, ARM64, fenix-ci]
+    timeout-minutes: 60
+    steps:
+      - name: Initialize isolated job directory
+        run: |
+          set -euo pipefail
+          REQUIRED_KIB="$((MIN_RUNNER_FREE_GIB * 1024 * 1024))"
+
+          for DISK_PATH in "${RUNNER_TEMP}" "${GITHUB_WORKSPACE}" "${HOME}" "${RUNNER_TOOL_CACHE:-${HOME}}"; do
+            AVAILABLE_KIB="$(df -Pk "${DISK_PATH}" | awk 'NR == 2 {print $4}')"
+            if [ "${AVAILABLE_KIB}" -lt "${REQUIRED_KIB}" ]; then
+              echo "::error::Runner disk guard: less than ${MIN_RUNNER_FREE_GIB} GiB free on ${DISK_PATH}."
+              df -h "${DISK_PATH}"
+              exit 1
+            fi
+          done
+
+          JOB_TEMP="${RUNNER_TEMP}/fenix-code-ci/${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}/verify"
+          case "${JOB_TEMP}" in
+            "${RUNNER_TEMP}/fenix-code-ci/${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}/verify") ;;
+            *) echo "::error::Unexpected Fenix Code job path: ${JOB_TEMP}"; exit 1 ;;
+          esac
+
+          rm -rf -- "${JOB_TEMP}"
+          mkdir -p \
+            "${JOB_TEMP}/source" \
+            "${JOB_TEMP}/home" \
+            "${JOB_TEMP}/pnpm" \
+            "${JOB_TEMP}/pnpm-store" \
+            "${JOB_TEMP}/rustup" \
+            "${JOB_TEMP}/cargo" \
+            "${JOB_TEMP}/tmp" \
+            "${JOB_TEMP}/xdg-cache"
+
+          {
+            echo "CI_JOB_TEMP=${JOB_TEMP}"
+            echo "CI_SOURCE_ROOT=${JOB_TEMP}/source"
+            echo "CARGO_HOME=${JOB_TEMP}/cargo"
+            echo "PNPM_HOME=${JOB_TEMP}/pnpm"
+            echo "RUSTUP_HOME=${JOB_TEMP}/rustup"
+            echo "TMPDIR=${JOB_TEMP}/tmp"
+            echo "XDG_CACHE_HOME=${JOB_TEMP}/xdg-cache"
+          } >> "${GITHUB_ENV}"
+          echo "${JOB_TEMP}/pnpm" >> "${GITHUB_PATH}"
+          echo "${JOB_TEMP}/cargo/bin" >> "${GITHUB_PATH}"
+
+      - name: Checkout exact pushed source
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          AUTH_HEADER="$(printf 'x-access-token:%s' "${GH_TOKEN}" | base64 | tr -d '\n')"
+          echo "::add-mask::${AUTH_HEADER}"
+          git init --quiet "${CI_SOURCE_ROOT}"
+          git -C "${CI_SOURCE_ROOT}" remote add origin "${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}.git"
+          git -C "${CI_SOURCE_ROOT}" \
+            -c http.extraheader="AUTHORIZATION: basic ${AUTH_HEADER}" \
+            fetch --no-tags --prune origin \
+            "+${GITHUB_SHA}:refs/remotes/fenix/pushed"
+          git -C "${CI_SOURCE_ROOT}" checkout --quiet --detach refs/remotes/fenix/pushed
+          test "$(git -C "${CI_SOURCE_ROOT}" rev-parse HEAD)" = "${GITHUB_SHA}"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Activate pnpm
+        working-directory: ${{ runner.temp }}/fenix-code-ci/${{ github.run_id }}-${{ github.run_attempt }}/verify/source
+        run: |
+          set -euo pipefail
+          corepack enable --install-directory "${PNPM_HOME}"
+          corepack prepare "pnpm@${PNPM_VERSION}" --activate
+          pnpm config set store-dir "${CI_JOB_TEMP}/pnpm-store"
+          node --version
+          pnpm --version
+
+      - name: Setup isolated Rust toolchain
+        uses: dtolnay/rust-toolchain@1.98.0
+        with:
+          components: rustfmt
+
+      - name: Install workspace dependencies
+        working-directory: ${{ runner.temp }}/fenix-code-ci/${{ github.run_id }}-${{ github.run_attempt }}/verify/source
+        run: pnpm install --frozen-lockfile
+
+      - name: Ensure Electron runtime is installed
+        working-directory: ${{ runner.temp }}/fenix-code-ci/${{ github.run_id }}-${{ github.run_attempt }}/verify/source
+        run: pnpm exec vp run --filter @t3tools/desktop ensure:electron
+
+      - name: Check formatting and lint
+        working-directory: ${{ runner.temp }}/fenix-code-ci/${{ github.run_id }}-${{ github.run_attempt }}/verify/source
+        run: pnpm exec vp check
+
+      - name: Verify Fenix product gates
+        working-directory: ${{ runner.temp }}/fenix-code-ci/${{ github.run_id }}-${{ github.run_attempt }}/verify/source
+        run: |
+          set -euo pipefail
+          bash scripts/fenix/generate-branding-inventory.sh selftest
+          bash scripts/fenix/generate-branding-inventory.sh check
+          bash scripts/fenix/check-visible-branding.sh selftest
+          bash scripts/fenix/check-visible-branding.sh
+          bash scripts/fenix/check-spanish-ui.sh selftest
+          bash scripts/fenix/check-spanish-ui.sh
+          bash scripts/fenix/companion-package/install.test.sh
+          bash scripts/fenix/companion-release-security.test.sh
+          node scripts/fenix/check-mobile-release-config.mjs
+
+      - name: Typecheck
+        working-directory: ${{ runner.temp }}/fenix-code-ci/${{ github.run_id }}-${{ github.run_attempt }}/verify/source
+        run: pnpm exec vpr typecheck
+
+      - name: Check resource monitor formatting
+        working-directory: ${{ runner.temp }}/fenix-code-ci/${{ github.run_id }}-${{ github.run_attempt }}/verify/source
+        run: cargo fmt --manifest-path native/resource-monitor/Cargo.toml -- --check
+
+      - name: Build desktop pipeline
+        working-directory: ${{ runner.temp }}/fenix-code-ci/${{ github.run_id }}-${{ github.run_attempt }}/verify/source
+        run: pnpm exec vp run build:desktop
+
+      - name: Verify preload bundle output
+        working-directory: ${{ runner.temp }}/fenix-code-ci/${{ github.run_id }}-${{ github.run_attempt }}/verify/source
+        run: |
+          set -euo pipefail
+          test -f apps/desktop/dist-electron/preload.cjs
+          grep -nE "desktopBridge|getLocalEnvironmentBootstrap|PICK_FOLDER_CHANNEL|wsUrl" apps/desktop/dist-electron/preload.cjs
+          grep -n "__clerk_internal_electron_passkeys" apps/desktop/dist-electron/preload.cjs
+
+      - name: Run workspace tests with bounded concurrency
+        working-directory: ${{ runner.temp }}/fenix-code-ci/${{ github.run_id }}-${{ github.run_attempt }}/verify/source
+        env:
+          T3CODE_TRANSFER_BUDGET_REPORT_PATH: ${{ runner.temp }}/fenix-code-ci/${{ github.run_id }}-${{ github.run_attempt }}/verify/t3code-transfer-budget.md
+          T3CODE_TRANSFER_BUDGET_RESULT_PATH: ${{ runner.temp }}/fenix-code-ci/${{ github.run_id }}-${{ github.run_attempt }}/verify/thread-transfer-result.json
+        run: pnpm exec vp run -r --concurrency-limit 2 test
+
+      - name: Publish transfer budget summary
+        if: always()
+        run: |
+          if test -f "${CI_JOB_TEMP}/t3code-transfer-budget.md"; then
+            tee -a "${GITHUB_STEP_SUMMARY}" < "${CI_JOB_TEMP}/t3code-transfer-budget.md"
+          else
+            echo "Transfer budget report was not produced." >> "${GITHUB_STEP_SUMMARY}"
+          fi
+          echo "Transfer result remains job-local and is deleted during cleanup; this push-only workflow does not use hosted artifact storage or the pull-request publisher." >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Test resource monitor
+        working-directory: ${{ runner.temp }}/fenix-code-ci/${{ github.run_id }}-${{ github.run_attempt }}/verify/source
+        run: cargo test --locked --manifest-path native/resource-monitor/Cargo.toml
+
+      - name: Install mobile static-analysis tools
+        working-directory: ${{ runner.temp }}/fenix-code-ci/${{ github.run_id }}-${{ github.run_attempt }}/verify/source
+        run: |
+          if ! brew bundle check --file apps/mobile/Brewfile; then
+            brew bundle install --file apps/mobile/Brewfile
+          fi
+
+      - name: Lint mobile native sources
+        working-directory: ${{ runner.temp }}/fenix-code-ci/${{ github.run_id }}-${{ github.run_attempt }}/verify/source
+        run: pnpm exec vp run lint:mobile
+
+      - name: Exercise release-only workflow steps
+        working-directory: ${{ runner.temp }}/fenix-code-ci/${{ github.run_id }}-${{ github.run_attempt }}/verify/source
+        run: node scripts/release-smoke.ts
+
+      - name: Job summary
+        if: always()
+        run: |
+          {
+            echo "## Fenix Code Self-Hosted CI"
+            echo
+            echo "- Commit: \`${GITHUB_SHA}\`"
+            echo "- Runner: \`${RUNNER_NAME}\`"
+            echo "- Architecture: \`${RUNNER_ARCH}\`"
+            echo "- Hosted runners used by this workflow: none"
+          } >> "${GITHUB_STEP_SUMMARY}"
+
+      - name: Cleanup isolated job directory
+        if: always()
+        run: |
+          set -euo pipefail
+          JOB_TEMP="${RUNNER_TEMP}/fenix-code-ci/${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}/verify"
+          case "${JOB_TEMP}" in
+            "${RUNNER_TEMP}/fenix-code-ci/${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}/verify")
+              rm -rf -- "${JOB_TEMP}"
+              ;;
+            *)
+              echo "::error::Refusing to clean unexpected path: ${JOB_TEMP}"
+              exit 1
+              ;;
+          esac
