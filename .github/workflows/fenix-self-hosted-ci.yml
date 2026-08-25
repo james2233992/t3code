@@ -65,6 +65,7 @@ jobs:
             echo "CI_JOB_TEMP=${JOB_TEMP}"
             echo "CI_SOURCE_ROOT=${JOB_TEMP}/source"
             echo "CARGO_HOME=${JOB_TEMP}/cargo"
+            echo "HOME=${JOB_TEMP}/home"
             echo "PNPM_HOME=${JOB_TEMP}/pnpm"
             echo "RUSTUP_HOME=${JOB_TEMP}/rustup"
             echo "TMPDIR=${JOB_TEMP}/tmp"

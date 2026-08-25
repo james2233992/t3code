@@ -67,6 +67,13 @@
 ./.github/workflows/fenix-fork-ci.yml:18:44:t3code
 ./.github/workflows/fenix-fork-ci.yml:43:30:@t3tools
 ./.github/workflows/fenix-fork-ci.yml:85:44:t3code
+./.github/workflows/fenix-self-hosted-ci.yml:119:40:@t3tools
+./.github/workflows/fenix-self-hosted-ci.yml:162:11:T3CODE
+./.github/workflows/fenix-self-hosted-ci.yml:162:134:t3code
+./.github/workflows/fenix-self-hosted-ci.yml:163:11:T3CODE
+./.github/workflows/fenix-self-hosted-ci.yml:169:38:t3code
+./.github/workflows/fenix-self-hosted-ci.yml:170:63:t3code
+./.github/workflows/fenix-self-hosted-ci.yml:29:44:t3code
 ./.github/workflows/mobile-eas-preview.yml:55:26:@t3tools
 ./.github/workflows/mobile-eas-production.yml:73:26:@t3tools
 ./.github/workflows/mobile-showcase-screenshots.yml:102:26:@t3tools
