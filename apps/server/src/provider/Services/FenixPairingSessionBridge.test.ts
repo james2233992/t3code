@@ -30,6 +30,18 @@ const modelCatalog = (overrides: Record<string, unknown> = {}) => ({
       models: ["claude-sonnet-4-6"],
       isDefault: false,
     },
+    {
+      providerSlug: "google",
+      displayName: "Google",
+      models: ["gemini-3-pro"],
+      isDefault: false,
+    },
+    {
+      providerSlug: "xai",
+      displayName: "xAI",
+      models: ["grok-4.5"],
+      isDefault: false,
+    },
   ],
   ...overrides,
 });
@@ -115,6 +127,24 @@ describe("FenixPairingSessionBridge", () => {
               displayName: "OpenAI",
               models: ["gpt-5.2-codex"],
               isDefault: true,
+            },
+            {
+              providerSlug: "anthropic",
+              displayName: "Anthropic",
+              models: ["claude-sonnet-4-6"],
+              isDefault: false,
+            },
+            {
+              providerSlug: "google",
+              displayName: "Google",
+              models: ["gemini-3-pro"],
+              isDefault: false,
+            },
+            {
+              providerSlug: "xai",
+              displayName: "xAI",
+              models: ["grok-4.5"],
+              isDefault: false,
             },
           ],
         },

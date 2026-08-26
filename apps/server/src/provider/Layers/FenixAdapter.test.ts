@@ -34,6 +34,9 @@ const INSTANCE = ProviderInstanceId.make("fenix");
 const EXTERNAL_MODEL = "groq/openai/gpt-oss-120b";
 const OPENAI_MODEL = "openai/gpt-5.2-codex";
 const INTERNAL_OPENAI_MODEL = `fenix/${OPENAI_MODEL}`;
+const ANTHROPIC_MODEL = "anthropic/claude-sonnet-4-6";
+const GOOGLE_MODEL = "google/gemini-3-pro";
+const XAI_MODEL = "xai/grok-4.5";
 
 const decodeFenixSettings = Schema.decodeSync(FenixSettings);
 
@@ -57,19 +60,37 @@ function selectableCatalog(): FenixCodeModelCatalog {
         models: ["gpt-5.2-codex"],
         isDefault: true,
       },
+      {
+        providerSlug: "anthropic",
+        displayName: "Anthropic",
+        models: ["claude-sonnet-4-6"],
+        isDefault: false,
+      },
+      {
+        providerSlug: "google",
+        displayName: "Google",
+        models: ["gemini-3-pro"],
+        isDefault: false,
+      },
+      {
+        providerSlug: "xai",
+        displayName: "xAI",
+        models: ["grok-4.5"],
+        isDefault: false,
+      },
     ],
   };
 }
 
-function filteredCatalog(): FenixCodeModelCatalog {
+function emptyCatalog(): FenixCodeModelCatalog {
   return {
     canSelectModels: true,
     providers: [
       {
         providerSlug: "anthropic",
         displayName: "Anthropic",
-        models: ["claude-sonnet-4-6"],
-        isDefault: false,
+        models: [],
+        isDefault: true,
       },
     ],
   };
@@ -143,7 +164,7 @@ function makeDelegate(events: ReadonlyArray<ProviderRuntimeEvent> = []) {
 
 describe("FenixAdapter", () => {
   it("collapses a selectable catalog with no eligible models to the exact fallback", () => {
-    const normalized = normalizeFenixCodeModelCatalog(filteredCatalog());
+    const normalized = normalizeFenixCodeModelCatalog(emptyCatalog());
 
     expect(normalized).toBe(fallbackFenixCodeModelCatalog());
     expect(normalized).toEqual({
@@ -159,34 +180,23 @@ describe("FenixAdapter", () => {
     });
   });
 
-  it("collapses a Groq-only selectable claim to the non-selectable exact fallback", () => {
-    const normalized = normalizeFenixCodeModelCatalog({
+  it("preserves a valid single-provider selectable catalog", () => {
+    const catalog: FenixCodeModelCatalog = {
       canSelectModels: true,
       providers: [
         {
           providerSlug: "groq",
           displayName: "Groq",
           models: ["openai/gpt-oss-120b"],
-          isDefault: false,
-        },
-      ],
-    });
-
-    expect(normalized).toBe(fallbackFenixCodeModelCatalog());
-    expect(normalized).toEqual({
-      canSelectModels: false,
-      providers: [
-        {
-          providerSlug: "groq",
-          displayName: "Groq",
-          models: ["openai/gpt-oss-120b"],
           isDefault: true,
         },
       ],
-    });
+    };
+
+    expect(normalizeFenixCodeModelCatalog(catalog)).toEqual(catalog);
   });
 
-  it("preserves valid OpenAI catalogs with and without an existing Groq fallback", () => {
+  it("preserves every provider routed through the server's compatible catalog", () => {
     const openAiOnly: FenixCodeModelCatalog = {
       canSelectModels: true,
       providers: [
@@ -211,7 +221,7 @@ describe("FenixAdapter", () => {
         instanceId: INSTANCE,
         delegate: delegate.adapter,
         initialCatalog: fallbackFenixCodeModelCatalog(),
-        resolveEntitlement: () => Effect.succeed(entitlement(filteredCatalog())),
+        resolveEntitlement: () => Effect.succeed(entitlement(emptyCatalog())),
       });
       const threadId = ThreadId.make("thread-fenix-filtered-entitlement");
 
@@ -286,6 +296,9 @@ describe("FenixAdapter", () => {
     expect(Object.keys(provider.models as Record<string, unknown>)).toEqual([
       EXTERNAL_MODEL,
       OPENAI_MODEL,
+      ANTHROPIC_MODEL,
+      GOOGLE_MODEL,
+      XAI_MODEL,
     ]);
     expect(environment).toMatchObject({
       XDG_CONFIG_HOME: "/Users/test/.fenix-code/runtime/opencode-fenix/config",
@@ -302,61 +315,61 @@ describe("FenixAdapter", () => {
     expect(environment.OPENCODE_PERMISSION).toBeUndefined();
   });
 
-  it.effect("preserves an entitled OpenAI model across start and implicit send", () =>
+  it.effect("runs every entitled catalog provider through the isolated local runtime", () =>
     Effect.gen(function* () {
-      const delegate = makeDelegate();
-      const adapter = wrapFenixOpenCodeAdapter({
-        settings: settings(),
-        instanceId: INSTANCE,
-        delegate: delegate.adapter,
-        initialCatalog: selectableCatalog(),
-        resolveEntitlement: () => Effect.succeed(entitlement(selectableCatalog())),
-      });
-      const threadId = ThreadId.make("thread-fenix-agent-9");
+      for (const model of [OPENAI_MODEL, ANTHROPIC_MODEL, GOOGLE_MODEL, XAI_MODEL]) {
+        const delegate = makeDelegate();
+        const adapter = wrapFenixOpenCodeAdapter({
+          settings: settings(),
+          instanceId: INSTANCE,
+          delegate: delegate.adapter,
+          initialCatalog: selectableCatalog(),
+          resolveEntitlement: () => Effect.succeed(entitlement(selectableCatalog())),
+        });
+        const threadId = ThreadId.make(`thread-fenix-${model}`);
 
-      const session = yield* adapter.startSession({
-        threadId,
-        runtimeMode: "full-access",
-        cwd: "/Users/test/project",
-        modelSelection: { instanceId: INSTANCE, model: OPENAI_MODEL, options: [] },
-      });
-      const result = yield* adapter.sendTurn({ threadId, input: "edita README.md" });
-
-      expect(adapter.provider).toBe(FENIX);
-      expect(session).toMatchObject({
-        provider: FENIX,
-        providerInstanceId: INSTANCE,
-        model: OPENAI_MODEL,
-        cwd: "/Users/test/project",
-      });
-      expect(result.turnId).toBe(TurnId.make(`turn-${threadId}`));
-      expect(delegate.startSession).toHaveBeenCalledWith(
-        expect.objectContaining({
+        const session = yield* adapter.startSession({
+          threadId,
+          runtimeMode: "full-access",
           cwd: "/Users/test/project",
-          modelSelection: expect.objectContaining({
-            instanceId: INSTANCE,
-            model: INTERNAL_OPENAI_MODEL,
+          modelSelection: { instanceId: INSTANCE, model, options: [] },
+        });
+        const result = yield* adapter.sendTurn({ threadId, input: "edita README.md" });
+
+        expect(adapter.provider, model).toBe(FENIX);
+        expect(session, model).toMatchObject({
+          provider: FENIX,
+          providerInstanceId: INSTANCE,
+          model,
+          cwd: "/Users/test/project",
+        });
+        expect(result.turnId, model).toBe(TurnId.make(`turn-${threadId}`));
+        expect(delegate.startSession, model).toHaveBeenCalledWith(
+          expect.objectContaining({
+            cwd: "/Users/test/project",
+            modelSelection: expect.objectContaining({
+              instanceId: INSTANCE,
+              model: `fenix/${model}`,
+            }),
           }),
-        }),
-      );
-      expect(delegate.sendTurn).toHaveBeenCalledWith(
-        expect.objectContaining({
-          input: "edita README.md",
-          modelSelection: expect.objectContaining({
-            instanceId: INSTANCE,
-            model: INTERNAL_OPENAI_MODEL,
+        );
+        expect(delegate.sendTurn, model).toHaveBeenCalledWith(
+          expect.objectContaining({
+            input: "edita README.md",
+            modelSelection: expect.objectContaining({
+              instanceId: INSTANCE,
+              model: `fenix/${model}`,
+            }),
           }),
-        }),
-      );
+        );
+      }
     }),
   );
 
-  it.effect("denies Claude, Gemini, xAI and unavailable OpenAI models", () =>
+  it.effect("denies unavailable and malformed models even when model selection is enabled", () =>
     Effect.gen(function* () {
       for (const model of [
-        "anthropic/claude-sonnet-4-6",
-        "google/gemini-3-pro",
-        "xai/grok-4.5",
+        "anthropic/claude-opus-not-entitled",
         "openai/gpt-5.3-codex",
         ` ${OPENAI_MODEL}`,
       ]) {
@@ -533,10 +546,12 @@ describe("FenixAdapter", () => {
   it("recognizes only clean canonical Fenix model forms for the websocket boundary", () => {
     expect(isCanonicalFenixModel(EXTERNAL_MODEL)).toBe(true);
     expect(isCanonicalFenixModel(OPENAI_MODEL)).toBe(true);
+    expect(isCanonicalFenixModel(ANTHROPIC_MODEL)).toBe(true);
+    expect(isCanonicalFenixModel(GOOGLE_MODEL)).toBe(true);
+    expect(isCanonicalFenixModel(XAI_MODEL)).toBe(true);
     expect(isCanonicalFenixModel("openai/gpt-5.2-codex\n")).toBe(false);
-    expect(isCanonicalFenixModel("anthropic/claude-sonnet-4-6")).toBe(false);
-    expect(isCanonicalFenixModel("google/gemini-3-pro")).toBe(false);
-    expect(isCanonicalFenixModel("xai/grok-4.5")).toBe(false);
+    expect(isCanonicalFenixModel("missing-provider-separator")).toBe(false);
+    expect(isCanonicalFenixModel("anthropic/")).toBe(false);
   });
 
   it.effect("fails closed when model selection targets another provider instance", () =>

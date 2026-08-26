@@ -74,15 +74,37 @@ describe("FenixDriver", () => {
             models: ["gpt-5.2-codex"],
             isDefault: true,
           },
+          {
+            providerSlug: "anthropic",
+            displayName: "Anthropic",
+            models: ["claude-sonnet-4-6"],
+            isDefault: false,
+          },
+          {
+            providerSlug: "google",
+            displayName: "Google",
+            models: ["gemini-3-pro"],
+            isDefault: false,
+          },
+          {
+            providerSlug: "xai",
+            displayName: "xAI",
+            models: ["grok-4.5"],
+            isDefault: false,
+          },
         ],
       });
 
-      expect(snapshot.models.map((model) => model.slug)).toEqual(["openai/gpt-5.2-codex"]);
+      expect(snapshot.models.map((model) => model.slug)).toEqual([
+        "openai/gpt-5.2-codex",
+        "anthropic/claude-sonnet-4-6",
+        "google/gemini-3-pro",
+        "xai/grok-4.5",
+      ]);
       expect(snapshot.models.find((model) => model.isDefault)?.slug).toBe("openai/gpt-5.2-codex");
       expect("session" in snapshot).toBe(false);
       expect("token" in snapshot).toBe(false);
-      expect(snapshot.models.some((model) => model.slug.includes("claude"))).toBe(false);
-      expect(snapshot.models.some((model) => model.slug.includes("grok-4.5"))).toBe(false);
+      expect("apiKey" in snapshot).toBe(false);
     }),
   );
 });

@@ -6781,13 +6781,34 @@ it.layer(NodeServices.layer)("server router seam", (it) => {
       const scopedThreadId = ThreadId.make("thread-fenix-cycle");
       const fenixModelSelection = {
         instanceId: ProviderInstanceId.make("fenix"),
-        model: "groq/openai/gpt-oss-120b",
+        model: "anthropic/claude-sonnet-4-6",
       } as const;
       const dispatchedTypes: string[] = [];
 
       yield* buildAppUnderTest({
         fenixCodeTenantScope,
         layers: {
+          fenixPairingSessionBridge: {
+            resolvePairingSessionSnapshot: () =>
+              Effect.succeed(
+                FenixPairingSessionBridge.unsafePairingSessionSnapshotForTest(
+                  { kind: "bearer", token: "fenix-test-ephemeral-token" },
+                  Number.MAX_SAFE_INTEGER,
+                  fenixCodeTenantScope,
+                  {
+                    canSelectModels: true,
+                    providers: [
+                      {
+                        providerSlug: "anthropic",
+                        displayName: "Anthropic",
+                        models: ["claude-sonnet-4-6"],
+                        isDefault: true,
+                      },
+                    ],
+                  },
+                ),
+              ),
+          },
           fenixScopedProjectionSnapshotQuery: {
             projectBelongsToScope: (_scope, projectId) =>
               Effect.succeed(projectId === scopedProjectId),

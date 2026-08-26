@@ -77,7 +77,13 @@ export function fallbackFenixCodeModelCatalog(): FenixCodeModelCatalog {
 }
 
 export function isCanonicalFenixModel(model: string): boolean {
-  return model === FENIX_FALLBACK_MODEL || (model.startsWith("openai/") && CLEAN_SLUG.test(model));
+  const providerSeparator = model.indexOf("/");
+  return (
+    providerSeparator > 0 &&
+    providerSeparator < model.length - 1 &&
+    CLEAN_SLUG.test(model.slice(0, providerSeparator)) &&
+    CLEAN_SLUG.test(model.slice(providerSeparator + 1))
+  );
 }
 
 function isCleanDisplayName(value: unknown): value is string {
@@ -146,10 +152,9 @@ export function normalizeFenixCodeModelCatalog(payload: unknown): FenixCodeModel
     if (models.length > 0) providers.push({ ...provider, models });
   }
 
-  const hasSelectableOpenAi = providers.some(
-    (provider) => provider.providerSlug === "openai" && provider.models.length > 0,
-  );
-  if (!hasSelectableOpenAi) return FALLBACK_CATALOG;
+  if (providers.length === 0 || providers.filter((provider) => provider.isDefault).length !== 1) {
+    return FALLBACK_CATALOG;
+  }
 
   return { canSelectModels: true, providers };
 }
