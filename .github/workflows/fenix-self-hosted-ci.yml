@@ -223,6 +223,7 @@ jobs:
             echo "## Fenix Code Self-Hosted CI"
             echo
             echo "- Commit: \`${GITHUB_SHA}\`"
+            echo "- Branch: \`${GITHUB_REF_NAME}\`"
             echo "- Runner: \`${RUNNER_NAME}\`"
             echo "- Architecture: \`${RUNNER_ARCH}\`"
             echo "- Hosted runners used by this workflow: none"
