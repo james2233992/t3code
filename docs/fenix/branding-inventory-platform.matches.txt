@@ -2676,7 +2676,7 @@
 ./apps/web/src/hooks/useActiveProjectTarget.ts:2:54:@t3tools
 ./apps/web/src/hooks/useHandleNewThread.ts:6:9:@t3tools
 ./apps/web/src/hooks/useHandleNewThread.ts:7:62:@t3tools
-./apps/web/src/hooks/useLocalStorage.ts:81:37:t3code
+./apps/web/src/hooks/useLocalStorage.ts:66:37:t3code
 ./apps/web/src/hooks/useSettings.test.ts:5:9:@t3tools
 ./apps/web/src/hooks/useSettings.test.ts:6:42:@t3tools
 ./apps/web/src/hooks/useSettings.ts:19:9:@t3tools
@@ -2693,7 +2693,7 @@
 ./apps/web/src/hooks/useTheme.test.ts:66:22:t3code
 ./apps/web/src/hooks/useTheme.ts:1:37:@t3tools
 ./apps/web/src/hooks/useTheme.ts:2:41:@t3tools
-./apps/web/src/hooks/useTheme.ts:36:22:t3code
+./apps/web/src/hooks/useTheme.ts:37:22:t3code
 ./apps/web/src/hooks/useThreadActionMenu.ts:13:9:@t3tools
 ./apps/web/src/hooks/useThreadActionMenu.ts:14:39:@t3tools
 ./apps/web/src/hooks/useThreadActionMenu.ts:1:51:@t3tools

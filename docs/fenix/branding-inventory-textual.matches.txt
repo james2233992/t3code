@@ -3047,17 +3047,19 @@
 ./apps/web/src/connection/desktopLocal.test.ts:5:62:@t3tools
 ./apps/web/src/connection/desktopLocal.ts:1:40:@t3tools
 ./apps/web/src/connection/desktopLocal.ts:6:9:@t3tools
-./apps/web/src/connection/fenixPortal.test.ts:363:46:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:142:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:166:39:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:17:28:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:272:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:313:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:316:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:327:42:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:377:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:39:21:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:41:4:Fenix Code
+./apps/web/src/connection/fenixPortal.test.ts:442:46:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:124:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:139:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:187:32:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:19:28:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:264:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:288:39:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:321:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:41:21:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:43:4:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:456:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:459:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:470:42:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:5:9:@t3tools
 ./apps/web/src/connection/fenixPortal.ts:6:32:@t3tools
 ./apps/web/src/connection/onboarding.ts:1:39:@t3tools
@@ -3131,7 +3133,7 @@
 ./apps/web/src/hooks/useActiveProjectTarget.ts:2:54:@t3tools
 ./apps/web/src/hooks/useHandleNewThread.ts:6:9:@t3tools
 ./apps/web/src/hooks/useHandleNewThread.ts:7:62:@t3tools
-./apps/web/src/hooks/useLocalStorage.ts:81:37:t3code
+./apps/web/src/hooks/useLocalStorage.ts:66:37:t3code
 ./apps/web/src/hooks/useSettings.test.ts:5:9:@t3tools
 ./apps/web/src/hooks/useSettings.test.ts:6:42:@t3tools
 ./apps/web/src/hooks/useSettings.ts:19:9:@t3tools
@@ -3147,7 +3149,7 @@
 ./apps/web/src/hooks/useTheme.test.ts:66:22:t3code
 ./apps/web/src/hooks/useTheme.ts:1:37:@t3tools
 ./apps/web/src/hooks/useTheme.ts:2:41:@t3tools
-./apps/web/src/hooks/useTheme.ts:36:22:t3code
+./apps/web/src/hooks/useTheme.ts:37:22:t3code
 ./apps/web/src/hooks/useThreadActionMenu.ts:13:9:@t3tools
 ./apps/web/src/hooks/useThreadActionMenu.ts:14:39:@t3tools
 ./apps/web/src/hooks/useThreadActionMenu.ts:1:51:@t3tools
@@ -3191,6 +3193,7 @@
 ./apps/web/src/lib/resourceTelemetryState.ts:1:80:@t3tools
 ./apps/web/src/lib/runtime.ts:6:40:@t3tools
 ./apps/web/src/lib/runtime.ts:7:46:@t3tools
+./apps/web/src/lib/storage.ts:51:14:Fenix Code
 ./apps/web/src/lib/terminalCloseShortcut.test.ts:3:49:@t3tools
 ./apps/web/src/lib/terminalCloseShortcut.ts:1:49:@t3tools
 ./apps/web/src/lib/terminalContext.test.ts:1:27:@t3tools
