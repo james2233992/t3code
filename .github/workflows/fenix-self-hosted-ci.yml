@@ -123,12 +123,17 @@ jobs:
         working-directory: ${{ runner.temp }}/fenix-code-ci/${{ github.run_id }}-${{ github.run_attempt }}/verify/source
         run: pnpm exec vp check
 
-      - name: Verify Fenix product gates
+      - name: Verify Fenix branding inventory
         working-directory: ${{ runner.temp }}/fenix-code-ci/${{ github.run_id }}-${{ github.run_attempt }}/verify/source
         run: |
           set -euo pipefail
           bash scripts/fenix/generate-branding-inventory.sh selftest
           bash scripts/fenix/generate-branding-inventory.sh check
+
+      - name: Verify Fenix product gates
+        working-directory: ${{ runner.temp }}/fenix-code-ci/${{ github.run_id }}-${{ github.run_attempt }}/verify/source
+        run: |
+          set -euo pipefail
           bash scripts/fenix/check-visible-branding.sh selftest
           bash scripts/fenix/check-visible-branding.sh
           bash scripts/fenix/check-spanish-ui.sh selftest
