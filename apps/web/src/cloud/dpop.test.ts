@@ -4,7 +4,13 @@ import * as Effect from "effect/Effect";
 import { decodeJwt } from "jose";
 import { vi } from "vite-plus/test";
 
-import { browserCryptoLayer, createBrowserDpopProof, generateBrowserDpopKey } from "./dpop";
+import {
+  browserCryptoLayer,
+  createBrowserDpopProof,
+  generateBrowserDpopKey,
+  readStoredBrowserDpopKey,
+  writeStoredBrowserDpopKey,
+} from "./dpop";
 
 describe("browser DPoP proofs", () => {
   it.effect("signs relay resource proofs with an access-token hash", () =>
@@ -31,5 +37,27 @@ describe("browser DPoP proofs", () => {
         }),
       ).toMatchObject({ ok: true });
     }),
+  );
+
+  it.effect("uses an ephemeral DPoP key when an opaque sandbox denies indexedDB", () =>
+    Effect.gen(function* () {
+      const deniedGlobal = globalThis as typeof globalThis & { indexedDB?: IDBFactory };
+      const original = Object.getOwnPropertyDescriptor(deniedGlobal, "indexedDB");
+      Object.defineProperty(deniedGlobal, "indexedDB", {
+        configurable: true,
+        get() {
+          throw new DOMException("Blocked by opaque origin", "SecurityError");
+        },
+      });
+
+      try {
+        const key = yield* generateBrowserDpopKey;
+        expect(yield* readStoredBrowserDpopKey()).toBeNull();
+        yield* writeStoredBrowserDpopKey(key);
+      } finally {
+        if (original) Object.defineProperty(deniedGlobal, "indexedDB", original);
+        else delete deniedGlobal.indexedDB;
+      }
+    }).pipe(Effect.provide(browserCryptoLayer)),
   );
 });

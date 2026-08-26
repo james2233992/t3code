@@ -44,9 +44,18 @@ function dpopError(message: string, cause?: unknown) {
   return new BrowserDpopError({ message, ...(cause === undefined ? {} : { cause }) });
 }
 
-function openDpopDatabase(): Effect.Effect<IDBDatabase, BrowserDpopError> {
+function resolveIndexedDb(): IDBFactory | null {
+  try {
+    return globalThis.indexedDB ?? null;
+  } catch {
+    // Opaque-origin sandboxes can throw while the property itself is read.
+    return null;
+  }
+}
+
+function openDpopDatabase(indexedDb: IDBFactory): Effect.Effect<IDBDatabase, BrowserDpopError> {
   return Effect.callback<IDBDatabase, BrowserDpopError>((resume) => {
-    const request = indexedDB.open(DPOP_DATABASE_NAME, DPOP_DATABASE_VERSION);
+    const request = indexedDb.open(DPOP_DATABASE_NAME, DPOP_DATABASE_VERSION);
     request.addEventListener("error", () =>
       resume(
         Effect.fail(
@@ -64,11 +73,12 @@ function openDpopDatabase(): Effect.Effect<IDBDatabase, BrowserDpopError> {
 }
 
 export function readStoredBrowserDpopKey(): Effect.Effect<BrowserDpopKey | null, BrowserDpopError> {
-  if (typeof indexedDB === "undefined") {
+  const indexedDb = resolveIndexedDb();
+  if (indexedDb === null) {
     return Effect.succeed(null);
   }
   return Effect.acquireUseRelease(
-    openDpopDatabase(),
+    openDpopDatabase(indexedDb),
     (database) =>
       Effect.callback<BrowserDpopKey | null, BrowserDpopError>((resume) => {
         const request = database
@@ -91,11 +101,12 @@ export function readStoredBrowserDpopKey(): Effect.Effect<BrowserDpopKey | null,
 export function writeStoredBrowserDpopKey(
   key: BrowserDpopKey,
 ): Effect.Effect<void, BrowserDpopError> {
-  if (typeof indexedDB === "undefined") {
+  const indexedDb = resolveIndexedDb();
+  if (indexedDb === null) {
     return Effect.void;
   }
   return Effect.acquireUseRelease(
-    openDpopDatabase(),
+    openDpopDatabase(indexedDb),
     (database) =>
       Effect.callback<void, BrowserDpopError>((resume) => {
         const transaction = database.transaction(DPOP_KEY_STORE_NAME, "readwrite");

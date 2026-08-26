@@ -1,6 +1,6 @@
 import * as Schema from "effect/Schema";
-import * as Record from "effect/Record";
 import { useCallback, useMemo, useSyncExternalStore } from "react";
+import { getBrowserStorage } from "../lib/storage";
 
 export class LocalStorageOperationError extends Schema.TaggedErrorClass<LocalStorageOperationError>()(
   "LocalStorageOperationError",
@@ -15,22 +15,7 @@ export class LocalStorageOperationError extends Schema.TaggedErrorClass<LocalSto
   }
 }
 
-const isomorphicLocalStorage: Storage =
-  typeof window !== "undefined"
-    ? window.localStorage
-    : (function () {
-        const store = new Map<string, string>();
-        return {
-          clear: () => store.clear(),
-          getItem: (_) => store.get(_) ?? null,
-          key: (_) => Record.keys(store).at(_) ?? null,
-          get length() {
-            return store.size;
-          },
-          removeItem: (_) => store.delete(_),
-          setItem: (_, value) => store.set(_, value),
-        };
-      })();
+const isomorphicLocalStorage = getBrowserStorage();
 
 const read = (key: string) => {
   try {

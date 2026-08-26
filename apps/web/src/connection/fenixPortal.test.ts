@@ -13,7 +13,10 @@ import {
   issueFenixPortalBrowserTicket,
   issueFenixPortalPairing,
   listFenixPortalDevices,
+  parseFenixPortalBrowserTicket,
+  parseFenixPortalPairing,
   readFenixPortalAgentId,
+  readFenixPortalBridgeToken,
   revokeFenixPortalDevice,
   verifyFenixPortalSession,
 } from "./fenixPortal.ts";
@@ -74,6 +77,82 @@ describe("Fenix portal companion API", () => {
       readFenixPortalAgentId(new URL("https://iaonline.io/code-lab/?agentId=invalid")),
     ).toBeNull();
     expect(isFenixPortalEmbeddedApp(new URL("https://iaonline.io/dashboard"))).toBe(false);
+  });
+
+  it("accepts only a 64-character lowercase bridge capability", () => {
+    const valid = new URL(`https://iaonline.io/code-lab/?bridgeToken=${"a".repeat(64)}`);
+    const invalid = new URL("https://iaonline.io/code-lab/?bridgeToken=not-a-capability");
+
+    expect(readFenixPortalBridgeToken(valid)).toBe("a".repeat(64));
+    expect(readFenixPortalBridgeToken(invalid)).toBeNull();
+    expect(readFenixPortalBridgeToken(new URL("https://iaonline.io/dashboard"))).toBeNull();
+  });
+
+  it("fails closed without a valid embedded bridge and never falls back to global fetch", async () => {
+    const globalFetch = vi.spyOn(globalThis, "fetch");
+    const invalidBridgeUrl = new URL("https://iaonline.io/code-lab/?agentId=9&bridgeToken=invalid");
+    const inputs = [
+      () => verifyFenixPortalSession({ agentId: 9, url: PORTAL_URL }),
+      () => listFenixPortalDevices({ agentId: 9, url: invalidBridgeUrl }),
+      () => issueFenixPortalPairing({ agentId: 9, deviceName: "Mac", url: PORTAL_URL }),
+      () =>
+        revokeFenixPortalDevice({
+          agentId: 9,
+          deviceId: "a".repeat(32),
+          url: invalidBridgeUrl,
+        }),
+      () =>
+        issueFenixPortalBrowserTicket({
+          agentId: 9,
+          deviceId: "a".repeat(32),
+          url: PORTAL_URL,
+        }),
+    ];
+
+    for (const invoke of inputs) {
+      await expect(invoke()).rejects.toThrow("HTTP 401");
+    }
+    expect(globalFetch).not.toHaveBeenCalled();
+    globalFetch.mockRestore();
+  });
+
+  it("rejects malformed pairing and browser-ticket bridge payloads", () => {
+    expect(() =>
+      parseFenixPortalPairing({
+        attemptId: "short",
+        pairingToken: "short",
+        expiresAt: "not-a-date",
+      }),
+    ).toThrow("invalid pairing envelope");
+
+    for (const invalidTicket of [
+      {
+        protocol: "wrong-protocol",
+        webSocketPath: "/code-lab/ws",
+        ticket: TICKET,
+        expiresAt: "2026-08-12T20:00:00Z",
+      },
+      {
+        protocol: "fenix-code-lab-v1",
+        webSocketPath: "https://evil.example/ws",
+        ticket: TICKET,
+        expiresAt: "2026-08-12T20:00:00Z",
+      },
+      {
+        protocol: "fenix-code-lab-v1",
+        webSocketPath: "/code-lab/ws",
+        ticket: "short",
+        expiresAt: "not-a-date",
+      },
+    ]) {
+      expect(() => parseFenixPortalBrowserTicket(invalidTicket)).toThrow("invalid browser ticket");
+      expect(() =>
+        fenixPortalSocket({
+          ticket: invalidTicket as never,
+          url: PORTAL_URL,
+        }),
+      ).toThrow("invalid browser ticket");
+    }
   });
 
   it("lists cookie-authenticated devices and maps them to platform registrations", async () => {

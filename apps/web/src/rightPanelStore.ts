@@ -12,7 +12,7 @@ import type { ScopedThreadRef } from "@t3tools/contracts";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import { resolveStorage } from "./lib/storage";
+import { getBrowserStorage } from "./lib/storage";
 
 export const RIGHT_PANEL_KINDS = [
   "diff",
@@ -543,9 +543,7 @@ export const useRightPanelStore = create<RightPanelStoreState>()(
     {
       name: RIGHT_PANEL_STORAGE_KEY,
       version: RIGHT_PANEL_STORAGE_VERSION,
-      storage: createJSONStorage(() =>
-        resolveStorage(typeof window !== "undefined" ? window.localStorage : undefined),
-      ),
+      storage: createJSONStorage(getBrowserStorage),
       partialize: (state) => ({ byThreadKey: state.byThreadKey }),
       migrate: migratePersistedRightPanelState,
     },

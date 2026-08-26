@@ -6,11 +6,19 @@ export interface StateStorage<R = unknown> {
   removeItem: (name: string) => R;
 }
 
+export interface SyncStateStorage {
+  getItem: (name: string) => string | null;
+  setItem: (name: string, value: string) => unknown;
+  removeItem: (name: string) => unknown;
+}
+
 export interface DebouncedStorage<R = unknown> extends StateStorage<R> {
   flush: () => void;
 }
 
-export function createMemoryStorage(): StateStorage {
+const browserMemoryStorage = createMemoryStorage();
+
+export function createMemoryStorage(): SyncStateStorage {
   const store = new Map<string, string>();
   return {
     getItem: (name) => store.get(name) ?? null,
@@ -37,6 +45,29 @@ export function isStateStorage(
 
 export function resolveStorage(storage: Partial<StateStorage> | null | undefined): StateStorage {
   return isStateStorage(storage) ? storage : createMemoryStorage();
+}
+
+/**
+ * Sandboxed Fenix Code frames intentionally use an opaque origin. Merely
+ * reading `window.localStorage` throws a SecurityError there, so callers must
+ * resolve browser storage through this boundary instead of touching the
+ * property while their module is loading.
+ */
+export function getBrowserStorage(
+  browserWindow: Pick<Window, "localStorage"> | undefined = typeof window === "undefined"
+    ? undefined
+    : window,
+): SyncStateStorage {
+  // Keep server/test module instances isolated. Only a real browser whose
+  // storage getter is denied needs the shared in-memory substitute.
+  if (browserWindow === undefined) return createMemoryStorage();
+  try {
+    return isStateStorage(browserWindow.localStorage)
+      ? browserWindow.localStorage
+      : browserMemoryStorage;
+  } catch {
+    return browserMemoryStorage;
+  }
 }
 
 export function createDebouncedStorage(

@@ -9,6 +9,8 @@ const CODE_LAB_PATH_PREFIX = "/code-lab/";
 const CODE_LAB_API_BASE = "/api/v1/code-lab";
 const CODE_LAB_PROTOCOL = "fenix-code-lab-v1";
 const CODE_LAB_TICKET_PREFIX = "fenix-code-lab-ticket.";
+const CODE_LAB_BRIDGE_CHANNEL = "fenix-code-lab-bridge-v1";
+const CODE_LAB_BRIDGE_TOKEN_PARAM = "bridgeToken";
 const DEFAULT_CODE_LAB_AGENT_ID = 9;
 const PORTAL_REQUEST_TIMEOUT_MS = 15_000;
 
@@ -89,6 +91,56 @@ export interface FenixPortalSession {
   };
 }
 
+type FenixPortalBridgeAction =
+  | "session"
+  | "listDevices"
+  | "issuePairing"
+  | "revokeDevice"
+  | "issueBrowserTicket";
+
+interface FenixPortalBridgeResponse {
+  readonly channel: typeof CODE_LAB_BRIDGE_CHANNEL;
+  readonly bridgeToken: string;
+  readonly requestId: string;
+  readonly ok: boolean;
+  readonly status: number;
+  readonly payload?: unknown;
+}
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return value !== null && typeof value === "object" && !Array.isArray(value);
+}
+
+export function parseFenixPortalPairing(value: unknown): FenixPortalPairing {
+  if (
+    !isRecord(value) ||
+    typeof value.attemptId !== "string" ||
+    value.attemptId.length < 16 ||
+    typeof value.pairingToken !== "string" ||
+    value.pairingToken.length < 32 ||
+    typeof value.expiresAt !== "string" ||
+    !Number.isFinite(Date.parse(value.expiresAt))
+  ) {
+    throw new Error("Fenix Code Lab returned an invalid pairing envelope.");
+  }
+  return value as unknown as FenixPortalPairing;
+}
+
+export function parseFenixPortalBrowserTicket(value: unknown): FenixPortalBrowserTicket {
+  if (
+    !isRecord(value) ||
+    value.protocol !== CODE_LAB_PROTOCOL ||
+    value.webSocketPath !== "/code-lab/ws" ||
+    typeof value.ticket !== "string" ||
+    value.ticket.length !== 43 ||
+    typeof value.expiresAt !== "string" ||
+    !Number.isFinite(Date.parse(value.expiresAt))
+  ) {
+    throw new Error("Fenix Code Lab returned an invalid browser ticket.");
+  }
+  return value as unknown as FenixPortalBrowserTicket;
+}
+
 function isFenixPortalDeviceId(value: unknown): value is string {
   return typeof value === "string" && /^[a-f0-9]{32}$/iu.test(value);
 }
@@ -109,6 +161,70 @@ export function readFenixPortalAgentId(url: URL = new URL(window.location.href))
   return requestedAgentId === null ? DEFAULT_CODE_LAB_AGENT_ID : positiveAgentId(requestedAgentId);
 }
 
+export function readFenixPortalBridgeToken(
+  url: URL = new URL(window.location.href),
+): string | null {
+  if (!isFenixPortalEmbeddedApp(url)) return null;
+  const token = url.searchParams.get(CODE_LAB_BRIDGE_TOKEN_PARAM);
+  return token !== null && /^[a-f0-9]{64}$/u.test(token) ? token : null;
+}
+
+async function requestFenixPortalBridge(input: {
+  readonly action: FenixPortalBridgeAction;
+  readonly payload?: Record<string, unknown>;
+  readonly url: URL;
+}): Promise<unknown> {
+  const bridgeToken = readFenixPortalBridgeToken(input.url);
+  if (bridgeToken === null || window.parent === window) {
+    throw new FenixPortalHttpError(401);
+  }
+
+  const requestId = window.crypto.randomUUID();
+
+  return new Promise((resolve, reject) => {
+    const timeout = window.setTimeout(() => {
+      window.removeEventListener("message", handleMessage);
+      reject(new DOMException("Fenix Code bridge timeout", "TimeoutError"));
+    }, PORTAL_REQUEST_TIMEOUT_MS);
+
+    function handleMessage(event: MessageEvent<unknown>) {
+      if (event.source !== window.parent || event.origin !== input.url.origin) return;
+      if (event.data === null || typeof event.data !== "object") return;
+
+      const response = event.data as Partial<FenixPortalBridgeResponse>;
+      if (
+        response.channel !== CODE_LAB_BRIDGE_CHANNEL ||
+        response.bridgeToken !== bridgeToken ||
+        response.requestId !== requestId ||
+        typeof response.ok !== "boolean" ||
+        !Number.isInteger(response.status)
+      ) {
+        return;
+      }
+
+      window.clearTimeout(timeout);
+      window.removeEventListener("message", handleMessage);
+      if (!response.ok) {
+        reject(new FenixPortalHttpError(response.status ?? 500));
+        return;
+      }
+      resolve(response.payload);
+    }
+
+    window.addEventListener("message", handleMessage);
+    window.parent.postMessage(
+      {
+        channel: CODE_LAB_BRIDGE_CHANNEL,
+        bridgeToken,
+        requestId,
+        action: input.action,
+        payload: input.payload,
+      },
+      input.url.origin,
+    );
+  });
+}
+
 function apiUrl(path: string, url: URL): string {
   return new URL(`${CODE_LAB_API_BASE}${path}`, url.origin).toString();
 }
@@ -118,17 +234,23 @@ export async function verifyFenixPortalSession(input: {
   readonly fetchImpl?: typeof fetch;
   readonly url?: URL;
 }): Promise<FenixPortalSession> {
-  const fetchImpl = input.fetchImpl ?? fetch;
   const url = input.url ?? new URL(window.location.href);
-  const endpoint = new URL(apiUrl("/session", url));
-  endpoint.searchParams.set("agentId", String(input.agentId));
-  const value = (await readJson(
-    await fetchImpl(endpoint, {
-      credentials: "include",
-      headers: { Accept: "application/json" },
-      signal: portalRequestSignal(),
-    }),
-  )) as Partial<FenixPortalSession>;
+  const fetchImpl = input.fetchImpl;
+  const value = (
+    fetchImpl === undefined
+      ? await requestFenixPortalBridge({ action: "session", url })
+      : await (async () => {
+          const endpoint = new URL(apiUrl("/session", url));
+          endpoint.searchParams.set("agentId", String(input.agentId));
+          return readJson(
+            await fetchImpl(endpoint, {
+              credentials: "include",
+              headers: { Accept: "application/json" },
+              signal: portalRequestSignal(),
+            }),
+          );
+        })()
+  ) as Partial<FenixPortalSession>;
   const owner = value.owner;
   if (
     value.authenticated !== true ||
@@ -173,24 +295,38 @@ export async function listFenixPortalDevices(input: {
   readonly fetchImpl?: typeof fetch;
   readonly url?: URL;
 }): Promise<ReadonlyArray<FenixPortalDevice>> {
-  const fetchImpl = input.fetchImpl ?? fetch;
   const url = input.url ?? new URL(window.location.href);
-  const endpoint = new URL(apiUrl("/devices", url));
-  endpoint.searchParams.set("agentId", String(input.agentId));
-  const envelope = (await readJson(
-    await fetchImpl(endpoint, {
-      credentials: "include",
-      headers: { Accept: "application/json" },
-      signal: portalRequestSignal(),
-    }),
-  )) as { readonly devices?: ReadonlyArray<Record<string, unknown>> };
+  const fetchImpl = input.fetchImpl;
+  const envelope =
+    fetchImpl === undefined
+      ? {
+          devices: (await requestFenixPortalBridge({
+            action: "listDevices",
+            url,
+          })) as ReadonlyArray<Record<string, unknown>>,
+        }
+      : ((await (async () => {
+          const endpoint = new URL(apiUrl("/devices", url));
+          endpoint.searchParams.set("agentId", String(input.agentId));
+          return readJson(
+            await fetchImpl(endpoint, {
+              credentials: "include",
+              headers: { Accept: "application/json" },
+              signal: portalRequestSignal(),
+            }),
+          );
+        })()) as { readonly devices?: ReadonlyArray<Record<string, unknown>> });
 
-  return (envelope.devices ?? []).flatMap((device) => {
+  if (!Array.isArray(envelope.devices)) {
+    throw new Error("Fenix Code Lab returned an invalid device list envelope.");
+  }
+
+  return envelope.devices.flatMap((device: Record<string, unknown>) => {
     if (
       !isFenixPortalDeviceId(device.deviceId) ||
       typeof device.deviceName !== "string" ||
       !Array.isArray(device.capabilities) ||
-      device.capabilities.some((value) => typeof value !== "string") ||
+      device.capabilities.some((value: unknown) => typeof value !== "string") ||
       typeof device.revoked !== "boolean" ||
       typeof device.connected !== "boolean"
     ) {
@@ -214,11 +350,19 @@ export async function revokeFenixPortalDevice(input: {
   readonly fetchImpl?: typeof fetch;
   readonly url?: URL;
 }): Promise<void> {
-  const fetchImpl = input.fetchImpl ?? fetch;
   const url = input.url ?? new URL(window.location.href);
   if (!isFenixPortalDeviceId(input.deviceId)) {
     throw new Error("El identificador local del equipo no es válido.");
   }
+  if (input.fetchImpl === undefined) {
+    await requestFenixPortalBridge({
+      action: "revokeDevice",
+      payload: { deviceId: input.deviceId },
+      url,
+    });
+    return;
+  }
+  const fetchImpl = input.fetchImpl;
   const endpoint = new URL(apiUrl(`/devices/${encodeURIComponent(input.deviceId)}`, url));
   endpoint.searchParams.set("agentId", String(input.agentId));
   const response = await fetchImpl(endpoint, {
@@ -241,37 +385,36 @@ export async function issueFenixPortalPairing(input: {
   readonly fetchImpl?: typeof fetch;
   readonly url?: URL;
 }): Promise<FenixPortalPairing> {
-  const fetchImpl = input.fetchImpl ?? fetch;
   const url = input.url ?? new URL(window.location.href);
   const deviceName = input.deviceName.trim();
   if (deviceName.length === 0 || deviceName.length > 80) {
     throw new Error("Introduce un nombre de entorno local de 1 a 80 caracteres.");
   }
-  const headers = await csrfHeader(fetchImpl, url);
-  const value = (await readJson(
-    await fetchImpl(apiUrl("/pairings", url), {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        ...headers,
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ agentId: input.agentId, deviceName }),
-      signal: portalRequestSignal(),
-    }),
-  )) as Partial<FenixPortalPairing>;
-  if (
-    typeof value.attemptId !== "string" ||
-    value.attemptId.length < 16 ||
-    typeof value.pairingToken !== "string" ||
-    value.pairingToken.length < 32 ||
-    typeof value.expiresAt !== "string" ||
-    !Number.isFinite(Date.parse(value.expiresAt))
-  ) {
-    throw new Error("Fenix Code Lab returned an invalid pairing envelope.");
+  let value: unknown;
+  if (input.fetchImpl === undefined) {
+    value = await requestFenixPortalBridge({
+      action: "issuePairing",
+      payload: { deviceName },
+      url,
+    });
+  } else {
+    const fetchImpl = input.fetchImpl;
+    const headers = await csrfHeader(fetchImpl, url);
+    value = await readJson(
+      await fetchImpl(apiUrl("/pairings", url), {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          ...headers,
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ agentId: input.agentId, deviceName }),
+        signal: portalRequestSignal(),
+      }),
+    );
   }
-  return value as FenixPortalPairing;
+  return parseFenixPortalPairing(value);
 }
 
 function shellQuote(value: string): string {
@@ -351,32 +494,35 @@ export async function issueFenixPortalBrowserTicket(input: {
   readonly fetchImpl?: typeof fetch;
   readonly url?: URL;
 }): Promise<FenixPortalBrowserTicket> {
-  const fetchImpl = input.fetchImpl ?? fetch;
   const url = input.url ?? new URL(window.location.href);
-  const headers = await csrfHeader(fetchImpl, url);
-  const value = (await readJson(
-    await fetchImpl(apiUrl(`/devices/${encodeURIComponent(input.deviceId)}/ticket`, url), {
-      method: "POST",
-      credentials: "include",
-      headers: {
-        ...headers,
-        Accept: "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ agentId: input.agentId }),
-      signal: portalRequestSignal(),
-    }),
-  )) as Partial<FenixPortalBrowserTicket>;
-  if (
-    value.protocol !== CODE_LAB_PROTOCOL ||
-    value.webSocketPath !== "/code-lab/ws" ||
-    typeof value.ticket !== "string" ||
-    value.ticket.length !== 43 ||
-    typeof value.expiresAt !== "string"
-  ) {
-    throw new Error("Fenix Code Lab returned an invalid browser ticket.");
+  if (!isFenixPortalDeviceId(input.deviceId)) {
+    throw new Error("El identificador local del equipo no es válido.");
   }
-  return value as FenixPortalBrowserTicket;
+  let value: unknown;
+  if (input.fetchImpl === undefined) {
+    value = await requestFenixPortalBridge({
+      action: "issueBrowserTicket",
+      payload: { deviceId: input.deviceId },
+      url,
+    });
+  } else {
+    const fetchImpl = input.fetchImpl;
+    const headers = await csrfHeader(fetchImpl, url);
+    value = await readJson(
+      await fetchImpl(apiUrl(`/devices/${encodeURIComponent(input.deviceId)}/ticket`, url), {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          ...headers,
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ agentId: input.agentId }),
+        signal: portalRequestSignal(),
+      }),
+    );
+  }
+  return parseFenixPortalBrowserTicket(value);
 }
 
 export function fenixPortalSocket(input: {
@@ -384,11 +530,12 @@ export function fenixPortalSocket(input: {
   readonly url?: URL;
 }): { readonly socketUrl: string; readonly protocols: ReadonlyArray<string> } {
   const url = input.url ?? new URL(window.location.href);
-  const socket = new URL(input.ticket.webSocketPath, url.origin);
+  const ticket = parseFenixPortalBrowserTicket(input.ticket);
+  const socket = new URL(ticket.webSocketPath, url.origin);
   socket.protocol = socket.protocol === "https:" ? "wss:" : "ws:";
   return {
     socketUrl: socket.toString(),
-    protocols: [CODE_LAB_PROTOCOL, `${CODE_LAB_TICKET_PREFIX}${input.ticket.ticket}`],
+    protocols: [CODE_LAB_PROTOCOL, `${CODE_LAB_TICKET_PREFIX}${ticket.ticket}`],
   };
 }
 
