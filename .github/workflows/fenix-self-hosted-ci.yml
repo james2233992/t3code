@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - codex/fenix-code-model-entitlement-20260824
+      - codex/fenix-code-all-authorized-providers-20260826
 
 permissions:
   contents: read
