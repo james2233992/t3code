@@ -107,6 +107,8 @@ interface FenixPortalBridgeResponse {
   readonly payload?: unknown;
 }
 
+let capturedBridgeToken: string | null = null;
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
@@ -165,8 +167,24 @@ export function readFenixPortalBridgeToken(
   url: URL = new URL(window.location.href),
 ): string | null {
   if (!isFenixPortalEmbeddedApp(url)) return null;
-  const token = url.searchParams.get(CODE_LAB_BRIDGE_TOKEN_PARAM);
-  return token !== null && /^[a-f0-9]{64}$/u.test(token) ? token : null;
+  const fragment = new URLSearchParams(url.hash.startsWith("#") ? url.hash.slice(1) : url.hash);
+  const token = fragment.get(CODE_LAB_BRIDGE_TOKEN_PARAM);
+  if (token !== null && /^[a-f0-9]{64}$/u.test(token)) {
+    capturedBridgeToken = token;
+    if (typeof window !== "undefined" && url.href === window.location.href) {
+      fragment.delete(CODE_LAB_BRIDGE_TOKEN_PARAM);
+      const sanitizedHash = fragment.toString();
+      window.history.replaceState(
+        window.history.state,
+        "",
+        `${url.pathname}${url.search}${sanitizedHash.length > 0 ? `#${sanitizedHash}` : ""}`,
+      );
+    }
+    return token;
+  }
+  return typeof window !== "undefined" && url.href === window.location.href
+    ? capturedBridgeToken
+    : null;
 }
 
 async function requestFenixPortalBridge(input: {
@@ -182,17 +200,18 @@ async function requestFenixPortalBridge(input: {
   const requestId = window.crypto.randomUUID();
 
   return new Promise((resolve, reject) => {
+    const messageChannel = new MessageChannel();
     const timeout = window.setTimeout(() => {
-      window.removeEventListener("message", handleMessage);
+      messageChannel.port1.close();
       reject(new DOMException("Fenix Code bridge timeout", "TimeoutError"));
     }, PORTAL_REQUEST_TIMEOUT_MS);
 
-    function handleMessage(event: MessageEvent<unknown>) {
-      if (event.source !== window.parent || event.origin !== input.url.origin) return;
-      if (event.data === null || typeof event.data !== "object") return;
-
-      const response = event.data as Partial<FenixPortalBridgeResponse>;
+    messageChannel.port1.onmessage = (event: MessageEvent<unknown>) => {
+      const response = isRecord(event.data)
+        ? (event.data as Partial<FenixPortalBridgeResponse>)
+        : null;
       if (
+        response === null ||
         response.channel !== CODE_LAB_BRIDGE_CHANNEL ||
         response.bridgeToken !== bridgeToken ||
         response.requestId !== requestId ||
@@ -203,15 +222,15 @@ async function requestFenixPortalBridge(input: {
       }
 
       window.clearTimeout(timeout);
-      window.removeEventListener("message", handleMessage);
+      messageChannel.port1.close();
       if (!response.ok) {
         reject(new FenixPortalHttpError(response.status ?? 500));
         return;
       }
       resolve(response.payload);
-    }
+    };
 
-    window.addEventListener("message", handleMessage);
+    messageChannel.port1.start();
     window.parent.postMessage(
       {
         channel: CODE_LAB_BRIDGE_CHANNEL,
@@ -221,6 +240,7 @@ async function requestFenixPortalBridge(input: {
         payload: input.payload,
       },
       input.url.origin,
+      [messageChannel.port2],
     );
   });
 }

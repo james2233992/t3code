@@ -79,18 +79,20 @@ describe("Fenix portal companion API", () => {
     expect(isFenixPortalEmbeddedApp(new URL("https://iaonline.io/dashboard"))).toBe(false);
   });
 
-  it("accepts only a 64-character lowercase bridge capability", () => {
-    const valid = new URL(`https://iaonline.io/code-lab/?bridgeToken=${"a".repeat(64)}`);
-    const invalid = new URL("https://iaonline.io/code-lab/?bridgeToken=not-a-capability");
+  it("accepts the bridge capability only in the fragment, never in the query", () => {
+    const valid = new URL(`https://iaonline.io/code-lab/#bridgeToken=${"a".repeat(64)}`);
+    const queryToken = new URL(`https://iaonline.io/code-lab/?bridgeToken=${"a".repeat(64)}`);
+    const invalid = new URL("https://iaonline.io/code-lab/#bridgeToken=not-a-capability");
 
     expect(readFenixPortalBridgeToken(valid)).toBe("a".repeat(64));
+    expect(readFenixPortalBridgeToken(queryToken)).toBeNull();
     expect(readFenixPortalBridgeToken(invalid)).toBeNull();
     expect(readFenixPortalBridgeToken(new URL("https://iaonline.io/dashboard"))).toBeNull();
   });
 
   it("fails closed without a valid embedded bridge and never falls back to global fetch", async () => {
     const globalFetch = vi.spyOn(globalThis, "fetch");
-    const invalidBridgeUrl = new URL("https://iaonline.io/code-lab/?agentId=9&bridgeToken=invalid");
+    const invalidBridgeUrl = new URL("https://iaonline.io/code-lab/?agentId=9#bridgeToken=invalid");
     const inputs = [
       () => verifyFenixPortalSession({ agentId: 9, url: PORTAL_URL }),
       () => listFenixPortalDevices({ agentId: 9, url: invalidBridgeUrl }),
@@ -114,6 +116,62 @@ describe("Fenix portal companion API", () => {
     }
     expect(globalFetch).not.toHaveBeenCalled();
     globalFetch.mockRestore();
+  });
+
+  it("uses a one-request MessagePort capability and removes the token from browser history", async () => {
+    const bridgeToken = "b".repeat(64);
+    const requestId = "12345678-1234-4234-9234-123456789abc";
+    const embeddedUrl = new URL(
+      `https://iaonline.io/code-lab/?agentId=9#bridgeToken=${bridgeToken}`,
+    );
+    const replaceState = vi.fn();
+    const parentWindow = {
+      postMessage: vi.fn(
+        (request: Record<string, unknown>, targetOrigin: string, transfer: MessagePort[]) => {
+          expect(targetOrigin).toBe("https://iaonline.io");
+          expect(transfer).toHaveLength(1);
+          expect(request).toEqual({
+            channel: "fenix-code-lab-bridge-v1",
+            bridgeToken,
+            requestId,
+            action: "session",
+            payload: undefined,
+          });
+          transfer[0]!.postMessage({
+            channel: "fenix-code-lab-bridge-v1",
+            bridgeToken,
+            requestId,
+            ok: true,
+            status: 200,
+            payload: {
+              authenticated: true,
+              owner: { companyId: 1, userId: 2, agentId: 9 },
+            },
+          });
+        },
+      ),
+    };
+    const browserWindow = {
+      location: { href: embeddedUrl.href },
+      parent: parentWindow,
+      crypto: { randomUUID: () => requestId },
+      history: { state: null, replaceState },
+      setTimeout: (callback: TimerHandler, timeout?: number) =>
+        globalThis.setTimeout(callback, timeout),
+      clearTimeout: (handle: number) => globalThis.clearTimeout(handle),
+    };
+    vi.stubGlobal("window", browserWindow);
+
+    try {
+      await expect(verifyFenixPortalSession({ agentId: 9, url: embeddedUrl })).resolves.toEqual({
+        authenticated: true,
+        owner: { companyId: 1, userId: 2, agentId: 9 },
+      });
+      expect(parentWindow.postMessage).toHaveBeenCalledTimes(1);
+      expect(replaceState).toHaveBeenCalledWith(null, "", "/code-lab/?agentId=9");
+    } finally {
+      vi.unstubAllGlobals();
+    }
   });
 
   it("rejects malformed pairing and browser-ticket bridge payloads", () => {
