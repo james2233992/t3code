@@ -2,10 +2,16 @@ import { ConnectionTransientError } from "@t3tools/client-runtime/connection";
 import { ConnectionCatalogDocument } from "@t3tools/client-runtime/platform";
 import { describe, expect, it } from "@effect/vitest";
 import * as Effect from "effect/Effect";
+import * as Layer from "effect/Layer";
 import * as Schema from "effect/Schema";
 import { afterEach, vi } from "vite-plus/test";
 
-import { makeCatalogBackend, makeCatalogStore } from "./storage";
+import {
+  connectionStorageLayer,
+  makeCatalogBackend,
+  makeCatalogStore,
+  makeInMemoryConnectionDatabase,
+} from "./storage";
 
 const emptyCatalog = {
   schemaVersion: 1,
@@ -14,7 +20,9 @@ const emptyCatalog = {
   credentials: [],
   remoteDpopTokens: [],
 } as const;
-const decodeCatalog = Schema.decodeUnknownSync(Schema.fromJsonString(ConnectionCatalogDocument));
+const catalogJson = Schema.fromJsonString(ConnectionCatalogDocument);
+const decodeCatalog = Schema.decodeUnknownSync(catalogJson);
+const encodeCatalog = Schema.encodeSync(catalogJson);
 
 afterEach(() => {
   vi.unstubAllGlobals();
@@ -72,6 +80,44 @@ describe("makeCatalogBackend", () => {
       expect(error).toBeInstanceOf(ConnectionTransientError);
       expect(error.message).toContain("El almacenamiento seguro del escritorio no está disponible");
       expect(setConnectionCatalog).toHaveBeenCalledWith("{}");
+    }),
+  );
+});
+
+describe("connectionStorageLayer", () => {
+  it.effect("uses ephemeral memory in the isolated Fenix portal iframe", () =>
+    Effect.gen(function* () {
+      const open = vi.fn(() => {
+        throw new DOMException("access denied", "SecurityError");
+      });
+      vi.stubGlobal("indexedDB", { open });
+      vi.stubGlobal("window", {
+        location: {
+          href: `https://iaonline.io/code-lab/?agentId=9#bridgeToken=${"a".repeat(64)}`,
+        },
+        parent: {},
+        history: { state: null, replaceState: vi.fn() },
+      });
+
+      yield* Layer.build(connectionStorageLayer).pipe(Effect.scoped);
+
+      expect(open).not.toHaveBeenCalled();
+    }),
+  );
+
+  it.effect("keeps ephemeral catalog data only for the database lifetime", () =>
+    Effect.gen(function* () {
+      vi.stubGlobal("window", {});
+      const database = makeInMemoryConnectionDatabase();
+      const backend = makeCatalogBackend(database);
+      const encoded = encodeCatalog(emptyCatalog);
+
+      yield* backend.write(encoded);
+      expect(yield* backend.read).toBe(encoded);
+
+      database.close();
+      expect(yield* backend.read).toBeNull();
+      expect(yield* makeCatalogBackend(makeInMemoryConnectionDatabase()).read).toBeNull();
     }),
   );
 });

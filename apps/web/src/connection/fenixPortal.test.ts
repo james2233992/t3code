@@ -10,6 +10,7 @@ import {
   fenixPortalConnectedDeviceRegistrations,
   fenixPortalSocket,
   isFenixPortalEmbeddedApp,
+  isFenixPortalIsolatedBridgeApp,
   issueFenixPortalBrowserTicket,
   issueFenixPortalPairing,
   listFenixPortalDevices,
@@ -88,6 +89,45 @@ describe("Fenix portal companion API", () => {
     expect(readFenixPortalBridgeToken(queryToken)).toBeNull();
     expect(readFenixPortalBridgeToken(invalid)).toBeNull();
     expect(readFenixPortalBridgeToken(new URL("https://iaonline.io/dashboard"))).toBeNull();
+  });
+
+  it("enables isolated storage only for the embedded production portal capability", () => {
+    const bridgeToken = "f".repeat(64);
+    const parentWindow = {};
+    vi.stubGlobal("window", {
+      location: {
+        href: `https://iaonline.io/code-lab/?agentId=9#bridgeToken=${bridgeToken}`,
+      },
+      parent: parentWindow,
+      history: { state: null, replaceState: vi.fn() },
+    });
+
+    expect(
+      isFenixPortalIsolatedBridgeApp(
+        new URL(`https://iaonline.io/code-lab/?agentId=9#bridgeToken=${bridgeToken}`),
+      ),
+    ).toBe(true);
+    expect(
+      isFenixPortalIsolatedBridgeApp(
+        new URL(`http://127.0.0.1:5173/code-lab/?agentId=9#bridgeToken=${bridgeToken}`),
+      ),
+    ).toBe(false);
+    expect(
+      isFenixPortalIsolatedBridgeApp(
+        new URL(`https://preview.example/code-lab/?agentId=9#bridgeToken=${bridgeToken}`),
+      ),
+    ).toBe(false);
+
+    vi.stubGlobal("window", {
+      location: { href: `https://iaonline.io/code-lab/?agentId=9#bridgeToken=${bridgeToken}` },
+      history: { state: null, replaceState: vi.fn() },
+    });
+    expect(
+      isFenixPortalIsolatedBridgeApp(
+        new URL(`https://iaonline.io/code-lab/?agentId=9#bridgeToken=${bridgeToken}`),
+      ),
+    ).toBe(false);
+    vi.unstubAllGlobals();
   });
 
   it("fails closed without a valid embedded bridge and never falls back to global fetch", async () => {

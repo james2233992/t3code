@@ -33,6 +33,8 @@ import * as Ref from "effect/Ref";
 import * as Schema from "effect/Schema";
 import * as Semaphore from "effect/Semaphore";
 
+import { isFenixPortalIsolatedBridgeApp } from "./fenixPortal";
+
 const DATABASE_NAME = "t3code:connection-runtime";
 const DATABASE_VERSION = 4;
 const CATALOG_STORE_NAME = "catalog";
@@ -42,6 +44,37 @@ const SERVER_CONFIG_STORE_NAME = "server-config";
 const VCS_REFS_STORE_NAME = "vcs-refs";
 const CATALOG_KEY = "document";
 const SHELL_SNAPSHOT_CACHE_SCHEMA_VERSION = 1;
+
+export interface InMemoryConnectionDatabase {
+  readonly _tag: "InMemoryConnectionDatabase";
+  readonly stores: Map<string, Map<IDBValidKey, unknown>>;
+  readonly close: () => void;
+}
+
+type ConnectionDatabase = IDBDatabase | InMemoryConnectionDatabase;
+
+export function makeInMemoryConnectionDatabase(): InMemoryConnectionDatabase {
+  const stores = new Map<string, Map<IDBValidKey, unknown>>();
+  return {
+    _tag: "InMemoryConnectionDatabase",
+    stores,
+    close: () => stores.clear(),
+  };
+}
+
+function isInMemoryConnectionDatabase(
+  database: ConnectionDatabase,
+): database is InMemoryConnectionDatabase {
+  return "_tag" in database && database._tag === "InMemoryConnectionDatabase";
+}
+
+function inMemoryStore(database: InMemoryConnectionDatabase, storeName: string) {
+  const existing = database.stores.get(storeName);
+  if (existing !== undefined) return existing;
+  const created = new Map<IDBValidKey, unknown>();
+  database.stores.set(storeName, created);
+  return created;
+}
 
 const StoredShellSnapshot = Schema.Struct({
   schemaVersion: Schema.Literal(SHELL_SNAPSHOT_CACHE_SCHEMA_VERSION),
@@ -120,7 +153,11 @@ function persistenceError(
 }
 
 const openDatabase = Effect.fn("web.connectionStorage.openDatabase")(function* () {
-  return yield* Effect.callback<IDBDatabase, ConnectionTransientError>((resume) => {
+  if (isFenixPortalIsolatedBridgeApp()) {
+    return makeInMemoryConnectionDatabase();
+  }
+
+  return yield* Effect.callback<ConnectionDatabase, ConnectionTransientError>((resume) => {
     if (typeof indexedDB === "undefined") {
       resume(
         Effect.fail(
@@ -156,7 +193,10 @@ const openDatabase = Effect.fn("web.connectionStorage.openDatabase")(function* (
   });
 });
 
-function readDatabaseValue(database: IDBDatabase, storeName: string, key: IDBValidKey) {
+function readDatabaseValue(database: ConnectionDatabase, storeName: string, key: IDBValidKey) {
+  if (isInMemoryConnectionDatabase(database)) {
+    return Effect.sync(() => inMemoryStore(database, storeName).get(key));
+  }
   return Effect.callback<unknown, ConnectionTransientError>((resume) => {
     const request = database.transaction(storeName, "readonly").objectStore(storeName).get(key);
     request.addEventListener("error", () => {
@@ -173,11 +213,16 @@ function readDatabaseValue(database: IDBDatabase, storeName: string, key: IDBVal
 }
 
 function writeDatabaseValue(
-  database: IDBDatabase,
+  database: ConnectionDatabase,
   storeName: string,
   key: IDBValidKey,
   value: unknown,
 ) {
+  if (isInMemoryConnectionDatabase(database)) {
+    return Effect.sync(() => {
+      inMemoryStore(database, storeName).set(key, value);
+    });
+  }
   return Effect.callback<void, ConnectionTransientError>((resume) => {
     const transaction = database.transaction(storeName, "readwrite");
     transaction.addEventListener("error", () => {
@@ -194,7 +239,12 @@ function writeDatabaseValue(
   }).pipe(Effect.withSpan("web.connectionStorage.writeDatabaseValue"));
 }
 
-function removeDatabaseValue(database: IDBDatabase, storeName: string, key: IDBValidKey) {
+function removeDatabaseValue(database: ConnectionDatabase, storeName: string, key: IDBValidKey) {
+  if (isInMemoryConnectionDatabase(database)) {
+    return Effect.sync(() => {
+      inMemoryStore(database, storeName).delete(key);
+    });
+  }
   return Effect.callback<void, ConnectionTransientError>((resume) => {
     const transaction = database.transaction(storeName, "readwrite");
     transaction.addEventListener("error", () => {
@@ -211,7 +261,21 @@ function removeDatabaseValue(database: IDBDatabase, storeName: string, key: IDBV
   }).pipe(Effect.withSpan("web.connectionStorage.removeDatabaseValue"));
 }
 
-function removeDatabaseValuesInRange(database: IDBDatabase, storeName: string, range: IDBKeyRange) {
+function removeDatabaseValuesWithPrefix(
+  database: ConnectionDatabase,
+  storeName: string,
+  prefix: string,
+) {
+  if (isInMemoryConnectionDatabase(database)) {
+    return Effect.sync(() => {
+      const store = inMemoryStore(database, storeName);
+      for (const key of store.keys()) {
+        if (typeof key === "string" && key.startsWith(prefix)) {
+          store.delete(key);
+        }
+      }
+    });
+  }
   return Effect.callback<void, ConnectionTransientError>((resume) => {
     const transaction = database.transaction(storeName, "readwrite");
     transaction.addEventListener("error", () => {
@@ -224,7 +288,9 @@ function removeDatabaseValuesInRange(database: IDBDatabase, storeName: string, r
     transaction.addEventListener("complete", () => {
       resume(Effect.void);
     });
-    const request = transaction.objectStore(storeName).openCursor(range);
+    const request = transaction
+      .objectStore(storeName)
+      .openCursor(IDBKeyRange.bound(prefix, `${prefix}\uffff`));
     request.addEventListener("error", () => {
       resume(
         Effect.fail(
@@ -240,7 +306,7 @@ function removeDatabaseValuesInRange(database: IDBDatabase, storeName: string, r
       cursor.delete();
       cursor.continue();
     });
-  }).pipe(Effect.withSpan("web.connectionStorage.removeDatabaseValuesInRange"));
+  }).pipe(Effect.withSpan("web.connectionStorage.removeDatabaseValuesWithPrefix"));
 }
 
 function threadCacheKey(environmentId: EnvironmentId, threadId: ThreadId) {
@@ -271,7 +337,7 @@ export interface CatalogBackend {
   readonly quarantine?: (raw: string) => Effect.Effect<void, ConnectionTransientError>;
 }
 
-export function makeCatalogBackend(database: IDBDatabase): CatalogBackend {
+export function makeCatalogBackend(database: ConnectionDatabase): CatalogBackend {
   const bridge = window.desktopBridge;
   if (bridge?.getConnectionCatalog !== undefined && bridge.setConnectionCatalog !== undefined) {
     return {
@@ -645,11 +711,9 @@ export const connectionStorageLayer = Layer.effectContext(
           vcsRefsCacheKey(environmentId, cwd),
         ).pipe(Effect.mapError((cause) => persistenceError("remove-vcs-refs", cause))),
       clearVcsRefs: (environmentId) =>
-        removeDatabaseValuesInRange(
-          database,
-          VCS_REFS_STORE_NAME,
-          IDBKeyRange.bound(`${environmentId}:`, `${environmentId}:\uffff`),
-        ).pipe(Effect.mapError((cause) => persistenceError("clear-vcs-refs", cause))),
+        removeDatabaseValuesWithPrefix(database, VCS_REFS_STORE_NAME, `${environmentId}:`).pipe(
+          Effect.mapError((cause) => persistenceError("clear-vcs-refs", cause)),
+        ),
       removeThread: (environmentId, threadId) =>
         removeDatabaseValue(
           database,
@@ -660,17 +724,9 @@ export const connectionStorageLayer = Layer.effectContext(
         Effect.all(
           [
             removeDatabaseValue(database, SHELL_STORE_NAME, environmentId),
-            removeDatabaseValuesInRange(
-              database,
-              THREAD_STORE_NAME,
-              IDBKeyRange.bound(`${environmentId}:`, `${environmentId}:\uffff`),
-            ),
+            removeDatabaseValuesWithPrefix(database, THREAD_STORE_NAME, `${environmentId}:`),
             removeDatabaseValue(database, SERVER_CONFIG_STORE_NAME, environmentId),
-            removeDatabaseValuesInRange(
-              database,
-              VCS_REFS_STORE_NAME,
-              IDBKeyRange.bound(`${environmentId}:`, `${environmentId}:\uffff`),
-            ),
+            removeDatabaseValuesWithPrefix(database, VCS_REFS_STORE_NAME, `${environmentId}:`),
           ],
           { concurrency: "unbounded", discard: true },
         ).pipe(Effect.mapError((cause) => persistenceError("clear-environment", cause))),

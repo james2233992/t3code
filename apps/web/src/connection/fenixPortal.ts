@@ -11,6 +11,7 @@ const CODE_LAB_PROTOCOL = "fenix-code-lab-v1";
 const CODE_LAB_TICKET_PREFIX = "fenix-code-lab-ticket.";
 const CODE_LAB_BRIDGE_CHANNEL = "fenix-code-lab-bridge-v1";
 const CODE_LAB_BRIDGE_TOKEN_PARAM = "bridgeToken";
+const FENIX_PRODUCTION_PORTAL_ORIGIN = "https://iaonline.io";
 const DEFAULT_CODE_LAB_AGENT_ID = 9;
 const PORTAL_REQUEST_TIMEOUT_MS = 15_000;
 
@@ -108,6 +109,11 @@ interface FenixPortalBridgeResponse {
 }
 
 let capturedBridgeToken: string | null = null;
+let capturedBridgeScope: string | null = null;
+
+function bridgeDocumentScope(url: URL): string {
+  return `${url.origin}${url.pathname}${url.search}`;
+}
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return value !== null && typeof value === "object" && !Array.isArray(value);
@@ -171,6 +177,7 @@ export function readFenixPortalBridgeToken(
   const token = fragment.get(CODE_LAB_BRIDGE_TOKEN_PARAM);
   if (token !== null && /^[a-f0-9]{64}$/u.test(token)) {
     capturedBridgeToken = token;
+    capturedBridgeScope = bridgeDocumentScope(url);
     if (typeof window !== "undefined" && url.href === window.location.href) {
       fragment.delete(CODE_LAB_BRIDGE_TOKEN_PARAM);
       const sanitizedHash = fragment.toString();
@@ -182,9 +189,22 @@ export function readFenixPortalBridgeToken(
     }
     return token;
   }
-  return typeof window !== "undefined" && url.href === window.location.href
+  return typeof window !== "undefined" &&
+    url.href === window.location.href &&
+    capturedBridgeScope === bridgeDocumentScope(url)
     ? capturedBridgeToken
     : null;
+}
+
+export function isFenixPortalIsolatedBridgeApp(url: URL = new URL(window.location.href)): boolean {
+  return (
+    url.origin === FENIX_PRODUCTION_PORTAL_ORIGIN &&
+    isFenixPortalEmbeddedApp(url) &&
+    typeof window !== "undefined" &&
+    window.parent !== undefined &&
+    window.parent !== window &&
+    readFenixPortalBridgeToken(url) !== null
+  );
 }
 
 async function requestFenixPortalBridge(input: {
