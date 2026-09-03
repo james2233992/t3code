@@ -3047,19 +3047,19 @@
 ./apps/web/src/connection/desktopLocal.test.ts:5:62:@t3tools
 ./apps/web/src/connection/desktopLocal.ts:1:40:@t3tools
 ./apps/web/src/connection/desktopLocal.ts:6:9:@t3tools
-./apps/web/src/connection/fenixPortal.test.ts:540:46:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:132:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:147:22:Fenix Code
+./apps/web/src/connection/fenixPortal.test.ts:636:46:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:133:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:148:22:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:20:28:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:226:32:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:304:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:328:39:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:361:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:253:32:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:331:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:355:39:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:388:22:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:42:21:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:44:4:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:496:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:499:22:Fenix Code
-./apps/web/src/connection/fenixPortal.ts:510:42:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:523:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:526:22:Fenix Code
+./apps/web/src/connection/fenixPortal.ts:537:42:Fenix Code
 ./apps/web/src/connection/fenixPortal.ts:5:9:@t3tools
 ./apps/web/src/connection/fenixPortal.ts:6:32:@t3tools
 ./apps/web/src/connection/onboarding.ts:1:39:@t3tools
@@ -3278,7 +3278,7 @@
 ./apps/web/src/routes/__root.tsx:1:53:@t3tools
 ./apps/web/src/routes/__root.tsx:2:52:@t3tools
 ./apps/web/src/routes/__root.tsx:3:43:@t3tools
-./apps/web/src/routes/__root.tsx:77:26:Fenix Code
+./apps/web/src/routes/__root.tsx:78:26:Fenix Code
 ./apps/web/src/routes/_chat.index.tsx:174:40:Fenix Connect
 ./apps/web/src/routes/_chat.index.tsx:1:34:@t3tools
 ./apps/web/src/routes/_chat.tsx:121:23:Fenix Code
