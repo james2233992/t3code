@@ -1,9 +1,10 @@
-import { describe, expect, it, vi } from "@effect/vitest";
+import { afterEach, describe, expect, it, vi } from "@effect/vitest";
 
 import {
   buildFenixCompanionPairCommand,
   buildFenixCompanionInstallCommand,
   buildFenixMobilePairingUrl,
+  clearFenixPortalBridgeCapability,
   classifyFenixPortalFailure,
   describeFenixPortalPairingFailure,
   fenixPortalDeviceRegistration,
@@ -24,6 +25,11 @@ import {
 
 const PORTAL_URL = new URL("https://iaonline.io/code-lab/?agentId=9");
 const TICKET = "t".repeat(43);
+
+afterEach(() => {
+  clearFenixPortalBridgeCapability();
+  vi.unstubAllGlobals();
+});
 
 describe("Fenix portal companion API", () => {
   it("describes pairing failures without exposing arbitrary exception content", async () => {
@@ -89,6 +95,96 @@ describe("Fenix portal companion API", () => {
     expect(readFenixPortalBridgeToken(queryToken)).toBeNull();
     expect(readFenixPortalBridgeToken(invalid)).toBeNull();
     expect(readFenixPortalBridgeToken(new URL("https://iaonline.io/dashboard"))).toBeNull();
+  });
+
+  it("keeps the in-memory bridge capability across internal router navigation only", () => {
+    const bridgeToken = "c".repeat(64);
+    const parentWindow = {};
+    const entryUrl = `https://iaonline.io/code-lab/?agentId=9#bridgeToken=${bridgeToken}`;
+    const location = { href: entryUrl };
+    vi.stubGlobal("window", {
+      location,
+      parent: parentWindow,
+      history: { state: null, replaceState: vi.fn() },
+    });
+
+    try {
+      expect(readFenixPortalBridgeToken(new URL(entryUrl))).toBe(bridgeToken);
+
+      location.href = "https://iaonline.io/code-lab/settings/general";
+      expect(readFenixPortalBridgeToken(new URL(location.href))).toBe(bridgeToken);
+
+      location.href = "https://iaonline.io/code-lab/settings/general?agentId=10";
+      expect(readFenixPortalBridgeToken(new URL(location.href))).toBeNull();
+
+      location.href = "https://iaonline.io/code-lab/settings/general";
+      expect(readFenixPortalBridgeToken(new URL(location.href))).toBeNull();
+
+      location.href = entryUrl;
+      expect(readFenixPortalBridgeToken(new URL(entryUrl))).toBe(bridgeToken);
+      location.href = "https://iaonline.io/dashboard";
+      expect(readFenixPortalBridgeToken(new URL(location.href))).toBeNull();
+      location.href = "https://iaonline.io/code-lab/settings/general";
+      expect(readFenixPortalBridgeToken(new URL(location.href))).toBeNull();
+    } finally {
+      clearFenixPortalBridgeCapability();
+      vi.unstubAllGlobals();
+    }
+  });
+
+  it("rejects initial bridge capture outside the production portal origin", () => {
+    const bridgeToken = "e".repeat(64);
+    const location = {
+      href: `https://evil.example/code-lab/?agentId=9#bridgeToken=${bridgeToken}`,
+    };
+    vi.stubGlobal("window", {
+      location,
+      parent: {},
+      history: { state: null, replaceState: vi.fn() },
+    });
+
+    expect(readFenixPortalBridgeToken(new URL(location.href))).toBeNull();
+  });
+
+  it("revokes a captured bridge when an explicit agent scope is invalid", () => {
+    const bridgeToken = "f".repeat(64);
+    const entryUrl = `https://iaonline.io/code-lab/?agentId=9#bridgeToken=${bridgeToken}`;
+    const location = { href: entryUrl };
+    vi.stubGlobal("window", {
+      location,
+      parent: {},
+      history: { state: null, replaceState: vi.fn() },
+    });
+
+    expect(readFenixPortalBridgeToken(new URL(entryUrl))).toBe(bridgeToken);
+    location.href = `https://iaonline.io/code-lab/settings/general?agentId=invalid#bridgeToken=${"a".repeat(64)}`;
+    expect(readFenixPortalBridgeToken(new URL(location.href))).toBeNull();
+    location.href = "https://iaonline.io/code-lab/settings/general";
+    expect(readFenixPortalBridgeToken(new URL(location.href))).toBeNull();
+  });
+
+  it("inherits a non-default agent only within the same embedded document", () => {
+    const bridgeToken = "d".repeat(64);
+    const entryUrl = `https://iaonline.io/code-lab/?agentId=10#bridgeToken=${bridgeToken}`;
+    const location = { href: entryUrl };
+    vi.stubGlobal("window", {
+      location,
+      parent: {},
+      history: { state: null, replaceState: vi.fn() },
+    });
+
+    try {
+      expect(readFenixPortalBridgeToken(new URL(entryUrl))).toBe(bridgeToken);
+      location.href = "https://iaonline.io/code-lab/settings/providers";
+      expect(readFenixPortalAgentId(new URL(location.href))).toBe(10);
+      expect(readFenixPortalBridgeToken(new URL(location.href))).toBe(bridgeToken);
+
+      location.href = "https://iaonline.io/code-lab/settings/providers?agentId=9";
+      expect(readFenixPortalBridgeToken(new URL(location.href))).toBeNull();
+    } finally {
+      clearFenixPortalBridgeCapability();
+      vi.unstubAllGlobals();
+    }
   });
 
   it("enables isolated storage only for the embedded production portal capability", () => {

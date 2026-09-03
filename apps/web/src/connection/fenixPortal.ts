@@ -109,10 +109,11 @@ interface FenixPortalBridgeResponse {
 }
 
 let capturedBridgeToken: string | null = null;
-let capturedBridgeScope: string | null = null;
+let capturedBridgeScope: { readonly origin: string; readonly agentId: number } | null = null;
 
-function bridgeDocumentScope(url: URL): string {
-  return `${url.origin}${url.pathname}${url.search}`;
+export function clearFenixPortalBridgeCapability(): void {
+  capturedBridgeToken = null;
+  capturedBridgeScope = null;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -166,18 +167,36 @@ export function isFenixPortalEmbeddedApp(url: URL = new URL(window.location.href
 export function readFenixPortalAgentId(url: URL = new URL(window.location.href)): number | null {
   if (!isFenixPortalEmbeddedApp(url)) return null;
   const requestedAgentId = url.searchParams.get("agentId");
-  return requestedAgentId === null ? DEFAULT_CODE_LAB_AGENT_ID : positiveAgentId(requestedAgentId);
+  if (requestedAgentId !== null) return positiveAgentId(requestedAgentId);
+  if (
+    typeof window !== "undefined" &&
+    url.href === window.location.href &&
+    capturedBridgeScope?.origin === url.origin
+  ) {
+    return capturedBridgeScope.agentId;
+  }
+  return DEFAULT_CODE_LAB_AGENT_ID;
 }
 
 export function readFenixPortalBridgeToken(
   url: URL = new URL(window.location.href),
 ): string | null {
-  if (!isFenixPortalEmbeddedApp(url)) return null;
+  if (url.origin !== FENIX_PRODUCTION_PORTAL_ORIGIN || !isFenixPortalEmbeddedApp(url)) {
+    clearFenixPortalBridgeCapability();
+    return null;
+  }
   const fragment = new URLSearchParams(url.hash.startsWith("#") ? url.hash.slice(1) : url.hash);
   const token = fragment.get(CODE_LAB_BRIDGE_TOKEN_PARAM);
   if (token !== null && /^[a-f0-9]{64}$/u.test(token)) {
+    const requestedAgentId = url.searchParams.get("agentId");
+    const agentId =
+      requestedAgentId === null ? DEFAULT_CODE_LAB_AGENT_ID : positiveAgentId(requestedAgentId);
+    if (agentId === null) {
+      clearFenixPortalBridgeCapability();
+      return null;
+    }
     capturedBridgeToken = token;
-    capturedBridgeScope = bridgeDocumentScope(url);
+    capturedBridgeScope = { origin: url.origin, agentId };
     if (typeof window !== "undefined" && url.href === window.location.href) {
       fragment.delete(CODE_LAB_BRIDGE_TOKEN_PARAM);
       const sanitizedHash = fragment.toString();
@@ -189,11 +208,19 @@ export function readFenixPortalBridgeToken(
     }
     return token;
   }
-  return typeof window !== "undefined" &&
+  const requestedAgentId = url.searchParams.get("agentId");
+  const matchesCurrentDocument =
+    typeof window !== "undefined" &&
     url.href === window.location.href &&
-    capturedBridgeScope === bridgeDocumentScope(url)
-    ? capturedBridgeToken
-    : null;
+    capturedBridgeScope !== null &&
+    capturedBridgeScope.origin === url.origin &&
+    (requestedAgentId === null ||
+      positiveAgentId(requestedAgentId) === capturedBridgeScope.agentId);
+  if (!matchesCurrentDocument) {
+    clearFenixPortalBridgeCapability();
+    return null;
+  }
+  return capturedBridgeToken;
 }
 
 export function isFenixPortalIsolatedBridgeApp(url: URL = new URL(window.location.href)): boolean {

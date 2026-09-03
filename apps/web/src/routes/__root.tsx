@@ -41,6 +41,7 @@ import { configureClientTracing } from "../observability/clientTracing";
 import { resolveInitialServerAuthGateState } from "../environments/primary";
 import { hasHostedPairingRequest, isHostedStaticApp } from "../hostedPairing";
 import {
+  clearFenixPortalBridgeCapability,
   isFenixPortalEmbeddedApp,
   readFenixPortalAgentId,
   verifyFenixPortalSession,
@@ -83,6 +84,8 @@ export const Route = createRootRoute({
         } as const,
       };
     }
+
+    clearFenixPortalBridgeCapability();
 
     if (isHostedStaticApp(browserUrl)) {
       return {
